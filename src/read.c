@@ -1,0 +1,271 @@
+/*
+ * BRAINS
+ * (B)LR (R)everberation-mapping Analysis (I)ntegrated with (N)ested (S)ampling
+ * Yan-Rong Li, liyanrong@ihep.ac.cn
+ * Thu, Aug 4, 2016
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "allvars.h"
+#include "proto.h"
+
+void read_parset()
+{
+  if(thistask == roottask)
+  {
+    #define MAXTAGS 300
+    #define DOUBLE 1
+    #define STRING 2
+    #define INT 3
+
+    FILE *fparam;
+    int i, j, nt;
+    char str[200], buf1[200], buf2[200], buf3[200];
+    int id[MAXTAGS];
+    void *addr[MAXTAGS];
+    char tag[MAXTAGS][50];
+
+    nt = 0;
+    strcpy(tag[nt], "FileDir");
+    addr[nt] = &parset.file_dir;
+    id[nt++] = STRING;
+
+    strcpy(tag[nt], "ContinnumFile");
+    addr[nt] = &parset.continuum_file;
+    id[nt++] = STRING;
+
+    strcpy(tag[nt], "LineFile");
+    addr[nt] = &parset.line_file;
+    id[nt++] = STRING;
+
+    strcpy(tag[nt], "Line2DFile");
+    addr[nt] = &parset.line2d_file;
+    id[nt++] = STRING;
+
+    strcpy(tag[nt], "FlagDim");
+    addr[nt] = &parset.flag_dim;
+    id[nt++] = INT;
+
+    strcpy(tag[nt], "FlagOnlyR");
+    addr[nt] = &parset.flag_only_recon;
+    id[nt++] = INT;
+
+    strcpy(tag[nt], "NConRecon");
+    addr[nt] = &parset.n_con_recon;
+    id[nt++] = INT;
+
+    strcpy(tag[nt], "ConConstructFileOut");
+    addr[nt] = &parset.pcon_out_file;
+    id[nt++] = STRING;
+
+    strcpy(tag[nt], "NLineRecon");
+    addr[nt] = &parset.n_line_recon;
+    id[nt++] = INT;
+
+    strcpy(tag[nt], "LineConstructFileOut");
+    addr[nt] = &parset.pline_out_file;
+    id[nt++] = STRING;
+
+    
+    char fname[200];
+    sprintf(fname, "%s", parset.param_file);
+    
+    fparam = fopen(fname, "r");
+    if(fparam == NULL)
+    {
+      fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+      exit(-1);
+    }
+
+    while(!feof(fparam))
+    {
+      sprintf(str,"empty");
+
+      fgets(str, 200, fparam);
+      if(sscanf(str, "%s%s%s", buf1, buf2, buf3)<2)
+        continue;
+      if(buf1[0]=='%')
+        continue;
+      for(i=0, j=-1; i<nt; i++)
+        if(strcmp(buf1, tag[i]) == 0)
+        {
+          j = i;
+          tag[i][0] = 0;
+          //printf("%s %s\n", buf1, buf2);
+          break;
+        }
+      if(j >=0)
+      {
+        switch(id[j])
+        {
+          case DOUBLE:
+            *((double *) addr[j]) = atof(buf2);
+            break;
+          case STRING:
+            strcpy(addr[j], buf2);
+            break;
+          case INT:
+            *((int *)addr[j]) = (int) atof(buf2);
+            break;
+        }
+      }
+      else
+      {
+        fprintf(stderr, "# Error in file %s: Tag '%s' is not allowed or multiple defined.\n", 
+                      parset.param_file, buf1);
+      }
+    }
+    fclose(fparam);
+  }
+  
+  MPI_Bcast(&parset, sizeof(parset), MPI_BYTE, roottask, MPI_COMM_WORLD);
+  return;
+}
+
+
+void read_data()
+{
+  FILE *fp;
+  char buf[200], fname[200];
+
+  if(thistask == roottask)
+  {
+    
+    int count;
+    
+    // continuum file
+    sprintf(fname, "%s/%s", parset.file_dir, parset.continuum_file);
+    fp = fopen(fname, "r");
+    if(fp == NULL)
+    {
+      fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+      exit(-1);
+    }
+    // count the number of lines
+    count = 0;
+    if(feof(fp) == 0)
+    {
+      fgets(buf, 200, fp);
+      count++;
+    }
+    fclose(fp);
+    count = 84;
+    n_con_data = count;
+    
+    printf("continuum data points: %d\n", n_con_data);
+
+    if(!parset.flag_only_recon && parset.flag_dim == 1)
+    {
+      sprintf(fname, "%s/%s", parset.file_dir, parset.line_file);
+    // emission flux line
+      fp = fopen(fname, "r");
+      if(fp == NULL)
+      {
+        fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+        exit(-1);
+      }
+
+      // count the number of lines
+      count = 0;
+      if(!feof(fp))
+      {
+        fgets(buf, 200, fp);
+        count++;
+      }
+      fclose(fp);
+      n_line_data = count;
+    }
+
+    if(!parset.flag_only_recon && parset.flag_dim == 2)
+    {
+      sprintf(fname, "%s/%s", parset.file_dir, parset.line2d_file);
+      fp = fopen(fname, "r");
+      if(fp == NULL)
+      {
+        fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+        exit(-1);
+      }
+      fscanf(fp, "%s %d %d\n", buf, &n_line_data, &n_vel_data);
+      fclose(fp);
+    }
+  }
+
+  MPI_Bcast(&n_con_data, 1, MPI_INT, roottask, MPI_COMM_WORLD);
+
+  if(!parset.flag_only_recon && parset.flag_dim == 1)
+    MPI_Bcast(&n_line_data, 1, MPI_INT, roottask, MPI_COMM_WORLD);
+
+  if(!parset.flag_only_recon && parset.flag_dim == 2)
+  {
+    MPI_Bcast(&n_line_data, 1, MPI_INT, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(&n_vel_data, 1, MPI_INT, roottask, MPI_COMM_WORLD);
+  }
+
+  allocate_memory_data();
+
+  // now read data
+  if(thistask == roottask)
+  {
+    int i;
+    // continuum data
+    sprintf(fname, "%s/%s", parset.file_dir, parset.continuum_file);
+    fp = fopen(fname, "r");
+    if(fp == NULL)
+    {
+      fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+      exit(-1);
+    }
+    for(i=0; i<n_con_data; i++)
+    {
+      fscanf(fp, "%lf %lf %lf \n", &Tcon_data[i], &Fcon_data[i], &Fcerrs_data[i]);
+    }
+    fclose(fp);
+
+  }
+
+  MPI_Bcast(Tcon_data, n_con_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+  MPI_Bcast(Fcon_data, n_con_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+  MPI_Bcast(Fcerrs_data, n_con_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+
+  return;
+}
+
+void allocate_memory_data()
+{
+  Tcon_data = malloc(n_con_data * sizeof(double));
+  Fcon_data = malloc(n_con_data * sizeof(double));
+  Fcerrs_data = malloc(n_con_data * sizeof(double));
+
+  if(!parset.flag_only_recon && parset.flag_dim == 1)
+  {
+    Tline_data = malloc(n_line_data * sizeof(double));
+    Fline_data = malloc(n_line_data * sizeof(double));
+    Flerrs_data = malloc(n_line_data * sizeof(double));
+  }
+
+  if(!parset.flag_only_recon && parset.flag_dim == 2)
+  {
+    Tline_data = malloc(n_line_data * sizeof(double));
+    Fline_data = malloc(n_line_data * sizeof(double));
+    Flerrs_data = malloc(n_line_data * sizeof(double));
+
+    int i;
+    Fline2d_data = malloc(n_line_data * sizeof(double *));
+    Flerrs2d_data = malloc(n_line_data * sizeof(double *));
+    for(i=0; i<n_line_data; i++)
+    {
+      Fline2d_data[i] = malloc(n_vel_data * sizeof(double));
+      Flerrs2d_data[i] = malloc(n_vel_data * sizeof(double));
+    }
+  }
+}
+
+void free_memory_data()
+{
+  free(Tcon_data);
+  free(Fcon_data);
+  free(Fcerrs_data);
+}
