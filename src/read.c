@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #include "allvars.h"
 #include "proto.h"
@@ -65,9 +66,53 @@ void read_parset()
     addr[nt] = &parset.n_line_recon;
     id[nt++] = INT;
 
+    strcpy(tag[nt], "NVelRecon");
+    addr[nt] = &parset.n_vel_recon;
+    id[nt++] = INT;
+
     strcpy(tag[nt], "LineConstructFileOut");
     addr[nt] = &parset.pline_out_file;
     id[nt++] = STRING;
+
+    strcpy(tag[nt], "Line2DConstructFileOut");
+    addr[nt] = &parset.pline2d_out_file;
+    id[nt++] = STRING;
+
+    strcpy(tag[nt], "Line2DDataConstructFileOut");
+    addr[nt] = &parset.pline2d_data_out_file;
+    id[nt++] = STRING;
+
+    strcpy(tag[nt], "NCloudPerCore");
+    addr[nt] = &parset.n_cloud_per_task;
+    id[nt++] = INT;
+
+    strcpy(tag[nt], "NVPerCloud");
+    addr[nt] = &parset.n_vel_per_cloud;
+    id[nt++] = INT;
+
+    strcpy(tag[nt], "NTau");
+    addr[nt] = &parset.n_tau;
+    id[nt++] = INT;
+
+    strcpy(tag[nt], "TauMinSet");
+    addr[nt] = &parset.tau_min_set;
+    id[nt++] = DOUBLE;
+
+    strcpy(tag[nt], "TauMaxSet");
+    addr[nt] = &parset.tau_max_set;
+    id[nt++] = DOUBLE;
+
+    strcpy(tag[nt], "FlagCloudsOut");
+    addr[nt] = &parset.flag_save_clouds;
+    id[nt++] = INT;
+
+    strcpy(tag[nt], "CloudsFileOut");
+    addr[nt] = &parset.cloud_out_file;
+    id[nt++] = STRING;
+
+    strcpy(tag[nt], "InstRes");
+    addr[nt] = &parset.InstRes;
+    id[nt++] = DOUBLE;
 
     
     char fname[200];
@@ -129,6 +174,7 @@ void read_parset()
 void read_data()
 {
   FILE *fp;
+  int i;
   char buf[200], fname[200];
 
   if(thistask == roottask)
@@ -146,13 +192,14 @@ void read_data()
     }
     // count the number of lines
     count = 0;
-    if(feof(fp) == 0)
+    while(1)
     {
       fgets(buf, 200, fp);
+      if(feof(fp)!=0)
+        break;
       count++;
     }
     fclose(fp);
-    count = 84;
     n_con_data = count;
     
     printf("continuum data points: %d\n", n_con_data);
@@ -170,13 +217,16 @@ void read_data()
 
       // count the number of lines
       count = 0;
-      if(!feof(fp))
+      while(1)
       {
         fgets(buf, 200, fp);
+        if(feof(fp)!=0)
+          break;
         count++;
       }
       fclose(fp);
       n_line_data = count;
+      printf("line data points: %d\n", n_line_data);
     }
 
     if(!parset.flag_only_recon && parset.flag_dim == 2)
@@ -190,6 +240,7 @@ void read_data()
       }
       fscanf(fp, "%s %d %d\n", buf, &n_line_data, &n_vel_data);
       fclose(fp);
+      printf("line2d data points: %d %d\n", n_line_data, n_vel_data);
     }
   }
 
@@ -209,7 +260,6 @@ void read_data()
   // now read data
   if(thistask == roottask)
   {
-    int i;
     // continuum data
     sprintf(fname, "%s/%s", parset.file_dir, parset.continuum_file);
     fp = fopen(fname, "r");
@@ -230,6 +280,73 @@ void read_data()
   MPI_Bcast(Fcon_data, n_con_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
   MPI_Bcast(Fcerrs_data, n_con_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
 
+  // read line
+  if(!parset.flag_only_recon && parset.flag_dim == 1)
+  {
+    if(thistask == roottask)
+    {
+    // line flux data
+      sprintf(fname, "%s/%s", parset.file_dir, parset.line_file);
+      fp = fopen(fname, "r");
+      if(fp == NULL)
+      {
+        fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+        exit(-1);
+      }
+      for(i=0; i<n_line_data; i++)
+      {
+        fscanf(fp, "%lf %lf %lf \n", &Tline_data[i], &Fline_data[i], &Flerrs_data[i]);
+      }
+      fclose(fp);
+    }
+
+    MPI_Bcast(Tline_data, n_line_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(Fline_data, n_line_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(Flerrs_data, n_line_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+  }
+
+  if(!parset.flag_only_recon && parset.flag_dim == 2)
+  {
+    if(thistask == roottask)
+    {
+      int j;
+
+      sprintf(fname, "%s/%s", parset.file_dir, parset.line2d_file);
+      fp = fopen(fname, "r");
+      if(fp == NULL)
+      {
+        fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+        exit(-1);
+      }
+
+      fgets(buf, 200, fp);
+
+      for(i=0; i<n_line_data; i++)
+      {
+        for(j=0; j<n_vel_data; j++)
+        {
+          fscanf(fp, "%lf%lf%lf%lf\n", &Vline_data[j], &Tline_data[i], 
+                 &Fline2d_data[i*n_vel_data + j], &Flerrs2d_data[i*n_vel_data + j]);
+
+          Vline_data[j] /= VelUnit;
+        }
+
+        fscanf(fp, "\n");
+      }
+      fclose(fp);
+      
+    }
+
+    // broadcast 2d data
+    MPI_Bcast(Vline_data, n_vel_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(Tline_data, n_line_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(Fline2d_data, n_line_data*n_vel_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(Flerrs2d_data, n_line_data*n_vel_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+
+    // each task calculates line fluxes
+    cal_emission_flux();
+  }
+
   return;
 }
 
@@ -248,18 +365,14 @@ void allocate_memory_data()
 
   if(!parset.flag_only_recon && parset.flag_dim == 2)
   {
+    Vline_data = malloc(n_vel_data * sizeof(double));
     Tline_data = malloc(n_line_data * sizeof(double));
     Fline_data = malloc(n_line_data * sizeof(double));
     Flerrs_data = malloc(n_line_data * sizeof(double));
 
-    int i;
-    Fline2d_data = malloc(n_line_data * sizeof(double *));
-    Flerrs2d_data = malloc(n_line_data * sizeof(double *));
-    for(i=0; i<n_line_data; i++)
-    {
-      Fline2d_data[i] = malloc(n_vel_data * sizeof(double));
-      Flerrs2d_data[i] = malloc(n_vel_data * sizeof(double));
-    }
+    
+    Fline2d_data = malloc(n_line_data * n_vel_data * sizeof(double *));
+    Flerrs2d_data = malloc(n_line_data * n_vel_data * sizeof(double *));
   }
 }
 
@@ -268,4 +381,50 @@ void free_memory_data()
   free(Tcon_data);
   free(Fcon_data);
   free(Fcerrs_data);
+
+  if(!parset.flag_only_recon && parset.flag_dim == 1)
+  {
+    free(Tline_data);
+    free(Fline_data);
+    free(Flerrs_data);
+  }
+
+  if(!parset.flag_only_recon && parset.flag_dim == 2)
+  {
+    free(Tline_data);
+    free(Fline_data);
+    free(Flerrs_data);
+
+    free(Fline2d_data);
+    free(Flerrs2d_data);
+  }
+}
+
+/* 
+ * calculate the integrated emission line flux.
+ */
+void cal_emission_flux()
+{
+  int i, j;
+  double dV;
+  
+  dV = (Vline_data[n_vel_data-1]-Vline_data[0])/(n_vel_data-1);
+// using trapezoid formula.
+
+  for(j=0; j<n_line_data; j++)
+  { 
+    Fline_data[j] = Fline2d_data[j*n_vel_data + 0]/2.0;
+    Flerrs_data[j] = (Flerrs2d_data[j*n_vel_data + 0] * Flerrs2d_data[j*n_vel_data + 0])/2.0;
+    for(i=1; i<n_vel_data-1; i++)
+    {
+      Fline_data[j] += Fline2d_data[j*n_vel_data + i];
+      Flerrs_data[j] += Flerrs2d_data[j*n_vel_data + i]*Flerrs2d_data[j*n_vel_data + i];
+    }
+    Fline_data[j] += Fline2d_data[j*n_vel_data + n_vel_data-1]/2.0;
+    Flerrs_data[j] += (Flerrs2d_data[j*n_vel_data + n_vel_data-1]*Flerrs2d_data[j*n_vel_data + n_vel_data-1])/2.0;
+
+    Fline_data[j] *= dV;
+    Flerrs_data[j] *= dV*dV;
+    Flerrs_data[j] = sqrt(Flerrs_data[j]);
+  }
 }

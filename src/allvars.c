@@ -19,16 +19,36 @@ char proc_name[MPI_MAX_PROCESSOR_NAME];
 
 PARSET parset;
 
+
+double VelUnit;
+
 /* Data */
 int n_con_data, n_line_data, n_vel_data;
 double *Tcon_data, *Fcon_data,  *Fcerrs_data;
 double *Tline_data, *Fline_data, *Flerrs_data;
-double **Fline2d_data, **Flerrs2d_data;
+double *Vline_data, *Fline2d_data, *Flerrs2d_data;
 double con_scale, line_scale;
 
 /* continuum reconstruction */
 double *Tcon, *Fcon, *Fcerrs;
+double Tcon_min, Tcon_max;
 double *PSmat;
+
+/* line reconstruction */
+double *Fline_at_data;
+double *Tline, *Fline, *Flerrs;
+double Tline_min, Tline_max;
+
+/* line reconstruction */
+double *Fline2d_at_data;
+double *Fline2d, *Flerrs2d;
+
+BLRmodel range_model[2];
+
+/* transfer function / velocity-delay map */
+double *TransTau, *TransV, *Trans1D, *Trans2D_at_veldata, *Trans2D;
+double dTransTau, dTransV;
+double rcloud_min_set, rcloud_max_set;
 
 /* GSL */
 const gsl_rng_type * gsl_T;

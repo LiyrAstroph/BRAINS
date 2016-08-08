@@ -36,27 +36,73 @@ typedef struct
        line_file[BRAINS_MAX_STR_LENGTH], 
        line2d_file[BRAINS_MAX_STR_LENGTH],
        pcon_out_file[BRAINS_MAX_STR_LENGTH],
-       pline_out_file[BRAINS_MAX_STR_LENGTH];
+       pline_out_file[BRAINS_MAX_STR_LENGTH],
+       pline2d_out_file[BRAINS_MAX_STR_LENGTH],
+       pline2d_data_out_file[BRAINS_MAX_STR_LENGTH],
+       cloud_out_file[BRAINS_MAX_STR_LENGTH];
 
   char file_dir[BRAINS_MAX_STR_LENGTH];
 
   int flag_only_recon, flag_dim;
 
-  int n_con_recon, n_line_recon;
+  int n_con_recon, n_line_recon, n_vel_recon;
 
+  int n_tau;
+  double tau_min_set, tau_max_set;
+
+  int n_cloud_per_task, n_vel_per_cloud;
+
+  int flag_save_clouds;
+
+  double InstRes;
 }PARSET;
 extern PARSET parset;
+
+extern double VelUnit;
 
 extern int n_con_data, n_line_data, n_vel_data;
 extern double *Tcon_data, *Fcon_data,  *Fcerrs_data;
 extern double *Tline_data, *Fline_data, *Flerrs_data;
-extern double **Fline2d_data, **Flerrs2d_data;
+extern double *Vline_data, *Fline2d_data, *Flerrs2d_data;
 extern double con_scale, line_scale;
 
 /* continuum reconstruction */
 extern double *Tcon, *Fcon, *Fcerrs;
+extern double Tcon_min, Tcon_max;
 extern double *PSmat;
 
+/* line reconstruction */
+extern double *Fline_at_data;
+extern double *Tline, *Fline, *Flerrs;
+extern double Tline_min, Tline_max;
+
+/* line reconstruction */
+extern double *Fline2d_at_data;
+extern double *Fline2d, *Flerrs2d;
+
+/* BLR model */
+typedef struct
+{
+	double mu;       // in light day;
+	double beta;     // 
+	double F;        //
+	double inc;      
+	double opn;	
+	double A;
+	double Ag;
+	double k;
+	double mbh;      // in 10e6 solar mass
+	double lambda;
+	double q;
+	//double logse;
+}BLRmodel;
+
+extern BLRmodel range_model[2];
+
+/* transfer function / velocity-delay map */
+extern double *TransTau, *TransV, *Trans1D, *Trans2D_at_veldata, *Trans2D;
+extern double dTransTau, dTransV;
+extern double rcloud_min_set, rcloud_max_set;
 
 /* GSL */
 extern const gsl_rng_type * gsl_T;

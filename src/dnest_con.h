@@ -10,24 +10,13 @@
 #include <stdbool.h>
 
 /*===========================================*/
-// users responsible for following struct definitions
-// data 
-typedef struct 
-{
-  double x;
-  double y;
-  double ey;
-}DataType;
+// users responsible for following struct definitions 
 
 // model
 
 /*==========================================*/
 extern int num_params;
 extern int size_of_modeltype;
-
-/* data */
-extern DataType *data;
-extern int num_data_points;
 
 /* best model */
 extern void *best_model_thismodel, *best_model_std_thismodel;

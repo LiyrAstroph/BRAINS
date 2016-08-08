@@ -19,10 +19,6 @@
 #include "dnest_con.h"
 #include "proto.h"
 
-void *particles;
-
-DataType *data;
-int num_data_points;
 int num_params;
 
 void *best_model_thismodel, *best_model_std_thismodel;

@@ -158,10 +158,11 @@ double lndet_mat(double *a, int n, int *info)
   return lndet;
 }
 
+/* Cholesky decomposition into upper triangle matrix*/
 void Chol_decomp_U(double *a, int n, int *info)
 {
   int i,j;
-  char uplo = 'L';
+  char uplo = 'U';   // decomposite as A = U^T*U, i.e., upper triangle matrix.
 //  dpotrf_(&uplo, &n, a, &n, info);
   *info=LAPACKE_dpotrf(LAPACK_ROW_MAJOR, uplo, n, a, n);
   if(*info<0)
@@ -176,8 +177,39 @@ void Chol_decomp_U(double *a, int n, int *info)
 //    exit(-1);
     return;
   }
+
+  // only the upper triangle is referenced by dpotrf output, 
+  // so the strictly lower triangle are must set to zero
   for(i=0;i<n;i++)
     for(j=0;j<i;j++)
+      a[i*n+j] = 0.0;
+  return;
+}
+
+/* Cholesky decomposition into lower triangle matrix */
+void Chol_decomp_L(double *a, int n, int *info)
+{
+  int i,j;
+  char uplo = 'L';   // decomposite as A = L*L^T, i.e., lower triangle matrix.
+//  dpotrf_(&uplo, &n, a, &n, info);
+  *info=LAPACKE_dpotrf(LAPACK_ROW_MAJOR, uplo, n, a, n);
+  if(*info<0)
+  {
+    fprintf(stderr, "The %d-th argument had an illegal value!\n", *info);
+//    exit(-1);
+    return;
+  }
+  else if (*info>0)
+  {
+    fprintf(stderr, "The leading minor of order %d is not positive definite, and the factorization could not be completed.\n", *info);
+//    exit(-1);
+    return;
+  }
+
+  // only the lower triangle is referenced by dpotrf output, 
+  // so the strictly upper triangle are must set to zero
+  for(i=0;i<n;i++)
+    for(j=i+1;j<n;j++)
       a[i*n+j] = 0.0;
   return;
 }
@@ -228,45 +260,4 @@ double * array_malloc(int n)
   }
 
   return array;
-}
-
-/*
- * get the best estimate of parameter and its errors from GLS histogram
- */
-int get_histogram_val_error(gsl_histogram *hist, double *val, double *err_lo, double *err_hi)
-{
-  int idx, i, nh;
-  double max;
-
-  nh = gsl_histogram_bins(hist);
-  idx = gsl_histogram_max_bin(hist);
-  max = gsl_histogram_max_val(hist);
-  *val = 0.5*(hist->range[idx] + hist->range[idx+1]);
-
-  max *= exp(-0.5);
-
-  for(i=idx-1; i>0; i--)
-  {
-    if(hist->bin[i]- max >= 0 && hist->bin[i-1] - max <=0 )
-    {
-      *err_lo = 0.25 * ( hist->range[i-1] + hist->range[i+1] + 2.0*hist->range[i] );
-      break;
-    }
-  } 
-
-  if(i==0)
-    *err_lo = hist->range[0];
-
-  for(i=idx; i<nh-1; i++)
-  {
-    if(hist->bin[i]-max >= 0 && hist->bin[i+1] - max <=0 )
-    {
-      *err_hi = 0.25 * ( hist->range[i] + hist->range[i+2] + 2.0*hist->range[i+1] );
-      break;
-    }
-  }  
-  if(i==nh-1)
-    *err_hi = hist->range[nh];
-  
-  return 0;
 }

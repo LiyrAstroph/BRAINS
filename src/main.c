@@ -42,6 +42,8 @@ int main(int argc, char **argv)
 
   begin_run();
 
+  end_run();
+  
   MPI_Finalize();
   if(thistask == roottask)
   {

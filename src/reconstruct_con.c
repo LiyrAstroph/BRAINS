@@ -44,6 +44,8 @@ void reconstruct_con()
     fclose(fp);
   }
 
+  reconstruct_con_end();
+
 }
 
 /* calculate continuum light curves form model parameters 
@@ -61,7 +63,7 @@ void calculate_con_from_model(const void *model)
   mu = pm[2];
   
   set_covar_Pmat(sigma, tau, alpha);
-  Chol_decomp_U(PSmat, parset.n_con_recon, &info);
+  Chol_decomp_L(PSmat, parset.n_con_recon, &info);
   multiply_matvec(PSmat, &pm[3], parset.n_con_recon, Fcon);
 
   // add back the mean of continuum
@@ -110,6 +112,11 @@ void set_covar_Pmat(double sigma, double tau, double alpha)
 }
 
 void reconstruct_con_init()
+{
+  return;
+}
+
+void reconstruct_con_end()
 {
   return;
 }
