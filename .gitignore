@@ -2,6 +2,8 @@
 src/*
 doc/*
 data/*
+analysis/*
+!analysis/*.py
 !src/*.[ch]
 !data/arp151_con.txt
 !data/arp151_hb.txt

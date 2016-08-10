@@ -151,12 +151,10 @@ double prob_line2d(void *model)
     fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, Tcon_data[i], gsl_acc);
     prob += -0.5*pow( (fcon - Fcon_data[i])/Fcerrs_data[i] ,  2.0) - ( 0.5*log(2.0*PI) + log(Fcerrs_data[i]) );
   }
-
   
   transfun_2d_cloud_direct(model, Vline_data, Trans2D_at_veldata, n_vel_data, 0);
 
   calculate_line2d_from_blrmodel(model, Tline_data, Vline_data, Trans2D_at_veldata, Fline2d_at_data, n_line_data, n_vel_data);
-
 
   for(i=0; i<n_line_data*n_vel_data; i++)
   {
@@ -165,7 +163,6 @@ double prob_line2d(void *model)
     var2 = 1.0*var2;
     prob += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
   }
-
   return prob;
 }
 

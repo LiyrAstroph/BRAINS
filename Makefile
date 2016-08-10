@@ -28,6 +28,15 @@ MPICHINCL     = $(shell pkg-config --cflags mpich)
 MPICHLIB    = $(shell pkg-config --libs mpich) 
 endif
 
+ifeq ($(SYSTEM), "Cluster")
+GSL_INCL = -I/mbh/mbhd01/soft/gsl/include
+GSL_LIBS = -L/mbh/mbhd01/soft/gsl/lib  -lgsl -lgslcblas -lm
+MPICHLIB = -L/mbh/mbhd01/user/liyanrong/soft/mvapich2/lib -lmpich
+MPIINCL  = -I/mbh/mbhd01/user/liyanrong/soft/mvapich2/include
+LAPACK_INCL = -I/mbh/mbhd01/user/liyanrong/soft/lapack/include
+LAPACK_LIBS = -L/mbh/mbhd01/user/liyanrong/soft/lapack/lib -llapacke -llapack -lblas -lgfortran
+endif
+
 EXEC     = brains
 SRC      = ./src
 OBJS     = $(SRC)/main.o $(SRC)/allvars.o $(SRC)/read.o $(SRC)/run.o     \

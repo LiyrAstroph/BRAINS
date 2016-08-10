@@ -39,6 +39,7 @@ void transfun_1d_cloud_direct(void *pm);
 
 /* 2d line reconstruction */
 int dnest_line2d(int argc, char **argv);
+double prob_line2d(void *model);
 void reconstruct_line2d();
 void reconstruct_line2d_init();
 void reconstruct_line2d_end();
