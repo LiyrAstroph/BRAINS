@@ -1,0 +1,32 @@
+% parameter file
+
+FileDir                     /home/liyropt/Projects/GIT/BRAINS
+
+FlagDim                     2                           % 0, only continuum reconstruction; 1, continuum + line 1d; 2, continuum + line 2d (velocity resolved)
+%===============================
+% data file
+ContinnumFile               data/arp151_con.txt         % file for contnnum data
+LineFile                    data/arp151_hb.txt          % file for line data
+Line2DFile                  data/arp151_hb2d.txt        % file for line 2d data
+%===============================
+% reconstruction
+NConRecon                   100                         % number of points of continuum reconstruction
+ConConstructFileOut         data/pcon.txt 
+
+NLineRecon                  200                         % number of points of line reconstruction along time axis
+LineConstructFileOut        data/pline.txt 
+NVelRecon                   100                         % number of points of line reconstruction along velocity axis
+Line2DConstructFileOut      data/pline2d.txt
+Line2DDataConstructFileOut  data/pline2d_data.txt
+
+NCloudPerCore               1000
+NVPerCloud                  10
+
+NTau                        100
+TauMinSet                   0.0
+TauMaxSet                   50.0
+
+FlagCloudsOut               0                           % 1, save clouds at the last run; 0, do not save
+CloudsFileOut               data/clouds.txt             % file for clouds 
+
+InstRes                     405                         % in km/s

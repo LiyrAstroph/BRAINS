@@ -22,17 +22,17 @@ void begin_run()
 
   init();
 
-  if(parset.flag_only_recon)
+  if(parset.flag_dim == 0)
   {
     reconstruct_con();
   }
 
-  if(!parset.flag_only_recon && parset.flag_dim == 1)
+  if(parset.flag_dim == 1)
   {
   	reconstruct_line1d();
   }
 
-  if(!parset.flag_only_recon && parset.flag_dim == 2)
+  if(parset.flag_dim == 2)
   {
     reconstruct_line2d();
   }

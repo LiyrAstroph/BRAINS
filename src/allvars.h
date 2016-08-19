@@ -43,7 +43,7 @@ typedef struct
 
   char file_dir[BRAINS_MAX_STR_LENGTH];
 
-  int flag_only_recon, flag_dim;
+  int flag_dim;
 
   int n_con_recon, n_line_recon, n_vel_recon;
 

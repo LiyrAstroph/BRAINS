@@ -50,10 +50,6 @@ void read_parset()
     addr[nt] = &parset.flag_dim;
     id[nt++] = INT;
 
-    strcpy(tag[nt], "FlagOnlyR");
-    addr[nt] = &parset.flag_only_recon;
-    id[nt++] = INT;
-
     strcpy(tag[nt], "NConRecon");
     addr[nt] = &parset.n_con_recon;
     id[nt++] = INT;
@@ -161,9 +157,16 @@ void read_parset()
       {
         fprintf(stderr, "# Error in file %s: Tag '%s' is not allowed or multiple defined.\n", 
                       parset.param_file, buf1);
+        exit(0);
       }
     }
     fclose(fparam);
+
+    if(parset.flag_dim > 2 || parset.flag_dim < 0)
+    {
+      fprintf(stderr, "# Error in flag_dim: value %d is not allowed.\n", parset.flag_dim);
+      exit(0);
+    }
   }
   
   MPI_Bcast(&parset, sizeof(parset), MPI_BYTE, roottask, MPI_COMM_WORLD);
@@ -204,7 +207,7 @@ void read_data()
     
     printf("continuum data points: %d\n", n_con_data);
 
-    if(!parset.flag_only_recon && parset.flag_dim == 1)
+    if(parset.flag_dim == 1)
     {
       sprintf(fname, "%s/%s", parset.file_dir, parset.line_file);
     // emission flux line
@@ -229,7 +232,7 @@ void read_data()
       printf("line data points: %d\n", n_line_data);
     }
 
-    if(!parset.flag_only_recon && parset.flag_dim == 2)
+    if(parset.flag_dim == 2)
     {
       sprintf(fname, "%s/%s", parset.file_dir, parset.line2d_file);
       fp = fopen(fname, "r");
@@ -246,10 +249,10 @@ void read_data()
 
   MPI_Bcast(&n_con_data, 1, MPI_INT, roottask, MPI_COMM_WORLD);
 
-  if(!parset.flag_only_recon && parset.flag_dim == 1)
+  if(parset.flag_dim == 1)
     MPI_Bcast(&n_line_data, 1, MPI_INT, roottask, MPI_COMM_WORLD);
 
-  if(!parset.flag_only_recon && parset.flag_dim == 2)
+  if(parset.flag_dim == 2)
   {
     MPI_Bcast(&n_line_data, 1, MPI_INT, roottask, MPI_COMM_WORLD);
     MPI_Bcast(&n_vel_data, 1, MPI_INT, roottask, MPI_COMM_WORLD);
@@ -281,7 +284,7 @@ void read_data()
   MPI_Bcast(Fcerrs_data, n_con_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
 
   // read line
-  if(!parset.flag_only_recon && parset.flag_dim == 1)
+  if(parset.flag_dim == 1)
   {
     if(thistask == roottask)
     {
@@ -305,7 +308,7 @@ void read_data()
     MPI_Bcast(Flerrs_data, n_line_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
   }
 
-  if(!parset.flag_only_recon && parset.flag_dim == 2)
+  if(parset.flag_dim == 2)
   {
     if(thistask == roottask)
     {
@@ -356,14 +359,14 @@ void allocate_memory_data()
   Fcon_data = malloc(n_con_data * sizeof(double));
   Fcerrs_data = malloc(n_con_data * sizeof(double));
 
-  if(!parset.flag_only_recon && parset.flag_dim == 1)
+  if(parset.flag_dim == 1)
   {
     Tline_data = malloc(n_line_data * sizeof(double));
     Fline_data = malloc(n_line_data * sizeof(double));
     Flerrs_data = malloc(n_line_data * sizeof(double));
   }
 
-  if(!parset.flag_only_recon && parset.flag_dim == 2)
+  if(parset.flag_dim == 2)
   {
     Vline_data = malloc(n_vel_data * sizeof(double));
     Tline_data = malloc(n_line_data * sizeof(double));
@@ -382,14 +385,14 @@ void free_memory_data()
   free(Fcon_data);
   free(Fcerrs_data);
 
-  if(!parset.flag_only_recon && parset.flag_dim == 1)
+  if(parset.flag_dim == 1)
   {
     free(Tline_data);
     free(Fline_data);
     free(Flerrs_data);
   }
 
-  if(!parset.flag_only_recon && parset.flag_dim == 2)
+  if(parset.flag_dim == 2)
   {
     free(Tline_data);
     free(Fline_data);
