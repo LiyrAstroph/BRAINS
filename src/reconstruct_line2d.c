@@ -17,7 +17,7 @@
 void reconstruct_line2d()
 {
   reconstruct_line2d_init();
-
+  
   dnest_line2d(0, " ");
 
   if(thistask == roottask)
@@ -61,14 +61,14 @@ void reconstruct_line2d()
     {
       for(j=0; j<n_vel_data; j++)
       {
-      	fprintf(fp, "%f %f %f\n", Tline_data[i], Vline_data[j], Fline2d_at_data[i*n_vel_data + j] / line_scale);
+      	fprintf(fp, "%f %f %f\n", Vline_data[j]*VelUnit, Tline_data[i],  Fline2d_at_data[i*n_vel_data + j] / line_scale);
       }
 
       fprintf(fp, "\n");
     }
     fclose(fp);
 
-    // recovered line2d at data points
+    // recovered line2d at specified points
     transfun_2d_cloud_direct(best_model_line2d, TransV, Trans2D, parset.n_vel_recon, 0);
     calculate_line2d_from_blrmodel(best_model_line2d, Tline, TransV, 
     	    Trans2D, Fline2d, parset.n_line_recon, parset.n_vel_recon);
@@ -85,13 +85,33 @@ void reconstruct_line2d()
     {
       for(j=0; j<parset.n_vel_recon; j++)
       {
-      	fprintf(fp, "%f %f %f\n", Tline[i], TransV[j], Fline2d[i*parset.n_vel_recon + j] / line_scale);
+      	fprintf(fp, "%f %f %f\n", TransV[j]*VelUnit, Tline[i],  Fline2d[i*parset.n_vel_recon + j] / line_scale);
       }
 
       fprintf(fp, "\n");
     }
     fclose(fp);
 
+    // output 2d transfer function
+    sprintf(fname, "%s/%s", parset.file_dir, parset.tran2d_out_file);
+    fp = fopen(fname, "w");
+    if(fp == NULL)
+    {
+      fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+      exit(-1);
+    }
+
+    for(i=0; i<parset.n_line_recon; i++)
+    {
+      for(j=0; j<parset.n_vel_recon; j++)
+      {
+        fprintf(fp, "%f %f %f\n", TransV[j]*VelUnit, TransTau[i], Trans2D[i*parset.n_vel_recon + j]);
+      }
+
+      fprintf(fp, "\n");
+    }
+    fclose(fp);
+    
   }
 
   reconstruct_line2d_end();
@@ -112,6 +132,8 @@ void reconstruct_line2d_init()
   Fline2d = malloc(parset.n_line_recon * parset.n_vel_recon * sizeof(double));
 
   int i;
+  Tline_min = Tline_data[0] - fmin(0.1*(Tline_data[n_line_data - 1] - Tline_data[0]), 20);
+  Tline_max = Tline_data[n_line_data -1] + fmin(0.1*(Tline_data[n_line_data - 1] - Tline_data[0]), 20);
   double dT = (Tline_max - Tline_min)/(n_line_data - 1);
 
   for(i=0; i<parset.n_line_recon; i++)

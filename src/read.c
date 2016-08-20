@@ -70,12 +70,20 @@ void read_parset()
     addr[nt] = &parset.pline_out_file;
     id[nt++] = STRING;
 
+    strcpy(tag[nt], "TranFileOut");
+    addr[nt] = &parset.tran_out_file;
+    id[nt++] = STRING;
+
     strcpy(tag[nt], "Line2DConstructFileOut");
     addr[nt] = &parset.pline2d_out_file;
     id[nt++] = STRING;
 
     strcpy(tag[nt], "Line2DDataConstructFileOut");
     addr[nt] = &parset.pline2d_data_out_file;
+    id[nt++] = STRING;
+
+    strcpy(tag[nt], "Tran2DFileOut");
+    addr[nt] = &parset.tran2d_out_file;
     id[nt++] = STRING;
 
     strcpy(tag[nt], "NCloudPerCore");

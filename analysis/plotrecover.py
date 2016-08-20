@@ -112,7 +112,7 @@ def reconstruct_line2d():
   
 if __name__ == "__main__":
 	reconstruct_con()
-	reconstruct_line1d()
+	#reconstruct_line1d()
 	#reconstruct_line2d()
 
 

@@ -1,8 +1,9 @@
 % parameter file
 
 FileDir                     /home/liyropt/Projects/GIT/BRAINS
+%FileDir                     /ihepbatch/mbhd01/user/liyanrong/RM/MCMC_BRAINS/arp151_con
 
-FlagDim                     2                           % 0, only continuum reconstruction; 1, continuum + line 1d; 2, continuum + line 2d (velocity resolved)
+FlagDim                     2
 %===============================
 % data file
 ContinnumFile               data/arp151_con.txt         % file for contnnum data
@@ -10,19 +11,21 @@ LineFile                    data/arp151_hb.txt          % file for line data
 Line2DFile                  data/arp151_hb2d.txt        % file for line 2d data
 %===============================
 % reconstruction
-NConRecon                   100                         % number of points of continuum reconstruction
+NConRecon                   200                         % number of points of continuum reconstruction
 ConConstructFileOut         data/pcon.txt 
 
-NLineRecon                  200                         % number of points of line reconstruction along time axis
+NLineRecon                  200
 LineConstructFileOut        data/pline.txt 
-NVelRecon                   100                         % number of points of line reconstruction along velocity axis
+TranFileOut                 data/tran.txt
+NVelRecon                   100
 Line2DConstructFileOut      data/pline2d.txt
 Line2DDataConstructFileOut  data/pline2d_data.txt
+Tran2DFileOut               data/tran2d.txt
 
-NCloudPerCore               1000
+NCloudPerCore               10000
 NVPerCloud                  10
 
-NTau                        100
+NTau                        200
 TauMinSet                   0.0
 TauMaxSet                   50.0
 

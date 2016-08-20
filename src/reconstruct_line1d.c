@@ -44,6 +44,7 @@ void reconstruct_line1d()
     transfun_1d_cloud_direct(best_model_line1d);
     calculate_line_from_blrmodel(best_model_line1d, Tline, Fline, parset.n_line_recon);
 
+    // output reconstructed line light curve
     sprintf(fname, "%s/%s", parset.file_dir, parset.pline_out_file);
     fp = fopen(fname, "w");
     if(fp == NULL)
@@ -58,6 +59,20 @@ void reconstruct_line1d()
     }
     fclose(fp);
 
+    // output transfer function.
+    sprintf(fname, "%s/%s", parset.file_dir, parset.tran_out_file);
+    fp = fopen(fname, "w");
+    if(fp == NULL)
+    {
+      fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+      exit(-1);
+    }
+
+    for(i=0; i<parset.n_tau; i++)
+    {
+      fprintf(fp, "%f %f\n", TransTau[i], Trans1D[i]);
+    }
+    fclose(fp);
   }
 
   reconstruct_line1d_end();
