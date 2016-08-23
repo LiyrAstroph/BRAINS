@@ -55,6 +55,7 @@ double dTransTau, dTransV;
 double rcloud_min_set, rcloud_max_set;
 
 double **Trans1D_particles, **Trans2D_at_veldata_particles;
+double **clouds_particles;
 
 /* GSL */
 const gsl_rng_type * gsl_T;

@@ -58,7 +58,7 @@ void transfun_1d_cloud_direct(void *pm)
   double x, y, z, xb, yb, zb;
   double inc, F, beta, mu, k, a, s;
   double Lphi, Lthe;
-  double Anorm, weight;
+  double Anorm, weight, rnd;
   BLRmodel *model = (BLRmodel *)pm;
 
   Lopn_cos = cos(model->opn*PI/180.0);
@@ -88,14 +88,24 @@ void transfun_1d_cloud_direct(void *pm)
     }
     else
       Lthe = 0.0;
-
-    r = rcloud_max_set+1.0;
-    while(r>rcloud_max_set || r<rcloud_min_set)
+    
+    if(which_parameter_update == 1) //
     {
-//      r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, mu/beta, beta);
-//      r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
-      r = mu * F + (1.0-F) * s * gsl_ran_gamma(gsl_r, a, 1.0);
-    }   
+      r = rcloud_max_set+1.0;
+      while(r>rcloud_max_set || r<rcloud_min_set)
+      {
+//        r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, mu/beta, beta);
+//        r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
+        rnd = gsl_ran_gamma(gsl_r, a, 1.0);
+        r = mu * F + (1.0-F) * s * rnd;
+      }
+      clouds_particles[which_particle_update][i] = rnd;
+    }
+    else
+    {
+      rnd = clouds_particles[which_particle_update][i];
+      r = mu * F + (1.0-F) * s * rnd;
+    }
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
     x = r * cos(phi); 
@@ -179,7 +189,7 @@ void transfun_2d_cloud_direct(void *pm, double *transv, double *trans2d, int n_v
   double x, y, z, xb, yb, zb, vx, vy, vz, vxb, vyb, vzb;
   double inc, F, beta, mu, k, a, s;
   double Lphi, Lthe, L, E, vcloud_max, vcloud_min;
-  double dV, V, Anorm, weight;
+  double dV, V, Anorm, weight, rnd;
   BLRmodel *model = (BLRmodel *)pm;
   FILE *fcloud_out;
   double Emin, Lmax, Vr, Vr2, Vph, mbh, chi, lambda, q;
@@ -208,7 +218,7 @@ void transfun_2d_cloud_direct(void *pm, double *transv, double *trans2d, int n_v
   vcloud_max = -DBL_MAX;
   vcloud_min = DBL_MAX;
 
-  if(flag_save)
+  if(flag_save && thistask == roottask)
   {
     char fname[200];
     sprintf(fname, "%s/%s", parset.file_dir, parset.cloud_out_file);
@@ -230,15 +240,24 @@ void transfun_2d_cloud_direct(void *pm, double *transv, double *trans2d, int n_v
     }
     else
       Lthe = 0.0;
-    r = rcloud_max_set+1.0;
-    while(r>rcloud_max_set || r<rcloud_min_set)
-    {
-//      r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, mu/beta, beta);
-//      r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
-        r = mu * F + (1.0-F) * s * gsl_ran_gamma(gsl_r, a, 1.0);
-    } 
-    //wrap(&r, rcloud_min_set, rcloud_max_set);
 
+    if(which_parameter_update == 1) // beta updated
+    {
+      r = rcloud_max_set+1.0;
+      while(r>rcloud_max_set || r<rcloud_min_set)
+      {
+        rnd = gsl_ran_gamma(gsl_r, a, 1.0);
+//        r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, mu/beta, beta);
+//        r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
+        r = mu * F + (1.0-F) * s * rnd;
+      } 
+      clouds_particles[which_particle_update][i] = rnd;
+    }
+    else
+    {
+      rnd = clouds_particles[which_particle_update][i];
+      r = mu * F + (1.0-F) * s * rnd;
+    }
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
     x = r * cos(phi); 
@@ -265,7 +284,6 @@ void transfun_2d_cloud_direct(void *pm, double *transv, double *trans2d, int n_v
 // velocity  
 // note that a cloud moves in its orbit plane, whose direction
 // is determined by the direction of its angular momentum.
-
     Emin = - mbh/r;
     //Ecirc = 0.5 * Emin;
     //Lcirc = sqrt(2.0 * r*r * (Ecirc + mbh/r));
@@ -347,7 +365,7 @@ void transfun_2d_cloud_direct(void *pm, double *transv, double *trans2d, int n_v
     //printf("%e %e %f %f %f\n", vcloud_max, vcloud_min, V, Vr, Vph);
   }
 
-  if(flag_save)
+  if(flag_save && thistask == roottask)
     fclose(fcloud_out);
 
   return;

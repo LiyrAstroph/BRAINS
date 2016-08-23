@@ -46,6 +46,7 @@ void reconstruct_line2d()
     gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
 
     // recovered line2d at data points
+    which_parameter_update = 1;
     Trans2D_at_veldata = Trans2D_at_veldata_particles[0];
     transfun_2d_cloud_direct(best_model_line2d, Vline_data, Trans2D_at_veldata, 
     	                                        n_vel_data, parset.flag_save_clouds);
@@ -170,9 +171,38 @@ void reconstruct_line2d_init()
   {
     Trans2D_at_veldata_particles[i] = malloc(parset.n_tau * n_vel_data * sizeof(double));
   }
+
+  // only record gamma-distribution random number of clouds
+  clouds_particles = malloc(parset.num_particles * sizeof(double *));
+  for(i=0; i<parset.num_particles; i++)
+  {
+    clouds_particles[i] = malloc(parset.n_cloud_per_task * sizeof(double));
+  }
   return;
 }
 
+void reconstruct_line2d_end()
+{
+  free(Tline);
+  //free(Fline2d_at_data);
+  free(Fline2d);
+
+  free(TransTau);
+  free(TransV);
+  free(Trans2D_at_veldata);
+  free(Trans2D);
+
+  int i;
+  for(i=0; i<parset.num_particles; i++)
+  {
+    free(Trans2D_at_veldata_particles[i]);
+    free(clouds_particles[i]);
+  }
+  free(Trans2D_at_veldata_particles);
+  free(clouds_particles);
+
+  return;
+}
 
 double prob_line2d(void *model)
 {
@@ -216,21 +246,3 @@ double prob_line2d(void *model)
   return prob;
 }
 
-void reconstruct_line2d_end()
-{
-  free(Tline);
-  //free(Fline2d_at_data);
-  free(Fline2d);
-
-  free(TransTau);
-  free(TransV);
-  free(Trans2D_at_veldata);
-  free(Trans2D);
-
-  int i;
-  for(i=0; i<parset.num_particles; i++)
-    free(Trans2D_at_veldata_particles[i]);
-  free(Trans2D_at_veldata_particles);
-
-  return;
-}

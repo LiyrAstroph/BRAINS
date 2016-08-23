@@ -16,9 +16,11 @@
 
 void reconstruct_line1d()
 {
+  char argv[1][10];
+
   reconstruct_line1d_init();
 
-  dnest_line1d(0, " ");
+  dnest_line1d(0, argv);
 
   if(thistask == roottask)
   {
@@ -42,6 +44,8 @@ void reconstruct_line1d()
     fclose(fp);
 
     gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
+
+    which_parameter_update = 1; // force to update the transfer function
     Trans1D = Trans1D_particles[0];
     transfun_1d_cloud_direct(best_model_line1d);
     calculate_line_from_blrmodel(best_model_line1d, Tline, Fline, parset.n_line_recon);
@@ -121,6 +125,13 @@ void reconstruct_line1d_init()
   {
     Trans1D_particles[i] = malloc(parset.n_tau * sizeof(double));
   }
+
+  // only record gamma-distribution random number of clouds
+  clouds_particles = malloc(parset.num_particles * sizeof(double *));
+  for(i=0; i<parset.num_particles; i++)
+  {
+    clouds_particles[i] = malloc(parset.n_cloud_per_task * sizeof(double));
+  }
 }
 
 void reconstruct_line1d_end()
@@ -135,8 +146,12 @@ void reconstruct_line1d_end()
 
   int i;
   for(i=0; i<parset.num_particles; i++)
+  {
     free(Trans1D_particles[i]);
+    free(clouds_particles[i]);
+  }
   free(Trans1D_particles);
+  free(clouds_particles);
 
   if(thistask == roottask)
   {
@@ -161,7 +176,7 @@ double prob_line1d(void *model)
   // only update transfer function when BLR model is changed.
   if(which_parameter_update < 8)
   {
-    Trans1D = Trans1D_particles[which_particle_update];
+    Trans1D = Trans1D_particles[which_particle_update]; // Trans1D is a pointer
     transfun_1d_cloud_direct(model);
     //memcpy(Trans1D_particles[which_particle_update], Trans1D, parset.n_tau*sizeof(double));
   }
