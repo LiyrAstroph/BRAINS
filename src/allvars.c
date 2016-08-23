@@ -32,7 +32,7 @@ double con_scale, line_scale;
 /* continuum reconstruction */
 double *Tcon, *Fcon, *Fcerrs;
 double Tcon_min, Tcon_max;
-double *PSmat;
+double *PSmat, *USmat, *PSmat_data;
 
 /* line reconstruction */
 double *Fline_at_data;

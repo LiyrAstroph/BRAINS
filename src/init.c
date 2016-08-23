@@ -9,6 +9,9 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include <gsl/gsl_rng.h>
+#include <gsl/gsl_randist.h>
+#include <gsl/gsl_interp.h>
 
 #include "allvars.h"
 #include "proto.h"
@@ -40,13 +43,13 @@ void init()
 
   /* set the range of cloud radial distribution */
   rcloud_min_set = parset.tau_min_set;
-  rcloud_max_set = parset.tau_max_set *10.0;
+  rcloud_max_set = parset.tau_max_set;
 
   range_model[0].mbh = log(0.1);
   range_model[1].mbh = log(1000.0);
 
   range_model[0].mu = log(0.1);
-  range_model[1].mu = log(100.0);
+  range_model[1].mu = log(parset.tau_max_set);
 
   range_model[0].beta = 0.001;
   range_model[1].beta = 1.0;
@@ -88,6 +91,8 @@ void allocate_memory()
   Fcerrs = malloc(parset.n_con_recon * sizeof(double));
 
   PSmat = malloc(parset.n_con_recon * parset.n_con_recon * sizeof(double));
+  USmat = malloc(parset.n_con_recon * n_con_data * sizeof(double));
+  PSmat_data = malloc(n_con_data * n_con_data * sizeof(double));
 }
 
 void free_memory()

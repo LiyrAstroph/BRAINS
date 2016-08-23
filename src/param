@@ -1,7 +1,7 @@
 % parameter file
 
 FileDir                     /home/liyropt/Projects/GIT/BRAINS
-%FileDir                     /ihepbatch/mbhd01/user/liyanrong/RM/MCMC_BRAINS/arp151_con
+%FileDir                     /ihepbatch/mbhd01/user/liyanrong/RM/MCMC_BRAINS/arp151_2d
 
 FlagDim                     2
 %===============================
@@ -15,19 +15,19 @@ NConRecon                   200                         % number of points of co
 ConConstructFileOut         data/pcon.txt 
 
 NLineRecon                  200
-LineConstructFileOut        data/pline.txt 
+LineConstructFileOut        data/pline.txt
 TranFileOut                 data/tran.txt
 NVelRecon                   100
 Line2DConstructFileOut      data/pline2d.txt
 Line2DDataConstructFileOut  data/pline2d_data.txt
 Tran2DFileOut               data/tran2d.txt
 
-NCloudPerCore               10000
+NCloudPerCore               1000
 NVPerCloud                  10
 
-NTau                        200
+NTau                        100
 TauMinSet                   0.0
-TauMaxSet                   50.0
+TauMaxSet                   20.0
 
 FlagCloudsOut               0                           % 1, save clouds at the last run; 0, do not save
 CloudsFileOut               data/clouds.txt             % file for clouds 

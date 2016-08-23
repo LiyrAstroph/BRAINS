@@ -8,9 +8,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <float.h>
 #include <string.h>
 #include <mpi.h>
+#include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
+#include <gsl/gsl_interp.h>
 
 #include "allvars.h"
 #include "proto.h"
@@ -179,6 +182,8 @@ void transfun_2d_cloud_direct(void *pm, double *transv, double *trans2d, int n_v
   double dV, V, Anorm, weight;
   BLRmodel *model = (BLRmodel *)pm;
   FILE *fcloud_out;
+  double Emin, Lmax, Vr, Vr2, Vph, mbh, chi, lambda, q;
+  
 
   Lopn_cos = cos(model->opn*PI/180.0);
   inc = model->inc * PI/180.0;
@@ -189,6 +194,10 @@ void transfun_2d_cloud_direct(void *pm, double *transv, double *trans2d, int n_v
 
   a = 1.0/beta/beta;
   s = mu/a;
+
+  mbh = exp(model->mbh);
+  lambda = model->lambda;
+  q = model->q;
   
   dV =(transv[1] - transv[0]);
 
@@ -196,8 +205,8 @@ void transfun_2d_cloud_direct(void *pm, double *transv, double *trans2d, int n_v
     for(j=0;j<n_vel;j++)
       Trans2D[i*n_vel+j]=0.0;
 
-  vcloud_max = -1.0e10;
-  vcloud_min = 1.0e10;
+  vcloud_max = -DBL_MAX;
+  vcloud_min = DBL_MAX;
 
   if(flag_save)
   {
@@ -227,7 +236,9 @@ void transfun_2d_cloud_direct(void *pm, double *transv, double *trans2d, int n_v
 //      r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, mu/beta, beta);
 //      r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
         r = mu * F + (1.0-F) * s * gsl_ran_gamma(gsl_r, a, 1.0);
-    }   
+    } 
+    //wrap(&r, rcloud_min_set, rcloud_max_set);
+
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
     x = r * cos(phi); 
@@ -247,17 +258,13 @@ void transfun_2d_cloud_direct(void *pm, double *transv, double *trans2d, int n_v
 
     if(dis< parset.tau_min_set || dis>= parset.tau_max_set + dTransTau)
       continue;
-    weight = 0.5 + k*(z/r);
-    //weight = 0.5 + k * x/sqrt(x*x+y*y);
+    //weight = 0.5 + k*(z/r);
+    weight = 0.5 + k * x/sqrt(x*x+y*y);
     idt = (dis - parset.tau_min_set)/dTransTau;
+
 // velocity  
 // note that a cloud moves in its orbit plane, whose direction
 // is determined by the direction of its angular momentum.
-
-    double Emin, Lmax, Vr, Vr2, Vph, mbh, chi, lambda, q;
-    mbh = exp(model->mbh);
-    lambda = model->lambda;
-    q = model->q;
 
     Emin = - mbh/r;
     //Ecirc = 0.5 * Emin;
@@ -268,12 +275,11 @@ void transfun_2d_cloud_direct(void *pm, double *transv, double *trans2d, int n_v
       chi = lambda * gsl_ran_gaussian(gsl_r, 1.0);
       E = Emin / (1.0 + exp(-chi));
       Lmax = sqrt(2.0 * r*r * (E + mbh/r));
-      if(lambda>1.0e-2)   //make suare that exp is caculatable.
+      if(lambda>1.0e-2)   //make sure that exp is caculatable.
         L = Lmax * lambda * log( (exp(1.0/lambda) - 1.0) * gsl_rng_uniform(gsl_r) + 1.0 );
       else
         L = Lmax + lambda * log(gsl_rng_uniform(gsl_r));
-
-      
+ 
       Vr2 = 2.0 * (E + mbh/r) - L*L/r/r;
       if(Vr2>=0.0)
       {
@@ -314,7 +320,7 @@ void transfun_2d_cloud_direct(void *pm, double *transv, double *trans2d, int n_v
       idV = (V - transv[0])/dV;
       //Trans2D[idt*n_vel + idV] += pow(1.0/r, 2.0*(1 + model.Ag)) * weight;
       trans2d[idt*n_vel + idV] += weight;
-    } 
+    }
   }
 
   Anorm = 0.0;
@@ -336,7 +342,9 @@ void transfun_2d_cloud_direct(void *pm, double *transv, double *trans2d, int n_v
   if(vrange<=0.0)
   {
     fprintf(stderr, "No velocity-resolved lag for given BLR model!\n");
-    //exit(-1);
+    //printf("%f %f %f %f %f\n", model->inc, model->opn, model->lambda, model->F, model->beta);
+    //printf("%f %f %f\n", model->k, model->q, model->mu);
+    //printf("%e %e %f %f %f\n", vcloud_max, vcloud_min, V, Vr, Vph);
   }
 
   if(flag_save)

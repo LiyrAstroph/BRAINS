@@ -11,6 +11,8 @@
 #include <math.h>
 #include <string.h>
 #include <gsl/gsl_rng.h>
+#include <gsl/gsl_randist.h>
+#include <gsl/gsl_interp.h>
 #include <mpi.h>
 // header file for DNEST
 #include "dnestvars.h"
@@ -65,6 +67,7 @@ void from_prior_thismodel(const void *model)
   pm[0] = -3.0 + dnest_rand()*3.0;
   pm[1] = 2.0 + dnest_rand()*8.0;
   pm[2] = 0.0 + dnest_rand()*2.0;
+  
   for(i=0; i<parset.n_con_recon; i++)
     pm[i+3] = dnest_randn();
 }

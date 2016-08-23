@@ -26,7 +26,10 @@ void reconstruct_con();
 void reconstruct_con_end();
 double prob_con_variability(const void *model);
 void set_covar_Pmat(double sigma, double tau, double alpha);
+void set_covar_Pmat_data(double sigma, double tau, double alpha);
+void set_covar_Umat(double sigma, double tau, double alpha);
 void calculate_con_from_model(const void *model);
+void reconstruct_con_from_varmodel(double sigma, double tau, double alpha);
 
 /* 1d line reconstruction */
 int dnest_line1d(int argc, char **argv);

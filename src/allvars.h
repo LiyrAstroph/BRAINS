@@ -71,7 +71,7 @@ extern double con_scale, line_scale;
 /* continuum reconstruction */
 extern double *Tcon, *Fcon, *Fcerrs;
 extern double Tcon_min, Tcon_max;
-extern double *PSmat;
+extern double *PSmat, *USmat, *PSmat_data;
 
 /* line reconstruction */
 extern double *Fline_at_data;

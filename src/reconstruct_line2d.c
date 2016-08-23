@@ -9,7 +9,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-
+#include <float.h>
+#include <gsl/gsl_interp.h>
+ 
 #include "dnest_line2d.h"
 #include "allvars.h"
 #include "proto.h"
@@ -165,7 +167,6 @@ double prob_line2d(void *model)
   int i;
   
   calculate_con_from_model(model + 11*sizeof(double));
-
   gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
 
   for(i=0; i<n_con_data; i++)
@@ -175,7 +176,6 @@ double prob_line2d(void *model)
   }
   
   transfun_2d_cloud_direct(model, Vline_data, Trans2D_at_veldata, n_vel_data, 0);
-
   calculate_line2d_from_blrmodel(model, Tline_data, Vline_data, Trans2D_at_veldata, Fline2d_at_data, n_line_data, n_vel_data);
 
   for(i=0; i<n_line_data*n_vel_data; i++)
@@ -185,6 +185,8 @@ double prob_line2d(void *model)
     var2 = 1.0*var2;
     prob += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
   }
+  if(isnan(prob))
+    prob = -DBL_MAX;
   return prob;
 }
 

@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <gsl/gsl_interp.h>
 
 #include "dnest_line1d.h"
 #include "allvars.h"
