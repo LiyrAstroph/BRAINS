@@ -29,6 +29,10 @@ double *Tline_data, *Fline_data, *Flerrs_data;
 double *Vline_data, *Fline2d_data, *Flerrs2d_data;
 double con_scale, line_scale;
 
+char dnest_options_file[BRAINS_MAX_STR_LENGTH];
+
+int which_parameter_update, which_particle_update;  // which parameter and particle to be updated
+
 /* continuum reconstruction */
 double *Tcon, *Fcon, *Fcerrs;
 double Tcon_min, Tcon_max;
@@ -49,6 +53,8 @@ BLRmodel range_model[2];
 double *TransTau, *TransV, *Trans1D, *Trans2D_at_veldata, *Trans2D;
 double dTransTau, dTransV;
 double rcloud_min_set, rcloud_max_set;
+
+double **Trans1D_particles;
 
 /* GSL */
 const gsl_rng_type * gsl_T;

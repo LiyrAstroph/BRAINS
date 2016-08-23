@@ -107,6 +107,19 @@ void reconstruct_line1d_init()
   {
     TransTau[i] = parset.tau_min_set + dTransTau * i;
   }
+
+  sprintf(dnest_options_file, "%s/%s", parset.file_dir, "src/OPTIONS1D");
+  if(thistask == roottask)
+  {
+    get_num_particles(dnest_options_file);
+  }
+  MPI_Bcast(&parset.num_particles, 1, MPI_INT, roottask, MPI_COMM_WORLD);
+
+  Trans1D_particles = malloc(parset.num_particles * sizeof(double *));
+  for(i=0; i<parset.num_particles; i++)
+  {
+    Trans1D_particles[i] = malloc(parset.n_tau * sizeof(double));
+  }
 }
 
 double prob_line1d(void *model)
@@ -124,7 +137,7 @@ double prob_line1d(void *model)
     prob += -0.5*pow( (fcon - Fcon_data[i])/Fcerrs_data[i] ,  2.0) - ( 0.5*log(2.0*PI) + log(Fcerrs_data[i]) );
   }
 
-
+  // only update transfer function when BLR model is changed.
   transfun_1d_cloud_direct(model);
   calculate_line_from_blrmodel(model, Tline_data, Fline_at_data, n_line_data);
   for(i=0; i<n_line_data; i++)

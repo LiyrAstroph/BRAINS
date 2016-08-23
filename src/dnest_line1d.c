@@ -42,7 +42,7 @@ int dnest_line1d(int argc, char **argv)
   get_num_params = get_num_params_line1d;
   copy_best_model = copy_best_model_line1d;
   
-  sprintf(options_file, "%s/%s", parset.file_dir, "src/OPTIONS1D");
+  strcpy(options_file, dnest_options_file);
 
   dnest(argc, argv);
   
@@ -100,7 +100,8 @@ double perturb_line1d(const void *model)
     printf("# Error: Incorrect which.\n");
     exit(0);
   }
-
+  
+  which_parameter_update = which;
   switch(which)
   {
   	case 0:

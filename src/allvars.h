@@ -57,6 +57,8 @@ typedef struct
   int flag_save_clouds;
 
   double InstRes;
+
+  int num_particles;
 }PARSET;
 extern PARSET parset;
 
@@ -67,6 +69,10 @@ extern double *Tcon_data, *Fcon_data,  *Fcerrs_data;
 extern double *Tline_data, *Fline_data, *Flerrs_data;
 extern double *Vline_data, *Fline2d_data, *Flerrs2d_data;
 extern double con_scale, line_scale;
+
+extern char dnest_options_file[BRAINS_MAX_STR_LENGTH];
+
+extern int which_parameter_update, which_particle_update;  // which parameter and particle to be updated
 
 /* continuum reconstruction */
 extern double *Tcon, *Fcon, *Fcerrs;
@@ -105,6 +111,8 @@ extern BLRmodel range_model[2];
 extern double *TransTau, *TransV, *Trans1D, *Trans2D_at_veldata, *Trans2D;
 extern double dTransTau, dTransV;
 extern double rcloud_min_set, rcloud_max_set;
+
+extern double **Trans1D_particles; // transfer function 1d for each particle
 
 /* GSL */
 extern const gsl_rng_type * gsl_T;

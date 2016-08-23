@@ -105,7 +105,9 @@ double perturb_line2d(const void *model)
     printf("# Error: Incorrect which.\n");
     exit(0);
   }
-
+  
+  which_parameter_update = which;
+  
   switch(which)
   {
   	case 0:

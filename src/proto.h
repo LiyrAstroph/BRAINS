@@ -18,6 +18,7 @@ void allocate_memory();
 void init();
 void scale_con_line();
 void cal_emission_flux();
+void get_num_particles(char *fname);
 
 /* continuum reconstruction */
 int dnest_con(int argc, char **argv);

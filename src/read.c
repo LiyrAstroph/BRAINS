@@ -402,6 +402,7 @@ void free_memory_data()
 
   if(parset.flag_dim == 2)
   {
+    free(Vline_data);
     free(Tline_data);
     free(Fline_data);
     free(Flerrs_data);
@@ -438,4 +439,24 @@ void cal_emission_flux()
     Flerrs_data[j] *= dV*dV;
     Flerrs_data[j] = sqrt(Flerrs_data[j]);
   }
+}
+
+void get_num_particles(char *fname)
+{
+  FILE *fp;
+  char buf[BRAINS_MAX_STR_LENGTH];
+  fp = fopen(fname, "r");
+  if(fp == NULL)
+  {
+    fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+    exit(-1);
+  }
+
+  buf[0]='#';
+  while(buf[0]=='#')
+  {
+    fgets(buf, BRAINS_MAX_STR_LENGTH, fp);
+  }
+  sscanf(buf, "%d", &parset.num_particles);
+  fclose(fp);
 }

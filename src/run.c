@@ -42,4 +42,5 @@ void begin_run()
 void end_run()
 {
   free_memory_data();
+  free_memory();
 }

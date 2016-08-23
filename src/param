@@ -3,7 +3,7 @@
 FileDir                     /home/liyropt/Projects/GIT/BRAINS
 %FileDir                     /ihepbatch/mbhd01/user/liyanrong/RM/MCMC_BRAINS/arp151_2d
 
-FlagDim                     2
+FlagDim                     1
 %===============================
 % data file
 ContinnumFile               data/arp151_con.txt         % file for contnnum data
@@ -11,7 +11,7 @@ LineFile                    data/arp151_hb.txt          % file for line data
 Line2DFile                  data/arp151_hb2d.txt        % file for line 2d data
 %===============================
 % reconstruction
-NConRecon                   200                         % number of points of continuum reconstruction
+NConRecon                   100                         % number of points of continuum reconstruction
 ConConstructFileOut         data/pcon.txt 
 
 NLineRecon                  200
