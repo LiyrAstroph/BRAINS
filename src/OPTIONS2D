@@ -1,6 +1,6 @@
 # File containing parameters for DNest4
 # Put comments at the top, or at the end of the line.
-2	# Number of particles
+1	# Number of particles
 5000	# new level interval
 5000	# save interval
 200	# threadSteps - how many steps each thread should do independently before communication

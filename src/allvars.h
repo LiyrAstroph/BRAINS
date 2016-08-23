@@ -73,6 +73,7 @@ extern double con_scale, line_scale;
 extern char dnest_options_file[BRAINS_MAX_STR_LENGTH];
 
 extern int which_parameter_update, which_particle_update;  // which parameter and particle to be updated
+extern double *beta_old_particles;
 
 /* continuum reconstruction */
 extern double *Tcon, *Fcon, *Fcerrs;

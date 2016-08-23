@@ -178,6 +178,11 @@ void reconstruct_line2d_init()
   {
     clouds_particles[i] = malloc(parset.n_cloud_per_task * sizeof(double));
   }
+
+  beta_old_particles = malloc(parset.num_particles * sizeof(double));
+  for(i=0; i<parset.num_particles; i++)
+    beta_old_particles[i] = -1.0;
+
   return;
 }
 
@@ -200,7 +205,7 @@ void reconstruct_line2d_end()
   }
   free(Trans2D_at_veldata_particles);
   free(clouds_particles);
-
+  free(beta_old_particles);
   return;
 }
 

@@ -32,6 +32,7 @@ double con_scale, line_scale;
 char dnest_options_file[BRAINS_MAX_STR_LENGTH];
 
 int which_parameter_update, which_particle_update;  // which parameter and particle to be updated
+double *beta_old_particles;
 
 /* continuum reconstruction */
 double *Tcon, *Fcon, *Fcerrs;

@@ -77,7 +77,7 @@ void transfun_1d_cloud_direct(void *pm)
   {
     Trans1D[i] = 0.0;
   }
-   
+  
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
 // generate a direction of the angular momentum     
@@ -89,7 +89,8 @@ void transfun_1d_cloud_direct(void *pm)
     else
       Lthe = 0.0;
     
-    if(which_parameter_update == 1) //
+    // when the lastest MH move is not accepted, update clouds
+    if(beta !=beta_old_particles[which_particle_update]) //
     {
       r = rcloud_max_set+1.0;
       while(r>rcloud_max_set || r<rcloud_min_set)
@@ -131,6 +132,10 @@ void transfun_1d_cloud_direct(void *pm)
     //Trans1D[idx] += pow(1.0/r, 2.0*(1 + model.Ag)) * weight;
     Trans1D[idx] += weight;
   }
+
+  // record the previous beta
+  if(which_parameter_update == 1)
+    beta_old_particles[which_particle_update] = beta;
 
   Anorm = 0.0;
   for(i=0;i<parset.n_tau;i++)
@@ -241,7 +246,7 @@ void transfun_2d_cloud_direct(void *pm, double *transv, double *trans2d, int n_v
     else
       Lthe = 0.0;
 
-    if(which_parameter_update == 1) // beta updated
+    if(beta !=beta_old_particles[which_particle_update]) // beta updated
     {
       r = rcloud_max_set+1.0;
       while(r>rcloud_max_set || r<rcloud_min_set)
@@ -340,6 +345,10 @@ void transfun_2d_cloud_direct(void *pm, double *transv, double *trans2d, int n_v
       trans2d[idt*n_vel + idV] += weight;
     }
   }
+  
+  // record the previous beta
+  if(which_parameter_update == 1)
+    beta_old_particles[which_particle_update] = beta;
 
   Anorm = 0.0;
   for(i=0; i<parset.n_tau; i++)

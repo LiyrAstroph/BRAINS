@@ -80,7 +80,7 @@ void from_prior_line1d(const void *model)
   for(i=0; i<parset.n_con_recon; i++)
     pm[i+3+8] = dnest_randn();
 
-  which_parameter_update = -1;
+  which_parameter_update = 1; // force to update the clouds's ridal distribution
 }
 
 double log_likelihoods_cal_line1d(const void *model)

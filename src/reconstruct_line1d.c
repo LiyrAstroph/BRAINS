@@ -132,6 +132,10 @@ void reconstruct_line1d_init()
   {
     clouds_particles[i] = malloc(parset.n_cloud_per_task * sizeof(double));
   }
+
+  beta_old_particles = malloc(parset.num_particles * sizeof(double));
+  for(i=0; i<parset.num_particles; i++)
+    beta_old_particles[i] = -1.0;
 }
 
 void reconstruct_line1d_end()
@@ -152,6 +156,8 @@ void reconstruct_line1d_end()
   }
   free(Trans1D_particles);
   free(clouds_particles);
+
+  free(beta_old_particles);
 
   if(thistask == roottask)
   {
