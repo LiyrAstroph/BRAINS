@@ -44,8 +44,7 @@ int dnest_line2d(int argc, char **argv)
   get_num_params = get_num_params_line2d;
   copy_best_model = copy_best_model_line2d;
   
-  sprintf(options_file, "%s/%s", parset.file_dir, "src/OPTIONS2D");
-
+  strcpy(options_file, dnest_options_file);
   dnest(argc, argv);
   
   if(thistask == 0)
@@ -84,7 +83,8 @@ void from_prior_line2d(const void *model)
   pm[13] = 0.0 + dnest_rand()*2.0;
   for(i=0; i<parset.n_con_recon; i++)
     pm[i+3+11] = dnest_randn();
-
+  
+  which_parameter_update = -1;
 }
 
 double log_likelihoods_cal_line2d(const void *model)

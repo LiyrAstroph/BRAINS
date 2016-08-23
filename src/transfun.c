@@ -115,8 +115,8 @@ void transfun_1d_cloud_direct(void *pm)
 
     if(dis<parset.tau_min_set || dis>=parset.tau_max_set+dTransTau)
     	continue;
-    weight = 0.5 + k*(z/r);
-    //weight = 0.5 + k * x/sqrt(x*x+y*y);
+    //weight = 0.5 + k*(z/r);
+    weight = 0.5 + k * x/sqrt(x*x+y*y);
     idx = (dis - parset.tau_min_set)/dTransTau;
     //Trans1D[idx] += pow(1.0/r, 2.0*(1 + model.Ag)) * weight;
     Trans1D[idx] += weight;

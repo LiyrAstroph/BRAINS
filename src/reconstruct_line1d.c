@@ -42,6 +42,7 @@ void reconstruct_line1d()
     fclose(fp);
 
     gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
+    Trans1D = Trans1D_particles[0];
     transfun_1d_cloud_direct(best_model_line1d);
     calculate_line_from_blrmodel(best_model_line1d, Tline, Fline, parset.n_line_recon);
 
@@ -83,7 +84,7 @@ void reconstruct_line1d()
 void reconstruct_line1d_init()
 {
   TransTau = malloc(parset.n_tau * sizeof(double));
-  Trans1D = malloc(parset.n_tau * sizeof(double));
+  //Trans1D = malloc(parset.n_tau * sizeof(double));
 
   Fline_at_data = malloc(n_line_data * sizeof(double));
 
@@ -122,13 +123,33 @@ void reconstruct_line1d_init()
   }
 }
 
+void reconstruct_line1d_end()
+{
+  free(TransTau);
+  //free(Trans1D);
+  free(Fline_at_data);
+
+  free(Tline);
+  free(Fline);
+  free(Flerrs);
+
+  int i;
+  for(i=0; i<parset.num_particles; i++)
+    free(Trans1D_particles[i]);
+  free(Trans1D_particles);
+
+  if(thistask == roottask)
+  {
+    printf("Ends reconstruct_line1d.\n");
+  }
+}
+
 double prob_line1d(void *model)
 {
   double prob = 0.0, fcon, var2, dy;
   int i;
   
   calculate_con_from_model(model + 8*sizeof(double));
-
   gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
 
   for(i=0; i<n_con_data; i++)
@@ -138,7 +159,18 @@ double prob_line1d(void *model)
   }
 
   // only update transfer function when BLR model is changed.
-  transfun_1d_cloud_direct(model);
+  if(which_parameter_update < 8)
+  {
+    Trans1D = Trans1D_particles[which_particle_update];
+    transfun_1d_cloud_direct(model);
+    //memcpy(Trans1D_particles[which_particle_update], Trans1D, parset.n_tau*sizeof(double));
+  }
+  else
+  {
+    Trans1D = Trans1D_particles[which_particle_update];
+    //memcpy(Trans1D, Trans1D_particles[which_particle_update], parset.n_tau*sizeof(double));
+  }
+
   calculate_line_from_blrmodel(model, Tline_data, Fline_at_data, n_line_data);
   for(i=0; i<n_line_data; i++)
   {
@@ -149,15 +181,4 @@ double prob_line1d(void *model)
   }
 
   return prob;
-}
-
-void reconstruct_line1d_end()
-{
-  free(TransTau);
-  free(Trans1D);
-  free(Fline_at_data);
-
-  free(Tline);
-  free(Fline);
-  free(Flerrs);
 }

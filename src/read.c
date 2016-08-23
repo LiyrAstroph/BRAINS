@@ -381,7 +381,6 @@ void allocate_memory_data()
     Fline_data = malloc(n_line_data * sizeof(double));
     Flerrs_data = malloc(n_line_data * sizeof(double));
 
-    
     Fline2d_data = malloc(n_line_data * n_vel_data * sizeof(double *));
     Flerrs2d_data = malloc(n_line_data * n_vel_data * sizeof(double *));
   }

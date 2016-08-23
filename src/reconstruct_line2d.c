@@ -46,6 +46,7 @@ void reconstruct_line2d()
     gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
 
     // recovered line2d at data points
+    Trans2D_at_veldata = Trans2D_at_veldata_particles[0];
     transfun_2d_cloud_direct(best_model_line2d, Vline_data, Trans2D_at_veldata, 
     	                                        n_vel_data, parset.flag_save_clouds);
     calculate_line2d_from_blrmodel(best_model_line2d, Tline_data, Vline_data, Trans2D_at_veldata,
@@ -122,7 +123,7 @@ void reconstruct_line2d()
 void reconstruct_line2d_init()
 {
   TransTau = malloc(parset.n_tau * sizeof(double));
-  Trans2D_at_veldata = malloc(parset.n_tau * n_vel_data * sizeof(double));
+  //Trans2D_at_veldata = malloc(parset.n_tau * n_vel_data * sizeof(double));
 
 
   TransV = malloc(parset.n_vel_recon * sizeof(double));
@@ -157,6 +158,18 @@ void reconstruct_line2d_init()
   	TransV[i] = vel_min_set + dVel*i;
   }
 
+  sprintf(dnest_options_file, "%s/%s", parset.file_dir, "src/OPTIONS2D");
+  if(thistask == roottask)
+  {
+    get_num_particles(dnest_options_file);
+  }
+  MPI_Bcast(&parset.num_particles, 1, MPI_INT, roottask, MPI_COMM_WORLD);
+
+  Trans2D_at_veldata_particles = malloc(parset.num_particles * sizeof(double *));
+  for(i=0; i<parset.num_particles; i++)
+  {
+    Trans2D_at_veldata_particles[i] = malloc(parset.n_tau * n_vel_data * sizeof(double));
+  }
   return;
 }
 
@@ -175,7 +188,20 @@ double prob_line2d(void *model)
     prob += -0.5*pow( (fcon - Fcon_data[i])/Fcerrs_data[i] ,  2.0) - ( 0.5*log(2.0*PI) + log(Fcerrs_data[i]) );
   }
   
-  transfun_2d_cloud_direct(model, Vline_data, Trans2D_at_veldata, n_vel_data, 0);
+  // only update transfer function when BLR model is changed.
+  if(which_parameter_update < 11)
+  {
+    Trans2D_at_veldata = Trans2D_at_veldata_particles[which_particle_update];
+    transfun_2d_cloud_direct(model, Vline_data, Trans2D_at_veldata, n_vel_data, 0);
+    //memcpy(Trans2D_at_veldata_particles[which_particle_update], Trans2D_at_veldata, 
+    //  n_vel_data*parset.n_tau * sizeof(double));
+  }
+  else
+  {
+    Trans2D_at_veldata = Trans2D_at_veldata_particles[which_particle_update];
+    //memcpy(Trans2D_at_veldata, Trans2D_at_veldata_particles[which_particle_update], 
+    //  n_vel_data*parset.n_tau * sizeof(double));
+  }
   calculate_line2d_from_blrmodel(model, Tline_data, Vline_data, Trans2D_at_veldata, Fline2d_at_data, n_line_data, n_vel_data);
 
   for(i=0; i<n_line_data*n_vel_data; i++)
@@ -193,12 +219,18 @@ double prob_line2d(void *model)
 void reconstruct_line2d_end()
 {
   free(Tline);
-  free(Fline2d_at_data);
+  //free(Fline2d_at_data);
   free(Fline2d);
 
   free(TransTau);
   free(TransV);
   free(Trans2D_at_veldata);
   free(Trans2D);
+
+  int i;
+  for(i=0; i<parset.num_particles; i++)
+    free(Trans2D_at_veldata_particles[i]);
+  free(Trans2D_at_veldata_particles);
+
   return;
 }

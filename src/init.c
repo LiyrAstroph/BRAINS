@@ -102,8 +102,8 @@ void free_memory()
   free(Fcerrs);
 
   free(PSmat);
-  free(PSmat_data);
   free(USmat);
+  free(PSmat_data);
 }
 
 void scale_con_line()
