@@ -46,7 +46,10 @@ void reconstruct_line2d()
     gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
 
     // recovered line2d at data points
+    // force to update the transfer function.
     which_parameter_update = 1;
+    which_particle_update = 0;
+    beta_old_particles[which_particle_update] = -1.0;
     Trans2D_at_veldata = Trans2D_at_veldata_particles[0];
     transfun_2d_cloud_direct(best_model_line2d, Vline_data, Trans2D_at_veldata, 
     	                                        n_vel_data, parset.flag_save_clouds);
@@ -73,6 +76,8 @@ void reconstruct_line2d()
     fclose(fp);
 
     // recovered line2d at specified points
+    which_parameter_update = 1;
+    which_particle_update = 0;
     transfun_2d_cloud_direct(best_model_line2d, TransV, Trans2D, parset.n_vel_recon, 0);
     calculate_line2d_from_blrmodel(best_model_line2d, Tline, TransV, 
     	    Trans2D, Fline2d, parset.n_line_recon, parset.n_vel_recon);
@@ -189,12 +194,11 @@ void reconstruct_line2d_init()
 void reconstruct_line2d_end()
 {
   free(Tline);
-  //free(Fline2d_at_data);
+  free(Fline2d_at_data);
   free(Fline2d);
 
   free(TransTau);
   free(TransV);
-  free(Trans2D_at_veldata);
   free(Trans2D);
 
   int i;

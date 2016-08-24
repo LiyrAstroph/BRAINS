@@ -46,6 +46,8 @@ void reconstruct_line1d()
     gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
 
     which_parameter_update = 1; // force to update the transfer function
+    which_particle_update = 0;
+    beta_old_particles[which_particle_update] = -1.0;
     Trans1D = Trans1D_particles[0];
     transfun_1d_cloud_direct(best_model_line1d);
     calculate_line_from_blrmodel(best_model_line1d, Tline, Fline, parset.n_line_recon);
@@ -141,7 +143,6 @@ void reconstruct_line1d_init()
 void reconstruct_line1d_end()
 {
   free(TransTau);
-  //free(Trans1D);
   free(Fline_at_data);
 
   free(Tline);
