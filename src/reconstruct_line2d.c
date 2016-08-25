@@ -18,9 +18,11 @@
 
 void reconstruct_line2d()
 {
+  char argv[1][10];
+
   reconstruct_line2d_init();
   
-  dnest_line2d(0, " ");
+  dnest_line2d(0, argv);
 
   if(thistask == roottask)
   {

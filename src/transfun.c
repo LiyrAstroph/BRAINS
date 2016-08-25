@@ -218,7 +218,7 @@ void transfun_2d_cloud_direct(void *pm, double *transv, double *trans2d, int n_v
 
   for(i=0; i<parset.n_tau; i++)
     for(j=0;j<n_vel;j++)
-      Trans2D[i*n_vel+j]=0.0;
+      trans2d[i*n_vel+j]=0.0;
 
   vcloud_max = -DBL_MAX;
   vcloud_min = DBL_MAX;
