@@ -15,19 +15,17 @@
 #include "allvars.h"
 #include "proto.h"
 
-#define NRANSI
- 
 #include "nrutil.h"
 
-void convlv(float data[], unsigned long n, float respns[], unsigned long m,
-  int isign, float ans[]);
+void convlv(double data[], unsigned long n, double respns[], unsigned long m,
+  int isign, double ans[]);
 
 /* Gaussian smooth */
 void line_gaussian_smooth_2D_FFT(double *transv, double *fl2d, int nl, int nv)
 {
   int i, j, nd, nM, isign;
   double sigV;
-  float *data, *respns, *resp, *ans, tot, dV;
+  double *data, *respns, *resp, *ans, tot, dV;
 
   sigV = parset.InstRes / VelUnit;
   nd = log(nv)/log(2.0) + 1.0;
@@ -64,7 +62,7 @@ void line_gaussian_smooth_2D_FFT(double *transv, double *fl2d, int nl, int nv)
 
   for(j=0; j<nl; j++)
   {
-    memcpy(resp+1, respns+1, nd*sizeof(float));
+    memcpy(resp+1, respns+1, nd*sizeof(double));
     for(i=0; i<nv; i++)
     {
       data[i+1] = fl2d[j*nv + i];
@@ -89,14 +87,14 @@ void line_gaussian_smooth_2D_FFT(double *transv, double *fl2d, int nl, int nv)
 
 }
 
-void convlv(float data[], unsigned long n, float respns[], unsigned long m,
-	int isign, float ans[])
+void convlv(double data[], unsigned long n, double respns[], unsigned long m,
+	int isign, double ans[])
 {
-	void realft(float data[], unsigned long n, int isign);
-	void twofft(float data1[], float data2[], float fft1[], float fft2[],
+	void realft(double data[], unsigned long n, int isign);
+	void twofft(double data1[], double data2[], double fft1[], double fft2[],
 		unsigned long n);
 	unsigned long i,no2;
-	float dum,mag2,*fft;
+	double dum,mag2,*fft;
 
 	fft=vector(1,n<<1);
 	for (i=1;i<=(m-1)/2;i++)
@@ -121,13 +119,11 @@ void convlv(float data[], unsigned long n, float respns[], unsigned long m,
 	free_vector(fft,1,n<<1);
 }
 
-#undef NRANSI
-
-void realft(float data[], unsigned long n, int isign)
+void realft(double data[], unsigned long n, int isign)
 {
-	void four1(float data[], unsigned long nn, int isign);
+	void four1(double data[], unsigned long nn, int isign);
 	unsigned long i,i1,i2,i3,i4,np3;
-	float c1=0.5,c2,h1r,h1i,h2r,h2i;
+	double c1=0.5,c2,h1r,h1i,h2r,h2i;
 	double wr,wi,wpr,wpi,wtemp,theta;
 
 	theta=3.141592653589793/(double) (n>>1);
@@ -167,12 +163,12 @@ void realft(float data[], unsigned long n, int isign)
 	}
 }
 
-void twofft(float data1[], float data2[], float fft1[], float fft2[],
+void twofft(double data1[], double data2[], double fft1[], double fft2[],
 	unsigned long n)
 {
-	void four1(float data[], unsigned long nn, int isign);
+	void four1(double data[], unsigned long nn, int isign);
 	unsigned long nn3,nn2,jj,j;
-	float rep,rem,aip,aim;
+	double rep,rem,aip,aim;
 
 	nn3=1+(nn2=2+n+n);
 	for (j=1,jj=2;j<=n;j++,jj+=2) {
@@ -199,11 +195,11 @@ void twofft(float data1[], float data2[], float fft1[], float fft2[],
 }
 
 #define SWAP(a,b) tempr=(a);(a)=(b);(b)=tempr
-void four1(float data[], unsigned long nn, int isign)
+void four1(double data[], unsigned long nn, int isign)
 {
 	unsigned long n,mmax,m,j,istep,i;
 	double wtemp,wr,wpr,wpi,wi,theta;
-	float tempr,tempi;
+	double tempr,tempi;
 
 	n=nn << 1;
 	j=1;

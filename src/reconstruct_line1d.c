@@ -181,9 +181,10 @@ double prob_line1d(void *model)
   }
 
   // only update transfer function when BLR model is changed.
+  // Trans1D is a pointer to the transfer function
   if(which_parameter_update < 8)
   {
-    Trans1D = Trans1D_particles[which_particle_update]; // Trans1D is a pointer
+    Trans1D = Trans1D_particles[which_particle_update]; 
     transfun_1d_cloud_direct(model);
     //memcpy(Trans1D_particles[which_particle_update], Trans1D, parset.n_tau*sizeof(double));
   }
@@ -198,7 +199,6 @@ double prob_line1d(void *model)
   {
     dy = Fline_data[i] - Fline_at_data[i] ;
     var2 = Flerrs_data[i]*Flerrs_data[i];
-    var2 = 1.0*var2;
     prob += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
   }
 

@@ -71,7 +71,6 @@ void transfun_1d_cloud_direct(void *pm)
   a = 1.0/beta/beta;
   s = mu/a;
   
-  //dtau =(parset.tau_max_set - parset.tau_min_set)/(parset.n_tau-1);
 
   for(i=0; i<parset.n_tau; i++)
   {
@@ -95,9 +94,9 @@ void transfun_1d_cloud_direct(void *pm)
       r = rcloud_max_set+1.0;
       while(r>rcloud_max_set || r<rcloud_min_set)
       {
+        rnd = gsl_ran_gamma(gsl_r, a, 1.0);
 //        r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, mu/beta, beta);
 //        r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
-        rnd = gsl_ran_gamma(gsl_r, a, 1.0);
         r = mu * F + (1.0-F) * s * rnd;
       }
       clouds_particles[which_particle_update][i] = rnd;
@@ -186,7 +185,9 @@ void calculate_line2d_from_blrmodel(void *pm, const double *Tl, const double *tr
   line_gaussian_smooth_2D_FFT(transv, fl2d, nl, nv);
 }
 
-/* time-lag grid is already set by parset.n_tau */
+/* time-lag grid is already set by parset.n_tau 
+ * calculate transfer function at velocity grid "transv" and time grid "TransTau" 
+ */
 void transfun_2d_cloud_direct(void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
   int i, j, idV, idt;
@@ -214,11 +215,11 @@ void transfun_2d_cloud_direct(void *pm, double *transv, double *trans2d, int n_v
   lambda = model->lambda;
   q = model->q;
   
-  dV =(transv[1] - transv[0]);
+  dV =(transv[1] - transv[0]); // velocity grid width
 
   for(i=0; i<parset.n_tau; i++)
     for(j=0;j<n_vel;j++)
-      trans2d[i*n_vel+j]=0.0;
+      trans2d[i*n_vel+j]=0.0;   // cleanup of transfer function
 
   vcloud_max = -DBL_MAX;
   vcloud_min = DBL_MAX;
