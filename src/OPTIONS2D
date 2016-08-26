@@ -1,11 +1,11 @@
 # File containing parameters for DNest4
 # Put comments at the top, or at the end of the line.
-1	# Number of particles
+2	# Number of particles
 5000	# new level interval
 5000	# save interval
 200	# threadSteps - how many steps each thread should do independently before communication
-200	# maximum number of levels
-10	# Backtracking scale length (lambda in the paper)
+150	# maximum number of levels
+5	# Backtracking scale length (lambda in the paper)
 100	# Strength of effect to force histogram to equal push. 0-10 is best. (beta in the paper)
 10	# Maximum number of saves (0 = infinite)
 data/sample2d.txt  # sample file

@@ -87,7 +87,7 @@ void init()
 void allocate_memory()
 {
   Tcon = malloc(parset.n_con_recon * sizeof(double));
-  Fcon = malloc(parset.n_con_recon * sizeof(double));
+//  Fcon = malloc(parset.n_con_recon * sizeof(double));
   Fcerrs = malloc(parset.n_con_recon * sizeof(double));
 
   PSmat = malloc(parset.n_con_recon * parset.n_con_recon * sizeof(double));
@@ -98,7 +98,7 @@ void allocate_memory()
 void free_memory()
 {
   free(Tcon);
-  free(Fcon);
+  //free(Fcon);
   free(Fcerrs);
 
   free(PSmat);

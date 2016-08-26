@@ -113,6 +113,7 @@ extern double *TransTau, *TransV, *Trans1D, *Trans2D_at_veldata, *Trans2D;
 extern double dTransTau, dTransV;
 extern double rcloud_min_set, rcloud_max_set;
 
+extern double **Fcon_particles;
 extern double **Trans1D_particles, **Trans2D_at_veldata_particles; // transfer function 1d for each particle
 extern double **clouds_particles;
 

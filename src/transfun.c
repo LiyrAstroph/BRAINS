@@ -89,7 +89,7 @@ void transfun_1d_cloud_direct(void *pm)
       Lthe = 0.0;
     
     // when the lastest MH move is not accepted, update clouds
-    if(beta !=beta_old_particles[which_particle_update]) //
+    if(beta !=beta_old_particles[which_particle_update] || which_parameter_update == -1) //
     {
       r = rcloud_max_set+1.0;
       while(r>rcloud_max_set || r<rcloud_min_set)
@@ -132,8 +132,8 @@ void transfun_1d_cloud_direct(void *pm)
     Trans1D[idx] += weight;
   }
 
-  // record the previous beta
-  if(which_parameter_update == 1)
+  // record the previous beta to save comupational time
+  if(which_parameter_update == 1 || which_parameter_update == -1)
     beta_old_particles[which_particle_update] = beta;
 
   Anorm = 0.0;
@@ -348,7 +348,7 @@ void transfun_2d_cloud_direct(void *pm, double *transv, double *trans2d, int n_v
   }
   
   // record the previous beta
-  if(which_parameter_update == 1)
+  if(which_parameter_update == 1 || which_parameter_update == -1)
     beta_old_particles[which_particle_update] = beta;
 
   Anorm = 0.0;

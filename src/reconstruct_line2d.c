@@ -49,10 +49,11 @@ void reconstruct_line2d()
 
     // recovered line2d at data points
     // force to update the transfer function.
-    which_parameter_update = 1;
+    which_parameter_update = -1;
     which_particle_update = 0;
     beta_old_particles[which_particle_update] = -1.0;
-    Trans2D_at_veldata = Trans2D_at_veldata_particles[0];
+    Fcon = Fcon_particles[which_particle_update];
+    Trans2D_at_veldata = Trans2D_at_veldata_particles[which_particle_update];
     transfun_2d_cloud_direct(best_model_line2d, Vline_data, Trans2D_at_veldata, 
     	                                        n_vel_data, parset.flag_save_clouds);
     calculate_line2d_from_blrmodel(best_model_line2d, Tline_data, Vline_data, Trans2D_at_veldata,
@@ -78,7 +79,7 @@ void reconstruct_line2d()
     fclose(fp);
 
     // recovered line2d at specified points
-    which_parameter_update = 1;
+    which_parameter_update = -1;
     which_particle_update = 0;
     transfun_2d_cloud_direct(best_model_line2d, TransV, Trans2D, parset.n_vel_recon, 0);
     calculate_line2d_from_blrmodel(best_model_line2d, Tline, TransV, 
@@ -112,7 +113,7 @@ void reconstruct_line2d()
       exit(-1);
     }
 
-    for(i=0; i<parset.n_line_recon; i++)
+    for(i=0; i<parset.n_tau; i++)
     {
       for(j=0; j<parset.n_vel_recon; j++)
       {
@@ -189,6 +190,12 @@ void reconstruct_line2d_init()
   beta_old_particles = malloc(parset.num_particles * sizeof(double));
   for(i=0; i<parset.num_particles; i++)
     beta_old_particles[i] = -1.0;
+  
+  Fcon_particles = malloc(parset.num_particles * sizeof(double *));
+  for(i=0; i<parset.num_particles; i++)
+  {
+    Fcon_particles[i] = malloc(parset.n_con_recon * sizeof(double));
+  }
 
   return;
 }
@@ -208,9 +215,12 @@ void reconstruct_line2d_end()
   {
     free(Trans2D_at_veldata_particles[i]);
     free(clouds_particles[i]);
+    free(Fcon_particles[i]);
   }
   free(Trans2D_at_veldata_particles);
   free(clouds_particles);
+  free(Fcon_particles);
+
   free(beta_old_particles);
   return;
 }
@@ -220,8 +230,16 @@ double prob_line2d(void *model)
   double prob = 0.0, fcon, var2, dy;
   int i;
   
-  calculate_con_from_model(model + 11*sizeof(double));
-  gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
+  if(which_parameter_update >=11 || which_parameter_update == -1)
+  {
+    Fcon = Fcon_particles[which_particle_update];
+    calculate_con_from_model(model + 11*sizeof(double));
+    gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
+  }
+  else
+  {
+    Fcon = Fcon_particles[which_particle_update];
+  }
 
   for(i=0; i<n_con_data; i++)
   {
@@ -230,7 +248,7 @@ double prob_line2d(void *model)
   }
   
   // only update transfer function when BLR model is changed.
-  if(which_parameter_update < 11)
+  if(which_parameter_update < 11 || which_parameter_update == -1)
   {
     Trans2D_at_veldata = Trans2D_at_veldata_particles[which_particle_update];
     transfun_2d_cloud_direct(model, Vline_data, Trans2D_at_veldata, n_vel_data, 0);

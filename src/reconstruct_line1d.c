@@ -45,10 +45,11 @@ void reconstruct_line1d()
 
     gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
 
-    which_parameter_update = 1; // force to update the transfer function
+    which_parameter_update = -1; // force to update the transfer function
     which_particle_update = 0;
     beta_old_particles[which_particle_update] = -1.0;
-    Trans1D = Trans1D_particles[0];
+    Fcon = Fcon_particles[which_particle_update];
+    Trans1D = Trans1D_particles[which_particle_update];
     transfun_1d_cloud_direct(best_model_line1d);
     calculate_line_from_blrmodel(best_model_line1d, Tline, Fline, parset.n_line_recon);
 
@@ -138,6 +139,12 @@ void reconstruct_line1d_init()
   beta_old_particles = malloc(parset.num_particles * sizeof(double));
   for(i=0; i<parset.num_particles; i++)
     beta_old_particles[i] = -1.0;
+
+  Fcon_particles = malloc(parset.num_particles * sizeof(double *));
+  for(i=0; i<parset.num_particles; i++)
+  {
+    Fcon_particles[i] = malloc(parset.n_con_recon * sizeof(double));
+  }
 }
 
 void reconstruct_line1d_end()
@@ -154,9 +161,11 @@ void reconstruct_line1d_end()
   {
     free(Trans1D_particles[i]);
     free(clouds_particles[i]);
+    free(Fcon_particles[i]);
   }
   free(Trans1D_particles);
   free(clouds_particles);
+  free(Fcon_particles);
 
   free(beta_old_particles);
 
@@ -171,8 +180,18 @@ double prob_line1d(void *model)
   double prob = 0.0, fcon, var2, dy;
   int i;
   
-  calculate_con_from_model(model + 8*sizeof(double));
-  gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
+  // only udate continuum reconstruction when the corresponding parameters are updated
+  // or force to update (which_parameter_update = -1)
+  if(which_parameter_update >= 8 || which_parameter_update == -1)
+  {
+    Fcon = Fcon_particles[which_particle_update];
+    calculate_con_from_model(model + 8*sizeof(double));
+    gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
+  }
+  else
+  {
+    Fcon = Fcon_particles[which_particle_update];
+  }
 
   for(i=0; i<n_con_data; i++)
   {
@@ -180,9 +199,10 @@ double prob_line1d(void *model)
     prob += -0.5*pow( (fcon - Fcon_data[i])/Fcerrs_data[i] ,  2.0) - ( 0.5*log(2.0*PI) + log(Fcerrs_data[i]) );
   }
 
-  // only update transfer function when BLR model is changed.
+  // only update transfer function when BLR model is changed
+  // or force to update (which_parameter_update = -1)
   // Trans1D is a pointer to the transfer function
-  if(which_parameter_update < 8)
+  if(which_parameter_update < 8 || which_parameter_update == -1)
   {
     Trans1D = Trans1D_particles[which_particle_update]; 
     transfun_1d_cloud_direct(model);
