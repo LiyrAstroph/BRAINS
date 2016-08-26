@@ -61,7 +61,7 @@ int dnest_line2d(int argc, char **argv)
 /*===========================================*/
 // users responsible for following struct definitions
 
-void from_prior_line2d(const void *model)
+void from_prior_line2d(void *model)
 {
   int i;
   double *pm = (double *)model;
@@ -94,7 +94,7 @@ double log_likelihoods_cal_line2d(const void *model)
   return logL;
 }
 
-double perturb_line2d(const void *model)
+double perturb_line2d(void *model)
 {
   double *pm = (double *)model;
   double logH = 0.0;
@@ -200,14 +200,14 @@ void print_particle_line2d(FILE *fp, const void *model)
   fprintf(fp, "\n");
 }
 
-void copy_model_line2d(const void *dest, const void *src)
+void copy_model_line2d(void *dest, const void *src)
 {
   memcpy(dest, src, size_of_modeltype);
 }
 
 void *create_model_line2d()
 {
-  return (void *)malloc( size_of_modeltype );
+  return (void *)malloc(size_of_modeltype);
 }
 
 int get_num_params_line2d()

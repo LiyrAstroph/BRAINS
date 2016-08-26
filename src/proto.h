@@ -13,6 +13,7 @@ void read_data();
 void allocate_memory_data();
 void free_memory_data();
 void allocate_memory();
+void free_memory();
 
 
 void init();
@@ -37,19 +38,19 @@ int dnest_line1d(int argc, char **argv);
 void reconstruct_line1d();
 void reconstruct_line1d_init();
 void reconstruct_line1d_end();
-double prob_line1d(void *model);
-void calculate_line_from_blrmodel(void *pm, double *Tl, double *Fl, int nl);
-void transfun_1d_cloud_direct(void *pm);
+double prob_line1d(const void *model);
+void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl);
+void transfun_1d_cloud_direct(const void *pm);
 
 /* 2d line reconstruction */
 int dnest_line2d(int argc, char **argv);
-double prob_line2d(void *model);
+double prob_line2d(const void *model);
 void reconstruct_line2d();
 void reconstruct_line2d_init();
 void reconstruct_line2d_end();
-void line_gaussian_smooth_2D_FFT(double *transv, double *fl2d, int nl, int nv);
-void transfun_2d_cloud_direct(void *pm, double *transv, double *trans2d, int n_vel, int flag_save);
-void calculate_line2d_from_blrmodel(void *pm, const double *Tl, const double *transv, const double *trans2d, 
+void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int nv);
+void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save);
+void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const double *transv, const double *trans2d, 
                                               double *fl2d, int nl, int nv);
 
 /* matrix operations */

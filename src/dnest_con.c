@@ -59,7 +59,7 @@ int dnest_con(int argc, char **argv)
 /*===========================================*/
 // users responsible for following struct definitions
 
-void from_prior_thismodel(const void *model)
+void from_prior_thismodel(void *model)
 {
   int i;
   double *pm = (double *)model;
@@ -79,7 +79,7 @@ double log_likelihoods_cal_thismodel(const void *model)
   return logL;
 }
 
-double perturb_thismodel(const void *model)
+double perturb_thismodel(void *model)
 {
   double *pm = (double *)model;
   double logH = 0.0;
@@ -133,7 +133,7 @@ void print_particle_thismodel(FILE *fp, const void *model)
   fprintf(fp, "\n");
 }
 
-void copy_model_thismodel(const void *dest, const void *src)
+void copy_model_thismodel(void *dest, const void *src)
 {
   memcpy(dest, src, size_of_modeltype);
 }

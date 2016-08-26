@@ -175,7 +175,7 @@ void reconstruct_line1d_end()
   }
 }
 
-double prob_line1d(void *model)
+double prob_line1d(const void *model)
 {
   double prob = 0.0, fcon, var2, dy;
   int i;

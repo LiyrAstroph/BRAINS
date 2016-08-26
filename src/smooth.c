@@ -21,7 +21,7 @@ void convlv(double data[], unsigned long n, double respns[], unsigned long m,
   int isign, double ans[]);
 
 /* Gaussian smooth */
-void line_gaussian_smooth_2D_FFT(double *transv, double *fl2d, int nl, int nv)
+void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int nv)
 {
   int i, j, nd, nM, isign;
   double sigV;

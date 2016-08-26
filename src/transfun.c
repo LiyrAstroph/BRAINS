@@ -20,7 +20,7 @@
 
 /* note that the light curves has been obtained in advance */
 
-void calculate_line_from_blrmodel(void *pm, double *Tl, double *Fl, int nl)
+void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl)
 {
   int i, j;
   double fline, fcon, tl, tc, tau, A;
@@ -51,7 +51,7 @@ void calculate_line_from_blrmodel(void *pm, double *Tl, double *Fl, int nl)
 
 }
 
-void transfun_1d_cloud_direct(void *pm)
+void transfun_1d_cloud_direct(const void *pm)
 {
   int i, idx;
   double r, phi, dis, Lopn_cos;
@@ -150,7 +150,7 @@ void transfun_1d_cloud_direct(void *pm)
   return;
 }
 
-void calculate_line2d_from_blrmodel(void *pm, const double *Tl, const double *transv, const double *trans2d, 
+void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const double *transv, const double *trans2d, 
                                               double *fl2d, int nl, int nv)
 {
   int i, j, k;
@@ -188,7 +188,7 @@ void calculate_line2d_from_blrmodel(void *pm, const double *Tl, const double *tr
 /* time-lag grid is already set by parset.n_tau 
  * calculate transfer function at velocity grid "transv" and time grid "TransTau" 
  */
-void transfun_2d_cloud_direct(void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
+void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
   int i, j, idV, idt;
   double vrange, r, phi, dis, Lopn_cos, u;
