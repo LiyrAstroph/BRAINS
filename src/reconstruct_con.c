@@ -184,10 +184,12 @@ void set_covar_Umat(double sigma, double tau, double alpha)
 
 void reconstruct_con_init()
 {
+  Fcon = malloc(parset.n_con_recon * sizeof(double));
   return;
 }
 
 void reconstruct_con_end()
 {
+  free(Fcon);
   return;
 }
