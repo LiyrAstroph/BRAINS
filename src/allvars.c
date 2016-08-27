@@ -33,8 +33,6 @@ char dnest_options_file[BRAINS_MAX_STR_LENGTH];
 
 int which_parameter_update, which_particle_update;  // which parameter and particle to be updated
 int *perturb_accept;
-double *beta_old_particles;
-double **model_old_particles;
 
 /* continuum reconstruction */
 double *Tcon, *Fcon, *Fcerrs;
@@ -59,7 +57,8 @@ double rcloud_min_set, rcloud_max_set;
 
 double **Fcon_particles, **Fcon_particles_perturb;
 double **Trans1D_particles, **Trans2D_at_veldata_particles;
-double **clouds_particles;
+double **Trans1D_particles_perturb, **Trans2D_at_veldata_particles_perturb;
+double **clouds_particles, **clouds_particles_perturb;
 
 /* GSL */
 const gsl_rng_type * gsl_T;

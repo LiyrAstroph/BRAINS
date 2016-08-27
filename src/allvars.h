@@ -74,8 +74,6 @@ extern char dnest_options_file[BRAINS_MAX_STR_LENGTH];
 
 extern int which_parameter_update, which_particle_update;  // which parameter and particle to be updated
 extern int *perturb_accept;
-extern double *beta_old_particles;
-extern double **model_old_particles;
 
 /* continuum reconstruction */
 extern double *Tcon, *Fcon, *Fcerrs;
@@ -117,7 +115,8 @@ extern double rcloud_min_set, rcloud_max_set;
 
 extern double **Fcon_particles, **Fcon_particles_perturb;
 extern double **Trans1D_particles, **Trans2D_at_veldata_particles; // transfer function 1d for each particle
-extern double **clouds_particles;
+extern double **Trans1D_particles_perturb, **Trans2D_at_veldata_particles_perturb;
+extern double **clouds_particles, **clouds_particles_perturb;
 
 /* GSL */
 extern const gsl_rng_type * gsl_T;

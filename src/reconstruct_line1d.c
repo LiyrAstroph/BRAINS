@@ -48,7 +48,6 @@ void reconstruct_line1d()
 
     which_parameter_update = -1; // force to update the transfer function
     which_particle_update = 0;
-    beta_old_particles[which_particle_update] = -1.0;
     Fcon = Fcon_particles[which_particle_update];
     Trans1D = Trans1D_particles[which_particle_update];
     transfun_1d_cloud_direct(best_model_line1d);
@@ -125,21 +124,21 @@ void reconstruct_line1d_init()
   MPI_Bcast(&parset.num_particles, 1, MPI_INT, roottask, MPI_COMM_WORLD);
 
   Trans1D_particles = malloc(parset.num_particles * sizeof(double *));
+  Trans1D_particles_perturb = malloc(parset.num_particles * sizeof(double *));
   for(i=0; i<parset.num_particles; i++)
   {
     Trans1D_particles[i] = malloc(parset.n_tau * sizeof(double));
+    Trans1D_particles_perturb[i] = malloc(parset.n_tau * sizeof(double));
   }
 
   // only record gamma-distribution random number of clouds
   clouds_particles = malloc(parset.num_particles * sizeof(double *));
+  clouds_particles_perturb = malloc(parset.num_particles * sizeof(double *));
   for(i=0; i<parset.num_particles; i++)
   {
     clouds_particles[i] = malloc(parset.n_cloud_per_task * sizeof(double));
+    clouds_particles_perturb[i] = malloc(parset.n_cloud_per_task * sizeof(double));
   }
-
-  beta_old_particles = malloc(parset.num_particles * sizeof(double));
-  for(i=0; i<parset.num_particles; i++)
-    beta_old_particles[i] = -1.0;
 
   Fcon_particles = malloc(parset.num_particles * sizeof(double *));
   Fcon_particles_perturb = malloc(parset.num_particles * sizeof(double *));
@@ -147,12 +146,6 @@ void reconstruct_line1d_init()
   {
     Fcon_particles[i] = malloc(parset.n_con_recon * sizeof(double));
     Fcon_particles_perturb[i] = malloc(parset.n_con_recon * sizeof(double));
-  }
-
-  model_old_particles = malloc(parset.num_particles * sizeof(double *));
-  for(i=0; i<parset.num_particles; i++)
-  {
-    model_old_particles[i] = malloc(size_of_modeltype);
   }
 
   perturb_accept = malloc(parset.num_particles * sizeof(int));
@@ -171,20 +164,20 @@ void reconstruct_line1d_end()
   for(i=0; i<parset.num_particles; i++)
   {
     free(Trans1D_particles[i]);
+    free(Trans1D_particles_perturb[i]);
     free(clouds_particles[i]);
+    free(clouds_particles_perturb[i]);
     free(Fcon_particles[i]);
     free(Fcon_particles_perturb[i]);
-    free(model_old_particles[i]);
   }
   free(Trans1D_particles);
+  free(Trans1D_particles_perturb);
   free(clouds_particles);
+  free(clouds_particles_perturb);
   free(Fcon_particles);
   free(Fcon_particles_perturb);
-  free(model_old_particles);
 
   free(perturb_accept);
-
-  free(beta_old_particles);
 
   if(thistask == roottask)
   {
@@ -197,18 +190,18 @@ double prob_line1d(const void *model)
   double prob = 0.0, fcon, var2, dy;
   int i;
   
-  // if the previous perturb is accepted, store the previous Fcon at perturb stage;
-  // otherwise, Fcon has no changes;
-  if(perturb_accept[which_particle_update] == 1)
-  {
-    memcpy(Fcon_particles[which_particle_update], Fcon_particles_perturb[which_particle_update], 
-      parset.n_con_recon*sizeof(double));
-  }
-  
   // only udate continuum reconstruction when the corresponding parameters are updated
   // or force to update (which_parameter_update = -1)
   if((which_parameter_update >= 8 ) || which_parameter_update == -1)
   {
+    // if the previous perturb is accepted, store the previous Fcon at perturb stage;
+    // otherwise, Fcon has no changes;
+    if(perturb_accept[which_particle_update] == 1)
+    {
+      memcpy(Fcon_particles[which_particle_update], Fcon_particles_perturb[which_particle_update], 
+        parset.n_con_recon*sizeof(double));
+    }
+
     Fcon = Fcon_particles_perturb[which_particle_update];
     calculate_con_from_model(model + 8*sizeof(double));
     gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
@@ -230,7 +223,12 @@ double prob_line1d(const void *model)
   // Trans1D is a pointer to the transfer function
   if(which_parameter_update < 8 || which_parameter_update == -1)
   {
-    Trans1D = Trans1D_particles[which_particle_update]; 
+    if(perturb_accept[which_particle_update] == 1)
+    {
+      memcpy(Trans1D_particles[which_particle_update], Trans1D_particles_perturb[which_particle_update], 
+        parset.n_tau * sizeof(double));
+    }
+    Trans1D = Trans1D_particles_perturb[which_particle_update]; 
     transfun_1d_cloud_direct(model);
     //memcpy(Trans1D_particles[which_particle_update], Trans1D, parset.n_tau*sizeof(double));
   }

@@ -51,7 +51,6 @@ void reconstruct_line2d()
     // force to update the transfer function.
     which_parameter_update = -1;
     which_particle_update = 0;
-    beta_old_particles[which_particle_update] = -1.0;
     Fcon = Fcon_particles[which_particle_update];
     Trans2D_at_veldata = Trans2D_at_veldata_particles[which_particle_update];
     transfun_2d_cloud_direct(best_model_line2d, Vline_data, Trans2D_at_veldata, 
@@ -175,27 +174,31 @@ void reconstruct_line2d_init()
   MPI_Bcast(&parset.num_particles, 1, MPI_INT, roottask, MPI_COMM_WORLD);
 
   Trans2D_at_veldata_particles = malloc(parset.num_particles * sizeof(double *));
+  Trans2D_at_veldata_particles_perturb = malloc(parset.num_particles * sizeof(double *));
   for(i=0; i<parset.num_particles; i++)
   {
     Trans2D_at_veldata_particles[i] = malloc(parset.n_tau * n_vel_data * sizeof(double));
+    Trans2D_at_veldata_particles_perturb[i] = malloc(parset.n_tau * n_vel_data * sizeof(double));
   }
 
   // only record gamma-distribution random number of clouds
   clouds_particles = malloc(parset.num_particles * sizeof(double *));
+  clouds_particles_perturb = malloc(parset.num_particles * sizeof(double *));
   for(i=0; i<parset.num_particles; i++)
   {
     clouds_particles[i] = malloc(parset.n_cloud_per_task * sizeof(double));
+    clouds_particles_perturb[i] = malloc(parset.n_cloud_per_task * sizeof(double));
   }
 
-  beta_old_particles = malloc(parset.num_particles * sizeof(double));
-  for(i=0; i<parset.num_particles; i++)
-    beta_old_particles[i] = -1.0;
-  
   Fcon_particles = malloc(parset.num_particles * sizeof(double *));
+  Fcon_particles_perturb = malloc(parset.num_particles * sizeof(double *));
   for(i=0; i<parset.num_particles; i++)
   {
     Fcon_particles[i] = malloc(parset.n_con_recon * sizeof(double));
+    Fcon_particles_perturb[i] = malloc(parset.n_con_recon * sizeof(double));
   }
+
+  perturb_accept = malloc(parset.num_particles * sizeof(int));
 
   return;
 }
@@ -214,14 +217,17 @@ void reconstruct_line2d_end()
   for(i=0; i<parset.num_particles; i++)
   {
     free(Trans2D_at_veldata_particles[i]);
+    free(Trans2D_at_veldata_particles_perturb[i]);
     free(clouds_particles[i]);
+    free(clouds_particles_perturb[i]);
     free(Fcon_particles[i]);
   }
   free(Trans2D_at_veldata_particles);
+  free(Trans2D_at_veldata_particles_perturb);
   free(clouds_particles);
+  free(clouds_particles_perturb);
   free(Fcon_particles);
 
-  free(beta_old_particles);
   return;
 }
 
@@ -232,7 +238,15 @@ double prob_line2d(const void *model)
   
   if(which_parameter_update >=11 || which_parameter_update == -1)
   {
-    Fcon = Fcon_particles[which_particle_update];
+    // if the previous perturb is accepted, store the previous Fcon at perturb stage;
+    // otherwise, Fcon has no changes;
+    if(perturb_accept[which_particle_update] == 1)
+    {
+      memcpy(Fcon_particles[which_particle_update], Fcon_particles_perturb[which_particle_update], 
+        parset.n_con_recon*sizeof(double));
+    }
+
+    Fcon = Fcon_particles_perturb[which_particle_update];
     calculate_con_from_model(model + 11*sizeof(double));
     gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
   }
@@ -251,7 +265,13 @@ double prob_line2d(const void *model)
   // only update transfer function when BLR model is changed.
   if(which_parameter_update < 11 || which_parameter_update == -1)
   {
-    Trans2D_at_veldata = Trans2D_at_veldata_particles[which_particle_update];
+    if(perturb_accept[which_particle_update] == 1)
+    {
+      memcpy(Trans2D_at_veldata_particles[which_particle_update], Trans2D_at_veldata_particles_perturb[which_particle_update], 
+        parset.n_tau * n_vel_data * sizeof(double));
+    }
+
+    Trans2D_at_veldata = Trans2D_at_veldata_particles_perturb[which_particle_update];
     transfun_2d_cloud_direct(model, Vline_data, Trans2D_at_veldata, n_vel_data, 0);
     //memcpy(Trans2D_at_veldata_particles[which_particle_update], Trans2D_at_veldata, 
     //  n_vel_data*parset.n_tau * sizeof(double));

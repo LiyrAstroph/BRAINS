@@ -89,7 +89,7 @@ void transfun_1d_cloud_direct(const void *pm)
       Lthe = 0.0;
     
     // when the lastest MH move is not accepted, update clouds
-    if(beta !=beta_old_particles[which_particle_update] || which_parameter_update == -1) //
+    if(which_parameter_update == 1 || which_parameter_update == -1) //
     {
       r = rcloud_max_set+1.0;
       while(r>rcloud_max_set || r<rcloud_min_set)
@@ -99,7 +99,7 @@ void transfun_1d_cloud_direct(const void *pm)
 //        r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
         r = mu * F + (1.0-F) * s * rnd;
       }
-      clouds_particles[which_particle_update][i] = rnd;
+      clouds_particles_perturb[which_particle_update][i] = rnd;
     }
     else
     {
@@ -133,8 +133,9 @@ void transfun_1d_cloud_direct(const void *pm)
   }
 
   // record the previous beta to save comupational time
-  if(which_parameter_update == 1 || which_parameter_update == -1)
-    beta_old_particles[which_particle_update] = beta;
+  if((which_parameter_update == 1 && perturb_accept[which_particle_update] == 1) || which_parameter_update == -1)
+    memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
+      parset.n_cloud_per_task * sizeof(double));
 
   Anorm = 0.0;
   for(i=0;i<parset.n_tau;i++)
@@ -247,7 +248,7 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
     else
       Lthe = 0.0;
 
-    if(beta !=beta_old_particles[which_particle_update]) // beta updated
+    if(which_parameter_update == 1 || which_parameter_update == -1) // beta updated
     {
       r = rcloud_max_set+1.0;
       while(r>rcloud_max_set || r<rcloud_min_set)
@@ -257,7 +258,7 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
 //        r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
         r = mu * F + (1.0-F) * s * rnd;
       } 
-      clouds_particles[which_particle_update][i] = rnd;
+      clouds_particles_perturb[which_particle_update][i] = rnd;
     }
     else
     {
@@ -348,8 +349,9 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
   }
   
   // record the previous beta
-  if(which_parameter_update == 1 || which_parameter_update == -1)
-    beta_old_particles[which_particle_update] = beta;
+  if((which_parameter_update == 1 && perturb_accept[which_particle_update] == 1) || which_parameter_update == -1)
+    memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
+      parset.n_cloud_per_task * sizeof(double));
 
   Anorm = 0.0;
   for(i=0; i<parset.n_tau; i++)
