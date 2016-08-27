@@ -223,12 +223,14 @@ void reconstruct_line2d_end()
     free(clouds_particles[i]);
     free(clouds_particles_perturb[i]);
     free(Fcon_particles[i]);
+    free(Fcon_particles_perturb[i]);
   }
   free(Trans2D_at_veldata_particles);
   free(Trans2D_at_veldata_particles_perturb);
   free(clouds_particles);
   free(clouds_particles_perturb);
   free(Fcon_particles);
+  free(Fcon_particles_perturb);
 
   return;
 }
