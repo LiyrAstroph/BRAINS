@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 #include <gsl/gsl_interp.h>
 
 #include "dnest_line1d.h"
@@ -141,10 +142,20 @@ void reconstruct_line1d_init()
     beta_old_particles[i] = -1.0;
 
   Fcon_particles = malloc(parset.num_particles * sizeof(double *));
+  Fcon_particles_perturb = malloc(parset.num_particles * sizeof(double *));
   for(i=0; i<parset.num_particles; i++)
   {
     Fcon_particles[i] = malloc(parset.n_con_recon * sizeof(double));
+    Fcon_particles_perturb[i] = malloc(parset.n_con_recon * sizeof(double));
   }
+
+  model_old_particles = malloc(parset.num_particles * sizeof(double *));
+  for(i=0; i<parset.num_particles; i++)
+  {
+    model_old_particles[i] = malloc(size_of_modeltype);
+  }
+
+  perturb_accept = malloc(parset.num_particles * sizeof(int));
 }
 
 void reconstruct_line1d_end()
@@ -162,10 +173,16 @@ void reconstruct_line1d_end()
     free(Trans1D_particles[i]);
     free(clouds_particles[i]);
     free(Fcon_particles[i]);
+    free(Fcon_particles_perturb[i]);
+    free(model_old_particles[i]);
   }
   free(Trans1D_particles);
   free(clouds_particles);
   free(Fcon_particles);
+  free(Fcon_particles_perturb);
+  free(model_old_particles);
+
+  free(perturb_accept);
 
   free(beta_old_particles);
 
@@ -180,11 +197,19 @@ double prob_line1d(const void *model)
   double prob = 0.0, fcon, var2, dy;
   int i;
   
+  // if the previous perturb is accepted, store the previous Fcon at perturb stage;
+  // otherwise, Fcon has no changes;
+  if(perturb_accept[which_particle_update] == 1)
+  {
+    memcpy(Fcon_particles[which_particle_update], Fcon_particles_perturb[which_particle_update], 
+      parset.n_con_recon*sizeof(double));
+  }
+  
   // only udate continuum reconstruction when the corresponding parameters are updated
   // or force to update (which_parameter_update = -1)
-  if(which_parameter_update >= 8 || which_parameter_update == -1)
+  if((which_parameter_update >= 8 ) || which_parameter_update == -1)
   {
-    Fcon = Fcon_particles[which_particle_update];
+    Fcon = Fcon_particles_perturb[which_particle_update];
     calculate_con_from_model(model + 8*sizeof(double));
     gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
   }
