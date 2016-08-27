@@ -26,7 +26,13 @@ void reconstruct_line2d()
 
   if(thistask == roottask)
   {
+    which_parameter_update = -1;
+    which_particle_update = 0;
+    Fcon = Fcon_particles[which_particle_update];
+
     calculate_con_from_model(best_model_line2d + 11 *sizeof(double));
+    gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
+
     FILE *fp;
     char fname[200];
     int i, j;
@@ -45,13 +51,9 @@ void reconstruct_line2d()
     }
     fclose(fp);
 
-    gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
-
+    
     // recovered line2d at data points
     // force to update the transfer function.
-    which_parameter_update = -1;
-    which_particle_update = 0;
-    Fcon = Fcon_particles[which_particle_update];
     Trans2D_at_veldata = Trans2D_at_veldata_particles[which_particle_update];
     transfun_2d_cloud_direct(best_model_line2d, Vline_data, Trans2D_at_veldata, 
     	                                        n_vel_data, parset.flag_save_clouds);

@@ -25,7 +25,13 @@ void reconstruct_line1d()
 
   if(thistask == roottask)
   {
+    which_parameter_update = -1; // force to update the transfer function
+    which_particle_update = 0;
+    Fcon = Fcon_particles[which_particle_update];
+
     calculate_con_from_model(best_model_line1d + 8 *sizeof(double));
+    gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
+    
     FILE *fp;
     char fname[200];
     int i;
@@ -44,11 +50,6 @@ void reconstruct_line1d()
     }
     fclose(fp);
 
-    gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
-
-    which_parameter_update = -1; // force to update the transfer function
-    which_particle_update = 0;
-    Fcon = Fcon_particles[which_particle_update];
     Trans1D = Trans1D_particles[which_particle_update];
     transfun_1d_cloud_direct(best_model_line1d);
     calculate_line_from_blrmodel(best_model_line1d, Tline, Fline, parset.n_line_recon);
