@@ -191,6 +191,7 @@ double prob_line1d(const void *model)
   else
   {
     Fcon = Fcon_particles[which_particle_update];
+    gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
   }
 
   for(i=0; i<n_con_data; i++)

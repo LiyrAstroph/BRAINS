@@ -160,7 +160,7 @@ void reconstruct_line2d_init()
   }
 
   double vel_max_set = Vline_data[n_vel_data -1], vel_min_set = Vline_data[0];
-  double dVel = (vel_max_set- vel_min_set)/(parset.n_vel_recon);
+  double dVel = (vel_max_set- vel_min_set)/(parset.n_vel_recon -1.0);
 
   for(i=0; i<parset.n_vel_recon; i++)
   {
@@ -239,6 +239,7 @@ double prob_line2d(const void *model)
   else
   {
     Fcon = Fcon_particles[which_particle_update];
+    gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
   }
 
   for(i=0; i<n_con_data; i++)
