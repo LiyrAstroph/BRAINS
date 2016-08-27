@@ -18,8 +18,10 @@
 
 void reconstruct_con()
 {
+  char *argv[]={""};
+
   reconstruct_con_init();
-  dnest_con(0, " ");
+  dnest_con(0, argv);
 
   if(thistask == roottask)
   {

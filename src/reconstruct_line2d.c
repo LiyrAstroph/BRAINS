@@ -18,7 +18,7 @@
 
 void reconstruct_line2d()
 {
-  char argv[1][10];
+  char *argv[]={" "};
 
   reconstruct_line2d_init();
   
