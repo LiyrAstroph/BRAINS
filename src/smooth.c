@@ -37,7 +37,7 @@ void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int
   resp = vector(1, nd);
   ans = vector(1, nd*2);
   
-  dV = TransV[1] - TransV[0];
+  dV = transv[1] - transv[0];
   tot = 0.0;
   for(i=1; i<=nM/2; i++)
   {
