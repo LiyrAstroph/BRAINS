@@ -201,6 +201,8 @@ void reconstruct_line2d_init()
   }
 
   perturb_accept = malloc(parset.num_particles * sizeof(int));
+  for(i=0; i<parset.num_particles; i++)
+    perturb_accept[i] = 0;
 
   return;
 }
