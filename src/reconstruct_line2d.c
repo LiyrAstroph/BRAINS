@@ -240,15 +240,18 @@ double prob_line2d(const void *model)
   double prob = 0.0, fcon, var2, dy;
   int i;
   
+  // if the previous perturb is accepted, store the previous Fcon at perturb stage;
+  // otherwise, Fcon has no changes;
+  if(perturb_accept[which_particle_update] == 1)
+  {
+    memcpy(Fcon_particles[which_particle_update], Fcon_particles_perturb[which_particle_update], 
+      parset.n_con_recon*sizeof(double));
+    memcpy(Trans2D_at_veldata_particles[which_particle_update], Trans2D_at_veldata_particles_perturb[which_particle_update], 
+        parset.n_tau * n_vel_data * sizeof(double));
+  }
+
   if(which_parameter_update >=11 || which_parameter_update == -1)
   {
-    // if the previous perturb is accepted, store the previous Fcon at perturb stage;
-    // otherwise, Fcon has no changes;
-    if(perturb_accept[which_particle_update] == 1)
-    {
-      memcpy(Fcon_particles[which_particle_update], Fcon_particles_perturb[which_particle_update], 
-        parset.n_con_recon*sizeof(double));
-    }
 
     Fcon = Fcon_particles_perturb[which_particle_update];
     calculate_con_from_model(model + 11*sizeof(double));
@@ -269,11 +272,6 @@ double prob_line2d(const void *model)
   // only update transfer function when BLR model is changed.
   if(which_parameter_update < 11 || which_parameter_update == -1)
   {
-    if(perturb_accept[which_particle_update] == 1)
-    {
-      memcpy(Trans2D_at_veldata_particles[which_particle_update], Trans2D_at_veldata_particles_perturb[which_particle_update], 
-        parset.n_tau * n_vel_data * sizeof(double));
-    }
 
     Trans2D_at_veldata = Trans2D_at_veldata_particles_perturb[which_particle_update];
     transfun_2d_cloud_direct(model, Vline_data, Trans2D_at_veldata, n_vel_data, 0);
@@ -297,6 +295,14 @@ double prob_line2d(const void *model)
   }
   if(isnan(prob))
     prob = -DBL_MAX;
+
+  if(which_parameter_update == -1)
+  {
+    memcpy(Fcon_particles[which_particle_update], Fcon_particles_perturb[which_particle_update], 
+      parset.n_con_recon*sizeof(double));
+    memcpy(Trans2D_at_veldata_particles[which_particle_update], Trans2D_at_veldata_particles_perturb[which_particle_update], 
+        parset.n_tau * n_vel_data * sizeof(double));
+  }
   return prob;
 }
 

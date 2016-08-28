@@ -72,7 +72,7 @@ void transfun_1d_cloud_direct(const void *pm)
   s = mu/a;
   
   // record the previous beta to save comupational time
-  if((which_parameter_update == 1 && perturb_accept[which_particle_update] == 1) || which_parameter_update == -1)
+  if(perturb_accept[which_particle_update] == 1 )
     memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
       parset.n_cloud_per_task * sizeof(double));
 
@@ -135,6 +135,11 @@ void transfun_1d_cloud_direct(const void *pm)
     //Trans1D[idx] += pow(1.0/r, 2.0*(1 + model.Ag)) * weight;
     Trans1D[idx] += weight;
   }
+
+  // record the previous beta to save comupational time
+  if(which_parameter_update == -1)
+    memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
+      parset.n_cloud_per_task * sizeof(double));
 
   Anorm = 0.0;
   for(i=0;i<parset.n_tau;i++)
@@ -226,7 +231,7 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
 
 
   // record the previous values
-  if((which_parameter_update == 1 && perturb_accept[which_particle_update] == 1) || which_parameter_update == -1)
+  if(perturb_accept[which_particle_update] == 1)
     memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
       parset.n_cloud_per_task * sizeof(double));
 
@@ -356,6 +361,11 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
     }
   }
   
+  
+  // force to record the previous values
+  if(which_parameter_update == -1)
+    memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
+      parset.n_cloud_per_task * sizeof(double));
 
   Anorm = 0.0;
   for(i=0; i<parset.n_tau; i++)

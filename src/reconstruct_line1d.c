@@ -191,18 +191,22 @@ double prob_line1d(const void *model)
   double prob = 0.0, fcon, var2, dy;
   int i;
   
+  
+  // if the previous perturb is accepted, store the previous Fcon at perturb stage;
+  // otherwise, Fcon has no changes;
+  if(perturb_accept[which_particle_update] == 1)
+  {
+    memcpy(Fcon_particles[which_particle_update], Fcon_particles_perturb[which_particle_update], 
+      parset.n_con_recon*sizeof(double));
+
+    memcpy(Trans1D_particles[which_particle_update], Trans1D_particles_perturb[which_particle_update], 
+        parset.n_tau * sizeof(double));
+  }
+
   // only udate continuum reconstruction when the corresponding parameters are updated
   // or force to update (which_parameter_update = -1)
   if((which_parameter_update >= 8 ) || which_parameter_update == -1)
   {
-    // if the previous perturb is accepted, store the previous Fcon at perturb stage;
-    // otherwise, Fcon has no changes;
-    if(perturb_accept[which_particle_update] == 1)
-    {
-      memcpy(Fcon_particles[which_particle_update], Fcon_particles_perturb[which_particle_update], 
-        parset.n_con_recon*sizeof(double));
-    }
-
     Fcon = Fcon_particles_perturb[which_particle_update];
     calculate_con_from_model(model + 8*sizeof(double));
     gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
@@ -224,11 +228,6 @@ double prob_line1d(const void *model)
   // Trans1D is a pointer to the transfer function
   if(which_parameter_update < 8 || which_parameter_update == -1)
   {
-    if(perturb_accept[which_particle_update] == 1)
-    {
-      memcpy(Trans1D_particles[which_particle_update], Trans1D_particles_perturb[which_particle_update], 
-        parset.n_tau * sizeof(double));
-    }
     Trans1D = Trans1D_particles_perturb[which_particle_update]; 
     transfun_1d_cloud_direct(model);
     //memcpy(Trans1D_particles[which_particle_update], Trans1D, parset.n_tau*sizeof(double));
@@ -245,6 +244,15 @@ double prob_line1d(const void *model)
     dy = Fline_data[i] - Fline_at_data[i] ;
     var2 = Flerrs_data[i]*Flerrs_data[i];
     prob += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
+  }
+
+  if(which_parameter_update == -1)
+  {
+    memcpy(Fcon_particles[which_particle_update], Fcon_particles_perturb[which_particle_update], 
+      parset.n_con_recon*sizeof(double));
+
+    memcpy(Trans1D_particles[which_particle_update], Trans1D_particles_perturb[which_particle_update], 
+        parset.n_tau * sizeof(double));
   }
 
   return prob;
