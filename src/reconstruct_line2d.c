@@ -22,10 +22,14 @@ void reconstruct_line2d()
 
   reconstruct_line2d_init();
   
+  smooth_init(n_vel_data);
   dnest_line2d(0, argv);
-
+  smooth_end();
+  
   if(thistask == roottask)
   {
+    smooth_init(n_vel_data);
+
     which_parameter_update = -1;
     which_particle_update = 0;
     Fcon = Fcon_particles[which_particle_update];
@@ -78,8 +82,11 @@ void reconstruct_line2d()
       fprintf(fp, "\n");
     }
     fclose(fp);
+    smooth_end();
 
     // recovered line2d at specified points
+    smooth_init(parset.n_vel_recon);
+
     which_parameter_update = -1;
     which_particle_update = 0;
     transfun_2d_cloud_direct(best_model_line2d, TransV, Trans2D, parset.n_vel_recon, 0);
@@ -124,7 +131,7 @@ void reconstruct_line2d()
       fprintf(fp, "\n");
     }
     fclose(fp);
-    
+    smooth_end();
   }
 
   reconstruct_line2d_end();
@@ -203,7 +210,6 @@ void reconstruct_line2d_init()
   perturb_accept = malloc(parset.num_particles * sizeof(int));
   for(i=0; i<parset.num_particles; i++)
     perturb_accept[i] = 0;
-
   return;
 }
 
@@ -233,7 +239,7 @@ void reconstruct_line2d_end()
   free(clouds_particles_perturb);
   free(Fcon_particles);
   free(Fcon_particles_perturb);
-
+  
   return;
 }
 

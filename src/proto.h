@@ -53,6 +53,9 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
 void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const double *transv, const double *trans2d, 
                                               double *fl2d, int nl, int nv);
 
+void smooth_init(int nv);
+void smooth_end();
+
 /* matrix operations */
 void inverse_mat(double *a, int n, int *info);
 double det_mat(double *a, int n, int *info);

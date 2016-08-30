@@ -3,7 +3,7 @@
 FileDir                     /home/liyropt/Projects/GIT/BRAINS
 %FileDir                     /ihepbatch/mbhd01/user/liyanrong/RM/MCMC_BRAINS/arp151_2d
 
-FlagDim                     0
+FlagDim                     2
 %===============================
 % data file
 ContinnumFile               data/arp151_con.txt         % file for contnnum data

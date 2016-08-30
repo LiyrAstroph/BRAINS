@@ -1,5 +1,6 @@
 *.o
 src/*
+src/*~
 doc/*
 data/*
 analysis/*

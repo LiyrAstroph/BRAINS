@@ -21,7 +21,7 @@
 #define SEC_PER_YEAR  3.155e7
 #define CM_PER_LD    (C*8.64e4)
 
-#define PI            3.141592653589793
+#define PI            M_PI
 #define BRAINS_MAX_STR_LENGTH  (100)
 
 /* MPICH */
