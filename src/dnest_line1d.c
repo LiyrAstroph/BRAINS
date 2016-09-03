@@ -27,6 +27,8 @@ void *best_model_line1d, *best_model_std_line1d;
 
 int dnest_line1d(int argc, char **argv)
 {
+  double temperature;
+  
   num_params = parset.n_con_recon + 3 + 8;
   size_of_modeltype = num_params * sizeof(double);
   best_model_line1d = malloc(size_of_modeltype);
@@ -45,7 +47,8 @@ int dnest_line1d(int argc, char **argv)
   strcpy(options_file, dnest_options_file);
 
   dnest(argc, argv);
-  
+  temperature = 1.0;
+  dnest_postprocess(temperature);
   if(thistask == 0)
   {
     int j;

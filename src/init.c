@@ -36,7 +36,12 @@ void init()
   /* initialize GSL */
   gsl_T = gsl_rng_default;
   gsl_r = gsl_rng_alloc (gsl_T);
+
+#ifndef Debug 
   gsl_rng_set(gsl_r, time(NULL)+thistask+1350); 
+#else
+  gsl_rng_set(gsl_r, 6666+thistask+1350); 
+#endif
 
   gsl_acc = gsl_interp_accel_alloc();
   gsl_linear = gsl_interp_alloc(gsl_interp_linear, parset.n_con_recon);

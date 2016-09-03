@@ -10,6 +10,8 @@ SHELL=/bin/bash
 CC       = mpicc
 OPTIMIZE = -O3 -Wall
 
+OPTIMIZE += -DDebug
+
 #------------target system---------
 #SYSTEM="Darwin"
 SYSTEM="Linux"

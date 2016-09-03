@@ -27,6 +27,8 @@ void *best_model_thismodel, *best_model_std_thismodel;
 
 int dnest_con(int argc, char **argv)
 {
+  double temperature;
+
   num_params = parset.n_con_recon + 3;
   size_of_modeltype = num_params * sizeof(double);
   best_model_thismodel = malloc(size_of_modeltype);
@@ -45,6 +47,8 @@ int dnest_con(int argc, char **argv)
   sprintf(options_file, "%s/%s", parset.file_dir, "src/OPTIONSCON");
   
   dnest(argc, argv);
+  temperature = 1.0;
+  dnest_postprocess(temperature);
   
   if(thistask == 0)
   {

@@ -19,13 +19,13 @@ cut = 0;
 numResampleLogX=1
 compression_bias_min=1.
 compression_scatter=0.
-temperature = 1
+temperature = 200.0
 zoom_in = True
 moreSamples = 1
 
-levels_orig = np.loadtxt("../data/levels.txt", comments='#')
-sample_info = np.loadtxt("../data/sample_info.txt", comments='#')
-sample = np.atleast_2d(np.loadtxt("../data/sample.txt"))
+levels_orig = np.loadtxt("../data/levels2d.txt", comments='#')
+sample_info = np.loadtxt("../data/sample_info2d.txt", comments='#')
+sample = np.atleast_2d(np.loadtxt("../data/sample2d.txt"))
 
 sample = sample[int(cut*sample.shape[0]):, :]
 sample_info = sample_info[int(cut*sample_info.shape[0]):, :]
@@ -124,7 +124,9 @@ for z in range(0, numResampleLogX):
       logp_samples[logl_samples_thisLevel[j][2]][z] = np.log(0.5) + logdiffexp(right, left)
 
   logl = sample_info[:,1]/temperature
-
+  
+  print(logl[100])
+  
   logp_samples[:,z] = logp_samples[:,z] - logsumexp(logp_samples[:,z]) # make sure that Sum(p) = 1.0
   logP_samples[:,z] = logp_samples[:,z] + logl
   logz_estimates[z] = logsumexp(logP_samples[:,z])
