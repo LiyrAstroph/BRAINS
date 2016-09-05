@@ -44,8 +44,7 @@ int dnest_con(int argc, char **argv)
   get_num_params = get_num_params_thismodel;
   copy_best_model = copy_best_model_thismodel;
   
-  sprintf(options_file, "%s/%s", parset.file_dir, "src/OPTIONSCON");
-  
+  strcpy(options_file, dnest_options_file);
   dnest(argc, argv);
   temperature = 1.0;
   dnest_postprocess(temperature);
@@ -86,7 +85,7 @@ double log_likelihoods_cal_thismodel(const void *model)
 double perturb_thismodel(void *model)
 {
   double *pm = (double *)model;
-  double logH = 0.0;
+  double logH = 0.0, limit1, limit2, width;
   //printf("P1 %f %f\n", model->params[0], model->params[1]);
   int which = dnest_rand_int(num_params);
   if(which >= num_params || which < 0)
@@ -97,26 +96,49 @@ double perturb_thismodel(void *model)
   
   which_parameter_update = which;
   
+  if(which_level_update !=0)
+  {
+    limit1 = limits[(which_level_update-1) * num_params *2 + which *2];
+    limit2 = limits[(which_level_update-1) * num_params *2 + which *2 + 1];
+    width = limit2 - limit1;
+  }
+
   switch(which)
   {
     case 0:
-      pm[0] += 3.0*dnest_randh();
+      if(which_level_update == 0)
+      {
+        width = 3.0;
+      }
+      pm[0] += width*dnest_randh();
       wrap(&(pm[0]), -3.0, 0.0);
       break;
     
     case 1:
-      pm[1] += 8.0*dnest_randh();
+      if(which_level_update == 0)
+      {
+        width = 8.0;
+      }
+      pm[1] += width*dnest_randh();
       wrap(&(pm[1]), 2.0, 10.0);
       break;
 
     case 2:
-      pm[2] += 2.0*dnest_randh();
+      if(which_level_update == 0)
+      {
+        width = 2.0;
+      }
+      pm[2] += width*dnest_randh();
       wrap(&(pm[2]), 0.0, 2.0);
       break;
 
     default:
+      if(which_level_update == 0)
+      {
+        width = 20.0;
+      }
       logH -= (-0.5*pow(pm[which], 2.0) );
-      pm[which] += 20.0*dnest_randh();
+      pm[which] += width*dnest_randh();
       wrap(&pm[which], -10.0, 10.0);
       logH += (-0.5*pow(pm[which], 2.0) );
       break;

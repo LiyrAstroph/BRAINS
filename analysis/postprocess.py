@@ -19,7 +19,7 @@ cut = 0;
 numResampleLogX=1
 compression_bias_min=1.
 compression_scatter=0.
-temperature = 200.0
+temperature = 1.0
 zoom_in = True
 moreSamples = 1
 

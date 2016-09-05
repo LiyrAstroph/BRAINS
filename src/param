@@ -23,7 +23,7 @@ Line2DDataConstructFileOut  data/pline2d_data.txt
 Tran2DFileOut               data/tran2d.txt
 
 NCloudPerCore               1000
-NVPerCloud                  100
+NVPerCloud                  10
 
 NTau                        100
 TauMinSet                   0.0

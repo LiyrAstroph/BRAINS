@@ -186,12 +186,27 @@ void set_covar_Umat(double sigma, double tau, double alpha)
 
 void reconstruct_con_init()
 {
+  int i;
+
   Fcon = malloc(parset.n_con_recon * sizeof(double));
+
+  sprintf(dnest_options_file, "%s/%s", parset.file_dir, "src/OPTIONSCON");
+  if(thistask == roottask)
+  {
+    get_num_particles(dnest_options_file);
+  }
+  MPI_Bcast(&parset.num_particles, 1, MPI_INT, roottask, MPI_COMM_WORLD);
+
+  perturb_accept = malloc(parset.num_particles * sizeof(int));
+  for(i=0; i<parset.num_particles; i++)
+    perturb_accept[i] = 0;
+
   return;
 }
 
 void reconstruct_con_end()
 {
   free(Fcon);
+  free(perturb_accept);
   return;
 }

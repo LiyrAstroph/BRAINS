@@ -24,8 +24,8 @@ void init()
   double dT;
 
   /* set time array for continuum */
-  Tcon_min = Tcon_data[0] - fmax(0.1*(Tcon_data[n_con_data -1] - Tcon_data[0]), 20);
-  Tcon_max = Tcon_data[n_con_data-1] + fmax(0.1*(Tcon_data[n_con_data -1] - Tcon_data[0]), 20);
+  Tcon_min = Tcon_data[0] - fmax(0.05*(Tcon_data[n_con_data -1] - Tcon_data[0]), 10);
+  Tcon_max = Tcon_data[n_con_data-1] + fmax(0.05*(Tcon_data[n_con_data -1] - Tcon_data[0]), 10);
   dT = (Tcon_max - Tcon_min)/(parset.n_con_recon -1);
   
   for(i=0; i<parset.n_con_recon; i++)

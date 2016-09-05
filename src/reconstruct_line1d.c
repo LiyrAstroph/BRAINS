@@ -194,8 +194,8 @@ double prob_line1d(const void *model)
   int i;
   
   
-  // if the previous perturb is accepted, store the previous Fcon at perturb stage;
-  // otherwise, Fcon has no changes;
+  // if the previous perturb is accepted, store the previous Fcon and transfer function 
+  // obtained at perturb stage; otherwise, no changes;
   if(perturb_accept[which_particle_update] == 1)
   {
     memcpy(Fcon_particles[which_particle_update], Fcon_particles_perturb[which_particle_update], 
@@ -205,7 +205,7 @@ double prob_line1d(const void *model)
         parset.n_tau * sizeof(double));
   }
 
-  // only udate continuum reconstruction when the corresponding parameters are updated
+  // only update continuum reconstruction when the corresponding parameters are updated
   // or force to update (which_parameter_update = -1)
   if((which_parameter_update >= 8 ) || which_parameter_update == -1)
   {
@@ -248,6 +248,7 @@ double prob_line1d(const void *model)
     prob += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
   }
 
+  // force to update
   if(which_parameter_update == -1)
   {
     memcpy(Fcon_particles[which_particle_update], Fcon_particles_perturb[which_particle_update], 

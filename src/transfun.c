@@ -382,14 +382,14 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
     }
   }
 
-  vrange = vcloud_max - vcloud_min;
+  /*vrange = vcloud_max - vcloud_min;
   if(vrange<=0.0)
   {
     fprintf(stderr, "No velocity-resolved lag for given BLR model!\n");
     //printf("%f %f %f %f %f\n", model->inc, model->opn, model->lambda, model->F, model->beta);
     //printf("%f %f %f\n", model->k, model->q, model->mu);
     //printf("%e %e %f %f %f\n", vcloud_max, vcloud_min, V, Vr, Vph);
-  }
+  }*/
 
   if(flag_save && thistask == roottask)
     fclose(fcloud_out);
