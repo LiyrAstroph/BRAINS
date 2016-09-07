@@ -50,14 +50,15 @@ void smooth_init(int nv)
 
 void smooth_end()
 {
+
   gsl_fft_real_wavetable_free(real_data);
   gsl_fft_real_wavetable_free(real_resp);
   gsl_fft_complex_wavetable_free(cmp_data);
-
+  
   gsl_fft_real_workspace_free(work_data);
   gsl_fft_real_workspace_free(work_resp);
   gsl_fft_complex_workspace_free(work_cmp);
-
+  
   free(resp);
   free(data_fft);
 
@@ -86,7 +87,7 @@ void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int
     tot += resp[i];
   }  
   
-  for(i=1; i<=nd_fft; i++)
+  for(i=0; i<nd_fft; i++)
   {
     resp[i] /= (tot * dV);
   }
