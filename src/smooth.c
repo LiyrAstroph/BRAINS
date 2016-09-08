@@ -117,6 +117,61 @@ void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int
   return;
 }
 
+// test smooth 
+void line_gaussian_smooth_2D_FFT_test(const double *transv, double *fl2d, int nl, int nv)
+{
+  int i, j;
+  double sigV, dV, tot;
+
+  sigV = parset.InstRes / VelUnit;
+  dV = transv[1] - transv[0];
+
+  tot = 0.0;
+  for (i = 0; i<nd_fft/2; i++)
+  {
+    resp[i] = 1.0/sqrt(2.0*M_PI)/sigV * exp(-0.5*(i*dV)*(i*dV)/sigV/sigV);
+    tot += resp[i];
+  }
+  for (i = nd_fft-1; i>= nd_fft/2; i--)
+  {
+    resp[i] = 1.0/sqrt(2.0*M_PI)/sigV * exp(-0.5*((i-nd_fft)*dV)*((i-nd_fft)*dV)/sigV/sigV);
+    tot += resp[i];
+  }  
+  
+  for(i=0; i<nd_fft; i++)
+  {
+    resp[i] /= (tot * dV);
+  }
+  gsl_fft_real_transform(resp, 1, nd_fft, real_resp, work_resp);
+  gsl_fft_halfcomplex_unpack(resp, resp_cmp, 1, nd_fft);
+
+  for(j=0; j<nl; j++)
+  {
+    //memcpy(data_fft, &fl2d[j*nv], nv*sizeof(double));
+    for(i=0; i<nv; i++)
+    {
+      data_fft[i] =   exp( - 0.5 * pow(transv[i]/(1500.0/VelUnit), 2.0));
+    }
+
+    gsl_fft_real_transform(data_fft, 1, nd_fft, real_data, work_data);
+    gsl_fft_halfcomplex_unpack(data_fft, data_fft_cmp, 1, nd_fft);
+    
+    for(i=0; i<nd_fft; i++)
+    {
+      data_fft_inverse[i*2] = data_fft_cmp[i*2]*resp_cmp[i*2] - data_fft_cmp[i*2+1]*resp_cmp[i*2+1];
+      data_fft_inverse[i*2+1] = data_fft_cmp[i*2]*resp_cmp[i*2+1] + data_fft_cmp[i*2+1]*resp_cmp[i*2];
+    }
+    gsl_fft_complex_inverse(data_fft_inverse, 1, nd_fft, cmp_data, work_cmp);
+
+    for(i=0; i<nv; i++)
+    {
+      // take into account the velocity grid width
+      fl2d[j*nv + i] = data_fft_inverse[i*2] * dV;
+    }
+  }
+  return;
+}
+
 void smooth_test()
 {
   int i, n = 205;
