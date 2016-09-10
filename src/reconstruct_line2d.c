@@ -28,12 +28,11 @@ void reconstruct_line2d()
   
   if(thistask == roottask)
   {
-    smooth_init(n_vel_data);
-
+    
     which_parameter_update = -1;
     which_particle_update = 0;
     Fcon = Fcon_particles[which_particle_update];
-
+    
     calculate_con_from_model(best_model_line2d + 11 *sizeof(double));
     gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
 
@@ -55,15 +54,15 @@ void reconstruct_line2d()
     }
     fclose(fp);
 
-    
+    smooth_init(n_vel_data);
     // recovered line2d at data points
     // force to update the transfer function.
     Trans2D_at_veldata = Trans2D_at_veldata_particles[which_particle_update];
     transfun_2d_cloud_direct(best_model_line2d, Vline_data, Trans2D_at_veldata, 
     	                                        n_vel_data, parset.flag_save_clouds);
-    calculate_line2d_from_blrmodel(best_model_line2d, Tline_data, Vline_data, Trans2D_at_veldata,
-    	                                            Fline2d_at_data, n_line_data, n_vel_data);
-
+    calculate_line2d_from_blrmodel(best_model_line2d, Tline_data, Vline_data, Trans2D_at_veldata, 
+                                                       Fline2d_at_data, n_line_data, n_vel_data);
+    
     sprintf(fname, "%s/%s", parset.file_dir, parset.pline2d_data_out_file);
     fp = fopen(fname, "w");
     if(fp == NULL)
@@ -71,19 +70,18 @@ void reconstruct_line2d()
       fprintf(stderr, "# Error: Cannot open file %s\n", fname);
       exit(-1);
     }
-
+    
     for(i=0; i<n_line_data; i++)
     {
       for(j=0; j<n_vel_data; j++)
       {
       	fprintf(fp, "%f %f %f\n", Vline_data[j]*VelUnit, Tline_data[i],  Fline2d_at_data[i*n_vel_data + j] / line_scale);
       }
-
       fprintf(fp, "\n");
     }
     fclose(fp);
     smooth_end();
-
+    
     // recovered line2d at specified points
     smooth_init(parset.n_vel_recon);
 
@@ -210,6 +208,9 @@ void reconstruct_line2d_init()
   perturb_accept = malloc(parset.num_particles * sizeof(int));
   for(i=0; i<parset.num_particles; i++)
     perturb_accept[i] = 0;
+
+  prob_con_particles = malloc(parset.num_particles * sizeof(double));
+  prob_con_particles_perturb = malloc(parset.num_particles * sizeof(double));
   return;
 }
 
@@ -240,6 +241,8 @@ void reconstruct_line2d_end()
   free(Fcon_particles);
   free(Fcon_particles_perturb);
   
+  free(prob_con_particles);
+  free(prob_con_particles_perturb);
   return;
 }
 
@@ -256,6 +259,7 @@ double prob_line2d(const void *model)
       parset.n_con_recon*sizeof(double));
     memcpy(Trans2D_at_veldata_particles[which_particle_update], Trans2D_at_veldata_particles_perturb[which_particle_update], 
         parset.n_tau * n_vel_data * sizeof(double));
+    prob_con_particles[which_particle_update] = prob_con_particles_perturb[which_particle_update];
   }
 
   if(which_parameter_update >=11 || which_parameter_update == -1)
@@ -264,17 +268,19 @@ double prob_line2d(const void *model)
     Fcon = Fcon_particles_perturb[which_particle_update];
     calculate_con_from_model(model + 11*sizeof(double));
     gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
+
+    for(i=0; i<n_con_data; i++)
+    {
+      fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, Tcon_data[i], gsl_acc);
+      prob += -0.5*pow( (fcon - Fcon_data[i])/Fcerrs_data[i] ,  2.0) - ( 0.5*log(2.0*PI) + log(Fcerrs_data[i]) );
+    }
+    prob_con_particles_perturb[which_particle_update] = prob;
   }
   else
   {
     Fcon = Fcon_particles[which_particle_update];
     gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
-  }
-
-  for(i=0; i<n_con_data; i++)
-  {
-    fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, Tcon_data[i], gsl_acc);
-    prob += -0.5*pow( (fcon - Fcon_data[i])/Fcerrs_data[i] ,  2.0) - ( 0.5*log(2.0*PI) + log(Fcerrs_data[i]) );
+    prob += prob_con_particles[which_particle_update];
   }
   
   // only update transfer function when BLR model is changed.
@@ -310,6 +316,7 @@ double prob_line2d(const void *model)
       parset.n_con_recon*sizeof(double));
     memcpy(Trans2D_at_veldata_particles[which_particle_update], Trans2D_at_veldata_particles_perturb[which_particle_update], 
         parset.n_tau * n_vel_data * sizeof(double));
+    prob_con_particles[which_particle_update] = prob_con_particles_perturb[which_particle_update];
   }
   return prob;
 }

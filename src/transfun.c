@@ -116,16 +116,16 @@ void transfun_1d_cloud_direct(const void *pm)
     y = r * sin(phi);
     z = 0.0;
 
-    xb = cos(Lthe)*cos(Lphi) * x - sin(Lphi) * y + sin(Lthe)*cos(Lphi) * z;
-    yb = cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
-    zb =-sin(Lthe) * x + cos(Lthe) * z;
+    xb = cos(Lthe)*cos(Lphi) * x - sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
+    yb = cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y - sin(Lthe)*sin(Lphi) * z;
+    zb = sin(Lthe) * x + cos(Lthe) * z;
 
 // rotate around y
-    x = xb * cos(inc) - zb * sin(inc);
+    x = xb * cos(PI/2.0-inc) - zb * sin(PI/2.0-inc);
     y = yb;
-    z = xb * sin(inc) + zb * cos(inc);
+    z = xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
 
-    dis = r - z;
+    dis = r - x;
 
     if(dis<parset.tau_min_set || dis>=parset.tau_max_set+dTransTau)
     	continue;
@@ -188,6 +188,14 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
 
 // smooth out the line profile
   line_gaussian_smooth_2D_FFT(transv, fl2d, nl, nv);
+// add narrow line
+  for(j = 0; j<nl; j++)
+  {
+    for(i=0; i<nv; i++)
+    {
+      fl2d[j*nv + i] += 3.38*0.15 * exp( -0.5 * pow( (transv[i] + 160.0/VelUnit)/(355.0/VelUnit), 2.0)) * line_scale;
+    }
+  }  
 }
 
 /* time-lag grid is already set by parset.n_tau 
@@ -251,12 +259,13 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
   {
 // generate a direction of the angular momentum     
     Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    if(Lopn_cos<1.0)
+    /*if(Lopn_cos<1.0)
     {
       Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
     }
     else
-      Lthe = 0.0;
+      Lthe = 0.0;*/
+    Lthe = gsl_rng_uniform(gsl_r) * model->opn*PI/180.0;
 
     if(which_parameter_update == 1 || which_parameter_update == -1) // beta updated
     {
@@ -281,16 +290,16 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
     y = r * sin(phi);
     z = 0.0;
 
-    xb = cos(Lthe)*cos(Lphi) * x - sin(Lphi) * y + sin(Lthe)*cos(Lphi) * z;
-    yb = cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
-    zb =-sin(Lthe) * x + cos(Lthe) * z;
+    xb = cos(Lthe)*cos(Lphi) * x - sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
+    yb = cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y - sin(Lthe)*sin(Lphi) * z;
+    zb = sin(Lthe) * x + cos(Lthe) * z;
 
 // rotate around y
-    x = xb * cos(inc) - zb * sin(inc);
+    x = xb * cos(PI/2.0-inc) - zb * sin(PI/2.0-inc);
     y = yb;
-    z = xb * sin(inc) + zb * cos(inc);
+    z = xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
 
-    dis = r - z;
+    dis = r - x;
 
     if(dis< parset.tau_min_set || dis>= parset.tau_max_set + dTransTau)
       continue;
@@ -335,13 +344,13 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
       vy = Vr * sin(phi) + Vph * cos(phi);
       vz = 0.0;     
 
-      vxb = cos(Lthe)*cos(Lphi) * vx - sin(Lphi) * vy + sin(Lthe)*cos(Lphi) * vz;
-      vyb = cos(Lthe)*sin(Lphi) * vx + cos(Lphi) * vy + sin(Lthe)*sin(Lphi) * vz;
-      vzb =-sin(Lthe) * vx + cos(Lthe) * vz;
+      vxb = cos(Lthe)*cos(Lphi) * vx - sin(Lphi) * vy - sin(Lthe)*cos(Lphi) * vz;
+      vyb = cos(Lthe)*sin(Lphi) * vx + cos(Lphi) * vy - sin(Lthe)*sin(Lphi) * vz;
+      vzb = sin(Lthe) * vx + cos(Lthe) * vz;
     
-      vx = vxb * cos(inc) - vzb * sin(inc);
+      vx = vxb * cos(PI/2.0-inc) - vzb * sin(PI/2.0-inc);
       vy = vyb;
-      vz = vxb * sin(inc) + vzb * cos(inc);
+      vz = vxb * sin(PI/2.0-inc) + vzb * cos(PI/2.0-inc);
 
       vcloud_max = fmax(vz, vcloud_max);
       vcloud_min = fmin(vz, vcloud_min);
@@ -351,7 +360,7 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
         fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx, vy, vz);
       }
 
-      V = -vz;  //note the definition of the line-of-sight velocity. postive means a receding 
+      V = -vx;  //note the definition of the line-of-sight velocity. postive means a receding 
                 // velocity relative to the observer.
       if(V<transv[0] || V>=transv[n_vel-1]+dV)
         continue;

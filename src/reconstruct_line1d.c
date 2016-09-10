@@ -152,6 +152,9 @@ void reconstruct_line1d_init()
   perturb_accept = malloc(parset.num_particles * sizeof(int));
   for(i=0; i<parset.num_particles; i++)
     perturb_accept[i] = 0;
+
+  prob_con_particles = malloc(parset.num_particles * sizeof(double));
+  prob_con_particles_perturb = malloc(parset.num_particles * sizeof(double));
 }
 
 void reconstruct_line1d_end()
@@ -181,6 +184,8 @@ void reconstruct_line1d_end()
   free(Fcon_particles_perturb);
 
   free(perturb_accept);
+  free(prob_con_particles);
+  free(prob_con_particles_perturb);
 
   if(thistask == roottask)
   {
