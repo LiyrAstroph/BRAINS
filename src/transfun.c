@@ -259,13 +259,13 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
   {
 // generate a direction of the angular momentum     
     Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    /*if(Lopn_cos<1.0)
+    if(Lopn_cos<1.0)
     {
       Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
     }
     else
-      Lthe = 0.0;*/
-    Lthe = gsl_rng_uniform(gsl_r) * model->opn*PI/180.0;
+      Lthe = 0.0;
+    //Lthe = gsl_rng_uniform(gsl_r) * model->opn*PI/180.0;
 
     if(which_parameter_update == 1 || which_parameter_update == -1) // beta updated
     {
@@ -325,7 +325,7 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
       if(lambda>1.0e-2)   //make sure that exp is caculatable.
         L = Lmax * lambda * log( (exp(1.0/lambda) - 1.0) * gsl_rng_uniform(gsl_r) + 1.0 );
       else
-        L = Lmax + lambda * log(gsl_rng_uniform(gsl_r));
+        L = Lmax * (1.0 + lambda * log(gsl_rng_uniform(gsl_r)) );
  
       Vr2 = 2.0 * (E + mbh/r) - L*L/r/r;
       if(Vr2>=0.0)
