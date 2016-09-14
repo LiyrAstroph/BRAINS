@@ -33,7 +33,7 @@ void reconstruct_line2d()
     which_particle_update = 0;
     Fcon = Fcon_particles[which_particle_update];
     
-    calculate_con_from_model(best_model_line2d + 11 *sizeof(double));
+    calculate_con_from_model(best_model_line2d + 12 *sizeof(double));
     gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
 
     FILE *fp;
@@ -150,8 +150,8 @@ void reconstruct_line2d_init()
   Fline2d = malloc(parset.n_line_recon * parset.n_vel_recon * sizeof(double));
 
   int i;
-  Tline_min = Tline_data[0] - fmin(0.1*(Tline_data[n_line_data - 1] - Tline_data[0]), 20);
-  Tline_max = Tline_data[n_line_data -1] + fmin(0.1*(Tline_data[n_line_data - 1] - Tline_data[0]), 20);
+  Tline_min = Tline_data[0] - fmin(0.1*(Tline_data[n_line_data - 1] - Tline_data[0]), 10);
+  Tline_max = Tline_data[n_line_data -1] + fmin(0.1*(Tline_data[n_line_data - 1] - Tline_data[0]), 10);
   double dT = (Tline_max - Tline_min)/(n_line_data - 1);
 
   for(i=0; i<parset.n_line_recon; i++)
@@ -250,6 +250,7 @@ double prob_line2d(const void *model)
 {
   double prob = 0.0, fcon, var2, dy;
   int i;
+  double *pm = (double *)model;
   
   // if the previous perturb is accepted, store the previous Fcon at perturb stage;
   // otherwise, Fcon has no changes;
@@ -262,11 +263,11 @@ double prob_line2d(const void *model)
     prob_con_particles[which_particle_update] = prob_con_particles_perturb[which_particle_update];
   }
 
-  if(which_parameter_update >=11 || which_parameter_update == -1)
+  if(which_parameter_update >=12 || which_parameter_update == -1)
   {
 
     Fcon = Fcon_particles_perturb[which_particle_update];
-    calculate_con_from_model(model + 11*sizeof(double));
+    calculate_con_from_model(model + 12*sizeof(double));
     gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
 
     for(i=0; i<n_con_data; i++)
@@ -284,6 +285,7 @@ double prob_line2d(const void *model)
   }
   
   // only update transfer function when BLR model is changed.
+  // pm[11] only appears as errors
   if(which_parameter_update < 11 || which_parameter_update == -1)
   {
 
@@ -304,7 +306,7 @@ double prob_line2d(const void *model)
   {
     dy = Fline2d_data[i] - Fline2d_at_data[i] ;
     var2 = Flerrs2d_data[i]*Flerrs2d_data[i];
-    var2 = 1.0*var2;
+    var2 += exp(pm[11])*exp(pm[11]);
     prob += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
   }
   if(isnan(prob))

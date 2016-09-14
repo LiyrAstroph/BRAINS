@@ -105,7 +105,7 @@ typedef struct
 	double mbh;      // in 10e6 solar mass
 	double lambda;
 	double q;
-	//double logse;
+	double logse;
 }BLRmodel;
 
 extern BLRmodel range_model[2];

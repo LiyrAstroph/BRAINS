@@ -319,8 +319,7 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
       chi = lambda * gsl_ran_gaussian(gsl_r, 1.0);
       E = Emin / (1.0 + exp(-chi));
 
-      Lmax = 2.0 * r*r * (E + mbh/r);
-      Lmax = sqrt(Lmax > 0.0? Lmax:0.0);
+      Lmax = sqrt(2.0 * r*r * (E + mbh/r));
 
       if(lambda>1.0e-2)   //make sure that exp is caculatable.
         L = Lmax * lambda * log( (exp(1.0/lambda) - 1.0) * gsl_rng_uniform(gsl_r) + 1.0 );
@@ -352,8 +351,8 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
       vy = vyb;
       vz = vxb * sin(PI/2.0-inc) + vzb * cos(PI/2.0-inc);
 
-      vcloud_max = fmax(vz, vcloud_max);
-      vcloud_min = fmin(vz, vcloud_min);
+      vcloud_max = fmax(vx, vcloud_max);
+      vcloud_min = fmin(vx, vcloud_min);
 
       if(flag_save && thistask==roottask)
       {

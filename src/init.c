@@ -83,8 +83,8 @@ void init()
   range_model[0].q = 0.0;
   range_model[1].q = 1.0;
 
-  //range_model[0].logse = log(1.0e-12);
-  //range_model[1].logse = log(1.0e6);
+  range_model[0].logse = log(1.0e-12);
+  range_model[1].logse = log(1.0e6);
 
   range_model[1].mu = fmin(range_model[1].mu, rcloud_max_set);
 }
