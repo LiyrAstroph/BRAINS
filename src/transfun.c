@@ -109,6 +109,9 @@ void transfun_1d_cloud_direct(const void *pm)
     {
       rnd = clouds_particles[which_particle_update][i];
       r = mu * F + (1.0-F) * s * rnd;
+
+      //update perturb value
+      clouds_particles_perturb[which_particle_update][i] = rnd;
     }
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
@@ -286,6 +289,9 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
     {
       rnd = clouds_particles[which_particle_update][i];
       r = mu * F + (1.0-F) * s * rnd;
+
+      //update perturb values
+      clouds_particles_perturb[which_particle_update][i] = rnd;
     }
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
