@@ -301,12 +301,14 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
 
     dis = r - x;
 
-    if(dis< parset.tau_min_set || dis>= parset.tau_max_set + dTransTau)
-      continue;
+    //if(dis< parset.tau_min_set || dis>= parset.tau_max_set + dTransTau)
+    //  continue;
     //weight = 0.5 + k*(z/r);
     weight = 0.5 + k * x/sqrt(x*x+y*y);
     idt = (dis - parset.tau_min_set)/dTransTau;
 
+    if(idt < 0 || idt >= parset.n_tau)
+      continue;
 // velocity  
 // note that a cloud moves in its orbit plane, whose direction
 // is determined by the direction of its angular momentum.
@@ -361,9 +363,12 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
 
       V = -vx;  //note the definition of the line-of-sight velocity. postive means a receding 
                 // velocity relative to the observer.
-      if(V<transv[0] || V>=transv[n_vel-1]+dV)
-        continue;
+      //if(V<transv[0] || V>=transv[n_vel-1]+dV)
+      //  continue
+
       idV = (V - transv[0])/dV;
+      if(idV < 0 || idV >= n_vel)
+        continue;
       //Trans2D[idt*n_vel + idV] += pow(1.0/r, 2.0*(1 + model.Ag)) * weight;
       trans2d[idt*n_vel + idV] += weight;
     }
