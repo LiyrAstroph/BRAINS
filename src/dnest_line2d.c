@@ -194,7 +194,7 @@ double perturb_line2d(void *model)
         width = ( limit2 - limit1 );
       }
       pm[5] += dnest_randh() * width;
-      wrap(&(pm[5]), range_model[0].A, range_model[0].A);
+      wrap(&(pm[5]), range_model[0].A, range_model[1].A);
       break;
 
     case 6:
