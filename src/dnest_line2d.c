@@ -139,7 +139,7 @@ double perturb_line2d(void *model)
       }
 
       pm[0] += dnest_randh() * width;
-      wrap(&(pm[0]), limit1, limit2);
+      wrap(&(pm[0]), range_model[0].mu, range_model[1].mu);
       break;
     
     case 1:
@@ -150,7 +150,7 @@ double perturb_line2d(void *model)
         width =  ( limit2 - limit1 );
       }
       pm[1] += dnest_randh() * width;
-      wrap(&(pm[1]), limit1, limit2);
+      wrap(&(pm[1]), range_model[0].beta, range_model[1].beta);
       break;
 
     case 2:
@@ -161,7 +161,7 @@ double perturb_line2d(void *model)
         width = ( limit2 - limit1 );
       }
       pm[2] += dnest_randh() * width;
-      wrap(&(pm[2]), limit1, limit2 );
+      wrap(&(pm[2]), range_model[0].F, range_model[1].F );
       break;
 
     case 3:
@@ -172,7 +172,7 @@ double perturb_line2d(void *model)
         width = ( limit2 - limit1 );
       }
       pm[3] += dnest_randh() * width;
-      wrap(&(pm[3]), limit1, limit2 );
+      wrap(&(pm[3]), range_model[0].inc, range_model[1].inc );
       break;
 
     case 4:
@@ -183,7 +183,7 @@ double perturb_line2d(void *model)
         width = ( limit2 - limit1 );
       }
       pm[4] += dnest_randh() * width;
-      wrap(&(pm[4]), limit1, limit2 );
+      wrap(&(pm[4]), range_model[0].opn, range_model[1].opn );
       break;
 
     case 5:
@@ -194,7 +194,7 @@ double perturb_line2d(void *model)
         width = ( limit2 - limit1 );
       }
       pm[5] += dnest_randh() * width;
-      wrap(&(pm[5]), limit1, limit2);
+      wrap(&(pm[5]), range_model[0].A, range_model[0].A);
       break;
 
     case 6:
@@ -205,7 +205,7 @@ double perturb_line2d(void *model)
         width = ( limit2 - limit1 );
       }
       pm[6] += dnest_randh() * width;
-      wrap(&(pm[6]), limit1, limit2);
+      wrap(&(pm[6]), range_model[0].Ag, range_model[1].Ag);
       break;
 
     case 7:
@@ -216,7 +216,7 @@ double perturb_line2d(void *model)
         width = ( limit2 - limit1 );
       }
       pm[7] += dnest_randh() * width;
-      wrap(&(pm[7]), limit1, limit2);
+      wrap(&(pm[7]), range_model[0].k, range_model[1].k);
       break;
 
     case 8:
@@ -227,7 +227,7 @@ double perturb_line2d(void *model)
         width = ( limit2 - limit1 );
       }
       pm[8] += dnest_randh() * width;
-      wrap(&(pm[8]), limit1, limit2);
+      wrap(&(pm[8]), range_model[0].mbh, range_model[1].mbh);
       break;
 
     case 9:
@@ -238,7 +238,7 @@ double perturb_line2d(void *model)
         width = ( limit2 - limit1 );
       }
       pm[9] += dnest_randh() * width;
-      wrap(&(pm[9]), limit1, limit2);
+      wrap(&(pm[9]), range_model[0].lambda, range_model[1].lambda);
       break;
 
     case 10:
@@ -249,7 +249,7 @@ double perturb_line2d(void *model)
         width = ( limit2 - limit1 );
       }
       pm[10] += dnest_randh() * width;
-      wrap(&(pm[10]), limit1, limit2);
+      wrap(&(pm[10]), range_model[0].q, range_model[1].q);
       break;
 
     case 11:
@@ -260,7 +260,7 @@ double perturb_line2d(void *model)
         width =  ( limit2 - limit1 );
       }
       pm[11] += dnest_randh() * width;
-      wrap(&(pm[11]), limit1, limit2);
+      wrap(&(pm[11]), range_model[0].logse, range_model[1].logse);
       break;
 
     case 12:
@@ -271,7 +271,7 @@ double perturb_line2d(void *model)
         width = ( limit2 - limit1 );
       }
       pm[12] += dnest_randh() * width;
-      wrap(&(pm[12]), limit1, limit2 );
+      wrap(&(pm[12]), -3.0, 0.0 );
       break;
     
     case 13:
@@ -282,7 +282,7 @@ double perturb_line2d(void *model)
         width = ( limit2 - limit1 );
       }
       pm[13] += dnest_randh() * width;
-      wrap(&(pm[13]), limit1, limit2);
+      wrap(&(pm[13]), 2.0, 10.0);
       break;
 
     case 14:
@@ -293,7 +293,7 @@ double perturb_line2d(void *model)
         width = ( limit2 - limit1 );
       }
       pm[14] += dnest_randh() * width;
-      wrap(&(pm[14]), limit1, limit2);
+      wrap(&(pm[14]), 0.0, 2.0);
       break;
 
     default:
@@ -305,7 +305,7 @@ double perturb_line2d(void *model)
       }
       logH -= (-0.5*pow(pm[which], 2.0) );
       pm[which] += dnest_randh() * width;
-      wrap(&pm[which], limit1, limit2);
+      wrap(&pm[which], -10.0, 10.0);
       logH += (-0.5*pow(pm[which], 2.0) );
       break;
   }
