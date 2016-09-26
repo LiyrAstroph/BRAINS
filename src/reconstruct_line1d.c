@@ -29,7 +29,7 @@ void reconstruct_line1d()
     which_particle_update = 0;
     Fcon = Fcon_particles[which_particle_update];
 
-    calculate_con_from_model(best_model_line1d + 8 *sizeof(double));
+    calculate_con_from_model(best_model_line1d + 9 *sizeof(double));
     gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
     
     FILE *fp;
@@ -197,6 +197,7 @@ double prob_line1d(const void *model)
 {
   double prob = 0.0, fcon, var2, dy;
   int i;
+  double *pm = (double *)model;
   
   
   // if the previous perturb is accepted, store the previous Fcon and transfer function 
@@ -208,28 +209,33 @@ double prob_line1d(const void *model)
 
     memcpy(Trans1D_particles[which_particle_update], Trans1D_particles_perturb[which_particle_update], 
         parset.n_tau * sizeof(double));
+
+    prob_con_particles[which_particle_update] = prob_con_particles_perturb[which_particle_update];
   }
 
   // only update continuum reconstruction when the corresponding parameters are updated
   // or force to update (which_parameter_update = -1)
-  if((which_parameter_update >= 8 ) || which_parameter_update == -1)
+  if((which_parameter_update >= 9 ) || which_parameter_update == -1)
   {
     Fcon = Fcon_particles_perturb[which_particle_update];
-    calculate_con_from_model(model + 8*sizeof(double));
+    calculate_con_from_model(model + 9*sizeof(double));
     gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
+
+    for(i=0; i<n_con_data; i++)
+    {
+      fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, Tcon_data[i], gsl_acc);
+      prob += -0.5*pow( (fcon - Fcon_data[i])/Fcerrs_data[i] ,  2.0) - ( 0.5*log(2.0*PI) + log(Fcerrs_data[i]) );
+    }
+    prob_con_particles_perturb[which_particle_update] = prob;
   }
   else
   {
     Fcon = Fcon_particles[which_particle_update];
     gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
+    prob += prob_con_particles[which_particle_update];
   }
 
-  for(i=0; i<n_con_data; i++)
-  {
-    fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, Tcon_data[i], gsl_acc);
-    prob += -0.5*pow( (fcon - Fcon_data[i])/Fcerrs_data[i] ,  2.0) - ( 0.5*log(2.0*PI) + log(Fcerrs_data[i]) );
-  }
-
+  
   // only update transfer function when BLR model is changed
   // or force to update (which_parameter_update = -1)
   // Trans1D is a pointer to the transfer function
@@ -250,6 +256,7 @@ double prob_line1d(const void *model)
   {
     dy = Fline_data[i] - Fline_at_data[i] ;
     var2 = Flerrs_data[i]*Flerrs_data[i];
+    var2 += exp(pm[8]) * exp(pm[8]);
     prob += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
   }
 
@@ -261,6 +268,8 @@ double prob_line1d(const void *model)
 
     memcpy(Trans1D_particles[which_particle_update], Trans1D_particles_perturb[which_particle_update], 
         parset.n_tau * sizeof(double));
+
+    prob_con_particles[which_particle_update] = prob_con_particles_perturb[which_particle_update];
   }
 
   return prob;

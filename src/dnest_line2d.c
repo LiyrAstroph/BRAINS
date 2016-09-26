@@ -103,7 +103,7 @@ double perturb_line2d(void *model)
 {
   double *pm = (double *)model;
   double logH = 0.0, limit1, limit2, width;
-  //printf("P1 %f %f\n", model->params[0], model->params[1]);
+
   int which = dnest_rand_int(num_params);
   if(which >= num_params || which < 0)
   {
@@ -215,6 +215,7 @@ double perturb_line2d(void *model)
       }
       pm[7] += dnest_randh() * width;
       wrap(&(pm[7]), limit1, limit2);
+      break;
 
     case 8:
       if(which_level_update == 0)
@@ -225,6 +226,7 @@ double perturb_line2d(void *model)
       }
       pm[8] += dnest_randh() * width;
       wrap(&(pm[8]), limit1, limit2);
+      break;
 
     case 9:
       if(which_level_update == 0)
@@ -235,6 +237,7 @@ double perturb_line2d(void *model)
       }
       pm[9] += dnest_randh() * width;
       wrap(&(pm[9]), limit1, limit2);
+      break;
 
     case 10:
       if(which_level_update == 0)
@@ -245,6 +248,7 @@ double perturb_line2d(void *model)
       }
       pm[10] += dnest_randh() * width;
       wrap(&(pm[10]), limit1, limit2);
+      break;
 
     case 11:
       if(which_level_update == 0)
@@ -255,6 +259,7 @@ double perturb_line2d(void *model)
       }
       pm[11] += dnest_randh() * width;
       wrap(&(pm[11]), limit1, limit2);
+      break;
 
     case 12:
       if(which_level_update == 0)

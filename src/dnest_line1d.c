@@ -29,7 +29,7 @@ int dnest_line1d(int argc, char **argv)
 {
   double temperature;
   
-  num_params = parset.n_con_recon + 3 + 8;
+  num_params = parset.n_con_recon + 3 + 9;
   size_of_modeltype = num_params * sizeof(double);
   best_model_line1d = malloc(size_of_modeltype);
   best_model_std_line1d = malloc(size_of_modeltype);
@@ -76,12 +76,13 @@ void from_prior_line1d(void *model)
   pm[5] = range_model[0].A + dnest_rand()*( range_model[1].A - range_model[0].A );
   pm[6] = range_model[0].Ag + dnest_rand()*( range_model[1].Ag - range_model[0].Ag );
   pm[7] = range_model[0].k + dnest_rand()*( range_model[1].k - range_model[0].k );
+  pm[8] = range_model[1].logse - dnest_rand()*( range_model[1].logse - range_model[0].logse )*0.1;
   
-  pm[8] = -3.0 + dnest_rand()*3.0;
-  pm[9] =  2.0 + dnest_rand()*8.0;
-  pm[10] = 0.0 + dnest_rand()*2.0;
+  pm[9] = -3.0 + dnest_rand()*3.0;
+  pm[10] =  2.0 + dnest_rand()*8.0;
+  pm[11] = 0.0 + dnest_rand()*2.0;
   for(i=0; i<parset.n_con_recon; i++)
-    pm[i+3+8] = dnest_randn();
+    pm[i+3+9] = dnest_randn();
 
   which_parameter_update = -1; // force to update the clouds's ridal distribution
 }
@@ -107,10 +108,16 @@ double perturb_line1d(void *model)
   
   which_parameter_update = which;
 
-  if(which_level_update !=0)
+  if(which_level_update !=0 || which_level_update < 10)
   {
     limit1 = limits[(which_level_update-1) * num_params *2 + which *2];
     limit2 = limits[(which_level_update-1) * num_params *2 + which *2 + 1];
+    width = limit2 - limit1;
+  }
+  else
+  {
+    limit1 = limits[(10-1) * num_params *2 + which *2];
+    limit2 = limits[(10-1) * num_params *2 + which *2 + 1];
     width = limit2 - limit1;
   }
 
@@ -187,32 +194,42 @@ double perturb_line1d(void *model)
       }
       pm[7] += dnest_randh() * width;
       wrap(&(pm[7]), range_model[0].k, range_model[1].k);
+      break;
 
-    case 8:
+     case 8:
+      if(which_level_update == 0)
+      {
+        width =  ( range_model[1].logse - range_model[0].logse );
+      }
+      pm[8] += dnest_randh() * width;
+      wrap(&(pm[8]), range_model[0].logse, range_model[1].logse);
+      break;
+
+    case 9:
       if(which_level_update == 0)
       {
         width = 3.0;
       }
-      pm[8] += dnest_randh() * width;
-      wrap(&(pm[8]), -3.0, 0.0);
+      pm[9] += dnest_randh() * width;
+      wrap(&(pm[9]), -3.0, 0.0);
       break;
     
-    case 9:
+    case 10:
       if(which_level_update == 0)
       {
         width = 8.0;
       }
-      pm[9] += dnest_randh() * width;
-      wrap(&(pm[9]), 2.0, 10.0);
+      pm[10] += dnest_randh() * width;
+      wrap(&(pm[10]), 2.0, 10.0);
       break;
 
-    case 10:
+    case 11:
       if(which_level_update == 0)
       {
         width = 2.0;
       }
-      pm[10] += dnest_randh() * width;
-      wrap(&(pm[10]), 0.0, 2.0);
+      pm[11] += dnest_randh() * width;
+      wrap(&(pm[11]), 0.0, 2.0);
       break;
 
     default:
