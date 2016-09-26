@@ -33,7 +33,7 @@ void reconstruct_line2d()
     which_particle_update = 0;
     Fcon = Fcon_particles[which_particle_update];
     
-    calculate_con_from_model(best_model_line2d + 12 *sizeof(double));
+    calculate_con_from_model(best_model_line2d + num_params_blr *sizeof(double));
     gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
 
     FILE *fp;
@@ -254,6 +254,8 @@ double prob_line2d(const void *model)
   
   // if the previous perturb is accepted, store the previous Fcon at perturb stage;
   // otherwise, Fcon has no changes;
+  // note that every time, only one parameter is updated, so that some 
+  // perturb values keep unchanged. It is hard to track the updated parameters at last time
   if(perturb_accept[which_particle_update] == 1)
   {
     memcpy(Fcon_particles[which_particle_update], Fcon_particles_perturb[which_particle_update], 
@@ -263,11 +265,11 @@ double prob_line2d(const void *model)
     prob_con_particles[which_particle_update] = prob_con_particles_perturb[which_particle_update];
   }
 
-  if(which_parameter_update >=12 || which_parameter_update == -1)
+  if(which_parameter_update >= num_params_blr || which_parameter_update == -1)
   {
 
     Fcon = Fcon_particles_perturb[which_particle_update];
-    calculate_con_from_model(model + 12*sizeof(double));
+    calculate_con_from_model(model + num_params_blr*sizeof(double));
     gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
 
     for(i=0; i<n_con_data; i++)
@@ -282,11 +284,16 @@ double prob_line2d(const void *model)
     Fcon = Fcon_particles[which_particle_update];
     gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
     prob += prob_con_particles[which_particle_update];
+
+    // update perturb values
+    prob_con_particles_perturb[which_particle_update] = prob_con_particles[which_particle_update];
+    memcpy(Fcon_particles_perturb[which_particle_update], Fcon_particles[which_particle_update], 
+      parset.n_con_recon*sizeof(double));
   }
   
   // only update transfer function when BLR model is changed.
   // pm[11] only appears as errors
-  if(which_parameter_update < 11 || which_parameter_update == -1)
+  if(which_parameter_update < num_params_blr-1 || which_parameter_update == -1)
   {
 
     Trans2D_at_veldata = Trans2D_at_veldata_particles_perturb[which_particle_update];
@@ -297,18 +304,22 @@ double prob_line2d(const void *model)
   else
   {
     Trans2D_at_veldata = Trans2D_at_veldata_particles[which_particle_update];
-    //memcpy(Trans2D_at_veldata, Trans2D_at_veldata_particles[which_particle_update], 
-    //  n_vel_data*parset.n_tau * sizeof(double));
+
+    //update perturb values
+    memcpy(Trans2D_at_veldata_particles_perturb[which_particle_update], Trans2D_at_veldata_particles[which_particle_update], 
+        parset.n_tau * n_vel_data * sizeof(double));
   }
+  
   calculate_line2d_from_blrmodel(model, Tline_data, Vline_data, Trans2D_at_veldata, Fline2d_at_data, n_line_data, n_vel_data);
 
   for(i=0; i<n_line_data*n_vel_data; i++)
   {
     dy = Fline2d_data[i] - Fline2d_at_data[i] ;
     var2 = Flerrs2d_data[i]*Flerrs2d_data[i];
-    var2 += exp(pm[11])*exp(pm[11]);
+    var2 += exp(pm[num_params_blr-1])*exp(pm[num_params_blr-1]);
     prob += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
   }
+
   if(isnan(prob))
     prob = -DBL_MAX;
 

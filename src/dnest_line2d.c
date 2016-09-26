@@ -23,7 +23,7 @@
 #include "dnest_line2d.h"
 #include "proto.h"
 
-int num_params;
+int num_params, num_params_blr, num_params_var;
 
 void *best_model_line2d, *best_model_std_line2d;
 
@@ -31,7 +31,9 @@ int dnest_line2d(int argc, char **argv)
 {
   double temperature;
 
-  num_params = parset.n_con_recon + 3 + 12;
+  num_params_var = 3; 
+  num_params_blr = 12;
+  num_params = parset.n_con_recon + num_params_blr + num_params_var;
   size_of_modeltype = num_params * sizeof(double);
   best_model_line2d = malloc(size_of_modeltype);
   best_model_std_line2d = malloc(size_of_modeltype);
@@ -87,7 +89,7 @@ void from_prior_line2d(void *model)
   pm[13] =  2.0 + dnest_rand()*8.0;
   pm[14] = 0.0 + dnest_rand()*2.0;
   for(i=0; i<parset.n_con_recon; i++)
-    pm[i+3+12] = dnest_randn();
+    pm[i + num_params_var + num_params_blr ] = dnest_randn();
   
   which_parameter_update = -1; // force to update the clouds's ridal distribution
 }
@@ -113,7 +115,7 @@ double perturb_line2d(void *model)
   
   which_parameter_update = which;
 
-  if(which_level_update !=0 && which_level_update < 10)
+  if(which_level_update !=0 && which_level_update < 100)
   {
     limit1 = limits[(which_level_update-1) * num_params *2 + which *2];
     limit2 = limits[(which_level_update-1) * num_params *2 + which *2 + 1];
@@ -121,8 +123,8 @@ double perturb_line2d(void *model)
   }
   else
   {
-    limit1 = limits[(10-1) * num_params *2 + which *2];
-    limit2 = limits[(10-1) * num_params *2 + which *2 + 1];
+    limit1 = limits[(100-1) * num_params *2 + which *2];
+    limit2 = limits[(100-1) * num_params *2 + which *2 + 1];
     width = limit2 - limit1;
   }
 
