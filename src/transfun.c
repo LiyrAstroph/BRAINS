@@ -53,7 +53,7 @@ void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl
 
 void transfun_1d_cloud_direct(const void *pm)
 {
-  int i, idx;
+  int i, idt;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb;
   double inc, F, beta, mu, k, a, s;
@@ -127,13 +127,16 @@ void transfun_1d_cloud_direct(const void *pm)
 
     dis = r - x;
 
-    if(dis<parset.tau_min_set || dis>=parset.tau_max_set+dTransTau)
-    	continue;
+    //if(dis<parset.tau_min_set || dis>=parset.tau_max_set+dTransTau)
+    //	continue;
+    idt = (dis - parset.tau_min_set)/dTransTau;
+    if(idt < 0 || idt >= parset.n_tau)
+      continue;
+
     //weight = 0.5 + k*(z/r);
     weight = 0.5 + k * x/sqrt(x*x+y*y);
-    idx = (dis - parset.tau_min_set)/dTransTau;
-    //Trans1D[idx] += pow(1.0/r, 2.0*(1 + model.Ag)) * weight;
-    Trans1D[idx] += weight;
+    //Trans1D[idt] += pow(1.0/r, 2.0*(1 + model.Ag)) * weight;
+    Trans1D[idt] += weight;
   }
 
   // record the previous beta to save comupational time
@@ -303,12 +306,13 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
 
     //if(dis< parset.tau_min_set || dis>= parset.tau_max_set + dTransTau)
     //  continue;
-    //weight = 0.5 + k*(z/r);
-    weight = 0.5 + k * x/sqrt(x*x+y*y);
     idt = (dis - parset.tau_min_set)/dTransTau;
-
     if(idt < 0 || idt >= parset.n_tau)
       continue;
+
+    //weight = 0.5 + k*(z/r);
+    weight = 0.5 + k * x/sqrt(x*x+y*y);
+    
 // velocity  
 // note that a cloud moves in its orbit plane, whose direction
 // is determined by the direction of its angular momentum.
