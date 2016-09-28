@@ -118,6 +118,14 @@ void read_parset()
     addr[nt] = &parset.InstRes;
     id[nt++] = DOUBLE;
 
+    strcpy(tag[nt], "BLRParFix");
+    addr[nt] = &parset.str_par_fix;
+    id[nt++] = STRING;
+
+    strcpy(tag[nt], "BLRParFixVal");
+    addr[nt] = &parset.str_par_fix_val;
+    id[nt++] = STRING;
+
     
     char fname[200];
     sprintf(fname, "%s", parset.param_file);
@@ -443,7 +451,7 @@ void cal_emission_flux()
 void get_num_particles(char *fname)
 {
   FILE *fp;
-  char buf[BRAINS_MAX_STR_LENGTH];
+  char buf[BRAINS_MAX_STR_LENGTH], buf1[BRAINS_MAX_STR_LENGTH];
   fp = fopen(fname, "r");
   if(fp == NULL)
   {
@@ -455,6 +463,10 @@ void get_num_particles(char *fname)
   while(buf[0]=='#')
   {
     fgets(buf, BRAINS_MAX_STR_LENGTH, fp);
+    if(sscanf(buf, "%s", buf1) < 1)  // a blank line
+    {
+      buf[0] = '#';
+    }
   }
   sscanf(buf, "%d", &parset.num_particles);
   fclose(fp);

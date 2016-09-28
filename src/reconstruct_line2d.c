@@ -243,6 +243,12 @@ void reconstruct_line2d_end()
   
   free(prob_con_particles);
   free(prob_con_particles_perturb);
+
+  free(par_fix);
+  free(par_fix_val);
+
+  free(best_model_line2d);
+  free(best_model_std_line2d);
   return;
 }
 
@@ -293,7 +299,7 @@ double prob_line2d(const void *model)
   
   // only update transfer function when BLR model is changed.
   // pm[11] only appears as errors
-  if(which_parameter_update < num_params_blr-1 || which_parameter_update == -1)
+  if( (which_parameter_update < num_params_blr-1) || which_parameter_update == -1)
   {
 
     Trans2D_at_veldata = Trans2D_at_veldata_particles_perturb[which_particle_update];
@@ -309,7 +315,7 @@ double prob_line2d(const void *model)
     memcpy(Trans2D_at_veldata_particles_perturb[which_particle_update], Trans2D_at_veldata_particles[which_particle_update], 
         parset.n_tau * n_vel_data * sizeof(double));
   }
-  
+
   calculate_line2d_from_blrmodel(model, Tline_data, Vline_data, Trans2D_at_veldata, Fline2d_at_data, n_line_data, n_vel_data);
 
   for(i=0; i<n_line_data*n_vel_data; i++)

@@ -59,6 +59,8 @@ typedef struct
   double InstRes;
 
   int num_particles;
+
+  char str_par_fix[BRAINS_MAX_STR_LENGTH], str_par_fix_val[BRAINS_MAX_STR_LENGTH];
 }PARSET;
 extern PARSET parset;
 
@@ -109,6 +111,10 @@ typedef struct
 }BLRmodel;
 
 extern BLRmodel range_model[2];
+extern int *par_fix, npar_fix;
+extern double *par_fix_val;
+
+extern double var_range_model[4][2];
 
 /* transfer function / velocity-delay map */
 extern double *TransTau, *TransV, *Trans1D, *Trans2D_at_veldata, *Trans2D;

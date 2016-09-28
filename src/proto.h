@@ -20,6 +20,7 @@ void init();
 void scale_con_line();
 void cal_emission_flux();
 void get_num_particles(char *fname);
+void set_par_fix(int num_params_blr);
 
 /* continuum reconstruction */
 int dnest_con(int argc, char **argv);
@@ -41,6 +42,7 @@ void reconstruct_line1d_end();
 double prob_line1d(const void *model);
 void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl);
 void transfun_1d_cloud_direct(const void *pm);
+
 
 /* 2d line reconstruction */
 int dnest_line2d(int argc, char **argv);

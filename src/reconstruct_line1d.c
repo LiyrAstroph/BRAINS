@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include <float.h>
 #include <gsl/gsl_interp.h>
 
 #include "dnest_line1d.h"
@@ -84,7 +85,7 @@ void reconstruct_line1d()
     }
     fclose(fp);
   }
-
+  
   reconstruct_line1d_end();
 
 }
@@ -187,6 +188,12 @@ void reconstruct_line1d_end()
   free(prob_con_particles);
   free(prob_con_particles_perturb);
 
+  free(par_fix);
+  free(par_fix_val);
+
+  free(best_model_line1d);
+  free(best_model_std_line1d);
+
   if(thistask == roottask)
   {
     printf("Ends reconstruct_line1d.\n");
@@ -245,7 +252,7 @@ double prob_line1d(const void *model)
   // a. only update transfer function when BLR model is changed
   // or force to update (which_parameter_update = -1)
   // b. Trans1D is a pointer to the transfer function
-  if(which_parameter_update < num_params_blr-1 || which_parameter_update == -1)
+  if( (which_parameter_update < num_params_blr-1) || which_parameter_update == -1)
   {
     Trans1D = Trans1D_particles_perturb[which_particle_update]; 
     transfun_1d_cloud_direct(model);

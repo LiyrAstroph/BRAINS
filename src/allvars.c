@@ -49,7 +49,13 @@ double Tline_min, Tline_max;
 double *Fline2d_at_data;
 double *Fline2d, *Flerrs2d;
 
+// BLR
 BLRmodel range_model[2];
+int *par_fix, npar_fix;
+double *par_fix_val;
+
+// continuum variation
+double var_range_model[4][2]; 
 
 /* transfer function / velocity-delay map */
 double *TransTau, *TransV, *Trans1D, *Trans2D_at_veldata, *Trans2D;

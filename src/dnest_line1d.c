@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <math.h>
+#include <float.h>
 #include <string.h>
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
@@ -27,6 +28,7 @@ void *best_model_line1d, *best_model_std_line1d;
 
 int dnest_line1d(int argc, char **argv)
 {
+  int i, j;
   double temperature;
   
   num_params_var = 3;
@@ -35,6 +37,8 @@ int dnest_line1d(int argc, char **argv)
   size_of_modeltype = num_params * sizeof(double);
   best_model_line1d = malloc(size_of_modeltype);
   best_model_std_line1d = malloc(size_of_modeltype);
+  par_fix = (int *) malloc(num_params * sizeof(int));
+  par_fix_val = (double *) malloc(num_params * sizeof(double));
 
   /* setup functions used for dnest*/
   from_prior = from_prior_line1d;
@@ -46,21 +50,25 @@ int dnest_line1d(int argc, char **argv)
   get_num_params = get_num_params_line1d;
   copy_best_model = copy_best_model_line1d;
   
-  strcpy(options_file, dnest_options_file);
+  set_par_fix(num_params_blr);
+  for(i=num_params_blr; i<num_params; i++)
+    par_fix[i] = 0;
 
+  strcpy(options_file, dnest_options_file);
+  
   dnest(argc, argv);
   temperature = 1.0;
   dnest_postprocess(temperature);
   if(thistask == 0)
   {
-    int j;
     for(j = 0; j<num_params; j++)
       printf("Best params %d %f +- %f\n", j, *((double *)best_model_line1d + j), *((double *)best_model_std_line1d+j) ); 
   }
-
+  
   return 0;
 
 }
+
 
 /*===========================================*/
 // users responsible for following struct definitions
@@ -78,15 +86,22 @@ void from_prior_line1d(void *model)
   pm[5] = range_model[0].A + dnest_rand()*( range_model[1].A - range_model[0].A );
   pm[6] = range_model[0].Ag + dnest_rand()*( range_model[1].Ag - range_model[0].Ag );
   pm[7] = range_model[0].k + dnest_rand()*( range_model[1].k - range_model[0].k );
-  pm[8] = range_model[1].logse - dnest_rand()*( range_model[1].logse - range_model[0].logse )*0.1;
+  pm[8] = range_model[1].logse - dnest_rand()*( range_model[1].logse - range_model[0].logse )*0.01;
+
+  for(i=0; i<num_params_blr; i++)
+  {
+    if(par_fix[i] == 1)
+      pm[i] = par_fix_val[i];
+  }
   
-  pm[9] = -3.0 + dnest_rand()*3.0;
-  pm[10] =  2.0 + dnest_rand()*8.0;
-  pm[11] = 0.0 + dnest_rand()*2.0;
+  pm[9] = var_range_model[0][0] + dnest_rand()* (var_range_model[0][1] - var_range_model[0][0]);
+  pm[10] = var_range_model[1][0] + dnest_rand()* (var_range_model[1][1] - var_range_model[1][0]);
+  pm[11] = var_range_model[2][0] + dnest_rand()* (var_range_model[2][1] - var_range_model[2][0]);
   for(i=0; i<parset.n_con_recon; i++)
     pm[i+num_params_var+num_params_blr] = dnest_randn();
 
   which_parameter_update = -1; // force to update the clouds's ridal distribution
+
 }
 
 double log_likelihoods_cal_line1d(const void *model)
@@ -100,8 +115,13 @@ double perturb_line1d(void *model)
 {
   double *pm = (double *)model;
   double logH = 0.0, limit1, limit2, width;
-  //printf("P1 %f %f\n", model->params[0], model->params[1]);
-  int which = dnest_rand_int(num_params);
+  int which;
+
+  do
+  {
+    which = dnest_rand_int(num_params);
+  }while(par_fix[which]==1);
+
   if(which >= num_params || which < 0)
   {
     printf("# Error: Incorrect which.\n");
@@ -203,45 +223,45 @@ double perturb_line1d(void *model)
       {
         width =  ( range_model[1].logse - range_model[0].logse );
       }
-      pm[8] += dnest_randh() * width;
-      wrap(&(pm[8]), range_model[0].logse, range_model[1].logse);
+      pm[8] += dnest_randh() * fmin(width, (range_model[1].logse - range_model[0].logse)*0.001 );
+      wrap_limit(&(pm[which]), range_model[0].logse, range_model[1].logse);
       break;
 
     case 9:
       if(which_level_update == 0)
       {
-        width = 3.0;
+        width = var_range_model[0][1] - var_range_model[0][0];
       }
       pm[9] += dnest_randh() * width;
-      wrap(&(pm[9]), -3.0, 0.0);
+      wrap(&(pm[9]), var_range_model[0][0], var_range_model[0][1]);
       break;
     
     case 10:
       if(which_level_update == 0)
       {
-        width = 8.0;
+        width = var_range_model[1][1] - var_range_model[1][0];
       }
       pm[10] += dnest_randh() * width;
-      wrap(&(pm[10]), 2.0, 10.0);
+      wrap(&(pm[10]), var_range_model[1][0], var_range_model[1][1]);
       break;
 
     case 11:
       if(which_level_update == 0)
       {
-        width = 2.0;
+        width = var_range_model[2][1] - var_range_model[2][0];
       }
       pm[11] += dnest_randh() * width;
-      wrap(&(pm[11]), 0.0, 2.0);
+      wrap(&(pm[11]), var_range_model[2][0], var_range_model[2][1]);
       break;
 
     default:
       if(which_level_update == 0)
       {
-        width = 20.0;
+        width = var_range_model[3][1] - var_range_model[3][0];;
       }
       logH -= (-0.5*pow(pm[which], 2.0) );
       pm[which] += dnest_randh() * width;
-      wrap(&pm[which], -10.0, 10.0);
+      wrap(&pm[which], var_range_model[3][0], var_range_model[3][1]);
       logH += (-0.5*pow(pm[which], 2.0) );
       break;
   }

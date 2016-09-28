@@ -22,7 +22,8 @@ void begin_run()
   scale_con_line();
 
   init();
-
+  
+  MPI_Barrier(MPI_COMM_WORLD);
   if(parset.flag_dim == 0)
   {
     reconstruct_con();

@@ -21,7 +21,7 @@
 #include "dnest_con.h"
 #include "proto.h"
 
-int num_params;
+int num_params, num_params_var;
 
 void *best_model_thismodel, *best_model_std_thismodel;
 
@@ -29,7 +29,8 @@ int dnest_con(int argc, char **argv)
 {
   double temperature;
 
-  num_params = parset.n_con_recon + 3;
+  num_params_var = 3;
+  num_params = parset.n_con_recon + num_params_var;
   size_of_modeltype = num_params * sizeof(double);
   best_model_thismodel = malloc(size_of_modeltype);
   best_model_std_thismodel = malloc(size_of_modeltype);
@@ -67,9 +68,9 @@ void from_prior_thismodel(void *model)
   int i;
   double *pm = (double *)model;
   
-  pm[0] = -3.0 + dnest_rand()*3.0;
-  pm[1] = 2.0 + dnest_rand()*8.0;
-  pm[2] = 0.0 + dnest_rand()*2.0;
+  pm[0] = var_range_model[0][0] + dnest_rand()*(var_range_model[0][1] - var_range_model[0][0]);
+  pm[1] = var_range_model[1][0] + dnest_rand()*(var_range_model[1][1] - var_range_model[1][0]);
+  pm[2] = var_range_model[2][0] + dnest_rand()*(var_range_model[2][1] - var_range_model[2][0]);
   
   for(i=0; i<parset.n_con_recon; i++)
     pm[i+3] = dnest_randn();
@@ -86,7 +87,7 @@ double perturb_thismodel(void *model)
 {
   double *pm = (double *)model;
   double logH = 0.0, limit1, limit2, width;
-  //printf("P1 %f %f\n", model->params[0], model->params[1]);
+  
   int which = dnest_rand_int(num_params);
   if(which >= num_params || which < 0)
   {
@@ -96,10 +97,16 @@ double perturb_thismodel(void *model)
   
   which_parameter_update = which;
   
-  if(which_level_update !=0)
+  if(which_level_update !=0 || which_level_update < 10)
   {
     limit1 = limits[(which_level_update-1) * num_params *2 + which *2];
     limit2 = limits[(which_level_update-1) * num_params *2 + which *2 + 1];
+    width = limit2 - limit1;
+  }
+  else
+  {
+    limit1 = limits[(10-1) * num_params *2 + which *2];
+    limit2 = limits[(10-1) * num_params *2 + which *2 + 1];
     width = limit2 - limit1;
   }
 
@@ -108,42 +115,42 @@ double perturb_thismodel(void *model)
     case 0:
       if(which_level_update == 0)
       {
-        width = 3.0;
+        width = var_range_model[0][1] - var_range_model[0][0];
       }
       pm[0] += width*dnest_randh();
-      wrap(&(pm[0]), -3.0, 0.0);
+      wrap(&(pm[0]), var_range_model[0][0], var_range_model[0][1]);
       break;
     
     case 1:
       if(which_level_update == 0)
       {
-        width = 8.0;
+        width = var_range_model[1][1] - var_range_model[1][0];
       }
       pm[1] += width*dnest_randh();
-      wrap(&(pm[1]), 2.0, 10.0);
+      wrap(&(pm[1]), var_range_model[1][0] , var_range_model[1][1] );
       break;
 
     case 2:
       if(which_level_update == 0)
       {
-        width = 2.0;
+        width = var_range_model[2][1] - var_range_model[2][0];
       }
       pm[2] += width*dnest_randh();
-      wrap(&(pm[2]), 0.0, 2.0);
+      wrap(&(pm[2]), var_range_model[2][0], var_range_model[2][1]);
       break;
 
     default:
       if(which_level_update == 0)
       {
-        width = 20.0;
+        width = var_range_model[3][1] - var_range_model[3][0];
       }
       logH -= (-0.5*pow(pm[which], 2.0) );
       pm[which] += width*dnest_randh();
-      wrap(&pm[which], -10.0, 10.0);
+      wrap(&pm[which], var_range_model[3][0], var_range_model[3][1]);
       logH += (-0.5*pow(pm[which], 2.0) );
       break;
   }
-  //printf("P2 %f %f %d\n", model->params[0], model->params[1], which);
+
   return logH;
 }
 

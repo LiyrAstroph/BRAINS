@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <math.h>
+#include <float.h>
 #include <string.h>
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
@@ -29,6 +30,7 @@ void *best_model_line2d, *best_model_std_line2d;
 
 int dnest_line2d(int argc, char **argv)
 {
+  int i;
   double temperature;
 
   num_params_var = 3; 
@@ -37,6 +39,8 @@ int dnest_line2d(int argc, char **argv)
   size_of_modeltype = num_params * sizeof(double);
   best_model_line2d = malloc(size_of_modeltype);
   best_model_std_line2d = malloc(size_of_modeltype);
+  par_fix = (int *) malloc(num_params * sizeof(int));
+  par_fix_val = (double *) malloc(num_params * sizeof(double));
 
   /* setup functions used for dnest*/
   from_prior = from_prior_line2d;
@@ -48,6 +52,14 @@ int dnest_line2d(int argc, char **argv)
   get_num_params = get_num_params_line2d;
   copy_best_model = copy_best_model_line2d;
   
+  /* setup the fixed parameters */
+  set_par_fix(num_params_blr);
+  for(i=num_params_blr; i<num_params; i++)
+  {
+    par_fix[i] = 0;
+    par_fix_val[i] = -DBL_MAX;
+  }
+
   strcpy(options_file, dnest_options_file);
   dnest(argc, argv);
   temperature = 1.0;
@@ -83,11 +95,17 @@ void from_prior_line2d(void *model)
   pm[9] = range_model[0].lambda + dnest_rand()*( range_model[1].lambda - range_model[0].lambda );
   pm[10] = range_model[0].q + dnest_rand()*( range_model[1].q - range_model[0].q );
   // system error, give a large initial value
-  pm[11] = range_model[1].logse - dnest_rand()*( range_model[1].logse - range_model[0].logse )*0.1;
+  pm[11] = range_model[1].logse - dnest_rand()*( range_model[1].logse - range_model[0].logse ) * 0.01;
+
+  for(i=0; i<num_params_blr; i++)
+  {
+    if(par_fix[i] == 1)
+      pm[i] = par_fix_val[i];
+  }
   
-  pm[12] = -3.0 + dnest_rand()*3.0;
-  pm[13] =  2.0 + dnest_rand()*8.0;
-  pm[14] = 0.0 + dnest_rand()*2.0;
+  pm[12] = var_range_model[0][0] + dnest_rand()*(var_range_model[0][1] - var_range_model[0][0]);
+  pm[13] =  var_range_model[1][0] + dnest_rand()*(var_range_model[1][1] - var_range_model[1][0]);
+  pm[14] = var_range_model[2][0] + dnest_rand()*(var_range_model[2][1] - var_range_model[2][0]);
   for(i=0; i<parset.n_con_recon; i++)
     pm[i + num_params_var + num_params_blr ] = dnest_randn();
   
@@ -105,8 +123,14 @@ double perturb_line2d(void *model)
 {
   double *pm = (double *)model;
   double logH = 0.0, limit1, limit2, width;
+  int which; 
 
-  int which = dnest_rand_int(num_params);
+  do
+  {
+    which = dnest_rand_int(num_params);
+  }while(par_fix[which] == 1);
+ 
+
   if(which >= num_params || which < 0)
   {
     printf("# Error: Incorrect which.\n");
@@ -115,7 +139,7 @@ double perturb_line2d(void *model)
   
   which_parameter_update = which;
 
-  if(which_level_update !=0 && which_level_update < 100)
+  if(which_level_update !=0 && which_level_update < 10)
   {
     limit1 = limits[(which_level_update-1) * num_params *2 + which *2];
     limit2 = limits[(which_level_update-1) * num_params *2 + which *2 + 1];
@@ -123,8 +147,8 @@ double perturb_line2d(void *model)
   }
   else
   {
-    limit1 = limits[(100-1) * num_params *2 + which *2];
-    limit2 = limits[(100-1) * num_params *2 + which *2 + 1];
+    limit1 = limits[(10-1) * num_params *2 + which *2];
+    limit2 = limits[(10-1) * num_params *2 + which *2 + 1];
     width = limit2 - limit1;
   }
 
@@ -259,53 +283,53 @@ double perturb_line2d(void *model)
         limit2 = range_model[1].logse;
         width =  ( limit2 - limit1 );
       }
-      pm[11] += dnest_randh() * width;
-      wrap(&(pm[11]), range_model[0].logse, range_model[1].logse);
+      pm[11] += dnest_randh() * fmin(width, (range_model[1].logse - range_model[0].logse)*0.001 );
+      wrap_limit(&(pm[11]), range_model[0].logse, range_model[1].logse);
       break;
 
     case 12:
       if(which_level_update == 0)
       {
-        limit1 = -3.0;
-        limit2 =  0.0;
+        limit1 = var_range_model[0][0];
+        limit2 =  var_range_model[0][1];
         width = ( limit2 - limit1 );
       }
       pm[12] += dnest_randh() * width;
-      wrap(&(pm[12]), -3.0, 0.0 );
+      wrap(&(pm[12]), var_range_model[0][0], var_range_model[0][1] );
       break;
     
     case 13:
       if(which_level_update == 0)
       {
-        limit1 = 2.0;
-        limit2 = 10.0;
+        limit1 = var_range_model[1][0];
+        limit2 = var_range_model[1][1];
         width = ( limit2 - limit1 );
       }
       pm[13] += dnest_randh() * width;
-      wrap(&(pm[13]), 2.0, 10.0);
+      wrap(&(pm[13]), var_range_model[1][0], var_range_model[1][1]);
       break;
 
     case 14:
       if(which_level_update == 0)
       {
-        limit1 = 0.0;
-        limit2 = 2.0;
+        limit1 = var_range_model[2][0];
+        limit2 = var_range_model[2][1];
         width = ( limit2 - limit1 );
       }
       pm[14] += dnest_randh() * width;
-      wrap(&(pm[14]), 0.0, 2.0);
+      wrap(&(pm[14]), var_range_model[2][0], var_range_model[2][1]);
       break;
 
     default:
       if(which_level_update == 0)
       {
-        limit1 = -10.0;
-        limit2 = 10.0;
+        limit1 = var_range_model[3][0];
+        limit2 = var_range_model[3][1];
         width = ( limit2 - limit1 );
       }
       logH -= (-0.5*pow(pm[which], 2.0) );
       pm[which] += dnest_randh() * width;
-      wrap(&pm[which], -10.0, 10.0);
+      wrap(&pm[which], var_range_model[3][0], var_range_model[3][1]);
       logH += (-0.5*pow(pm[which], 2.0) );
       break;
   }

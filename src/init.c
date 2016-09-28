@@ -9,6 +9,8 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include <string.h>
+#include <float.h>
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
 #include <gsl/gsl_interp.h>
@@ -46,6 +48,19 @@ void init()
   gsl_acc = gsl_interp_accel_alloc();
   gsl_linear = gsl_interp_alloc(gsl_interp_linear, parset.n_con_recon);
 
+  /* set the range of continuum variation  */
+  var_range_model[0][0] = -3.0; // log(sigma)
+  var_range_model[0][1] = 1.0; 
+
+  var_range_model[1][0] = 2.0; // log(tau)
+  var_range_model[1][1] = 10.0; 
+
+  var_range_model[2][0] = 0.0; // mean value
+  var_range_model[2][1] = 2.0; 
+
+  var_range_model[3][0] = -10.0; // light curve values
+  var_range_model[3][1] = 10.0; 
+
   /* set the range of cloud radial distribution */
   rcloud_min_set = parset.tau_min_set;
   rcloud_max_set = parset.tau_max_set;
@@ -53,8 +68,8 @@ void init()
   range_model[0].mbh = log(0.1);
   range_model[1].mbh = log(1000.0);
 
-  range_model[0].mu = log(0.1);
-  range_model[1].mu = log(parset.tau_max_set*0.5);
+  range_model[0].mu = log(1.0);
+  range_model[1].mu = log(parset.tau_max_set);
 
   range_model[0].beta = 0.001;
   range_model[1].beta = 1.0;
@@ -162,4 +177,55 @@ void scale_con_line()
         Flerrs2d_data[i*n_vel_data + j] *= line_scale;
       } 
   }
+}
+
+void set_par_fix(int num_params_blr)
+{
+  int i;
+  char *pstr;
+  
+  npar_fix = 0;
+
+  if(thistask == roottask)
+  {
+    pstr = parset.str_par_fix_val;
+    // set the default value if not provided.
+    for(i=strlen(parset.str_par_fix); i<num_params_blr; i++)
+      parset.str_par_fix[i] = '0';
+
+    for(i=0; i<num_params_blr; i++)
+    {
+      if(parset.str_par_fix[i] == '0')
+      {
+        par_fix[i] = 0;
+        par_fix_val[i] = -DBL_MAX;
+      }
+      else if(parset.str_par_fix[i] == '1')
+      {
+        if(pstr == NULL)
+        {
+          printf("# %d-th BLR parameter value is not provided (counting from 0).\n", i);
+          exit(0);
+        }
+        par_fix[i] = 1;
+        sscanf(pstr, "%lf", &par_fix_val[i]);
+        npar_fix++;
+        printf("# %d-th parameter fixed, value= %f.\n", i, par_fix_val[i]);
+        pstr = strchr(pstr, ':');
+        if(pstr!=NULL)
+        {
+          pstr++;
+        }
+      }
+      else   // default value
+      {
+        par_fix[i] = 0;
+        par_fix_val[i] = -DBL_MAX;
+      }
+    }
+  }
+
+  MPI_Bcast(par_fix, num_params_blr, MPI_INT, roottask, MPI_COMM_WORLD);
+  MPI_Bcast(par_fix_val, num_params_blr, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+  return;
 }
