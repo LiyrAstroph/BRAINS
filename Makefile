@@ -13,8 +13,8 @@ OPTIMIZE = -O2 -Wall
 
 #------------target system---------
 #SYSTEM="Darwin"
-SYSTEM="Linux"
-#SYSTEM="Cluster"
+#SYSTEM="Linux"
+SYSTEM="Cluster"
 
 ifeq ($(SYSTEM), "Linux")
 NCORE      :=$(grep -c ^processor /proc/cpuinfo)

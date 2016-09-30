@@ -184,7 +184,7 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
         if(tc>=Tcon_min && tc <=Tcon_max)
         {
           fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, tc, gsl_acc);
-          fline += Trans2D[k*nv+i] * fcon * pow(fabs(fcon), model->Ag);
+          fline += trans2d[k*nv+i] * fcon * pow(fabs(fcon), model->Ag);
           //fline += trans2d[k*nv+i] * fcon;
         }
       }
@@ -381,7 +381,7 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
       idV = (V - transv[0])/dV;
       if(idV < 0 || idV >= n_vel)
         continue;
-      //Trans2D[idt*n_vel + idV] += pow(1.0/r, 2.0*(1 + gam)) * weight;
+      //trans2d[idt*n_vel + idV] += pow(1.0/r, 2.0*(1 + gam)) * weight;
       trans2d[idt*n_vel + idV] += weight;
     }
   }
