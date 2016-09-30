@@ -137,6 +137,18 @@ void reconstruct_line2d()
 
 void reconstruct_line2d_init()
 {
+  int i;
+  double dT;
+  /* set time array for continuum */
+  Tcon_min = Tcon_data[0] - fmax(0.05*(Tcon_data[n_con_data -1] - Tcon_data[0]), parset.tau_max_set + (Tcon_data[0] - Tline_data[0]));
+  Tcon_max = Tcon_data[n_con_data-1] + fmax(0.05*(Tcon_data[n_con_data -1] - Tcon_data[0]), 10.0);
+  dT = (Tcon_max - Tcon_min)/(parset.n_con_recon -1);
+  
+  for(i=0; i<parset.n_con_recon; i++)
+  {
+    Tcon[i] = Tcon_min + i*dT;
+  }
+
   TransTau = malloc(parset.n_tau * sizeof(double));
   //Trans2D_at_veldata = malloc(parset.n_tau * n_vel_data * sizeof(double));
 
@@ -149,10 +161,10 @@ void reconstruct_line2d_init()
   Tline = malloc(parset.n_line_recon * sizeof(double));
   Fline2d = malloc(parset.n_line_recon * parset.n_vel_recon * sizeof(double));
 
-  int i;
+  
   Tline_min = Tline_data[0] - fmin(0.1*(Tline_data[n_line_data - 1] - Tline_data[0]), 10);
   Tline_max = Tline_data[n_line_data -1] + fmin(0.1*(Tline_data[n_line_data - 1] - Tline_data[0]), 10);
-  double dT = (Tline_max - Tline_min)/(n_line_data - 1);
+  dT = (Tline_max - Tline_min)/(n_line_data - 1);
 
   for(i=0; i<parset.n_line_recon; i++)
   {

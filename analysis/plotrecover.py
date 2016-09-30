@@ -36,17 +36,17 @@ def reconstruct_con():
 
 
 def reconstruct_line1d():
-	con_data = np.loadtxt("../data/arp151_con.txt")
+	con_data = np.loadtxt("../data/mcg06_con.txt")
 	con_scale = np.mean(con_data[:, 1])
 	con_data[:, 1:] /= con_scale
 	
-	line_data = np.loadtxt("../data/arp151_hb.txt")
+	line_data = np.loadtxt("../data/mcg06_hb.txt")
 	#line_data[:, 1:] /= np.mean(line_data[:, 1])
 
 	
 	sample  = np.loadtxt("../data/posterior_sample1d.txt")
 	
-	pcon = np.loadtxt("../data/pcon1d.txt")
+	pcon = np.loadtxt("../data/pcon.txt")
 	pline = np.loadtxt("../data/pline.txt")
 
 	fig = plt.figure()
@@ -56,11 +56,11 @@ def reconstruct_line1d():
 	offset = 8
 	con = np.zeros(pcon.shape[0])
 	for i in range(sample.shape[0]):
-		Pmat = set_cov_Pmat(np.exp(sample[i, 0+8]), np.exp(sample[i, 1+8]), 1.0, pcon[:, 0])
+		Pmat = set_cov_Pmat(np.exp(sample[i, 0+9]), np.exp(sample[i, 1+9]), 1.0, pcon[:, 0])
 		Mmat = np.linalg.cholesky(Pmat)
 		#Mmat = Mmat.T
 
-		con = np.matmul(Mmat, sample[i, 3+8:]) + sample[i, 2+8]
+		con = np.matmul(Mmat, sample[i, 3+9:]) + sample[i, 2+9]
 		ax1.plot(pcon[:, 0], con, color='grey')
 
 	ax1.errorbar(con_data[:, 0], con_data[:, 1], yerr=con_data[:, 2], ls='none', marker='o', color='r')

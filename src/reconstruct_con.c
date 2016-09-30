@@ -187,6 +187,17 @@ void set_covar_Umat(double sigma, double tau, double alpha)
 void reconstruct_con_init()
 {
   int i;
+  double dT;
+
+  /* set time array for continuum */
+  Tcon_min = Tcon_data[0] - fmax(0.05*(Tcon_data[n_con_data -1] - Tcon_data[0]), 10.0);
+  Tcon_max = Tcon_data[n_con_data-1] + fmax(0.05*(Tcon_data[n_con_data -1] - Tcon_data[0]), 10.0);
+  dT = (Tcon_max - Tcon_min)/(parset.n_con_recon -1);
+  
+  for(i=0; i<parset.n_con_recon; i++)
+  {
+    Tcon[i] = Tcon_min + i*dT;
+  }
 
   Fcon = malloc(parset.n_con_recon * sizeof(double));
 

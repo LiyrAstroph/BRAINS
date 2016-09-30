@@ -67,6 +67,7 @@ int dnest_line2d(int argc, char **argv)
   if(thistask == 0)
   {
     int j;
+    double *pm = (double *)best_model_line2d;
     for(j = 0; j<num_params; j++)
       printf("Best params %d %f +- %f\n", j, *((double *)best_model_line2d + j), *((double *)best_model_std_line2d+j) ); 
   }
@@ -109,7 +110,7 @@ void from_prior_line2d(void *model)
   for(i=0; i<parset.n_con_recon; i++)
     pm[i + num_params_var + num_params_blr ] = dnest_randn();
   
-  which_parameter_update = -1; // force to update the clouds's ridal distribution
+  which_parameter_update = -1; // force to update all the perturb values
 }
 
 double log_likelihoods_cal_line2d(const void *model)

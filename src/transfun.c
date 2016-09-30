@@ -41,8 +41,8 @@ void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl
   	  if(tc>=Tcon_min && tc <=Tcon_max)
   	  {
   		  fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, tc, gsl_acc);
-  		//	fline += Trans1D[j] * fcon * pow(fabs(fcon), pmodel.Ag);
-        fline += Trans1D[j] * fcon;
+  			fline += Trans1D[j] * fcon * pow(fabs(fcon), model->Ag);
+        //fline += Trans1D[j] * fcon;
   	  }
   	}
   	fline *= dTransTau * A;
@@ -56,7 +56,7 @@ void transfun_1d_cloud_direct(const void *pm)
   int i, idt;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb;
-  double inc, F, beta, mu, k, a, s;
+  double inc, F, beta, mu, k, gam, a, s;
   double Lphi, Lthe;
   double Anorm, weight, rnd;
   BLRmodel *model = (BLRmodel *)pm;
@@ -67,6 +67,7 @@ void transfun_1d_cloud_direct(const void *pm)
   F = model->F;
   mu = exp(model->mu);
   k = model->k;  
+  gam = model-> Ag;
 
   a = 1.0/beta/beta;
   s = mu/a;
@@ -136,9 +137,9 @@ void transfun_1d_cloud_direct(const void *pm)
     if(idt < 0 || idt >= parset.n_tau)
       continue;
 
-    //weight = 0.5 + k*(z/r);
-    weight = 0.5 + k * x/sqrt(x*x+y*y);
-    //Trans1D[idt] += pow(1.0/r, 2.0*(1 + model.Ag)) * weight;
+    weight = 0.5 + k*(x/r);
+    //weight = 0.5 + k * x/sqrt(x*x+y*y);
+    //Trans1D[idt] += pow(1.0/r, 2.0*(1 + gam)) * weight;
     Trans1D[idt] += weight;
   }
 
@@ -183,8 +184,8 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
         if(tc>=Tcon_min && tc <=Tcon_max)
         {
           fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, tc, gsl_acc);
-        //  fline += Trans2D[k*n_vel+i] * fcon * pow(fabs(fcon), pmodel.Ag);
-          fline += trans2d[k*nv+i] * fcon;
+          fline += Trans2D[k*nv+i] * fcon * pow(fabs(fcon), model->Ag);
+          //fline += trans2d[k*nv+i] * fcon;
         }
       }
       fline *= dTransTau * A ;
@@ -195,13 +196,13 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
 // smooth out the line profile
   line_gaussian_smooth_2D_FFT(transv, fl2d, nl, nv);
 // add narrow line
-  for(j = 0; j<nl; j++)
+/*  for(j = 0; j<nl; j++)
   {
     for(i=0; i<nv; i++)
     {
       fl2d[j*nv + i] += 3.38*0.15 * exp( -0.5 * pow( (transv[i] + 160.0/VelUnit)/(355.0/VelUnit), 2.0)) * line_scale;
     }
-  }  
+  }  */
 }
 
 /* time-lag grid is already set by parset.n_tau 
@@ -212,7 +213,7 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
   int i, j, idV, idt;
   double vrange, r, phi, dis, Lopn_cos, u;
   double x, y, z, xb, yb, zb, vx, vy, vz, vxb, vyb, vzb;
-  double inc, F, beta, mu, k, a, s;
+  double inc, F, beta, mu, k, gam, a, s;
   double Lphi, Lthe, L, E, vcloud_max, vcloud_min;
   double dV, V, Anorm, weight, rnd;
   BLRmodel *model = (BLRmodel *)pm;
@@ -226,6 +227,7 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
   F = model->F;
   mu = exp(model->mu);
   k = model->k;
+  gam = model->Ag;
 
   a = 1.0/beta/beta;
   s = mu/a;
@@ -316,8 +318,8 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
     if(idt < 0 || idt >= parset.n_tau)
       continue;
 
-    //weight = 0.5 + k*(z/r);
-    weight = 0.5 + k * x/sqrt(x*x+y*y);
+    weight = 0.5 + k*(x/r);
+    //weight = 0.5 + k * x/sqrt(x*x+y*y);
     
 // velocity  
 // note that a cloud moves in its orbit plane, whose direction
@@ -331,7 +333,7 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
       chi = lambda * gsl_ran_gaussian(gsl_r, 1.0);
       E = Emin / (1.0 + exp(-chi));
 
-      Lmax = sqrt(2.0 * r*r * (E + mbh/r));
+      Lmax = sqrt(2.0 * r*r * (E + mbh/r));      
 
       if(lambda>1.0e-2)   //make sure that exp is caculatable.
         L = Lmax * lambda * log( (exp(1.0/lambda) - 1.0) * gsl_rng_uniform(gsl_r) + 1.0 );
@@ -379,7 +381,7 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
       idV = (V - transv[0])/dV;
       if(idV < 0 || idV >= n_vel)
         continue;
-      //Trans2D[idt*n_vel + idV] += pow(1.0/r, 2.0*(1 + model.Ag)) * weight;
+      //Trans2D[idt*n_vel + idV] += pow(1.0/r, 2.0*(1 + gam)) * weight;
       trans2d[idt*n_vel + idV] += weight;
     }
   }

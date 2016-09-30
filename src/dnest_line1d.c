@@ -61,6 +61,7 @@ int dnest_line1d(int argc, char **argv)
   dnest_postprocess(temperature);
   if(thistask == 0)
   {
+    double *pm = (double *)best_model_line1d;
     for(j = 0; j<num_params; j++)
       printf("Best params %d %f +- %f\n", j, *((double *)best_model_line1d + j), *((double *)best_model_std_line1d+j) ); 
   }
@@ -100,7 +101,7 @@ void from_prior_line1d(void *model)
   for(i=0; i<parset.n_con_recon; i++)
     pm[i+num_params_var+num_params_blr] = dnest_randn();
 
-  which_parameter_update = -1; // force to update the clouds's ridal distribution
+  which_parameter_update = -1; // force to update the all the perturb values 
 
 }
 

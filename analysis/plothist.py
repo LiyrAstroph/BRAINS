@@ -6,7 +6,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 
 pdf = PdfPages('hist.pdf')
 
-samples = np.loadtxt("../data/posterior_sample2d.txt", skiprows=1)
+samples = np.loadtxt("../data/posterior_sample1d.txt", skiprows=1)
 
 
 for i in range(samples.shape[1]):
