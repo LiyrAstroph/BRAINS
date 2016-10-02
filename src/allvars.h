@@ -76,7 +76,7 @@ extern char dnest_options_file[BRAINS_MAX_STR_LENGTH];
 
 extern int which_parameter_update, which_particle_update;  // which parameter and particle to be updated
 extern int which_level_update;
-extern int *perturb_accept;
+extern int *perturb_accept, *which_parameter_update_prev;
 extern double *limits;  // external from dnest
 
 /* continuum reconstruction */

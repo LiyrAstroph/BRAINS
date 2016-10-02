@@ -163,8 +163,12 @@ void reconstruct_line1d_init()
   }
 
   perturb_accept = malloc(parset.num_particles * sizeof(int));
+  which_parameter_update_prev = malloc(parset.num_particles * sizeof(int));
   for(i=0; i<parset.num_particles; i++)
+  {
     perturb_accept[i] = 0;
+    which_parameter_update_prev[i] = -1;
+  }
 
   prob_con_particles = malloc(parset.num_particles * sizeof(double));
   prob_con_particles_perturb = malloc(parset.num_particles * sizeof(double));
@@ -197,6 +201,7 @@ void reconstruct_line1d_end()
   free(Fcon_particles_perturb);
 
   free(perturb_accept);
+  free(which_parameter_update_prev);
   free(prob_con_particles);
   free(prob_con_particles_perturb);
 
@@ -215,21 +220,26 @@ void reconstruct_line1d_end()
 double prob_line1d(const void *model)
 {
   double prob = 0.0, fcon, var2, dy;
-  int i;
+  int i, param;
   double *pm = (double *)model;
   
   
-  // if the previous perturb is accepted, store the previous Fcon and transfer function 
-  // obtained at perturb stage; otherwise, no changes;
+  // if the previous perturb is accepted, store the previous perturb values, otherwise, no changes;
   if(perturb_accept[which_particle_update] == 1)
-  {
-    memcpy(Fcon_particles[which_particle_update], Fcon_particles_perturb[which_particle_update], 
-      parset.n_con_recon*sizeof(double));
+  { 
+    param = which_parameter_update_prev[which_particle_update];
+    if( param >= num_params_blr)
+    {
+      memcpy(Fcon_particles[which_particle_update], Fcon_particles_perturb[which_particle_update], 
+        parset.n_con_recon*sizeof(double));
+      prob_con_particles[which_particle_update] = prob_con_particles_perturb[which_particle_update];
+    }
 
-    memcpy(Trans1D_particles[which_particle_update], Trans1D_particles_perturb[which_particle_update], 
+    if( param < num_params_blr-1 )
+    {
+      memcpy(Trans1D_particles[which_particle_update], Trans1D_particles_perturb[which_particle_update], 
         parset.n_tau * sizeof(double));
-
-    prob_con_particles[which_particle_update] = prob_con_particles_perturb[which_particle_update];
+    }  
   }
 
   // only update continuum reconstruction when the corresponding parameters are updated
@@ -255,9 +265,9 @@ double prob_line1d(const void *model)
     prob += prob_con_particles[which_particle_update];
 
     //update perturb values
-    prob_con_particles_perturb[which_particle_update] = prob_con_particles[which_particle_update];
+    /*prob_con_particles_perturb[which_particle_update] = prob_con_particles[which_particle_update];
     memcpy(Fcon_particles_perturb[which_particle_update], Fcon_particles[which_particle_update], 
-      parset.n_con_recon*sizeof(double));
+      parset.n_con_recon*sizeof(double));*/
   }
 
   
@@ -275,8 +285,8 @@ double prob_line1d(const void *model)
     Trans1D = Trans1D_particles[which_particle_update];
     
     //update perturb values
-    memcpy(Trans1D_particles_perturb[which_particle_update], Trans1D_particles[which_particle_update], 
-        parset.n_tau * sizeof(double));
+    /*memcpy(Trans1D_particles_perturb[which_particle_update], Trans1D_particles[which_particle_update], 
+        parset.n_tau * sizeof(double));*/
   }
 
   calculate_line_from_blrmodel(model, Tline_data, Fline_at_data, n_line_data);
@@ -300,5 +310,6 @@ double prob_line1d(const void *model)
     prob_con_particles[which_particle_update] = prob_con_particles_perturb[which_particle_update];
   }
 
+  which_parameter_update_prev[which_particle_update] = which_parameter_update;
   return prob;
 }

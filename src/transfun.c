@@ -73,7 +73,7 @@ void transfun_1d_cloud_direct(const void *pm)
   s = mu/a;
   
   // record the previous beta to save comupational time
-  if(perturb_accept[which_particle_update] == 1 )
+  if(perturb_accept[which_particle_update] == 1 && which_parameter_update_prev[which_parameter_update] == 1)
     memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
       parset.n_cloud_per_task * sizeof(double));
 
@@ -112,7 +112,7 @@ void transfun_1d_cloud_direct(const void *pm)
       r = mu * F + (1.0-F) * s * rnd;
 
       //update perturb value
-      clouds_particles_perturb[which_particle_update][i] = rnd;
+      //clouds_particles_perturb[which_particle_update][i] = rnd;
     }
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
@@ -247,7 +247,7 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
 
 
   // record the previous values
-  if(perturb_accept[which_particle_update] == 1)
+  if(perturb_accept[which_particle_update] == 1 && which_parameter_update_prev[which_particle_update] == 1)
     memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
       parset.n_cloud_per_task * sizeof(double));
 
@@ -293,7 +293,7 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
       r = mu * F + (1.0-F) * s * rnd;
 
       //update perturb values
-      clouds_particles_perturb[which_particle_update][i] = rnd;
+      //clouds_particles_perturb[which_particle_update][i] = rnd;
     }
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 

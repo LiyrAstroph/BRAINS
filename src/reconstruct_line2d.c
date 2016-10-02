@@ -218,8 +218,12 @@ void reconstruct_line2d_init()
   }
 
   perturb_accept = malloc(parset.num_particles * sizeof(int));
+  which_parameter_update_prev = malloc(parset.num_particles * sizeof(int));
   for(i=0; i<parset.num_particles; i++)
+  {
     perturb_accept[i] = 0;
+    which_parameter_update_prev[i] = -1;
+  }
 
   prob_con_particles = malloc(parset.num_particles * sizeof(double));
   prob_con_particles_perturb = malloc(parset.num_particles * sizeof(double));
@@ -253,6 +257,8 @@ void reconstruct_line2d_end()
   free(Fcon_particles);
   free(Fcon_particles_perturb);
   
+  free(perturb_accept);
+  free(which_parameter_update_prev);
   free(prob_con_particles);
   free(prob_con_particles_perturb);
 
@@ -267,7 +273,7 @@ void reconstruct_line2d_end()
 double prob_line2d(const void *model)
 {
   double prob = 0.0, fcon, var2, dy;
-  int i;
+  int i, param;
   double *pm = (double *)model;
   
   // if the previous perturb is accepted, store the previous Fcon at perturb stage;
@@ -276,11 +282,21 @@ double prob_line2d(const void *model)
   // perturb values keep unchanged. It is hard to track the updated parameters at last time
   if(perturb_accept[which_particle_update] == 1)
   {
-    memcpy(Fcon_particles[which_particle_update], Fcon_particles_perturb[which_particle_update], 
-      parset.n_con_recon*sizeof(double));
-    memcpy(Trans2D_at_veldata_particles[which_particle_update], Trans2D_at_veldata_particles_perturb[which_particle_update], 
+    param = which_parameter_update_prev[which_particle_update];
+    if(param >= num_params_blr)
+    {
+      memcpy(Fcon_particles[which_particle_update], Fcon_particles_perturb[which_particle_update], 
+        parset.n_con_recon*sizeof(double));
+
+      prob_con_particles[which_particle_update] = prob_con_particles_perturb[which_particle_update];
+    }
+
+    if(param < num_params_blr -1 )
+    {
+      memcpy(Trans2D_at_veldata_particles[which_particle_update], Trans2D_at_veldata_particles_perturb[which_particle_update], 
         parset.n_tau * n_vel_data * sizeof(double));
-    prob_con_particles[which_particle_update] = prob_con_particles_perturb[which_particle_update];
+    }
+    
   }
 
   if(which_parameter_update >= num_params_blr || which_parameter_update == -1)
@@ -304,9 +320,9 @@ double prob_line2d(const void *model)
     prob += prob_con_particles[which_particle_update];
 
     // update perturb values
-    prob_con_particles_perturb[which_particle_update] = prob_con_particles[which_particle_update];
+    /*prob_con_particles_perturb[which_particle_update] = prob_con_particles[which_particle_update];
     memcpy(Fcon_particles_perturb[which_particle_update], Fcon_particles[which_particle_update], 
-      parset.n_con_recon*sizeof(double));
+      parset.n_con_recon*sizeof(double));*/
   }
   
   // only update transfer function when BLR model is changed.
@@ -324,8 +340,8 @@ double prob_line2d(const void *model)
     Trans2D_at_veldata = Trans2D_at_veldata_particles[which_particle_update];
 
     //update perturb values
-    memcpy(Trans2D_at_veldata_particles_perturb[which_particle_update], Trans2D_at_veldata_particles[which_particle_update], 
-        parset.n_tau * n_vel_data * sizeof(double));
+    /*memcpy(Trans2D_at_veldata_particles_perturb[which_particle_update], Trans2D_at_veldata_particles[which_particle_update], 
+        parset.n_tau * n_vel_data * sizeof(double));*/
   }
 
   calculate_line2d_from_blrmodel(model, Tline_data, Vline_data, Trans2D_at_veldata, Fline2d_at_data, n_line_data, n_vel_data);
@@ -349,6 +365,8 @@ double prob_line2d(const void *model)
         parset.n_tau * n_vel_data * sizeof(double));
     prob_con_particles[which_particle_update] = prob_con_particles_perturb[which_particle_update];
   }
+
+  which_parameter_update_prev[which_particle_update] = which_parameter_update;
   return prob;
 }
 

@@ -55,7 +55,7 @@ void init()
   range_model[0].mbh = log(0.1);
   range_model[1].mbh = log(1000.0);
 
-  range_model[0].mu = log(1.0);
+  range_model[0].mu = log(0.1);
   range_model[1].mu = log(parset.tau_max_set);
 
   range_model[0].beta = 0.001;
@@ -80,7 +80,7 @@ void init()
   range_model[1].k = 0.5;
 
   range_model[0].lambda = 0.0;
-  range_model[1].lambda = 1.0;
+  range_model[1].lambda = 2.0;
 
   range_model[0].q = 0.0;
   range_model[1].q = 1.0;
@@ -91,6 +91,7 @@ void init()
   range_model[1].mu = fmin(range_model[1].mu, rcloud_max_set);
 }
 
+/* allocate memory for variables used throughout the code */
 void allocate_memory()
 {
   Tcon = malloc(parset.n_con_recon * sizeof(double));
@@ -111,6 +112,7 @@ void free_memory()
   free(PSmat_data);
 }
 
+/* normalise the light curves to a scale of unity */
 void scale_con_line()
 {
   int i, j;
@@ -166,6 +168,7 @@ void scale_con_line()
   }
 }
 
+/* cope with parameter fixing */
 void set_par_fix(int num_params_blr)
 {
   int i;

@@ -33,7 +33,7 @@ char dnest_options_file[BRAINS_MAX_STR_LENGTH];
 
 int which_parameter_update, which_particle_update;  // which parameter and particle to be updated
 int which_level_update;
-int *perturb_accept;
+int *perturb_accept, *which_parameter_update_prev;
 
 /* continuum reconstruction */
 double *Tcon, *Fcon, *Fcerrs;

@@ -62,7 +62,7 @@ int dnest_line2d(int argc, char **argv)
 
   strcpy(options_file, dnest_options_file);
   dnest(argc, argv);
-  temperature = 1.0;
+  temperature = 5.0;
   dnest_postprocess(temperature);
   if(thistask == 0)
   {
