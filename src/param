@@ -13,7 +13,7 @@ LineFile                    data/mcg06_hb.txt          % file for line data
 Line2DFile                  data/mcg06_hb2d.txt        % file for line 2d data
 %===============================
 % reconstruction
-NConRecon                   200                         % number of points for continuum reconstruction
+NConRecon                   100                         % number of points for continuum reconstruction
 ConConstructFileOut         data/pcon.txt               % output filename 
 
 NLineRecon                  200                         % number of points for line reconstruction along time axis
@@ -30,7 +30,7 @@ NVPerCloud                  10                          % number of velocities p
 
 NTau                        100                         % number of time-lag points calculated in transfer function
 TauMinSet                   0.0                         % minimum time lag calculated
-TauMaxSet                   100.0                        % maximum time lag calculated
+TauMaxSet                   50.0                        % maximum time lag calculated
 
 FlagCloudsOut               0                           % 1, save clouds at the last run; 0, do not save
 CloudsFileOut               data/clouds.txt             % output filename for clouds 

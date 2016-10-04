@@ -36,17 +36,20 @@ void init()
   gsl_linear = gsl_interp_alloc(gsl_interp_linear, parset.n_con_recon);
 
   /* set the range of continuum variation  */
-  var_range_model[0][0] = -3.0; // log(sigma)
-  var_range_model[0][1] = 1.0; 
+  var_range_model[0][0] = log(1.0e-12);; // systematic error in continuum
+  var_range_model[0][1] = log(1.0e6);;
 
-  var_range_model[1][0] = 2.0; // log(tau)
-  var_range_model[1][1] = 10.0; 
+  var_range_model[1][0] = -3.0; // log(sigma)
+  var_range_model[1][1] = 1.0; 
 
-  var_range_model[2][0] = 0.0; // mean value
-  var_range_model[2][1] = 2.0; 
+  var_range_model[2][0] = 2.0; // log(tau)
+  var_range_model[2][1] = 10.0; 
 
-  var_range_model[3][0] = -10.0; // light curve values
-  var_range_model[3][1] = 10.0; 
+  var_range_model[3][0] = 0.0; // mean value
+  var_range_model[3][1] = 2.0; 
+
+  var_range_model[4][0] = -10.0; // light curve values
+  var_range_model[4][1] = 10.0; 
 
   /* set the range of cloud radial distribution */
   rcloud_min_set = parset.tau_min_set;

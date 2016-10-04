@@ -9,7 +9,7 @@
 150	# maximum number of levels
 10	# Backtracking scale length (lambda in the paper)
 100	# Strength of effect to force histogram to equal push. 0-10 is best. (beta in the paper)
-300	# Maximum number of saves (0 = infinite)
+400	# Maximum number of saves (0 = infinite)
 data/sample2d.txt  # sample file
 data/sample_info2d.txt # sample_info file
 data/levels2d.txt  #

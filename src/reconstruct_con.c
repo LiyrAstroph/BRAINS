@@ -58,14 +58,14 @@ void calculate_con_from_model(const void *model)
   double sigma, tau, alpha, mu;
   int i, info;
   
-  sigma = exp(pm[0]);
-  tau = exp(pm[1]);
+  sigma = exp(pm[1]);
+  tau = exp(pm[2]);
   alpha = 1.0;
-  mu = pm[2];
+  mu = pm[3];
   
   set_covar_Pmat(sigma, tau, alpha);
   Chol_decomp_L(PSmat, parset.n_con_recon, &info);
-  multiply_matvec(PSmat, &pm[3], parset.n_con_recon, Fcon);
+  multiply_matvec(PSmat, &pm[num_params_var], parset.n_con_recon, Fcon);
 
   // add back the mean of continuum
   for(i=0; i<parset.n_con_recon; i++)
@@ -113,8 +113,9 @@ void reconstruct_con_from_varmodel(double sigma, double tau, double alpha)
 /* calculate likelihood */
 double prob_con_variability(const void *model)
 {
-  double prob = 0.0, fcon;
+  double prob = 0.0, fcon, var2;
   int i;
+  double *pm = (double *)model;
   
   calculate_con_from_model(model);
   
@@ -123,7 +124,8 @@ double prob_con_variability(const void *model)
   for(i=0; i<n_con_data; i++)
   {
     fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, Tcon_data[i], gsl_acc);
-    prob += -0.5*pow( (fcon - Fcon_data[i])/Fcerrs_data[i] ,  2.0) - ( 0.5*log(2.0*PI) + log(Fcerrs_data[i]) );
+    var2 = Fcerrs_data[i] * Fcerrs_data[i] + exp(pm[0])*exp(pm[0]);
+    prob += -0.5*pow( (fcon - Fcon_data[i])/Fcerrs_data[i] ,  2.0) - 0.5*(log(2.0*PI) + log(var2));
   }
 
   return prob;

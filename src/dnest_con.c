@@ -29,7 +29,7 @@ int dnest_con(int argc, char **argv)
 {
   double temperature;
 
-  num_params_var = 3;
+  num_params_var = 4;
   num_params = parset.n_con_recon + num_params_var;
   size_of_modeltype = num_params * sizeof(double);
   best_model_thismodel = malloc(size_of_modeltype);
@@ -68,12 +68,13 @@ void from_prior_thismodel(void *model)
   int i;
   double *pm = (double *)model;
   
-  pm[0] = var_range_model[0][0] + dnest_rand()*(var_range_model[0][1] - var_range_model[0][0]);
+  pm[0] = var_range_model[0][1] - dnest_rand()*(var_range_model[0][1] - var_range_model[0][0]) * 0.01;
   pm[1] = var_range_model[1][0] + dnest_rand()*(var_range_model[1][1] - var_range_model[1][0]);
   pm[2] = var_range_model[2][0] + dnest_rand()*(var_range_model[2][1] - var_range_model[2][0]);
-  
+  pm[3] = var_range_model[3][0] + dnest_rand()*(var_range_model[3][1] - var_range_model[3][0]);
+
   for(i=0; i<parset.n_con_recon; i++)
-    pm[i+3] = dnest_randn();
+    pm[i+num_params_var] = dnest_randn();
 }
 
 double log_likelihoods_cal_thismodel(const void *model)
@@ -117,7 +118,7 @@ double perturb_thismodel(void *model)
       {
         width = var_range_model[0][1] - var_range_model[0][0];
       }
-      pm[0] += width*dnest_randh();
+      pm[0] += fmin(width, (var_range_model[0][1] - var_range_model[0][0]) * 0.01) * dnest_randh();
       wrap(&(pm[0]), var_range_model[0][0], var_range_model[0][1]);
       break;
     
@@ -139,14 +140,23 @@ double perturb_thismodel(void *model)
       wrap(&(pm[2]), var_range_model[2][0], var_range_model[2][1]);
       break;
 
-    default:
+    case 3:
       if(which_level_update == 0)
       {
         width = var_range_model[3][1] - var_range_model[3][0];
       }
+      pm[3] += width*dnest_randh();
+      wrap(&(pm[3]), var_range_model[3][0], var_range_model[3][1]);
+      break;
+
+    default:
+      if(which_level_update == 0)
+      {
+        width = var_range_model[4][1] - var_range_model[4][0];
+      }
       logH -= (-0.5*pow(pm[which], 2.0) );
       pm[which] += width*dnest_randh();
-      wrap(&pm[which], var_range_model[3][0], var_range_model[3][1]);
+      wrap(&pm[which], var_range_model[4][0], var_range_model[4][1]);
       logH += (-0.5*pow(pm[which], 2.0) );
       break;
   }

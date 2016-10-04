@@ -31,7 +31,7 @@ int dnest_line1d(int argc, char **argv)
   int i, j;
   double temperature;
   
-  num_params_var = 3;
+  num_params_var = 4;
   num_params_blr = 9;
   num_params = parset.n_con_recon + num_params_var + num_params_blr;
   size_of_modeltype = num_params * sizeof(double);
@@ -56,7 +56,7 @@ int dnest_line1d(int argc, char **argv)
 
   strcpy(options_file, dnest_options_file);
   
-  dnest(argc, argv);
+  //dnest(argc, argv);
   temperature = 1.0;
   dnest_postprocess(temperature);
   if(thistask == 0)
@@ -95,9 +95,10 @@ void from_prior_line1d(void *model)
       pm[i] = par_fix_val[i];
   }
   
-  pm[9] = var_range_model[0][0] + dnest_rand()* (var_range_model[0][1] - var_range_model[0][0]);
+  pm[9] = var_range_model[0][1] - dnest_rand()*(var_range_model[0][1] - var_range_model[0][0]) * 0.01;
   pm[10] = var_range_model[1][0] + dnest_rand()* (var_range_model[1][1] - var_range_model[1][0]);
   pm[11] = var_range_model[2][0] + dnest_rand()* (var_range_model[2][1] - var_range_model[2][0]);
+  pm[12] = var_range_model[3][0] + dnest_rand()* (var_range_model[3][1] - var_range_model[3][0]);
   for(i=0; i<parset.n_con_recon; i++)
     pm[i+num_params_var+num_params_blr] = dnest_randn();
 
@@ -233,7 +234,7 @@ double perturb_line1d(void *model)
       {
         width = var_range_model[0][1] - var_range_model[0][0];
       }
-      pm[9] += dnest_randh() * width;
+      pm[9] += dnest_randh() * fmin(width, (var_range_model[0][1] - var_range_model[0][0]) * 0.01);
       wrap(&(pm[9]), var_range_model[0][0], var_range_model[0][1]);
       break;
     
@@ -255,14 +256,23 @@ double perturb_line1d(void *model)
       wrap(&(pm[11]), var_range_model[2][0], var_range_model[2][1]);
       break;
 
+    case 12:
+      if(which_level_update == 0)
+      {
+        width = var_range_model[3][1] - var_range_model[3][0];
+      }
+      pm[12] += dnest_randh() * width;
+      wrap(&(pm[12]), var_range_model[3][0], var_range_model[3][1]);
+      break;
+
     default:
       if(which_level_update == 0)
       {
-        width = var_range_model[3][1] - var_range_model[3][0];;
+        width = var_range_model[4][1] - var_range_model[4][0];;
       }
       logH -= (-0.5*pow(pm[which], 2.0) );
       pm[which] += dnest_randh() * width;
-      wrap(&pm[which], var_range_model[3][0], var_range_model[3][1]);
+      wrap(&pm[which], var_range_model[4][0], var_range_model[4][1]);
       logH += (-0.5*pow(pm[which], 2.0) );
       break;
   }

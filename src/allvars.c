@@ -55,7 +55,7 @@ int *par_fix, npar_fix;
 double *par_fix_val;
 
 // continuum variation
-double var_range_model[4][2]; 
+double var_range_model[5][2]; 
 
 /* transfer function / velocity-delay map */
 double *TransTau, *TransV, *Trans1D, *Trans2D_at_veldata, *Trans2D;

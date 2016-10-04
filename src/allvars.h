@@ -107,14 +107,14 @@ typedef struct
 	double mbh;      // in 10e6 solar mass
 	double lambda;
 	double q;
-	double logse;
+	double logse;    // systematic error
 }BLRmodel;
 
 extern BLRmodel range_model[2];
 extern int *par_fix, npar_fix;
 extern double *par_fix_val;
 
-extern double var_range_model[4][2];
+extern double var_range_model[5][2];
 
 /* transfer function / velocity-delay map */
 extern double *TransTau, *TransV, *Trans1D, *Trans2D_at_veldata, *Trans2D;
