@@ -24,7 +24,7 @@
 #include "dnest_line2d.h"
 #include "proto.h"
 
-int num_params, num_params_blr, num_params_var;
+//int num_params, num_params_blr, num_params_var;
 
 void *best_model_line2d, *best_model_std_line2d;
 

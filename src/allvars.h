@@ -114,6 +114,8 @@ extern BLRmodel range_model[2];
 extern int *par_fix, npar_fix;
 extern double *par_fix_val;
 
+extern int num_params, num_params_blr, num_params_var;
+
 extern double var_range_model[5][2];
 
 /* transfer function / velocity-delay map */

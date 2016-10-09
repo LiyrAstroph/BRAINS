@@ -10,19 +10,151 @@
 #include <math.h>
 #include <string.h>
 #include <float.h>
+#include <gsl/gsl_rng.h>
 #include <gsl/gsl_interp.h>
+
+#include "dnestvars.h"
 
 #include "dnest_line1d.h"
 #include "allvars.h"
 #include "proto.h"
 
+void *post_model;
+void *best_model_line1d, *best_model_std_line1d;
+
+void postprocess1d()
+{
+  char posterior_sample_file[BRAINS_MAX_STR_LENGTH];
+  double temperature=1.0;
+  double *pm;
+  int num_ps, i, j;
+  const int nlag_max=10000;
+  double *lag;
+  double mean_lag, mean_lag_std, sum1, sum2;
+  
+  post_model = malloc(num_params * sizeof(double));
+  best_model_line1d = malloc(size_of_modeltype);
+  best_model_std_line1d = malloc(size_of_modeltype);
+
+// generate posterior sample  
+  dnest_postprocess(temperature);
+
+  if(thistask == roottask)
+  {
+    FILE *fp, *fcon, *fline;
+    get_posterior_sample_file(dnest_options_file, posterior_sample_file);
+    fp = fopen(posterior_sample_file, "r");
+    if(fp == NULL)
+    {
+      fprintf(stderr, "# Error: Cannot open file %s.\n", posterior_sample_file);
+      exit(0);
+    }
+
+    fcon = fopen("data/con_rec.txt", "w");
+    if(fcon == NULL)
+    {
+      fprintf(stderr, "# Error: Cannot open file data/con_rec.txt.\n");
+      exit(0);
+    }
+    fline = fopen("data/line_rec.txt", "w");
+    if(fline == NULL)
+    {
+      fprintf(stderr, "# Error: Cannot open file data/line_rec.txt.\n");
+      exit(0);
+    }
+
+    lag = malloc(nlag_max * sizeof(double));
+    num_ps = 0;
+    mean_lag = 0.0;
+    which_parameter_update = -1; // force to update the transfer function
+    which_particle_update = 0;
+    while(!feof(fp) && num_ps <= nlag_max)
+    {
+      for(j=0; j<num_params; j++)
+      {
+        if(fscanf(fp, "%lf", (double *)post_model + j) < 1)
+        {
+          fprintf(stderr, "# Error: Cannot read file %s.\n", posterior_sample_file);
+          exit(0);
+        }
+      }
+      fscanf(fp, "\n");
+      
+      Fcon = Fcon_particles[which_particle_update];
+      calculate_con_from_model(post_model + num_params_blr *sizeof(double));
+      gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
+
+      Trans1D = Trans1D_particles[which_particle_update];
+      transfun_1d_cloud_direct(post_model);
+      calculate_line_from_blrmodel(post_model, Tline, Fline, parset.n_line_recon);
+
+      sum1 = 0.0;
+      sum2 = 0.0;
+      for(j=0; j<parset.n_tau; j++)
+      {
+        sum1 += Trans1D[j] * TransTau[j];
+        sum2 += Trans1D[j];
+      }
+      lag[num_ps] = sum1/sum2;
+      mean_lag += lag[num_ps];
+
+
+      if(gsl_rng_uniform(gsl_r) < (10.0/num_ps))
+      {
+        for(i=0; i<parset.n_con_recon; i++)
+        {
+          fprintf(fcon, "%f %f\n", Tcon[i], Fcon[i]/con_scale);
+        }
+        fprintf(fcon, "\n");
+
+        for(i=0; i<parset.n_line_recon; i++)
+        {
+          fprintf(fline, "%f %f\n", Tline[i], Fline[i]/line_scale);
+        }
+        fprintf(fline, "\n");
+      }
+      num_ps++;
+    }
+    
+    mean_lag /= num_ps;
+    mean_lag_std = 0.0;
+    for(i=0; i<num_ps; i++)
+    {
+      mean_lag_std = (lag[i] - mean_lag) * (lag[i] - mean_lag);
+    }
+    if(num_ps > 1)
+      mean_lag_std = sqrt(mean_lag_std/(num_ps -1.0));
+    else
+      mean_lag_std = 0.0;
+    printf("Mean time lag: %f+-%f\n", mean_lag, mean_lag_std);
+
+    /*double *pm = (double *)best_model_line1d;
+    for(j = 0; j<num_params; j++)
+      printf("Best params %d %f +- %f\n", j, *((double *)best_model_line1d + j), *((double *)best_model_std_line1d+j) );*/ 
+    
+    fclose(fp);
+    fclose(fcon);
+    fclose(fline);
+  }
+
+  free(post_model);
+  free(best_model_line1d);
+  free(best_model_std_line1d);
+}
+
 void reconstruct_line1d()
 {
   char *argv[]={""};
+  int i, j;
 
   reconstruct_line1d_init();
 
+// dnest run
   dnest_line1d(0, argv);
+
+  postprocess1d();
+
+  return;
 
   if(thistask == roottask)
   {
@@ -207,9 +339,6 @@ void reconstruct_line1d_end()
 
   free(par_fix);
   free(par_fix_val);
-
-  free(best_model_line1d);
-  free(best_model_std_line1d);
 
   if(thistask == roottask)
   {

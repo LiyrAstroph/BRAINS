@@ -21,7 +21,7 @@
 #include "dnest_con.h"
 #include "proto.h"
 
-int num_params, num_params_var;
+//int num_params, num_params_var;
 
 void *best_model_thismodel, *best_model_std_thismodel;
 

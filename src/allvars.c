@@ -54,6 +54,8 @@ BLRmodel range_model[2];
 int *par_fix, npar_fix;
 double *par_fix_val;
 
+int num_params, num_params_blr, num_params_var;
+
 // continuum variation
 double var_range_model[5][2]; 
 

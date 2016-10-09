@@ -12,11 +12,7 @@
 
 
 /*==========================================*/
-extern int num_params, num_params_blr, num_params_var;
 extern int size_of_modeltype;
-
-/* best model */
-extern void *best_model_line1d, *best_model_std_line1d;
 
 /* functions */
 void from_prior_line1d(void *model);
@@ -26,7 +22,6 @@ double perturb_line1d(void *model);
 void copy_model_line1d(void *dest, const void *src);
 void* create_model_line1d();
 int get_num_params_line1d();
-void copy_best_model_line1d(const void *bm, const void *bm_std);
 
 void (*print_particle)(FILE *fp, const void *model);
 void (*from_prior)(void *model);
@@ -35,6 +30,5 @@ double (*perturb)(void *model);
 void (*copy_model)(void *dest, const void *src);
 void* (*create_model)();
 int (*get_num_params)();
-void (*copy_best_model)(const void *bm, const void *bm_std);
 
 #endif
