@@ -11,35 +11,221 @@
 #include <math.h>
 #include <float.h>
 #include <gsl/gsl_interp.h>
- 
+
+#include "dnestvars.h"
+
 #include "dnest_line2d.h"
 #include "allvars.h"
 #include "proto.h"
 
-void reconstruct_line2d()
-{
-  char *argv[]={" "};
+void *best_model_line2d, *best_model_std_line2d;
 
-  reconstruct_line2d_init();
-  
-  smooth_init(n_vel_data);
-  dnest_line2d(0, argv);
-  smooth_end();
-  
+void postprocess2d()
+{
+  char posterior_sample_file[BRAINS_MAX_STR_LENGTH];
+  int num_ps, i, j, k;
+  double *pm, *pmstd;
+  double temperature=1.0;
+  double *lag, *Fcon_mean, *Fline2d_at_data_mean, *Fline2d_mean, *Trans2D_mean;
+  void *posterior_sample, *post_model;
+  double mean_lag, mean_lag_std, sum1, sum2;
+
+  best_model_line2d = malloc(size_of_modeltype);
+  best_model_std_line2d = malloc(size_of_modeltype);
+
+// generate posterior sample
+  temperature = 5.0;
+  dnest_postprocess(temperature);
+
   if(thistask == roottask)
   {
-    
-    which_parameter_update = -1;
-    which_particle_update = 0;
-    Fcon = Fcon_particles[which_particle_update];
-    
-    calculate_con_from_model(best_model_line2d + num_params_blr *sizeof(double));
-    gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
-
-    FILE *fp;
+    // initialize smooth work space
+    smooth_init(n_vel_data);
     char fname[200];
-    int i, j;
+    FILE *fp, *fcon, *fline, *ftran;
 
+    // get number of lines in posterior sample file
+    get_posterior_sample_file(dnest_options_file, posterior_sample_file);
+
+    //file for posterior sample
+    fp = fopen(posterior_sample_file, "r");
+    if(fp == NULL)
+    {
+      fprintf(stderr, "# Error: Cannot open file %s.\n", posterior_sample_file);
+      exit(0);
+    }
+    //file for continuum reconstruction
+    fcon = fopen("data/con_rec.txt", "w");
+    if(fcon == NULL)
+    {
+      fprintf(stderr, "# Error: Cannot open file data/con_rec.txt.\n");
+      exit(0);
+    }
+    //file for line reconstruction
+    fline = fopen("data/line2d_rec.txt", "w");
+    if(fline == NULL)
+    {
+      fprintf(stderr, "# Error: Cannot open file data/line1d_rec.txt.\n");
+      exit(0);
+    }
+    //file for transfer function
+    ftran = fopen("data/tran2d_rec.txt", "w");
+    if(fline == NULL)
+    {
+      fprintf(stderr, "# Error: Cannot open file data/tran_rec.txt.\n");
+      exit(0);
+    }
+
+    // read number of lines
+    if(fscanf(fp, "# %d", &num_ps) < 1)
+    {
+      fprintf(stderr, "# Error: Cannot read file %s.\n", posterior_sample_file);
+      exit(0);
+    }
+    printf("# Number of points in posterior sample: %d\n", num_ps);
+
+    lag = malloc(num_ps * sizeof(double));
+    post_model = malloc(size_of_modeltype);
+    posterior_sample = malloc(num_ps * size_of_modeltype);
+    
+    Fcon_mean = malloc(parset.n_con_recon*sizeof(double));
+    Fline2d_at_data_mean = malloc(n_line_data * n_vel_data *sizeof(double));
+    Fline2d_mean = malloc(parset.n_line_recon * parset.n_vel_recon *sizeof(double));
+    Trans2D_mean = malloc(parset.n_tau * parset.n_vel_recon * sizeof(double));
+
+    which_parameter_update = -1; // force to update the transfer function
+    which_particle_update = 0;
+    mean_lag = 0.0;
+    for(j = 0; j<parset.n_con_recon; j++)
+      Fcon_mean[j] = 0.0;
+    for(j=0; j<n_line_data * n_vel_data; j++)
+      Fline2d_at_data_mean[j] = 0.0;
+    for(j=0; j<parset.n_line_recon * parset.n_vel_recon; j++)
+      Fline2d_mean[j] = 0.0;
+    for(j=0; j<parset.n_tau * parset.n_vel_recon; j++)
+      Trans2D_mean[j] = 0.0;
+
+    for(i=0; i<num_ps; i++)
+    {
+      // read lines
+      for(j=0; j<num_params; j++)
+      {
+        if(fscanf(fp, "%lf", (double *)post_model + j) < 1)
+        {
+          fprintf(stderr, "# Error: Cannot read file %s.\n", posterior_sample_file);
+          exit(0);
+        }
+      }
+      fscanf(fp, "\n");
+
+      //store lines
+      memcpy(posterior_sample+i*size_of_modeltype, post_model, size_of_modeltype);
+
+      Fcon = Fcon_particles[which_particle_update];
+    
+      calculate_con_from_model(post_model + num_params_blr *sizeof(double));
+      gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
+
+      Trans2D_at_veldata = Trans2D_at_veldata_particles[which_particle_update];
+      transfun_2d_cloud_direct(post_model, Vline_data, Trans2D_at_veldata, 
+                                      n_vel_data, parset.flag_save_clouds);
+      calculate_line2d_from_blrmodel(post_model, Tline_data, Vline_data, Trans2D_at_veldata, 
+                                      Fline2d_at_data, n_line_data, n_vel_data);
+
+      for(j=0; j<parset.n_con_recon; j++)
+      {
+        Fcon_mean[j] += Fcon[j];
+      }
+      for(j=0; j<n_line_data * n_vel_data; j++)
+      {
+        Fline2d_at_data_mean[j] += Fline2d_at_data[j];
+      }
+      
+      sum1 = 0.0;
+      sum2 = 0.0;
+      for(j=0; j<parset.n_tau; j++)
+      {
+        for(k=0; k<n_vel_data; k++)
+        {
+          sum1 += Trans2D_at_veldata[j * n_vel_data + k] * TransTau[j];
+          sum2 += Trans2D_at_veldata[j * n_vel_data + k];
+        }
+      }
+      lag[i] = sum1/sum2;
+      mean_lag += lag[i];
+
+      if(gsl_rng_uniform(gsl_r) < 1.0)
+      {
+        for(j=0; j<parset.n_con_recon; j++)
+        {
+          fprintf(fcon, "%f %f\n", Tcon[j], Fcon[j]/con_scale);
+        }
+        fprintf(fcon, "\n");
+
+        for(j=0; j<n_line_data; j++)
+        {
+          for(k=0; k<n_vel_data; k++)
+          {
+            fprintf(fline, "%f ", Fline2d_at_data[j * n_vel_data + k]/line_scale);
+          }
+          fprintf(fline, "\n");
+        }
+        fprintf(fline, "\n");
+
+        for(j=0; j<n_line_data; j++)
+        {
+          for(k=0; k<n_vel_data; k++)
+          {
+            fprintf(ftran, "%f ", Trans2D_at_veldata[j * n_vel_data + k]);
+          }
+          fprintf(ftran, "\n");
+        }
+        fprintf(ftran, "\n");
+      }
+    }
+
+    smooth_end();
+
+    fclose(fp);
+    fclose(fcon);
+    fclose(fline);
+    fclose(ftran);
+
+    //
+    smooth_init(parset.n_vel_recon);
+    for(i=0; i<num_ps; i++)
+    {
+      memcpy(post_model, posterior_sample+i*size_of_modeltype, size_of_modeltype);
+
+      Fcon = Fcon_particles[which_particle_update];
+    
+      calculate_con_from_model(post_model + num_params_blr *sizeof(double));
+      gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
+
+      transfun_2d_cloud_direct(post_model, TransV, Trans2D, parset.n_vel_recon, 0);
+      calculate_line2d_from_blrmodel(post_model, Tline, TransV, 
+          Trans2D, Fline2d, parset.n_line_recon, parset.n_vel_recon);
+
+      for(j=0; j<parset.n_line_recon * parset.n_vel_recon; j++)
+      {
+        Fline2d_mean[j] += Fline2d[j];
+      }
+      for(j=0; j<parset.n_tau * parset.n_vel_recon; j++)
+      {
+        Trans2D_mean[j] += Trans2D[j];
+      }
+    }
+    smooth_end();
+
+    for(j=0; j<parset.n_con_recon; j++)
+      Fcon_mean[j] /= num_ps;
+    for(j=0; j<n_line_data * n_vel_data; j++)
+      Fline2d_at_data_mean[j] /= num_ps;
+    for(j=0; j<parset.n_line_recon * parset.n_vel_recon; j++)
+      Fline2d_mean[j] /= num_ps;
+    for(j=0; j<parset.n_tau * parset.n_vel_recon; j++)
+      Trans2D_mean[j] /= num_ps;
+    
     sprintf(fname, "%s/%s", parset.file_dir, parset.pcon_out_file);
     fp = fopen(fname, "w");
     if(fp == NULL)
@@ -47,22 +233,12 @@ void reconstruct_line2d()
       fprintf(stderr, "# Error: Cannot open file %s\n", fname);
       exit(-1);
     }
-
     for(i=0; i<parset.n_con_recon; i++)
     {
-      fprintf(fp, "%f %f\n", Tcon[i], Fcon[i] / con_scale);
+      fprintf(fp, "%f %f\n", Tcon[i], Fcon_mean[i] / con_scale);
     }
     fclose(fp);
 
-    smooth_init(n_vel_data);
-    // recovered line2d at data points
-    // force to update the transfer function.
-    Trans2D_at_veldata = Trans2D_at_veldata_particles[which_particle_update];
-    transfun_2d_cloud_direct(best_model_line2d, Vline_data, Trans2D_at_veldata, 
-    	                                        n_vel_data, parset.flag_save_clouds);
-    calculate_line2d_from_blrmodel(best_model_line2d, Tline_data, Vline_data, Trans2D_at_veldata, 
-                                                       Fline2d_at_data, n_line_data, n_vel_data);
-    
     sprintf(fname, "%s/%s", parset.file_dir, parset.pline2d_data_out_file);
     fp = fopen(fname, "w");
     if(fp == NULL)
@@ -70,26 +246,15 @@ void reconstruct_line2d()
       fprintf(stderr, "# Error: Cannot open file %s\n", fname);
       exit(-1);
     }
-    
     for(i=0; i<n_line_data; i++)
     {
       for(j=0; j<n_vel_data; j++)
       {
-      	fprintf(fp, "%f %f %f\n", Vline_data[j]*VelUnit, Tline_data[i],  Fline2d_at_data[i*n_vel_data + j] / line_scale);
+        fprintf(fp, "%f %f %f\n", Vline_data[j]*VelUnit, Tline_data[i],  Fline2d_at_data_mean[i*n_vel_data + j] / line_scale);
       }
       fprintf(fp, "\n");
     }
     fclose(fp);
-    smooth_end();
-    
-    // recovered line2d at specified points
-    smooth_init(parset.n_vel_recon);
-
-    which_parameter_update = -1;
-    which_particle_update = 0;
-    transfun_2d_cloud_direct(best_model_line2d, TransV, Trans2D, parset.n_vel_recon, 0);
-    calculate_line2d_from_blrmodel(best_model_line2d, Tline, TransV, 
-    	    Trans2D, Fline2d, parset.n_line_recon, parset.n_vel_recon);
 
     sprintf(fname, "%s/%s", parset.file_dir, parset.pline2d_out_file);
     fp = fopen(fname, "w");
@@ -98,12 +263,11 @@ void reconstruct_line2d()
       fprintf(stderr, "# Error: Cannot open file %s\n", fname);
       exit(-1);
     }
-
     for(i=0; i<parset.n_line_recon; i++)
     {
       for(j=0; j<parset.n_vel_recon; j++)
       {
-      	fprintf(fp, "%f %f %f\n", TransV[j]*VelUnit, Tline[i],  Fline2d[i*parset.n_vel_recon + j] / line_scale);
+        fprintf(fp, "%f %f %f\n", TransV[j]*VelUnit, Tline[i],  Fline2d_mean[i*parset.n_vel_recon + j] / line_scale);
       }
 
       fprintf(fp, "\n");
@@ -118,21 +282,88 @@ void reconstruct_line2d()
       fprintf(stderr, "# Error: Cannot open file %s\n", fname);
       exit(-1);
     }
-
     for(i=0; i<parset.n_tau; i++)
     {
       for(j=0; j<parset.n_vel_recon; j++)
       {
-        fprintf(fp, "%f %f %f\n", TransV[j]*VelUnit, TransTau[i], Trans2D[i*parset.n_vel_recon + j]);
+        fprintf(fp, "%f %f %f\n", TransV[j]*VelUnit, TransTau[i], Trans2D_mean[i*parset.n_vel_recon + j]);
       }
-
       fprintf(fp, "\n");
     }
     fclose(fp);
-    smooth_end();
+
+    mean_lag /= num_ps;
+    mean_lag_std = 0.0;
+    for(i=0; i<num_ps; i++)
+    {
+      mean_lag_std = (lag[i] - mean_lag) * (lag[i] - mean_lag);
+    }
+    if(num_ps > 1)
+      mean_lag_std = sqrt(mean_lag_std/(num_ps -1.0));
+    else
+      mean_lag_std = 0.0;
+    printf("Mean time lag: %f+-%f\n", mean_lag, mean_lag_std);
+
+    pm = (double *)best_model_line2d;
+    pmstd = (double *)best_model_std_line2d;
+    for(j=0; j<num_params; j++)
+    {
+      pm[j] = pmstd[j] = 0.0;
+    }
+    for(i=0; i<num_ps; i++)
+    {
+      for(j =0; j<num_params; j++)
+        pm[j] += *((double *)posterior_sample + i*num_params + j );
+    }
+
+    for(j=0; j<num_params; j++)
+      pm[j] /= num_ps;
+
+    for(i=0; i<num_ps; i++)
+    {
+      for(j=0; j<num_params; j++)
+        pmstd[j] += pow( *((double *)posterior_sample + i*num_params + j ) - pm[j], 2.0 );
+    }
+
+    for(j=0; j<num_params; j++)
+    {
+      if(num_ps > 1)
+        pmstd[j] = sqrt(pmstd[j]/(num_ps-1.0));
+      else
+        pmstd[j] = 0.0;
+    }
+
+    for(j = 0; j<num_params_blr + num_params_var; j++)
+      printf("Best params %d %f +- %f\n", j, *((double *)best_model_line2d + j), *((double *)best_model_std_line2d+j) ); 
+ 
+    free(lag);
+    free(post_model);
+    free(posterior_sample);
+    free(Fcon_mean);
+    free(Fline2d_at_data_mean);
+    free(Fline2d_mean);
+    free(Trans2D_mean);
   }
+  return;
+}
+
+void reconstruct_line2d()
+{
+  char *argv[]={" "};
+
+  reconstruct_line2d_init();
+  
+  smooth_init(n_vel_data);
+
+  dnest_line2d(0, argv);
+
+  smooth_end();
+
+  postprocess2d();
 
   reconstruct_line2d_end();
+
+  return;
 }
 
 void reconstruct_line2d_init()
@@ -164,7 +395,7 @@ void reconstruct_line2d_init()
   
   Tline_min = Tline_data[0] - fmin(0.1*(Tline_data[n_line_data - 1] - Tline_data[0]), 10);
   Tline_max = Tline_data[n_line_data -1] + fmin(0.1*(Tline_data[n_line_data - 1] - Tline_data[0]), 10);
-  dT = (Tline_max - Tline_min)/(n_line_data - 1);
+  dT = (Tline_max - Tline_min)/(parset.n_line_recon - 1);
 
   for(i=0; i<parset.n_line_recon; i++)
   {

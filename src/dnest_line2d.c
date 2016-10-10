@@ -26,8 +26,6 @@
 
 //int num_params, num_params_blr, num_params_var;
 
-void *best_model_line2d, *best_model_std_line2d;
-
 int dnest_line2d(int argc, char **argv)
 {
   int i;
@@ -37,8 +35,6 @@ int dnest_line2d(int argc, char **argv)
   num_params_blr = 12;
   num_params = parset.n_con_recon + num_params_blr + num_params_var;
   size_of_modeltype = num_params * sizeof(double);
-  best_model_line2d = malloc(size_of_modeltype);
-  best_model_std_line2d = malloc(size_of_modeltype);
   par_fix = (int *) malloc(num_params * sizeof(int));
   par_fix_val = (double *) malloc(num_params * sizeof(double));
 
@@ -50,7 +46,6 @@ int dnest_line2d(int argc, char **argv)
   copy_model = copy_model_line2d;
   create_model = create_model_line2d;
   get_num_params = get_num_params_line2d;
-  copy_best_model = copy_best_model_line2d;
   
   /* setup the fixed parameters */
   set_par_fix(num_params_blr);
@@ -62,16 +57,7 @@ int dnest_line2d(int argc, char **argv)
 
   strcpy(options_file, dnest_options_file);
   //dnest(argc, argv);
-  temperature = 1.0;
-  dnest_postprocess(temperature);
-  if(thistask == 0)
-  {
-    int j;
-    double *pm = (double *)best_model_line2d;
-    for(j = 0; j<num_params; j++)
-      printf("Best params %d %f +- %f\n", j, *((double *)best_model_line2d + j), *((double *)best_model_std_line2d+j) ); 
-  }
-
+  
   return 0;
 
 }
@@ -375,10 +361,4 @@ void *create_model_line2d()
 int get_num_params_line2d()
 {
   return num_params;
-}
-
-void copy_best_model_line2d(const void *bm, const void *bm_std)
-{
-  memcpy(best_model_line2d, bm, size_of_modeltype);
-  memcpy(best_model_std_line2d, bm_std, size_of_modeltype);
 }

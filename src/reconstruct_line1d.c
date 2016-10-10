@@ -19,207 +19,17 @@
 #include "allvars.h"
 #include "proto.h"
 
-void *post_model;
+
 void *best_model_line1d, *best_model_std_line1d;
-
-void postprocess1d()
-{
-  char posterior_sample_file[BRAINS_MAX_STR_LENGTH];
-  double temperature=1.0;
-  double *pm;
-  int num_ps, i, j;
-  const int nlag_max=10000;
-  double *lag;
-  double mean_lag, mean_lag_std, sum1, sum2;
-  
-  post_model = malloc(num_params * sizeof(double));
-  best_model_line1d = malloc(size_of_modeltype);
-  best_model_std_line1d = malloc(size_of_modeltype);
-
-// generate posterior sample  
-  dnest_postprocess(temperature);
-
-  if(thistask == roottask)
-  {
-    FILE *fp, *fcon, *fline;
-    get_posterior_sample_file(dnest_options_file, posterior_sample_file);
-    fp = fopen(posterior_sample_file, "r");
-    if(fp == NULL)
-    {
-      fprintf(stderr, "# Error: Cannot open file %s.\n", posterior_sample_file);
-      exit(0);
-    }
-
-    fcon = fopen("data/con_rec.txt", "w");
-    if(fcon == NULL)
-    {
-      fprintf(stderr, "# Error: Cannot open file data/con_rec.txt.\n");
-      exit(0);
-    }
-    fline = fopen("data/line_rec.txt", "w");
-    if(fline == NULL)
-    {
-      fprintf(stderr, "# Error: Cannot open file data/line_rec.txt.\n");
-      exit(0);
-    }
-
-    lag = malloc(nlag_max * sizeof(double));
-    num_ps = 0;
-    mean_lag = 0.0;
-    which_parameter_update = -1; // force to update the transfer function
-    which_particle_update = 0;
-    while(!feof(fp) && num_ps <= nlag_max)
-    {
-      for(j=0; j<num_params; j++)
-      {
-        if(fscanf(fp, "%lf", (double *)post_model + j) < 1)
-        {
-          fprintf(stderr, "# Error: Cannot read file %s.\n", posterior_sample_file);
-          exit(0);
-        }
-      }
-      fscanf(fp, "\n");
-      
-      Fcon = Fcon_particles[which_particle_update];
-      calculate_con_from_model(post_model + num_params_blr *sizeof(double));
-      gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
-
-      Trans1D = Trans1D_particles[which_particle_update];
-      transfun_1d_cloud_direct(post_model);
-      calculate_line_from_blrmodel(post_model, Tline, Fline, parset.n_line_recon);
-
-      sum1 = 0.0;
-      sum2 = 0.0;
-      for(j=0; j<parset.n_tau; j++)
-      {
-        sum1 += Trans1D[j] * TransTau[j];
-        sum2 += Trans1D[j];
-      }
-      lag[num_ps] = sum1/sum2;
-      mean_lag += lag[num_ps];
-
-
-      if(gsl_rng_uniform(gsl_r) < (10.0/num_ps))
-      {
-        for(i=0; i<parset.n_con_recon; i++)
-        {
-          fprintf(fcon, "%f %f\n", Tcon[i], Fcon[i]/con_scale);
-        }
-        fprintf(fcon, "\n");
-
-        for(i=0; i<parset.n_line_recon; i++)
-        {
-          fprintf(fline, "%f %f\n", Tline[i], Fline[i]/line_scale);
-        }
-        fprintf(fline, "\n");
-      }
-      num_ps++;
-    }
-    
-    mean_lag /= num_ps;
-    mean_lag_std = 0.0;
-    for(i=0; i<num_ps; i++)
-    {
-      mean_lag_std = (lag[i] - mean_lag) * (lag[i] - mean_lag);
-    }
-    if(num_ps > 1)
-      mean_lag_std = sqrt(mean_lag_std/(num_ps -1.0));
-    else
-      mean_lag_std = 0.0;
-    printf("Mean time lag: %f+-%f\n", mean_lag, mean_lag_std);
-
-    /*double *pm = (double *)best_model_line1d;
-    for(j = 0; j<num_params; j++)
-      printf("Best params %d %f +- %f\n", j, *((double *)best_model_line1d + j), *((double *)best_model_std_line1d+j) );*/ 
-    
-    fclose(fp);
-    fclose(fcon);
-    fclose(fline);
-  }
-
-  free(post_model);
-  free(best_model_line1d);
-  free(best_model_std_line1d);
-}
 
 void reconstruct_line1d()
 {
   char *argv[]={""};
-  int i, j;
-
   reconstruct_line1d_init();
-
 // dnest run
   dnest_line1d(0, argv);
-
   postprocess1d();
-
-  return;
-
-  if(thistask == roottask)
-  {
-    which_parameter_update = -1; // force to update the transfer function
-    which_particle_update = 0;
-    Fcon = Fcon_particles[which_particle_update];
-
-    calculate_con_from_model(best_model_line1d + num_params_blr *sizeof(double));
-    gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
-    
-    FILE *fp;
-    char fname[200];
-    int i;
-
-    sprintf(fname, "%s/%s", parset.file_dir, parset.pcon_out_file);
-    fp = fopen(fname, "w");
-    if(fp == NULL)
-    {
-      fprintf(stderr, "# Error: Cannot open file %s\n", fname);
-      exit(-1);
-    }
-
-    for(i=0; i<parset.n_con_recon; i++)
-    {
-      fprintf(fp, "%f %f\n", Tcon[i], Fcon[i] / con_scale);
-    }
-    fclose(fp);
-
-    Trans1D = Trans1D_particles[which_particle_update];
-    transfun_1d_cloud_direct(best_model_line1d);
-    calculate_line_from_blrmodel(best_model_line1d, Tline, Fline, parset.n_line_recon);
-
-    // output reconstructed line light curve
-    sprintf(fname, "%s/%s", parset.file_dir, parset.pline_out_file);
-    fp = fopen(fname, "w");
-    if(fp == NULL)
-    {
-      fprintf(stderr, "# Error: Cannot open file %s\n", fname);
-      exit(-1);
-    }
-
-    for(i=0; i<parset.n_line_recon; i++)
-    {
-      fprintf(fp, "%f %f\n", Tline[i], Fline[i] / line_scale);
-    }
-    fclose(fp);
-
-    // output transfer function.
-    sprintf(fname, "%s/%s", parset.file_dir, parset.tran_out_file);
-    fp = fopen(fname, "w");
-    if(fp == NULL)
-    {
-      fprintf(stderr, "# Error: Cannot open file %s\n", fname);
-      exit(-1);
-    }
-
-    for(i=0; i<parset.n_tau; i++)
-    {
-      fprintf(fp, "%f %f\n", TransTau[i], Trans1D[i]);
-    }
-    fclose(fp);
-  }
-  
   reconstruct_line1d_end();
-
 }
 
 void reconstruct_line1d_init()
@@ -339,6 +149,8 @@ void reconstruct_line1d_end()
 
   free(par_fix);
   free(par_fix_val);
+  free(best_model_line1d);
+  free(best_model_std_line1d);
 
   if(thistask == roottask)
   {
@@ -346,12 +158,268 @@ void reconstruct_line1d_end()
   }
 }
 
+void postprocess1d()
+{
+  char posterior_sample_file[BRAINS_MAX_STR_LENGTH];
+  double temperature=1.0;
+  double *pm, *pmstd;
+  int num_ps, i, j;
+  double *lag, *Fcon_mean, *Fline_mean, *Trans1D_mean;
+  void *posterior_sample, *post_model;
+  double mean_lag, mean_lag_std, sum1, sum2;
+  
+  best_model_line1d = malloc(size_of_modeltype);
+  best_model_std_line1d = malloc(size_of_modeltype);
+
+// generate posterior sample  
+  dnest_postprocess(temperature);
+
+  if(thistask == roottask)
+  {
+    char fname[200];
+    FILE *fp, *fcon, *fline, *ftran;
+    get_posterior_sample_file(dnest_options_file, posterior_sample_file);
+
+    //file for posterior sample
+    fp = fopen(posterior_sample_file, "r");
+    if(fp == NULL)
+    {
+      fprintf(stderr, "# Error: Cannot open file %s.\n", posterior_sample_file);
+      exit(0);
+    }
+    //file for continuum reconstruction
+    fcon = fopen("data/con_rec.txt", "w");
+    if(fcon == NULL)
+    {
+      fprintf(stderr, "# Error: Cannot open file data/con_rec.txt.\n");
+      exit(0);
+    }
+    //file for line reconstruction
+    fline = fopen("data/line_rec.txt", "w");
+    if(fline == NULL)
+    {
+      fprintf(stderr, "# Error: Cannot open file data/line1d_rec.txt.\n");
+      exit(0);
+    }
+    //file for transfer function
+    ftran = fopen("data/tran_rec.txt", "w");
+    if(fline == NULL)
+    {
+      fprintf(stderr, "# Error: Cannot open file data/tran_rec.txt.\n");
+      exit(0);
+    }
+
+    if(fscanf(fp, "# %d", &num_ps) < 1)
+    {
+      fprintf(stderr, "# Error: Cannot read file %s.\n", posterior_sample_file);
+      exit(0);
+    }
+    printf("# Number of points in posterior sample: %d\n", num_ps);
+
+    lag = malloc(num_ps * sizeof(double));
+    post_model = malloc(size_of_modeltype);
+    posterior_sample = malloc(num_ps * size_of_modeltype);
+    mean_lag = 0.0;
+    which_parameter_update = -1; // force to update the transfer function
+    which_particle_update = 0;
+    Fcon_mean = malloc(parset.n_con_recon*sizeof(double));
+    Fline_mean = malloc(parset.n_line_recon*sizeof(double));
+    Trans1D_mean = malloc(parset.n_tau*sizeof(double));
+    
+    for(j=0; j<parset.n_con_recon; j++)
+    {
+      Fcon_mean[j] = 0.0;
+    }
+    for(j=0; j<parset.n_line_recon; j++)
+    {
+      Fline_mean[j] = 0.0;
+    }
+    for(j=0; j<parset.n_tau; j++)
+    {
+      Trans1D_mean[j] = 0.0;
+    }
+
+    for(i=0; i<num_ps; i++)
+    {
+      for(j=0; j<num_params; j++)
+      {
+        if(fscanf(fp, "%lf", (double *)post_model + j) < 1)
+        {
+          fprintf(stderr, "# Error: Cannot read file %s.\n", posterior_sample_file);
+          exit(0);
+        }
+      }
+      fscanf(fp, "\n");
+
+      memcpy(posterior_sample+i*size_of_modeltype, post_model, size_of_modeltype);
+      
+      Fcon = Fcon_particles[which_particle_update];
+      calculate_con_from_model(post_model + num_params_blr *sizeof(double));
+      gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
+
+      Trans1D = Trans1D_particles[which_particle_update];
+      transfun_1d_cloud_direct(post_model);
+      calculate_line_from_blrmodel(post_model, Tline, Fline, parset.n_line_recon);
+
+      for(j=0; j<parset.n_con_recon; j++)
+      {
+        Fcon_mean[j] += Fcon[j];
+      }
+      for(j=0; j<parset.n_line_recon; j++)
+      {
+        Fline_mean[j] += Fline[j];
+      }
+      for(j=0; j<parset.n_tau; j++)
+      {
+        Trans1D_mean[j] += Trans1D[j];
+      }
+
+      sum1 = 0.0;
+      sum2 = 0.0;
+      for(j=0; j<parset.n_tau; j++)
+      {
+        sum1 += Trans1D[j] * TransTau[j];
+        sum2 += Trans1D[j];
+      }
+      lag[i] = sum1/sum2;
+      mean_lag += lag[i];
+
+      if(gsl_rng_uniform(gsl_r) < 1.0)
+      {
+        for(j=0; j<parset.n_con_recon; j++)
+        {
+          fprintf(fcon, "%f %f\n", Tcon[j], Fcon[j]/con_scale);
+        }
+        fprintf(fcon, "\n");
+
+        for(j=0; j<parset.n_line_recon; j++)
+        {
+          fprintf(fline, "%f %f\n", Tline[j], Fline[j]/line_scale);
+        }
+        fprintf(fline, "\n");
+
+        for(j=0; j<parset.n_tau; j++)
+        {
+          fprintf(ftran, "%f %f\n", TransTau[j], Trans1D[j]);
+        }
+        fprintf(ftran, "\n");
+      }
+    }
+    fclose(fp);
+    fclose(fcon);
+    fclose(fline);
+    fclose(ftran);
+    
+    
+    for(j=0; j<parset.n_con_recon; j++)
+      Fcon_mean[j] /= num_ps;
+    for(j=0; j<parset.n_line_recon; j++)
+      Fline_mean[j] /= num_ps;
+    for(j=0; j<parset.n_tau; j++)
+      Trans1D_mean[j] /= num_ps;
+
+    
+    // mean continuum
+    sprintf(fname, "%s/%s", parset.file_dir, parset.pcon_out_file);
+    fp = fopen(fname, "w");
+    if(fp == NULL)
+    {
+      fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+      exit(-1);
+    }
+    for(i=0; i<parset.n_con_recon; i++)
+    {
+      fprintf(fp, "%f %f\n", Tcon[i], Fcon_mean[i]/con_scale);
+    }
+    fclose(fp);
+    //mean line
+    sprintf(fname, "%s/%s", parset.file_dir, parset.pline_out_file);
+    fp = fopen(fname, "w");
+    if(fp == NULL)
+    {
+      fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+      exit(-1);
+    }
+    for(i=0; i<parset.n_line_recon; i++)
+    {
+      fprintf(fp, "%f %f\n", Tline[i], Fline_mean[i] / line_scale);
+    }
+    fclose(fp);
+
+    //mean transfer function.
+    sprintf(fname, "%s/%s", parset.file_dir, parset.tran_out_file);
+    fp = fopen(fname, "w");
+    if(fp == NULL)
+    {
+      fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+      exit(-1);
+    }
+    for(i=0; i<parset.n_tau; i++)
+    {
+      fprintf(fp, "%f %f\n", TransTau[i], Trans1D_mean[i]);
+    }
+    fclose(fp);
+
+    mean_lag /= num_ps;
+    mean_lag_std = 0.0;
+    for(i=0; i<num_ps; i++)
+    {
+      mean_lag_std = (lag[i] - mean_lag) * (lag[i] - mean_lag);
+    }
+    if(num_ps > 1)
+      mean_lag_std = sqrt(mean_lag_std/(num_ps -1.0));
+    else
+      mean_lag_std = 0.0;
+    printf("Mean time lag: %f+-%f\n", mean_lag, mean_lag_std);
+
+    pm = (double *)best_model_line1d;
+    pmstd = (double *)best_model_std_line1d;
+    for(j=0; j<num_params; j++)
+    {
+      pm[j] = pmstd[j] = 0.0;
+    }
+    for(i=0; i<num_ps; i++)
+    {
+      for(j =0; j<num_params; j++)
+        pm[j] += *((double *)posterior_sample + i*num_params + j );
+    }
+
+    for(j=0; j<num_params; j++)
+      pm[j] /= num_ps;
+
+    for(i=0; i<num_ps; i++)
+    {
+      for(j=0; j<num_params; j++)
+        pmstd[j] += pow( *((double *)posterior_sample + i*num_params + j ) - pm[j], 2.0 );
+    }
+
+    for(j=0; j<num_params; j++)
+    {
+      if(num_ps > 1)
+        pmstd[j] = sqrt(pmstd[j]/(num_ps-1.0));
+      else
+        pmstd[j] = 0.0;
+    }
+
+    double *pm = (double *)best_model_line1d;
+    for(j = 0; j<num_params_blr+num_params_var; j++)
+      printf("Best params %d %f +- %f\n", j, *((double *)best_model_line1d + j), *((double *)best_model_std_line1d+j) );
+    
+    free(lag);
+    free(Fcon_mean);
+    free(Fline_mean);
+    free(Trans1D_mean); 
+    free(post_model);
+    free(posterior_sample);
+  }
+  return;
+}
+
 double prob_line1d(const void *model)
 {
   double prob = 0.0, fcon, var2, dy;
   int i, param;
   double *pm = (double *)model;
-  
   
   // if the previous perturb is accepted, store the previous perturb values, otherwise, no changes;
   if(perturb_accept[which_particle_update] == 1)

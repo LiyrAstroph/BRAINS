@@ -23,18 +23,13 @@
 
 //int num_params, num_params_var;
 
-void *best_model_thismodel, *best_model_std_thismodel;
 
 int dnest_con(int argc, char **argv)
 {
-  double temperature;
-
   num_params_var = 4;
   num_params = parset.n_con_recon + num_params_var;
   size_of_modeltype = num_params * sizeof(double);
-  best_model_thismodel = malloc(size_of_modeltype);
-  best_model_std_thismodel = malloc(size_of_modeltype);
-
+  
   /* setup functions used for dnest*/
   from_prior = from_prior_thismodel;
   log_likelihoods_cal = log_likelihoods_cal_thismodel;
@@ -43,19 +38,10 @@ int dnest_con(int argc, char **argv)
   copy_model = copy_model_thismodel;
   create_model = create_model_thismodel;
   get_num_params = get_num_params_thismodel;
-  copy_best_model = copy_best_model_thismodel;
   
   strcpy(options_file, dnest_options_file);
-  dnest(argc, argv);
-  temperature = 1.0;
-  dnest_postprocess(temperature);
   
-  if(thistask == 0)
-  {
-    int j;
-    for(j = 0; j<num_params; j++)
-      printf("Best params %d %f +- %f\n", j, *((double *)best_model_thismodel + j), *((double *)best_model_std_thismodel+j)  ); 
-  }
+  //dnest(argc, argv);
   
   return 0;
 }
@@ -189,10 +175,4 @@ void *create_model_thismodel()
 int get_num_params_thismodel()
 {
   return num_params;
-}
-
-void copy_best_model_thismodel(const void *bm, const void *bm_std)
-{
-  memcpy(best_model_thismodel, bm, size_of_modeltype);
-  memcpy(best_model_std_thismodel, bm_std, size_of_modeltype);
 }

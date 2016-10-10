@@ -23,9 +23,9 @@ temperature = 1.0
 zoom_in = True
 moreSamples = 1
 
-levels_orig = np.loadtxt("../data/levels.txt", comments='#')
-sample_info = np.loadtxt("../data/sample_info.txt", comments='#')
-sample = np.atleast_2d(np.loadtxt("../data/sample.txt"))
+levels_orig = np.loadtxt("../data/levels1d.txt", comments='#')
+sample_info = np.loadtxt("../data/sample_info1d.txt", comments='#')
+sample = np.atleast_2d(np.loadtxt("../data/sample1d.txt"))
 
 sample = sample[int(cut*sample.shape[0]):, :]
 sample_info = sample_info[int(cut*sample_info.shape[0]):, :]

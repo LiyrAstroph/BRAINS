@@ -26,7 +26,6 @@ double perturb_line2d(void *model);
 void copy_model_line2d(void *dest, const void *src);
 void* create_model_line2d();
 int get_num_params_line2d();
-void copy_best_model_line2d(const void *bm, const void *bm_std);
 
 void (*print_particle)(FILE *fp, const void *model);
 void (*from_prior)(void *model);
@@ -35,6 +34,5 @@ double (*perturb)(void *model);
 void (*copy_model)(void *dest, const void *src);
 void* (*create_model)();
 int (*get_num_params)();
-void (*copy_best_model)(const void *bm, const void *bm_std);
 
 #endif
