@@ -1,3 +1,9 @@
+/* BRAINS
+ * (B)LR (R)everberation-mapping (A)nalysis (I)ntegrated with (N)ested (S)ampling
+ * Yan-Rong Li, liyanrong@ihep.ac.cn
+ * Thu, Aug 4, 2016
+ */
+ 
 #ifndef _NR_UTILS_H_
 #define _NR_UTILS_H_
 

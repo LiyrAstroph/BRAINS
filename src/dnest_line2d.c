@@ -1,6 +1,6 @@
 /*
  * BRAINS
- * (B)LR (R)everberation-mapping Analysis (I)ntegrated with (N)ested (S)ampling
+ * (B)LR (R)everberation-mapping (A)nalysis (I)ntegrated with (N)ested (S)ampling
  * Yan-Rong Li, liyanrong@ihep.ac.cn
  * Thu, Aug 4, 2016
  */
@@ -56,7 +56,7 @@ int dnest_line2d(int argc, char **argv)
   }
 
   strcpy(options_file, dnest_options_file);
-  //dnest(argc, argv);
+  dnest(argc, argv);
   
   return 0;
 

@@ -1,6 +1,6 @@
 /*
  * BRAINS
- * (B)LR (R)everberation-mapping Analysis (I)ntegrated with (N)ested (S)ampling
+ * (B)LR (R)everberation-mapping (A)nalysis (I)ntegrated with (N)ested (S)ampling
  * Yan-Rong Li, liyanrong@ihep.ac.cn
  * Thu, Aug 4, 2016
  */
@@ -12,6 +12,13 @@
 #include "allvars.h"
 #include "proto.h"
 
+/*! \file run.c
+ *  \brief setup and run the program. 
+ */
+
+/*!
+ * This function setup and run the program.
+ */
 void begin_run()
 {
   /* Velocity unit */
@@ -40,6 +47,9 @@ void begin_run()
   }
 }
 
+/*!
+ * This function free the memory and end the run.
+ */
 void end_run()
 {
   free_memory_data();

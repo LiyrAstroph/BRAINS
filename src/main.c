@@ -1,6 +1,5 @@
-/*
- * BRAINS
- * (B)LR (R)everberation-mapping Analysis (I)ntegrated with (N)ested (S)ampling
+/* BRAINS
+ * (B)LR (R)everberation-mapping (A)nalysis (I)ntegrated with (N)ested (S)ampling
  * Yan-Rong Li, liyanrong@ihep.ac.cn
  * Thu, Aug 4, 2016
  */
@@ -12,7 +11,14 @@
 
 #include "allvars.h"
 #include "proto.h"
+
+/*! \file main.c
+ *  \brief start of the program
+ */
  
+/*!
+ *  This function initializes the MPI communication packages.
+ */ 
 int main(int argc, char **argv)
 {
   MPI_Init(&argc, &argv);
@@ -38,13 +44,14 @@ int main(int argc, char **argv)
     return 0;
   }
 
-  strcpy(parset.param_file, argv[1]);
+  strcpy(parset.param_file, argv[1]); /* copy input parameter file */
 
-  begin_run();
 
-  end_run();
+  begin_run();    /* implementation run */
+
+  end_run();      /* end run */
   
-  MPI_Finalize();
+  MPI_Finalize();   /* clean up and finalize MPI */
   if(thistask == roottask)
   {
     printf("Ends successfully.\n");
@@ -52,3 +59,30 @@ int main(int argc, char **argv)
   }
   return 0;
 }
+
+/* ----------------------------------------------------------------------
+   The rest of this file contains documentation for compiling and
+   running the code, in a format appropriate for 'doxygen'.
+   ----------------------------------------------------------------------
+ */
+
+/*! \mainpage Reference documentation of BRAINS
+
+\author Yan-Rong Li\n
+        liyanrong@ihep.ac.cn\n
+        Institute of High Energy Physics
+
+\section introduction Introduction
+
+\b BRAINS is an abbreviation for  <b>B</b>LR <b>R</b>everberation-mapping 
+   <b>A</b>nalysis <b>I</b>ntegrated with <b>N</b>ested <b>S</b>ampling.
+
+\section install Compilation 
+
+BRAINS needs the following non-standard libraries for compilation:
+
+- \b MPI - the Message Passing Interface (version 1.0 or higher).
+
+\section howtorun Running the code
+ */
+

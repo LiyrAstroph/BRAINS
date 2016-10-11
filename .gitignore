@@ -8,6 +8,7 @@ analysis/*
 !src/OPTIONS*
 !src/*.[ch]
 !src/param
+!src/doxyfile
 !data/arp151_con.txt
 !data/arp151_hb.txt
 !data/arp151_hb2d.txt
