@@ -5,6 +5,11 @@
  * Thu, Aug 4, 2016
  */
 
+/*!
+ *  \file dnest_con.h
+ *  \brief header file.
+ */
+
 #ifndef _DNEST_CON_H
 
 #include <stdbool.h>

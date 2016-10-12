@@ -5,6 +5,11 @@
  * Thu, Aug 4, 2016
  */
 
+/*!
+ *  \file init.c
+ *
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>

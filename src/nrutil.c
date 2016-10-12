@@ -3,6 +3,13 @@
  * Yan-Rong Li, liyanrong@ihep.ac.cn
  * Thu, Aug 4, 2016
  */
+
+/*!
+ *  \file nrutil.c
+ *  \brief numerical recipes's functions.
+ *
+ *  Not used. To be removed.
+ */
  
 #include <stdio.h>
 #include <stddef.h>

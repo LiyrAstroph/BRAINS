@@ -5,6 +5,11 @@
  * Thu, Aug 4, 2016
  */
 
+/*!
+ *  \file transfun.c
+ *  \brief calculate transfer functions and emission lines
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>

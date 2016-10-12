@@ -3,6 +3,11 @@
  * Yan-Rong Li, liyanrong@ihep.ac.cn
  * Thu, Aug 4, 2016
  */
+
+/*!
+ *  \file mathfun.c
+ *  \brief mathematic functions.
+ */
  
 #include <stdio.h>
 #include <stdlib.h>

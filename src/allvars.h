@@ -5,6 +5,11 @@
  * Thu, Aug 4, 2016
  */
 
+/*!
+ *  \file allvars.h
+ *  \brief header file of allvars.c.
+ */
+
 #ifndef _ALLVARS_H
 #define _ALLVARS_H
 
@@ -96,18 +101,18 @@ extern double *Fline2d, *Flerrs2d;
 /* BLR model */
 typedef struct
 {
-	double mu;       // in light day;
-	double beta;     // 
-	double F;        //
-	double inc;      
-	double opn;	
-	double A;
-	double Ag;
-	double k;
-	double mbh;      // in 10e6 solar mass
-	double lambda;
-	double q;
-	double logse;    // systematic error
+	double mu;       /*!< mean BLR radius, in light day */
+	double beta;     /*!< shape parameter */ 
+	double F;        /*!< inner edge */
+	double inc;      /*!< inclination, in degree, 0-90 */
+	double opn;	     /*!< openning angle, in degere, 0-90 */
+	double A;        /*!< response coefficient */
+	double Ag;       /*!< nonlinear response */
+	double k;        /*!< anisotropic emission */
+	double mbh;      /*!< black hole mass,  in 10e6 solar mass */
+	double lambda;   /*!< orbit parameter */
+	double q;        /*!< inflow/outflow */
+	double logse;    /*!< systematic errors in continuum and emission line */
 }BLRmodel;
 
 extern BLRmodel range_model[2];

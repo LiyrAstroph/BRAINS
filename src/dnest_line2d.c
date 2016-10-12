@@ -5,6 +5,10 @@
  * Thu, Aug 4, 2016
  */
 
+/*!
+ *  \file dnest_line2d.c
+ *
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,7 +28,6 @@
 #include "dnest_line2d.h"
 #include "proto.h"
 
-//int num_params, num_params_blr, num_params_var;
 
 int dnest_line2d(int argc, char **argv)
 {

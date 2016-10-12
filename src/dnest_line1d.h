@@ -5,6 +5,11 @@
  * Thu, Aug 4, 2016
  */
 
+/*!
+ *  \file dnest_line1d.h
+ *  \brief header file.
+ */
+
 #ifndef _DNEST_LINE1D_H
 #define _DNEST_LINE1D_H
 

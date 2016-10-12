@@ -5,6 +5,12 @@
  * Thu, Aug 4, 2016
  */
 
+/*!
+ *  \file smooth_nr.c
+ *  \brief smoothing functions using numerical recieps' procedures.
+ *
+ *  Not used. To be removed.
+ */
 
 #include <stdio.h>
 #include <stdlib.h>

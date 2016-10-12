@@ -1,8 +1,13 @@
-/*!
+/*
  * BRAINS
  * (B)LR (R)everberation-mapping (A)nalysis (I)ntegrated with (N)ested (S)ampling
  * Yan-Rong Li, liyanrong@ihep.ac.cn
  * Thu, Aug 4, 2016
+ */
+
+/*!
+ *  \file dnest_con.c
+ *
  */
 
 #include <stdio.h>
@@ -20,8 +25,6 @@
 #include "allvars.h"
 #include "dnest_con.h"
 #include "proto.h"
-
-//int num_params, num_params_var;
 
 
 int dnest_con(int argc, char **argv)

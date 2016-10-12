@@ -5,6 +5,11 @@
  * Thu, Aug 4, 2016
  */
 
+/*!
+ *  \file smooth.c
+ *  \brief smoothing functions.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>

@@ -5,6 +5,11 @@
  * Thu, Aug 4, 2016
  */
 
+/*!
+ *  \file allvars.c
+ *  \brief define all variables.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -23,7 +28,9 @@ PARSET parset;
 double VelUnit;
 
 /* Data */
-int n_con_data, n_line_data, n_vel_data;
+int n_con_data;    /*!< number of continuum data points */
+int n_line_data;   /*!< number of emission data points along time axis */
+int n_vel_data;    /*!< number of emission data points along velocity axis */
 double *Tcon_data, *Fcon_data,  *Fcerrs_data;
 double *Tline_data, *Fline_data, *Flerrs_data;
 double *Vline_data, *Fline2d_data, *Flerrs2d_data;
@@ -31,8 +38,9 @@ double con_scale, line_scale;
 
 char dnest_options_file[BRAINS_MAX_STR_LENGTH];
 
-int which_parameter_update, which_particle_update;  // which parameter and particle to be updated
-int which_level_update;
+int which_parameter_update;  /*!< which parameter being updated */
+int which_particle_update;   /*!< which particle being updated */
+int which_level_update;      /*!< which level of the particle */
 int *perturb_accept, *which_parameter_update_prev;
 
 /* continuum reconstruction */
@@ -50,14 +58,14 @@ double *Fline2d_at_data;
 double *Fline2d, *Flerrs2d;
 
 // BLR
-BLRmodel range_model[2];
+BLRmodel range_model[2];    /*!< define the range of BLR model parameters */
 int *par_fix, npar_fix;
 double *par_fix_val;
 
 int num_params, num_params_blr, num_params_var;
 
 // continuum variation
-double var_range_model[5][2]; 
+double var_range_model[5][2]; /*!< define the range of variability parameters */
 
 /* transfer function / velocity-delay map */
 double *TransTau, *TransV, *Trans1D, *Trans2D_at_veldata, *Trans2D;

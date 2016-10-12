@@ -5,6 +5,11 @@
  * Thu, Aug 4, 2016
  */
 
+/*!
+ *  \file proto.h
+ *  \brief declare proto types.
+ */
+
 void begin_run();
 void end_run();
 void read_parset();

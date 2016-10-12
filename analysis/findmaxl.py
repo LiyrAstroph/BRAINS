@@ -1,3 +1,8 @@
+##
+#  \file findmaxl.py
+#  \brief find out the maximum likelihood value and the corresponding parameters.
+#
+
 import numpy as np
 
 info = np.loadtxt("../data/sample_info2d.txt", skiprows=1)

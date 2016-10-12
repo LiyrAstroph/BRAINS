@@ -83,6 +83,13 @@ BRAINS needs the following non-standard libraries for compilation:
 
 - \b MPI - the Message Passing Interface (version 1.0 or higher).
 
+- \b GSL - the GNU Scientific Library (version 2.2.1 or higher).
+
+- \b LAPACKE - the C-interface of LAPACK (version 3.6.1 or higher).
+
 \section howtorun Running the code
+
+To run the code in a terminal, type:\n
+mpiexec -n np ./brains param
  */
 

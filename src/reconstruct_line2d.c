@@ -5,6 +5,11 @@
  * Thu, Aug 4, 2016
  */
 
+/*!
+ *  \file reconstruct_line2d.c
+ *
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

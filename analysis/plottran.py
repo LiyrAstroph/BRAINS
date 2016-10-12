@@ -1,3 +1,8 @@
+##
+#  \file plottran.py
+#  \brief plot transfer function.
+#
+
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator, FormatStrFormatter

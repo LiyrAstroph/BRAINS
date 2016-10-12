@@ -5,6 +5,11 @@
  * Thu, Aug 4, 2016
  */
 
+/*!
+ *  \file read.c
+ *
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

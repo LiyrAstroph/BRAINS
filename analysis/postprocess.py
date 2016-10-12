@@ -1,7 +1,18 @@
+##
+#  \file postprocess.py
+#  \brief posterior process.
+#         
+#         from DNest4 by Brenden J. Brewer.\n
+#         see https://github.com/eggplantbren/DNest4/
+#
+
 import copy
 import numpy as np
 import matplotlib.pyplot as plt
 
+##
+# This function calculates an exponential summation of an array
+#
 def logsumexp(values):     # log SUM( exp(values) )
   biggest = np.max(values)
   x = values - biggest

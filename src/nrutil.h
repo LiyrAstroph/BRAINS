@@ -3,6 +3,13 @@
  * Yan-Rong Li, liyanrong@ihep.ac.cn
  * Thu, Aug 4, 2016
  */
+
+/*!
+ *  \file nrutil.h
+ *  \brief Head file for numerical recipes' procedures.
+ *
+ *  Not used. To be removed.
+ */
  
 #ifndef _NR_UTILS_H_
 #define _NR_UTILS_H_
