@@ -22,8 +22,12 @@
 
 #include "dnest_con.h"
 
-void *best_model_thismodel, *best_model_std_thismodel;
+void *best_model_con;   /*!< best model */
+void *best_model_std_con;  /*!< standard deviation of the best model */
 
+/*!
+ *  this function does postprocess for continuum. 
+ */
 void postprocess_con()
 {
   char posterior_sample_file[BRAINS_MAX_STR_LENGTH];
@@ -32,8 +36,8 @@ void postprocess_con()
   int num_ps, i, j;
   void *posterior_sample, *post_model;
   
-  best_model_thismodel = malloc(size_of_modeltype);
-  best_model_std_thismodel = malloc(size_of_modeltype);
+  best_model_con = malloc(size_of_modeltype);
+  best_model_std_con = malloc(size_of_modeltype);
 
   temperature = 1.0;
   dnest_postprocess(temperature);
@@ -98,8 +102,8 @@ void postprocess_con()
     fclose(fp);
     fclose(fcon);
 
-    pm = (double *)best_model_thismodel;
-    pmstd = (double *)best_model_std_thismodel;
+    pm = (double *)best_model_con;
+    pmstd = (double *)best_model_std_con;
     for(j=0; j<num_params; j++)
     {
       pm[j] = pmstd[j] = 0.0;
@@ -128,8 +132,8 @@ void postprocess_con()
     }  
 
     for(j = 0; j<num_params_var; j++)
-      printf("Best params %d %f +- %f\n", j, *((double *)best_model_thismodel + j), 
-                                             *((double *)best_model_std_thismodel+j) ); 
+      printf("Best params %d %f +- %f\n", j, *((double *)best_model_con + j), 
+                                             *((double *)best_model_std_con+j) ); 
 
     free(post_model);
     free(posterior_sample);
@@ -148,7 +152,7 @@ void reconstruct_con()
 
   if(thistask == roottask)
   {
-    calculate_con_from_model(best_model_thismodel);
+    calculate_con_from_model(best_model_con);
 
     FILE *fp;
     char fname[200];
@@ -172,8 +176,9 @@ void reconstruct_con()
 
 }
 
-/* calculate continuum light curves form model parameters 
- * stored into Fcon.
+/*!
+ *  this function calculates continuum light curves form model parameters 
+ *  and stores it into Fcon.
  */
 void calculate_con_from_model(const void *model)
 {
@@ -233,7 +238,9 @@ void reconstruct_con_from_varmodel(double sigma, double tau, double alpha)
   free(ybuf);
 }
 
-/* calculate likelihood */
+/*!
+ * this function calculates likelihood 
+ */
 double prob_con_variability(const void *model)
 {
   double prob = 0.0, fcon, var2;
@@ -254,7 +261,9 @@ double prob_con_variability(const void *model)
   return prob;
 }
 
-/* set the covariance matrix */
+/*!
+ * this function sets the covariance matrix 
+ */
 void set_covar_Pmat(double sigma, double tau, double alpha)
 {
   double t1, t2;
@@ -273,7 +282,9 @@ void set_covar_Pmat(double sigma, double tau, double alpha)
   return;
 }
 
-/* set the covariance matrix at data points */
+/*!
+ * this function sets the covariance matrix at data points 
+ */
 void set_covar_Pmat_data(double sigma, double tau, double alpha)
 {
   double t1, t2;
@@ -344,5 +355,7 @@ void reconstruct_con_end()
 {
   free(Fcon);
   free(perturb_accept);
+  free(best_model_con);
+  free(best_model_std_con);
   return;
 }

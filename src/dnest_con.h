@@ -20,20 +20,19 @@
 // model
 
 /*==========================================*/
-//extern int num_params, num_params_var;
 extern int size_of_modeltype;
 
 /* best model */
-extern void *best_model_thismodel, *best_model_std_thismodel;
+extern void *best_model_con, *best_model_std_con;
 
 /* functions */
-void from_prior_thismodel(void *model);
-void print_particle_thismodel(FILE *fp, const void *model);
-double log_likelihoods_cal_thismodel(const void *model);
-double perturb_thismodel(void *model);
-void copy_model_thismodel(void *dest, const void *src);
-void* create_model_thismodel();
-int get_num_params_thismodel();
+void from_prior_con(void *model);
+void print_particle_con(FILE *fp, const void *model);
+double log_likelihoods_cal_con(const void *model);
+double perturb_con(void *model);
+void copy_model_con(void *dest, const void *src);
+void* create_model_con();
+int get_num_params_con();
 
 void (*print_particle)(FILE *fp, const void *model);
 void (*from_prior)(void *model);

@@ -34,13 +34,13 @@ int dnest_con(int argc, char **argv)
   size_of_modeltype = num_params * sizeof(double);
   
   /* setup functions used for dnest*/
-  from_prior = from_prior_thismodel;
-  log_likelihoods_cal = log_likelihoods_cal_thismodel;
-  perturb = perturb_thismodel;
-  print_particle = print_particle_thismodel;
-  copy_model = copy_model_thismodel;
-  create_model = create_model_thismodel;
-  get_num_params = get_num_params_thismodel;
+  from_prior = from_prior_con;
+  log_likelihoods_cal = log_likelihoods_cal_con;
+  perturb = perturb_con;
+  print_particle = print_particle_con;
+  copy_model = copy_model_con;
+  create_model = create_model_con;
+  get_num_params = get_num_params_con;
   
   strcpy(options_file, dnest_options_file);
   
@@ -52,7 +52,7 @@ int dnest_con(int argc, char **argv)
 /*===========================================*/
 // users responsible for following struct definitions
 
-void from_prior_thismodel(void *model)
+void from_prior_con(void *model)
 {
   int i;
   double *pm = (double *)model;
@@ -66,14 +66,14 @@ void from_prior_thismodel(void *model)
     pm[i+num_params_var] = dnest_randn();
 }
 
-double log_likelihoods_cal_thismodel(const void *model)
+double log_likelihoods_cal_con(const void *model)
 {
   double logL;
   logL = prob_con_variability(model);
   return logL;
 }
 
-double perturb_thismodel(void *model)
+double perturb_con(void *model)
 {
   double *pm = (double *)model;
   double logH = 0.0, limit1, limit2, width;
@@ -153,7 +153,7 @@ double perturb_thismodel(void *model)
   return logH;
 }
 
-void print_particle_thismodel(FILE *fp, const void *model)
+void print_particle_con(FILE *fp, const void *model)
 {
   int i;
   double *pm = (double *)model;
@@ -165,17 +165,17 @@ void print_particle_thismodel(FILE *fp, const void *model)
   fprintf(fp, "\n");
 }
 
-void copy_model_thismodel(void *dest, const void *src)
+void copy_model_con(void *dest, const void *src)
 {
   memcpy(dest, src, size_of_modeltype);
 }
 
-void *create_model_thismodel()
+void *create_model_con()
 {
   return (void *)malloc( size_of_modeltype );
 }
 
-int get_num_params_thismodel()
+int get_num_params_con()
 {
   return num_params;
 }

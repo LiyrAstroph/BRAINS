@@ -36,7 +36,8 @@ def reconstruct_con():
 
 	plt.plot(pcon[:, 0], pcon[:, 1], color='r', lw=2)
 	plt.errorbar(data[:, 0], data[:, 1], yerr=data[:, 2], ls='none', marker='o', color='b')
-	
+	plt.xlabel("HJD")
+	plt.ylabel("Fcon")
 	plt.savefig("rec_con.pdf", bbox_inches='tight')
 	
 	plt.close()

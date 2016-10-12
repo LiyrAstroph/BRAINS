@@ -17,7 +17,6 @@
 
 
 /*==========================================*/
-//extern int num_params, num_params_blr, num_params_var;
 extern int size_of_modeltype;
 
 /* best model */
