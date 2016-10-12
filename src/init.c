@@ -58,7 +58,7 @@ void init()
 
   /* set the range of cloud radial distribution */
   rcloud_min_set = parset.tau_min_set;
-  rcloud_max_set = parset.tau_max_set;
+  rcloud_max_set = parset.tau_max_set*4.0;
 
   range_model[0].mbh = log(0.1);
   range_model[1].mbh = log(1000.0);
