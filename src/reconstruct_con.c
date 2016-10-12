@@ -26,7 +26,6 @@ void postprocess_con()
   double *pm, *pmstd;
   int num_ps, i, j;
   void *posterior_sample, *post_model;
-  double *Fcon_mean;
   
   best_model_thismodel = malloc(size_of_modeltype);
   best_model_std_thismodel = malloc(size_of_modeltype);
@@ -37,11 +36,10 @@ void postprocess_con()
   if(thistask == roottask)
   {
     FILE *fp, *fcon;
-    char fname[200];
     // get number of lines in posterior sample file
     get_posterior_sample_file(dnest_options_file, posterior_sample_file);
 
-        //file for posterior sample
+    //file for posterior sample
     fp = fopen(posterior_sample_file, "r");
     if(fp == NULL)
     {
@@ -65,10 +63,6 @@ void postprocess_con()
 
     post_model = malloc(size_of_modeltype);
     posterior_sample = malloc(num_ps * size_of_modeltype);
-    Fcon_mean = malloc(parset.n_con_recon * sizeof(double));
-
-    for(j=0; j<parset.n_con_recon; j++)
-      Fcon_mean[j] = 0.0;
 
     for(i=0; i<num_ps; i++)
     {
@@ -94,32 +88,10 @@ void postprocess_con()
         }
         fprintf(fcon, "\n");
       }
-
-      for(j=0; j<parset.n_con_recon; j++)
-      {
-        Fcon_mean[j] += Fcon[j];
-      }
     }
 
     fclose(fp);
     fclose(fcon);
-    
-    for(j=0; j<parset.n_con_recon; j++)
-      Fcon_mean[j] /= num_ps;
-
-    // mean continuum
-    sprintf(fname, "%s/%s", parset.file_dir, parset.pcon_out_file);
-    fp = fopen(fname, "w");
-    if(fp == NULL)
-    {
-      fprintf(stderr, "# Error: Cannot open file %s\n", fname);
-      exit(-1);
-    }
-    for(i=0; i<parset.n_con_recon; i++)
-    {
-      fprintf(fp, "%f %f\n", Tcon[i], Fcon_mean[i]/con_scale);
-    }
-    fclose(fp);  
 
     pm = (double *)best_model_thismodel;
     pmstd = (double *)best_model_std_thismodel;
@@ -151,11 +123,11 @@ void postprocess_con()
     }  
 
     for(j = 0; j<num_params_var; j++)
-      printf("Best params %d %f +- %f\n", j, *((double *)best_model_thismodel + j), *((double *)best_model_std_thismodel+j) ); 
+      printf("Best params %d %f +- %f\n", j, *((double *)best_model_thismodel + j), 
+                                             *((double *)best_model_std_thismodel+j) ); 
 
     free(post_model);
     free(posterior_sample);
-    free(Fcon_mean);
   }
   return;
 }
@@ -169,7 +141,7 @@ void reconstruct_con()
 
   postprocess_con();
 
-  /*if(thistask == roottask)
+  if(thistask == roottask)
   {
     calculate_con_from_model(best_model_thismodel);
 
@@ -189,7 +161,7 @@ void reconstruct_con()
       fprintf(fp, "%f %f\n", Tcon[i], Fcon[i] / con_scale);
     }
     fclose(fp);
-  }*/
+  }
 
   reconstruct_con_end();
 

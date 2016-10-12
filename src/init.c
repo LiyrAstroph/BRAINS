@@ -59,7 +59,7 @@ void init()
   range_model[1].mbh = log(1000.0);
 
   range_model[0].mu = log(0.1);
-  range_model[1].mu = log(parset.tau_max_set);
+  range_model[1].mu = log(parset.tau_max_set*4.0);
 
   range_model[0].beta = 0.001;
   range_model[1].beta = 1.0;
@@ -83,7 +83,7 @@ void init()
   range_model[1].k = 0.5;
 
   range_model[0].lambda = 0.0;
-  range_model[1].lambda = 2.0;
+  range_model[1].lambda = 3.0;
 
   range_model[0].q = 0.0;
   range_model[1].q = 1.0;

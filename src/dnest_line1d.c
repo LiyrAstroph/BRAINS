@@ -5,6 +5,10 @@
  * Thu, Aug 4, 2016
  */
 
+/*! \file dnest_line1d.c
+ *  \brief run dnest sampling for 1d line analysis.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -23,6 +27,9 @@
 #include "dnest_line1d.h"
 #include "proto.h"
 
+/*!
+ * This function setup functions for dnest and run dnest.
+ */
 int dnest_line1d(int argc, char **argv)
 {
   int i;
@@ -58,7 +65,6 @@ int dnest_line1d(int argc, char **argv)
 
 /*===========================================*/
 // users responsible for following struct definitions
-
 void from_prior_line1d(void *model)
 {
   int i;
@@ -87,7 +93,7 @@ void from_prior_line1d(void *model)
   for(i=0; i<parset.n_con_recon; i++)
     pm[i+num_params_var+num_params_blr] = dnest_randn();
 
-  which_parameter_update = -1; // force to update the all the perturb values 
+  which_parameter_update = -1; /*< force to update the all the perturb values */
 
 }
 

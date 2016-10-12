@@ -3,14 +3,14 @@
 % 
 
 FileDir                     /home/liyropt/Projects/GIT/BRAINS
-%FileDir                     /ihepbatch/mbhd01/user/liyanrong/RM/MCMC_BRAINS/arp151_2d
+%FileDir                     /ihepbatch/mbhd01/user/liyanrong/RM/MCMC_BRAINS/mrk486
 
-FlagDim                     2                           % 0, only continuum; 1, 1d line; 2, 2d line
+FlagDim                     1                           % 0, only continuum; 1, 1d line; 2, 2d line
 %===============================
 % data file
-ContinnumFile               data/mrk493_con.txt         % file for contnnum data
-LineFile                    data/mrk493_hb.txt          % file for line data
-Line2DFile                  data/mrk493_hb2d.txt        % file for line 2d data
+ContinnumFile               data/mrk486_con.txt         % file for contnnum data
+LineFile                    data/mrk486_hb.txt          % file for line data
+Line2DFile                  data/mrk486_hb2d.txt        % file for line 2d data
 %===============================
 % reconstruction
 NConRecon                   100                         % number of points for continuum reconstruction
@@ -20,12 +20,12 @@ NLineRecon                  200                         % number of points for l
 LineConstructFileOut        data/pline.txt              % output filename
 TranFileOut                 data/tran.txt               % output filename for 1d transfer function
 
-NVelRecon                   25                         % number of points for line reconstruction along velocity axis      
+NVelRecon                   100                         % number of points for line reconstruction along velocity axis      
 Line2DConstructFileOut      data/pline2d.txt            % output filename  
 Line2DDataConstructFileOut  data/pline2d_data.txt       % output filename for 2d transfer function at points same with data
 Tran2DFileOut               data/tran2d.txt             % output filename for 2d transfer function
 
-NCloudPerCore               1000                        % number of clouds per task
+NCloudPerCore               20000                        % number of clouds per task
 NVPerCloud                  10                          % number of velocities per cloud
 
 NTau                        100                         % number of time-lag points calculated in transfer function
@@ -35,7 +35,7 @@ TauMaxSet                   50.0                        % maximum time lag calcu
 FlagCloudsOut               0                           % 1, save clouds at the last run; 0, do not save
 CloudsFileOut               data/clouds.txt             % output filename for clouds 
 
-InstRes                     220                         % instrument resolution, in km/s
+InstRes                     280                         % instrument resolution, in km/s
 
 %===============================
 % set fixed BLR parameters and their fixed values
@@ -43,5 +43,5 @@ InstRes                     220                         % instrument resolution,
 % 1: fixed; 0: not fixed;
 % values are separated by ":"
 
-BLRParFix                   00000000000
-BLRParFixVal                1.38:0.86:22.0:34.5:0.0:0.4:0.9         
+BLRParFix                   0000000000
+BLRParFixVal                1.38:22.0:34.5           
