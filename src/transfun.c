@@ -77,8 +77,11 @@ void transfun_1d_cloud_direct(const void *pm)
   a = 1.0/beta/beta;
   s = mu/a;
   
-  // record the previous beta to save comupational time
-  if(perturb_accept[which_particle_update] == 1 && which_parameter_update_prev[which_parameter_update] == 1)
+  /* according to the perturb information of each particle at the previous step,
+   * only record the perturb radial locations when the previous step is accepted and 
+   * the pervious updated paramete is beta.
+   */
+  if(perturb_accept[which_particle_update] == 1 && which_parameter_update_prev[which_particle_update] == 1)
     memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
       parset.n_cloud_per_task * sizeof(double));
 
@@ -98,7 +101,9 @@ void transfun_1d_cloud_direct(const void *pm)
     else
       Lthe = 0.0;
     
-    // when the lastest MH move is not accepted, update clouds
+    /* note a only depends on beta, so resample the radial
+     * locations when beta is updated or forced to update
+     */
     if(which_parameter_update == 1 || which_parameter_update == -1) //
     {
       r = rcloud_max_set+1.0;
@@ -148,7 +153,9 @@ void transfun_1d_cloud_direct(const void *pm)
     Trans1D[idt] += weight;
   }
 
-  // record the previous beta to save comupational time
+  /* record the previous beta to save comupational time
+   * when forced to update
+   */
   if(which_parameter_update == -1)
     memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
       parset.n_cloud_per_task * sizeof(double));
@@ -198,7 +205,7 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
     }
   }
 
-// smooth out the line profile
+// smooth the line profile
   line_gaussian_smooth_2D_FFT(transv, fl2d, nl, nv);
 // add narrow line
 /*  for(j = 0; j<nl; j++)
@@ -210,8 +217,9 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
   }  */
 }
 
-/* time-lag grid is already set by parset.n_tau 
- * calculate transfer function at velocity grid "transv" and time grid "TransTau" 
+/*! 
+ * This function calculate 2d transfer function at velocity grid "transv" and time grid "TransTau" . 
+ * Note that time-lag grid is already set by parset.n_tau.
  */
 void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
@@ -251,7 +259,10 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
   vcloud_min = DBL_MAX;
 
 
-  // record the previous values
+   /* according to the perturb information of each particle at the previous step,
+   * only record the perturb radial locations when the previous step is accepted and 
+   * the pervious updated paramete is beta.
+   */
   if(perturb_accept[which_particle_update] == 1 && which_parameter_update_prev[which_particle_update] == 1)
     memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
       parset.n_cloud_per_task * sizeof(double));
