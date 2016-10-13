@@ -5,7 +5,7 @@
 %FileDir                     /home/liyropt/Projects/GIT/BRAINS
 FileDir                     ./
 
-FlagDim                     2                           % 0, only continuum; 1, 1d line; 2, 2d line
+FlagDim                     0                           % 0, only continuum; 1, 1d line; 2, 2d line
 %===============================
 % data file
 ContinnumFile               data/mrk382_con.txt         % file for contnnum data

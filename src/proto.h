@@ -66,6 +66,11 @@ void postprocess2d();
 void smooth_init(int nv);
 void smooth_end();
 
+/* time */
+double second();
+double timediff(double t0, double t1);
+void get_hms(double dt, int *h, int *m, double *s);
+
 /* matrix operations */
 void inverse_mat(double *a, int n, int *info);
 double det_mat(double *a, int n, int *info);

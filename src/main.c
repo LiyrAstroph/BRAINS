@@ -21,6 +21,7 @@
  */ 
 int main(int argc, char **argv)
 {
+  double t0, t1, dt;
   /* initialize MPI */
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &thistask);
@@ -29,6 +30,7 @@ int main(int argc, char **argv)
   
   if(thistask == roottask)
   {
+    t0 = second();
     printf("===============BRAINS==================\n");
     printf("Starts to run...\n");
     printf("%d cores used.\n", totaltask);
@@ -54,6 +56,12 @@ int main(int argc, char **argv)
   MPI_Finalize();   /* clean up and finalize MPI */
   if(thistask == roottask)
   {
+    int ht, mt;
+    double st;
+    t1 = second();
+    dt = timediff(t0, t1);
+    get_hms(dt, &ht, &mt, &st);
+    printf("Time used: %dh %dm %fs.\n", ht, mt, st);
     printf("Ends successfully.\n");
     printf("===============BRAINS==================\n");
   }
