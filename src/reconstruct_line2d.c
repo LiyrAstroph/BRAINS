@@ -46,6 +46,7 @@ void postprocess2d()
   {
     // initialize smooth work space
     smooth_init(n_vel_data);
+    char fname[200];
     FILE *fp, *fcon, *fline, *ftran;
 
     // get number of lines in posterior sample file
@@ -59,24 +60,27 @@ void postprocess2d()
       exit(0);
     }
     //file for continuum reconstruction
-    fcon = fopen("data/con_rec.txt", "w");
+    sprintf(fname, "%s/%s", parset.file_dir, "data/con_rec.txt");
+    fcon = fopen(fname, "w");
     if(fcon == NULL)
     {
-      fprintf(stderr, "# Error: Cannot open file data/con_rec.txt.\n");
+      fprintf(stderr, "# Error: Cannot open file %s.\n", fname);
       exit(0);
     }
     //file for line reconstruction
-    fline = fopen("data/line2d_rec.txt", "w");
+    sprintf(fname, "%s/%s", parset.file_dir, "data/line2d_rec.txt");
+    fline = fopen(fname, "w");
     if(fline == NULL)
     {
-      fprintf(stderr, "# Error: Cannot open file data/line1d_rec.txt.\n");
+      fprintf(stderr, "# Error: Cannot open file %s.\n", fname);
       exit(0);
     }
     //file for transfer function
-    ftran = fopen("data/tran2d_rec.txt", "w");
+    sprintf(fname, "%s/%s", parset.file_dir, "data/tran2d_rec.txt");
+    ftran = fopen(fname, "w");
     if(fline == NULL)
     {
-      fprintf(stderr, "# Error: Cannot open file data/tran_rec.txt.\n");
+      fprintf(stderr, "# Error: Cannot open file %s.\n", fname);
       exit(0);
     }
 
@@ -358,6 +362,7 @@ void reconstruct_line2d_init()
   /* set time array for continuum */
   Tcon_min = Tcon_data[0] - fmax(0.05*(Tcon_data[n_con_data -1] - Tcon_data[0]), parset.tau_max_set + (Tcon_data[0] - Tline_data[0]));
   Tcon_max = Tcon_data[n_con_data-1] + fmax(0.05*(Tcon_data[n_con_data -1] - Tcon_data[0]), 10.0);
+  Tcon_max = fmax(Tcon_max, Tline_data[n_line_data -1]);  /* The time span shoud cover that of the emission line data */
   dT = (Tcon_max - Tcon_min)/(parset.n_con_recon -1);
   
   for(i=0; i<parset.n_con_recon; i++)
@@ -380,6 +385,8 @@ void reconstruct_line2d_init()
   
   Tline_min = Tline_data[0] - fmin(0.1*(Tline_data[n_line_data - 1] - Tline_data[0]), 10);
   Tline_max = Tline_data[n_line_data -1] + fmin(0.1*(Tline_data[n_line_data - 1] - Tline_data[0]), 10);
+  Tline_max = fmin(Tline_max, Tcon_max);  /* The time span should be within that of the continuum */
+  
   dT = (Tline_max - Tline_min)/(parset.n_line_recon - 1);
 
   for(i=0; i<parset.n_line_recon; i++)

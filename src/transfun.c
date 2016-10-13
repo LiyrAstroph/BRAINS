@@ -283,7 +283,7 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
     if(which_parameter_update == 1 || which_parameter_update == -1) // beta updated
     {
       r = rcloud_max_set+1.0;
-      while(r>rcloud_max_set || r<rcloud_min_set)
+      //while(r>rcloud_max_set || r<rcloud_min_set)
       {
         rnd = gsl_ran_gamma(gsl_r, a, 1.0);
 //        r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, mu/beta, beta);

@@ -5,7 +5,7 @@
 FileDir                     /home/liyropt/Projects/GIT/BRAINS
 %FileDir                     /ihepbatch/mbhd01/user/liyanrong/RM/MCMC_BRAINS/mrk486
 
-FlagDim                     0                           % 0, only continuum; 1, 1d line; 2, 2d line
+FlagDim                     2                           % 0, only continuum; 1, 1d line; 2, 2d line
 %===============================
 % data file
 ContinnumFile               data/mrk486_con.txt         % file for contnnum data
@@ -25,7 +25,7 @@ Line2DConstructFileOut      data/pline2d.txt            % output filename
 Line2DDataConstructFileOut  data/pline2d_data.txt       % output filename for 2d transfer function at points same with data
 Tran2DFileOut               data/tran2d.txt             % output filename for 2d transfer function
 
-NCloudPerCore               20000                        % number of clouds per task
+NCloudPerCore               1000                        % number of clouds per task
 NVPerCloud                  10                          % number of velocities per cloud
 
 NTau                        100                         % number of time-lag points calculated in transfer function

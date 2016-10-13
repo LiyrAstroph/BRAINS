@@ -44,6 +44,7 @@ void postprocess_con()
   
   if(thistask == roottask)
   {
+    char fname[200];
     FILE *fp, *fcon;
     // get number of lines in posterior sample file
     get_posterior_sample_file(dnest_options_file, posterior_sample_file);
@@ -56,10 +57,11 @@ void postprocess_con()
       exit(0);
     }
     //file for continuum reconstruction
-    fcon = fopen("data/con_rec.txt", "w");
+    sprintf(fname, "%s/%s", parset.file_dir, "data/con_rec.txt");
+    fcon = fopen(fname, "w");
     if(fcon == NULL)
     {
-      fprintf(stderr, "# Error: Cannot open file data/con_rec.txt.\n");
+      fprintf(stderr, "# Error: Cannot open file %s.\n", fname);
       exit(0);
     }
 
