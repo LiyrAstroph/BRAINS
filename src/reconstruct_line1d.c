@@ -127,7 +127,7 @@ void postprocess1d()
       lag[i] = sum1/sum2;
       mean_lag += lag[i];
 
-      if(gsl_rng_uniform(gsl_r) < 10.0/num_ps)
+      if(i % (num_ps/10+1) == 0)
       {
         for(j=0; j<parset.n_con_recon; j++)
         {

@@ -39,7 +39,7 @@ void postprocess2d()
   best_model_std_line2d = malloc(size_of_modeltype);
 
 // generate posterior sample
-  temperature = 5.0;
+  temperature = 10.0;
   dnest_postprocess(temperature);
 
   if(thistask == roottask)
@@ -113,7 +113,7 @@ void postprocess2d()
       }
       fscanf(fp, "\n");
 
-      //store lines
+      //store model
       memcpy(posterior_sample+i*size_of_modeltype, post_model, size_of_modeltype);
 
       Fcon = Fcon_particles[which_particle_update];
@@ -140,7 +140,7 @@ void postprocess2d()
       lag[i] = sum1/sum2;
       mean_lag += lag[i];
 
-      if(gsl_rng_uniform(gsl_r) < 10.0/num_ps)
+      if( i % (num_ps/10+1) == 0)  /* only output every ~10 calculations */
       {
         for(j=0; j<parset.n_con_recon; j++)
         {
@@ -177,6 +177,7 @@ void postprocess2d()
     fclose(fline);
     fclose(ftran);
 
+    /* calculate mean lags */
     mean_lag /= num_ps;
     mean_lag_std = 0.0;
     for(i=0; i<num_ps; i++)

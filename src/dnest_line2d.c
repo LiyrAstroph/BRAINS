@@ -59,7 +59,7 @@ int dnest_line2d(int argc, char **argv)
   }
 
   strcpy(options_file, dnest_options_file);
-  dnest(argc, argv);
+  //dnest(argc, argv);
   
   return 0;
 }
@@ -115,6 +115,7 @@ double perturb_line2d(void *model)
   double logH = 0.0, limit1, limit2, width;
   int which; 
 
+  /* fixed parameters need not to update */
   do
   {
     which = dnest_rand_int(num_params);
@@ -273,6 +274,7 @@ double perturb_line2d(void *model)
         limit2 = range_model[1].logse;
         width =  ( limit2 - limit1 );
       }
+      /* limit the step size of systematic error, like simulated annealing */
       pm[11] += dnest_randh() * fmin(width, (range_model[1].logse - range_model[0].logse)*0.001 );
       wrap_limit(&(pm[11]), range_model[0].logse, range_model[1].logse);
       break;
@@ -284,6 +286,7 @@ double perturb_line2d(void *model)
         limit2 =  var_range_model[0][1];
         width = ( limit2 - limit1 );
       }
+      /* limit the step size of systematic error, like simulated annealing */
       pm[12] += dnest_randh() * fmin(width, (var_range_model[0][1] - var_range_model[0][0]) * 0.01);
       wrap(&(pm[12]), var_range_model[0][0], var_range_model[0][1] );
       break;

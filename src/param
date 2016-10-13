@@ -5,12 +5,12 @@
 %FileDir                     /home/liyropt/Projects/GIT/BRAINS
 FileDir                     ./
 
-FlagDim                     0                           % 0, only continuum; 1, 1d line; 2, 2d line
+FlagDim                     2                           % 0, only continuum; 1, 1d line; 2, 2d line
 %===============================
 % data file
-ContinnumFile               data/mrk382_con.txt         % file for contnnum data
-LineFile                    data/mrk382_hb.txt          % file for line data
-Line2DFile                  data/mrk382_hb2d.txt        % file for line 2d data
+ContinnumFile               data/mrk1044_con.txt         % file for contnnum data
+LineFile                    data/mrk1044_hb.txt          % file for line data
+Line2DFile                  data/mrk1044_hb2d.txt        % file for line 2d data
 %===============================
 % reconstruction
 NConRecon                   100                         % number of points for continuum reconstruction
