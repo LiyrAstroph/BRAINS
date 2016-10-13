@@ -7,7 +7,7 @@
 
 /*!
  *  \file dnest_line2d.c
- *
+ *  \brief run dnest for 2d line analysis.
  */
 
 #include <stdio.h>

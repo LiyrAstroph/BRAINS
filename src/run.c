@@ -17,19 +17,27 @@
  */
 
 /*!
- * This function setup and run the program.
+ * This function setups and runs the program.
  */
 void begin_run()
 {
-  /* Velocity unit */
+  /*   Velocity unit 
+   *   This unit should be determined in the beginning because the data velocity
+   *   needs to be converted using this unit in read.c.
+   */
   VelUnit = sqrt( GRAVITY * 1.0e6 * SOLAR_MASS / CM_PER_LD ) / 1.0e5;
 
+  /* read parameter file */
   read_parset();
+  /* read data files */
   read_data();
+  /* scale continuum and line to an order of unity */
   scale_con_line();
 
+  /* initialization */
   init();
   
+  /* now run dnest and reconstruct the model. */
   MPI_Barrier(MPI_COMM_WORLD);
   if(parset.flag_dim == 0)
   {
@@ -45,10 +53,12 @@ void begin_run()
   {
     reconstruct_line2d();
   }
+
+  return;
 }
 
 /*!
- * This function free the memory and end the run.
+ * This function frees the memory and ends the run.
  */
 void end_run()
 {

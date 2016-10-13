@@ -20,6 +20,27 @@
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_interp.h>
 
+/*! \def GRAVITY
+ *  \brief Gravitational constant. 
+
+ *  \def SOLAR_MASS
+ *  \brief Solar mass.
+
+ *  \def C
+ *  \brief speed of light.
+
+ *  \def SEC_PER_YEAR
+ *  \brief seconds per year.
+
+ *  \def CM_PER_LD
+ *  \brief light day in centimeter.
+
+ *  \def PI
+ *  \brief Pi.
+
+ *  \def BRAINS_MAX_STR_LENGTH
+ *  \brief maximum string length.
+ */
 #define GRAVITY       6.672e-8
 #define SOLAR_MASS    1.989e33
 #define C             2.9979e10
@@ -29,11 +50,14 @@
 #define PI            M_PI
 #define BRAINS_MAX_STR_LENGTH  (100)
 
-/* MPICH */
+/* variables for MPICH */
 extern int thistask, totaltask, namelen;
 extern int roottask;
 extern char proc_name[MPI_MAX_PROCESSOR_NAME];
 
+/*! \struct PARSET
+ *  \brief the configuration parameters.
+ */
 typedef struct 
 {
   char param_file[BRAINS_MAX_STR_LENGTH];
@@ -98,21 +122,24 @@ extern double Tline_min, Tline_max;
 extern double *Fline2d_at_data;
 extern double *Fline2d, *Flerrs2d;
 
-/* BLR model */
+/*!
+ *  \struct BLRmodel
+ *  \brief broad-line region model. 
+ */
 typedef struct
 {
-	double mu;       /*!< mean BLR radius, in light day */
-	double beta;     /*!< shape parameter */ 
-	double F;        /*!< inner edge */
-	double inc;      /*!< inclination, in degree, 0-90 */
-	double opn;	     /*!< openning angle, in degere, 0-90 */
-	double A;        /*!< response coefficient */
-	double Ag;       /*!< nonlinear response */
-	double k;        /*!< anisotropic emission */
-	double mbh;      /*!< black hole mass,  in 10e6 solar mass */
-	double lambda;   /*!< orbit parameter */
-	double q;        /*!< inflow/outflow */
-	double logse;    /*!< systematic errors in continuum and emission line */
+	double mu;       /*!< \brief mean BLR radius, in light day */
+	double beta;     /*!< \brief shape parameter */ 
+	double F;        /*!< \brief inner edge */
+	double inc;      /*!< \brief inclination, in degree, 0-90 */
+	double opn;	     /*!< \brief openning angle, in degere, 0-90 */
+	double A;        /*!< \brief response coefficient */
+	double Ag;       /*!< \brief nonlinear response */
+	double k;        /*!< \brief anisotropic emission */
+	double mbh;      /*!< \brief black hole mass,  in 10e6 solar mass */
+	double lambda;   /*!< \brief orbit parameter */
+	double q;        /*!< \brief inflow/outflow */
+	double logse;    /*!< \brief systematic errors in continuum and emission line */
 }BLRmodel;
 
 extern BLRmodel range_model[2];

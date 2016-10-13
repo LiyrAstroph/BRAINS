@@ -7,7 +7,7 @@
 
 /*!
  *  \file read.c
- *
+ *  \brief read configuration file and data files.
  */
 
 #include <stdio.h>

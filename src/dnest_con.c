@@ -7,7 +7,7 @@
 
 /*!
  *  \file dnest_con.c
- *
+ *  \brief run dnest for continuum analysis
  */
 
 #include <stdio.h>

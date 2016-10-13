@@ -7,7 +7,7 @@
 
 /*!
  *  \file reconstruct_line2d.c
- *
+ *  \brief reconstruct 2d line and BLR model.
  */
 
 #include <stdio.h>
@@ -39,7 +39,7 @@ void postprocess2d()
   best_model_std_line2d = malloc(size_of_modeltype);
 
 // generate posterior sample
-  temperature = 1.0;
+  temperature = 5.0;
   dnest_postprocess(temperature);
 
   if(thistask == roottask)

@@ -7,7 +7,7 @@
 
 /*!
  *  \file init.c
- *
+ *  \brief initialize the program.
  */
 
 #include <stdio.h>
@@ -22,6 +22,10 @@
 
 #include "allvars.h"
 #include "proto.h"
+
+/*! 
+ * This function initialize the program.
+ */
 
 void init()
 {
@@ -99,7 +103,9 @@ void init()
   range_model[1].mu = fmin(range_model[1].mu, rcloud_max_set);
 }
 
-/* allocate memory for variables used throughout the code */
+/*!
+ * This function allocates memory for variables used throughout the code. 
+ */
 void allocate_memory()
 {
   Tcon = malloc(parset.n_con_recon * sizeof(double));
@@ -110,6 +116,9 @@ void allocate_memory()
   PSmat_data = malloc(n_con_data * n_con_data * sizeof(double));
 }
 
+/*! 
+ * This function free memory.
+ */
 void free_memory()
 {
   free(Tcon);
@@ -120,7 +129,9 @@ void free_memory()
   free(PSmat_data);
 }
 
-/* normalise the light curves to a scale of unity */
+/*!
+ * This function normalise the light curves to a scale of unity.
+ */
 void scale_con_line()
 {
   int i, j;
@@ -176,7 +187,10 @@ void scale_con_line()
   }
 }
 
-/* cope with parameter fixing */
+/*!
+ * This function copes with parameter fixing.\n
+ * Only fix BLR model parameters. 
+ */
 void set_par_fix(int num_params_blr)
 {
   int i;
@@ -196,7 +210,7 @@ void set_par_fix(int num_params_blr)
       if(parset.str_par_fix[i] == '0')
       {
         par_fix[i] = 0;
-        par_fix_val[i] = -DBL_MAX;
+        par_fix_val[i] = -DBL_MAX;  /* set to be the smallest value */
       }
       else if(parset.str_par_fix[i] == '1')
       {
@@ -209,7 +223,7 @@ void set_par_fix(int num_params_blr)
         sscanf(pstr, "%lf", &par_fix_val[i]);
         npar_fix++;
         printf("# %d-th parameter fixed, value= %f.\n", i, par_fix_val[i]);
-        pstr = strchr(pstr, ':');
+        pstr = strchr(pstr, ':'); /* values are separated by ":" */
         if(pstr!=NULL)
         {
           pstr++;

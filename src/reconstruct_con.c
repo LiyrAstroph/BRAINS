@@ -7,7 +7,7 @@
 
 /*!
  *  \file reconstruct_con.c
- *
+ *  \brief reconstruct continuum.
  */
 
 #include <stdio.h>
@@ -143,6 +143,9 @@ void postprocess_con()
   return;
 }
 
+/*! 
+ *
+ */
 void reconstruct_con()
 {
   char *argv[]={""};

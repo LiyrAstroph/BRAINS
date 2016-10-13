@@ -7,7 +7,7 @@
 
 /*!
  *  \file reconstruct_line1d.c
- *
+ *  \brief reconstruct 1d line and recover BLR model.
  */
 
 #include <stdio.h>
