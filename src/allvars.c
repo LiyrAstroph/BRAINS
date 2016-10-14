@@ -75,6 +75,8 @@ double rcloud_min_set, rcloud_max_set;
 double **Fcon_particles, **Fcon_particles_perturb;
 double **Trans1D_particles, **Trans2D_at_veldata_particles;
 double **Trans1D_particles_perturb, **Trans2D_at_veldata_particles_perturb;
+double **Fline_at_data_particles, **Fline_at_data_particles_perturb;
+double *prob_line_particles, *prob_line_particles_perturb;
 double **clouds_particles, **clouds_particles_perturb;
 double *prob_con_particles, *prob_con_particles_perturb;
 

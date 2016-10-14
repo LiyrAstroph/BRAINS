@@ -158,6 +158,8 @@ extern double rcloud_min_set, rcloud_max_set;
 extern double **Fcon_particles, **Fcon_particles_perturb;
 extern double **Trans1D_particles, **Trans2D_at_veldata_particles; // transfer function 1d for each particle
 extern double **Trans1D_particles_perturb, **Trans2D_at_veldata_particles_perturb;
+extern double **Fline_at_data_particles, **Fline_at_data_particles_perturb;
+extern double *prob_line_particles, *prob_line_particles_perturb;
 extern double **clouds_particles, **clouds_particles_perturb;
 extern double *prob_con_particles, *prob_con_particles_perturb;
 

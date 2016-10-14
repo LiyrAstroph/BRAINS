@@ -301,7 +301,7 @@ void reconstruct_line1d_init()
   TransTau = malloc(parset.n_tau * sizeof(double));
   //Trans1D = malloc(parset.n_tau * sizeof(double));
 
-  Fline_at_data = malloc(n_line_data * sizeof(double));
+  //Fline_at_data = malloc(n_line_data * sizeof(double));
 
   Tline = malloc(parset.n_line_recon * sizeof(double));
   Fline = malloc(parset.n_line_recon * sizeof(double));
@@ -340,6 +340,14 @@ void reconstruct_line1d_init()
     Trans1D_particles_perturb[i] = malloc(parset.n_tau * sizeof(double));
   }
 
+  Fline_at_data_particles = malloc(parset.num_particles * sizeof(double *));
+  Fline_at_data_particles_perturb = malloc(parset.num_particles * sizeof(double *));
+  for(i=0; i<parset.num_particles; i++)
+  {
+    Fline_at_data_particles[i] = malloc(n_line_data * sizeof(double));
+    Fline_at_data_particles_perturb[i] = malloc(n_line_data * sizeof(double));
+  }
+
   // only record gamma-distribution random number of clouds
   clouds_particles = malloc(parset.num_particles * sizeof(double *));
   clouds_particles_perturb = malloc(parset.num_particles * sizeof(double *));
@@ -367,12 +375,14 @@ void reconstruct_line1d_init()
 
   prob_con_particles = malloc(parset.num_particles * sizeof(double));
   prob_con_particles_perturb = malloc(parset.num_particles * sizeof(double));
+  prob_line_particles = malloc(parset.num_particles * sizeof(double));
+  prob_line_particles_perturb = malloc(parset.num_particles * sizeof(double));
 }
 
 void reconstruct_line1d_end()
 {
   free(TransTau);
-  free(Fline_at_data);
+  //free(Fline_at_data);
 
   free(Tline);
   free(Fline);
@@ -400,6 +410,11 @@ void reconstruct_line1d_end()
   free(prob_con_particles);
   free(prob_con_particles_perturb);
 
+  free(Fline_at_data_particles);
+  free(Fline_at_data_particles_perturb);
+  free(prob_line_particles);
+  free(prob_line_particles_perturb);
+
   free(par_fix);
   free(par_fix_val);
   free(best_model_line1d);
@@ -414,7 +429,7 @@ void reconstruct_line1d_end()
 
 double prob_line1d(const void *model)
 {
-  double prob = 0.0, fcon, var2, dy;
+  double prob = 0.0, prob_line=0.0, fcon, var2, dy;
   int i, param;
   double *pm = (double *)model;
   
@@ -422,26 +437,57 @@ double prob_line1d(const void *model)
   if(perturb_accept[which_particle_update] == 1)
   { 
     param = which_parameter_update_prev[which_particle_update];
-    if( param >= num_params_blr)
-    {
-      memcpy(Fcon_particles[which_particle_update], Fcon_particles_perturb[which_particle_update], 
-        parset.n_con_recon*sizeof(double));
-      prob_con_particles[which_particle_update] = prob_con_particles_perturb[which_particle_update];
-    }
 
-    if( param < num_params_blr-1 )
+    /* continuum parameter is updated */
+    if( param >= num_params_blr )
     {
-      memcpy(Trans1D_particles[which_particle_update], Trans1D_particles_perturb[which_particle_update], 
-        parset.n_tau * sizeof(double));
+      /* probability is always changed. */
+      prob_con_particles[which_particle_update] = prob_con_particles_perturb[which_particle_update];
+
+      /* the num_params_blr-th parameter is systematic error of continuum, which 
+       * only appear at the stage of calculating likelihood probability.
+       * when this paramete is updated, Fcon is unchanged.  
+       */
+      if( param > num_params_blr )
+        memcpy(Fcon_particles[which_particle_update], Fcon_particles_perturb[which_particle_update], 
+          parset.n_con_recon*sizeof(double));
+    }
+    else 
+    {
+      /* BLR parameter is udated 
+     * Note that the (num_par_blr-1)-th parameter is systematic error of line.
+     * when this parameter is updated, Trans1D and Fline are unchanged.
+     */
+      prob_line_particles[which_particle_update] = prob_line_particles_perturb[which_particle_update];
+      if( param < num_params_blr-1 )
+      {
+        memcpy(Trans1D_particles[which_particle_update], Trans1D_particles_perturb[which_particle_update], 
+          parset.n_tau * sizeof(double));
+
+        memcpy(Fline_at_data_particles[which_particle_update], Fline_at_data_particles_perturb[which_particle_update], 
+          n_line_data * sizeof(double));
+      }
     }  
   }
 
-  // only update continuum reconstruction when the corresponding parameters are updated
-  // or force to update (which_parameter_update = -1)
+  /* only update continuum reconstruction when the corresponding parameters are updated
+   * or force to update (which_parameter_update = -1) 
+   */
   if((which_parameter_update >= num_params_blr ) || which_parameter_update == -1)
   {
-    Fcon = Fcon_particles_perturb[which_particle_update];
-    calculate_con_from_model(model + num_params_blr*sizeof(double));
+    /* the num_params_blr-th parameter is systematic error of continuum, which 
+     * only appears at the stage of calculating likelihood probability.
+     * when this paramete is updated, no need to re-calculate the contionuum.  
+     */
+    if( which_parameter_update > num_params_blr || which_parameter_update == -1 )
+    {
+      Fcon = Fcon_particles_perturb[which_particle_update];
+      calculate_con_from_model(model + num_params_blr*sizeof(double));
+    }
+    else  /* if systematic error of continuum is updated */
+    {
+      Fcon = Fcon_particles[which_particle_update];
+    }
     gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
 
     for(i=0; i<n_con_data; i++)
@@ -450,47 +496,73 @@ double prob_line1d(const void *model)
       var2 = Fcerrs_data[i] * Fcerrs_data[i] + exp(pm[num_params_blr]) * exp(num_params_blr);
       prob += -0.5*pow( (fcon - Fcon_data[i])/Fcerrs_data[i] ,  2.0) - 0.5* (log(2.0*PI) + log(var2) );
     }
+
     prob_con_particles_perturb[which_particle_update] = prob;
 
   }
-  else
+  else /* continuum has no change, use the previous values */
   {
     Fcon = Fcon_particles[which_particle_update];
     gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
     prob += prob_con_particles[which_particle_update];
-
-    //update perturb values
-    /*prob_con_particles_perturb[which_particle_update] = prob_con_particles[which_particle_update];
-    memcpy(Fcon_particles_perturb[which_particle_update], Fcon_particles[which_particle_update], 
-      parset.n_con_recon*sizeof(double));*/
   }
-
   
-  // a. only update transfer function when BLR model is changed
-  // or force to update (which_parameter_update = -1)
-  // b. Trans1D is a pointer to the transfer function
+  /* only update transfer function when BLR model is changed
+   * or forced to update (which_parameter_update = -1)
+   * Trans1D is a pointer to the transfer function
+   */
   if( (which_parameter_update < num_params_blr-1) || which_parameter_update == -1)
   {
+    /* re-point */
     Trans1D = Trans1D_particles_perturb[which_particle_update]; 
     transfun_1d_cloud_direct(model);
-    //memcpy(Trans1D_particles[which_particle_update], Trans1D, parset.n_tau*sizeof(double));
   }
   else
   {
+    /* re-point */
     Trans1D = Trans1D_particles[which_particle_update];
-    
-    //update perturb values
-    /*memcpy(Trans1D_particles_perturb[which_particle_update], Trans1D_particles[which_particle_update], 
-        parset.n_tau * sizeof(double));*/
   }
 
-  calculate_line_from_blrmodel(model, Tline_data, Fline_at_data, n_line_data);
-  for(i=0; i<n_line_data; i++)
+  /* no need to calculate line when only systematic error parameters are updated.
+   * otherwise, always need to calculate line.
+   */
+  if( (which_parameter_update!= num_params_blr-1 && which_parameter_update!= num_params_blr) || which_parameter_update == -1 )
   {
-    dy = Fline_data[i] - Fline_at_data[i] ;
-    var2 = Flerrs_data[i]*Flerrs_data[i];
-    var2 += exp(pm[num_params_blr-1]) * exp(pm[num_params_blr-1]);
-    prob += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
+    /* re-point */
+    Fline_at_data = Fline_at_data_particles_perturb[which_particle_update];
+    calculate_line_from_blrmodel(model, Tline_data, Fline_at_data, n_line_data);
+
+    for(i=0; i<n_line_data; i++)
+    {
+      dy = Fline_data[i] - Fline_at_data[i] ;
+      var2 = Flerrs_data[i]*Flerrs_data[i];
+      var2 += exp(pm[num_params_blr-1]) * exp(pm[num_params_blr-1]);
+      prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
+    }
+    /* backup prob_line */
+    prob_line_particles_perturb[which_particle_update] = prob_line;
+  }
+  else
+  {
+    /* continuum systematic error is updated */
+    if( which_parameter_update == num_params_blr )
+    {
+      prob_line = prob_line_particles[which_particle_update];
+    }
+    else  /* line systematic error is updated */
+    {
+      /* re-point */
+      Fline_at_data = Fline_at_data_particles[which_particle_update];
+      for(i=0; i<n_line_data; i++)
+      {
+        dy = Fline_data[i] - Fline_at_data[i] ;
+        var2 = Flerrs_data[i]*Flerrs_data[i];
+        var2 += exp(pm[num_params_blr-1]) * exp(pm[num_params_blr-1]);
+        prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
+      }
+      /* backup prob_line */
+      prob_line_particles_perturb[which_particle_update] = prob_line;
+    }
   }
 
   // force to update
@@ -500,11 +572,18 @@ double prob_line1d(const void *model)
       parset.n_con_recon*sizeof(double));
 
     memcpy(Trans1D_particles[which_particle_update], Trans1D_particles_perturb[which_particle_update], 
-        parset.n_tau * sizeof(double));
+      parset.n_tau * sizeof(double));
+
+    memcpy(Fline_at_data_particles[which_particle_update], Fline_at_data_particles_perturb[which_particle_update],
+      n_line_data * sizeof(double));
 
     prob_con_particles[which_particle_update] = prob_con_particles_perturb[which_particle_update];
+    prob_line_particles[which_particle_update] = prob_line_particles_perturb[which_particle_update];
   }
 
   which_parameter_update_prev[which_particle_update] = which_parameter_update;
+
+  /* add up line probability */
+  prob += prob_line;
   return prob;
 }

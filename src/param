@@ -8,9 +8,9 @@ FileDir                     ./
 FlagDim                     2                           % 0, only continuum; 1, 1d line; 2, 2d line
 %===============================
 % data file
-ContinnumFile               data/mrk1044_con.txt         % file for contnnum data
-LineFile                    data/mrk1044_hb.txt          % file for line data
-Line2DFile                  data/mrk1044_hb2d.txt        % file for line 2d data
+ContinnumFile               data/mrk486_con.txt         % file for contnnum data
+LineFile                    data/mrk486_hb.txt          % file for line data
+Line2DFile                  data/mrk486_hb2d.txt        % file for line 2d data
 %===============================
 % reconstruction
 NConRecon                   100                         % number of points for continuum reconstruction
