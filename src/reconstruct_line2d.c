@@ -384,6 +384,7 @@ void reconstruct_line2d_init()
 
   
   Tline_min = Tline_data[0] - fmin(0.1*(Tline_data[n_line_data - 1] - Tline_data[0]), 10);
+  Tline_min = fmax(Tline_min, Tcon_min + parset.tau_max_set);
   Tline_max = Tline_data[n_line_data -1] + fmin(0.1*(Tline_data[n_line_data - 1] - Tline_data[0]), 10);
   Tline_max = fmin(Tline_max, Tcon_max);  /* The time span should be within that of the continuum */
 
