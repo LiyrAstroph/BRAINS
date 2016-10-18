@@ -28,7 +28,7 @@ void *best_model_line2d, *best_model_std_line2d;
 void postprocess2d()
 {
   char posterior_sample_file[BRAINS_MAX_STR_LENGTH];
-  int num_ps, i, j, k;
+  int num_ps, i, j, k, nc;
   double *pm, *pmstd;
   double temperature=1.0;
   double *lag;
@@ -39,7 +39,7 @@ void postprocess2d()
   best_model_std_line2d = malloc(size_of_modeltype);
 
 // generate posterior sample
-  temperature = 10.0;
+  temperature = 8.0;
   dnest_postprocess(temperature);
 
   if(thistask == roottask)
@@ -99,6 +99,7 @@ void postprocess2d()
     which_parameter_update = -1; // force to update the transfer function
     which_particle_update = 0;
     mean_lag = 0.0;
+    nc = 0;
 
     for(i=0; i<num_ps; i++)
     {
@@ -138,10 +139,18 @@ void postprocess2d()
           sum2 += Trans2D_at_veldata[j * n_vel_data + k];
         }
       }
-      lag[i] = sum1/sum2;
-      mean_lag += lag[i];
+      if(sum2 > 0.0)
+      {
+        lag[i] = sum1/sum2;
+        mean_lag += lag[i];
+        nc++;
+      }
+      else
+      {
+        lag[i] = -DBL_MAX;
+      } 
 
-      if( i % (num_ps/10+1) == 0)  /* only output every ~10 calculations */
+      if( i % (num_ps/10+1) == 0)  
       {
         for(j=0; j<parset.n_con_recon; j++)
         {
@@ -179,14 +188,15 @@ void postprocess2d()
     fclose(ftran);
 
     /* calculate mean lags */
-    mean_lag /= num_ps;
+    mean_lag /= (nc);
     mean_lag_std = 0.0;
     for(i=0; i<num_ps; i++)
     {
-      mean_lag_std = (lag[i] - mean_lag) * (lag[i] - mean_lag);
+      if(lag[i] > -DBL_MAX)
+        mean_lag_std = (lag[i] - mean_lag) * (lag[i] - mean_lag);
     }
-    if(num_ps > 1)
-      mean_lag_std = sqrt(mean_lag_std/(num_ps -1.0));
+    if(nc > 1)
+      mean_lag_std = sqrt(mean_lag_std/(nc -1.0));
     else
       mean_lag_std = 0.0;
     printf("Mean time lag: %f+-%f\n", mean_lag, mean_lag_std);
@@ -247,7 +257,10 @@ void reconstruct_line2d()
   if(thistask == roottask)
   {
     double *pm = (double *)best_model_line2d;
-
+    
+    pm[0] = 2.0;
+    pm[7] = -0.3;
+    pm[10] = 0.25;
     which_parameter_update = -1;
     which_particle_update = 0;
     Fcon = Fcon_particles[which_particle_update];

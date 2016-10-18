@@ -33,8 +33,6 @@ void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl
 
   A=exp(model->A);
   
-  //dtau = (TransTau[parset.n_tau-1] - TransTau[0])/(parset.n_tau-1);
-
   for(i=0;i<nl;i++)
   {
   	tl = Tl[i];
@@ -130,6 +128,9 @@ void transfun_1d_cloud_direct(const void *pm)
     y = r * sin(phi);
     z = 0.0;
 
+/* first rotate around y axis by an angle of Lthe, then roate around z axis 
+ * by an angle of Lphi
+ */
     xb = cos(Lthe)*cos(Lphi) * x - sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
     yb = cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y - sin(Lthe)*sin(Lphi) * z;
     zb = sin(Lthe) * x + cos(Lthe) * z;
@@ -160,15 +161,27 @@ void transfun_1d_cloud_direct(const void *pm)
     memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
       parset.n_cloud_per_task * sizeof(double));
 
+  /* normalize transfer function */
   Anorm = 0.0;
   for(i=0;i<parset.n_tau;i++)
   {
     Anorm += Trans1D[i] * dTransTau;
   }
 
-  for(i=0; i<parset.n_tau; i++)
+  /* check if we get a zero transfer function */
+  if(Anorm > 0.0)
   {
-    Trans1D[i] /= Anorm;
+    for(i=0; i<parset.n_tau; i++)
+    {
+      Trans1D[i] /= Anorm;
+    }
+  }
+  else
+  {
+    for(i=0; i<parset.n_tau; i++)
+    {
+      Trans1D[i] = 0.0;
+    }
   }
 
   return;
@@ -307,15 +320,13 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
     {
       rnd = clouds_particles[which_particle_update][i];
       r = mu * F + (1.0-F) * s * rnd;
-
-      //update perturb values
-      //clouds_particles_perturb[which_particle_update][i] = rnd;
     }
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
     x = r * cos(phi); 
     y = r * sin(phi);
     z = 0.0;
+
 
     xb = cos(Lthe)*cos(Lphi) * x - sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
     yb = cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y - sin(Lthe)*sin(Lphi) * z;
@@ -408,20 +419,36 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
     memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
       parset.n_cloud_per_task * sizeof(double));
 
+  /* normalize transfer function */
   Anorm = 0.0;
   for(i=0; i<parset.n_tau; i++)
     for(j=0; j<n_vel; j++)
     {
       Anorm += trans2d[i*n_vel+j] * dV * dTransTau;
     }
-
-  for(i=0; i<parset.n_tau; i++)
+  
+  /* check if we get a zero transfer function */
+  if(Anorm > 0.0)
   {
-    for(j=0; j<n_vel; j++)
+    for(i=0; i<parset.n_tau; i++)
     {
-      trans2d[i*n_vel+j] /= Anorm;
+      for(j=0; j<n_vel; j++)
+      {
+        trans2d[i*n_vel+j] /= Anorm;
+      }
     }
   }
+  else
+  {
+    for(i=0; i<parset.n_tau; i++)
+    {
+      for(j=0; j<n_vel; j++)
+      {
+        trans2d[i*n_vel+j] = 0.0;
+      }
+    }
+  }
+  
 
   /*vrange = vcloud_max - vcloud_min;
   if(vrange<=0.0)

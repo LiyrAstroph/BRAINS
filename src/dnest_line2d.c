@@ -59,7 +59,7 @@ int dnest_line2d(int argc, char **argv)
   }
 
   strcpy(options_file, dnest_options_file);
-  dnest(argc, argv);
+  //dnest(argc, argv);
   
   return 0;
 }

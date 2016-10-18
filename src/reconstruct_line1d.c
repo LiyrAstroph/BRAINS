@@ -32,7 +32,7 @@ void postprocess1d()
   char posterior_sample_file[BRAINS_MAX_STR_LENGTH];
   double temperature=1.0;
   double *pm, *pmstd;
-  int num_ps, i, j;
+  int num_ps, i, j, nc;
   double *lag;
   void *posterior_sample, *post_model;
   double mean_lag, mean_lag_std, sum1, sum2;
@@ -92,6 +92,7 @@ void postprocess1d()
     post_model = malloc(size_of_modeltype);
     posterior_sample = malloc(num_ps * size_of_modeltype);
     mean_lag = 0.0;
+    nc = 0;
     which_parameter_update = -1; // force to update the transfer function
     which_particle_update = 0;
 
@@ -124,8 +125,17 @@ void postprocess1d()
         sum1 += Trans1D[j] * TransTau[j];
         sum2 += Trans1D[j];
       }
-      lag[i] = sum1/sum2;
-      mean_lag += lag[i];
+      if(sum2 > 0.0)
+      {
+        lag[i] = sum1/sum2;
+        mean_lag += lag[i];
+        nc++;
+      }
+      else
+      {
+        lag[i] = -DBL_MAX;
+      }
+      
 
       if(i % (num_ps/10+1) == 0)
       {
@@ -153,14 +163,15 @@ void postprocess1d()
     fclose(fline);
     fclose(ftran);
 
-    mean_lag /= num_ps;
+    mean_lag /= nc;
     mean_lag_std = 0.0;
     for(i=0; i<num_ps; i++)
     {
-      mean_lag_std = (lag[i] - mean_lag) * (lag[i] - mean_lag);
+      if(lag[i] > -DBL_MAX)
+        mean_lag_std = (lag[i] - mean_lag) * (lag[i] - mean_lag);
     }
-    if(num_ps > 1)
-      mean_lag_std = sqrt(mean_lag_std/(num_ps -1.0));
+    if(nc > 1)
+      mean_lag_std = sqrt(mean_lag_std/(nc -1.0));
     else
       mean_lag_std = 0.0;
     printf("Mean time lag: %f+-%f\n", mean_lag, mean_lag_std);
