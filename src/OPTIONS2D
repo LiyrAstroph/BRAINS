@@ -15,4 +15,5 @@ data/sample_info2d.txt # sample_info file
 data/levels2d.txt  #
 data/sampler_state2d.txt  # 
 data/posterior_sample2d.txt  #
+data/posterior_sample_info2d.txt  #
 data/limits2d.txt

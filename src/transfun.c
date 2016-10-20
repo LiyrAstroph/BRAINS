@@ -105,13 +105,13 @@ void transfun_1d_cloud_direct(const void *pm)
     if(which_parameter_update == 1 || which_parameter_update == -1) //
     {
       r = rcloud_max_set+1.0;
-      while(r>rcloud_max_set || r<rcloud_min_set)
-      {
+      //while(r>rcloud_max_set || r<rcloud_min_set)
+      //{
         rnd = gsl_ran_gamma(gsl_r, a, 1.0);
 //        r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, mu/beta, beta);
 //        r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
         r = mu * F + (1.0-F) * s * rnd;
-      }
+      //}
       clouds_particles_perturb[which_particle_update][i] = rnd;
     }
     else

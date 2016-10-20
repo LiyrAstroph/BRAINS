@@ -91,6 +91,10 @@ void read_parset()
     addr[nt] = &parset.tran2d_out_file;
     id[nt++] = STRING;
 
+    strcpy(tag[nt], "Tran2DDataFileOut");
+    addr[nt] = &parset.tran2d_data_out_file;
+    id[nt++] = STRING;
+
     strcpy(tag[nt], "NCloudPerCore");
     addr[nt] = &parset.n_cloud_per_task;
     id[nt++] = INT;

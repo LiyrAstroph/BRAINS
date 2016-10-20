@@ -39,7 +39,7 @@ void postprocess2d()
   best_model_std_line2d = malloc(size_of_modeltype);
 
 // generate posterior sample
-  temperature = 8.0;
+  temperature = 15;
   dnest_postprocess(temperature);
 
   if(thistask == roottask)
@@ -150,7 +150,7 @@ void postprocess2d()
         lag[i] = -DBL_MAX;
       } 
 
-      if( i % (num_ps/10+1) == 0)  
+      //if( i % (num_ps/10+1) == 0)  
       {
         for(j=0; j<parset.n_con_recon; j++)
         {
@@ -168,7 +168,7 @@ void postprocess2d()
         }
         fprintf(fline, "\n");
 
-        for(j=0; j<n_line_data; j++)
+        for(j=0; j<parset.n_tau; j++)
         {
           for(k=0; k<n_vel_data; k++)
           {
@@ -258,9 +258,6 @@ void reconstruct_line2d()
   {
     double *pm = (double *)best_model_line2d;
     
-    pm[0] = 2.0;
-    pm[7] = -0.3;
-    pm[10] = 0.25;
     which_parameter_update = -1;
     which_particle_update = 0;
     Fcon = Fcon_particles[which_particle_update];
@@ -313,6 +310,26 @@ void reconstruct_line2d()
       fprintf(fp, "\n");
     }
     fclose(fp);
+
+    sprintf(fname, "%s/%s", parset.file_dir, parset.tran2d_data_out_file);
+    fp = fopen(fname, "w");
+    if(fp == NULL)
+    {
+      fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+      exit(-1);
+    }
+    
+    fprintf(fp, "# %d %d\n", parset.n_tau, n_vel_data);
+    for(i=0; i<parset.n_tau; i++)
+    {
+      for(j=0; j<n_vel_data; j++)
+      {
+        fprintf(fp, "%f %f %f\n", Vline_data[j]*VelUnit, TransTau[i],  Trans2D_at_veldata[i*n_vel_data + j]);
+      }
+      fprintf(fp, "\n");
+    }
+    fclose(fp);
+
     smooth_end();
     
     // recovered line2d at specified points
@@ -351,7 +368,7 @@ void reconstruct_line2d()
       fprintf(stderr, "# Error: Cannot open file %s\n", fname);
       exit(-1);
     }
-
+    fprintf(fp, "# %d %d\n", parset.n_tau, n_vel_data);
     for(i=0; i<parset.n_tau; i++)
     {
       for(j=0; j<parset.n_vel_recon; j++)

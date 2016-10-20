@@ -7,13 +7,14 @@
 5000	# new level interval
 5000	# save interval
 200	# threadSteps - how many steps each thread should do independently before communication
-120	# maximum number of levels
+300	# maximum number of levels
 10	# Backtracking scale length (lambda in the paper)
 100	# Strength of effect to force histogram to equal push. 0-10 is best. (beta in the paper)
-1000	# Maximum number of saves (0 = infinite)
+10000	# Maximum number of saves (0 = infinite)
 data/sample1d.txt  # sample file
 data/sample_info1d.txt # sample_info file
 data/levels1d.txt  #
 data/sampler_state1d.txt  # 
 data/posterior_sample1d.txt  #
+data/posterior_sample_info1d.txt  #
 data/limits1d.txt

@@ -70,7 +70,8 @@ typedef struct
        pline2d_data_out_file[BRAINS_MAX_STR_LENGTH],
        cloud_out_file[BRAINS_MAX_STR_LENGTH],
        tran_out_file[BRAINS_MAX_STR_LENGTH],
-       tran2d_out_file[BRAINS_MAX_STR_LENGTH];
+       tran2d_out_file[BRAINS_MAX_STR_LENGTH],
+       tran2d_data_out_file[BRAINS_MAX_STR_LENGTH];
 
   char file_dir[BRAINS_MAX_STR_LENGTH];
 

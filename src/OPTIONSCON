@@ -16,4 +16,5 @@ data/sample_info.txt # sample_info file
 data/levels.txt  #
 data/sampler_state.txt  # 
 data/posterior_sample.txt  #
+data/posterior_sample_info.txt  #
 data/limits.txt
