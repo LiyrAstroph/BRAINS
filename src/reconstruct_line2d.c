@@ -39,7 +39,7 @@ void postprocess2d()
   best_model_std_line2d = malloc(size_of_modeltype);
 
 // generate posterior sample
-  temperature = 15;
+  temperature = 1.0;
   dnest_postprocess(temperature);
 
   if(thistask == roottask)

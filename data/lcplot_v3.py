@@ -13,7 +13,7 @@ def set_cov_Pmat(sigma, tau, alpha, Tcon):
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif', size=15)
 
-obj = "mrk486"
+obj = "1h0323"
 
 fp=open(obj + "_hb2d.txt", "r")
 line=fp.readline()

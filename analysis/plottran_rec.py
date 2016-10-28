@@ -14,7 +14,7 @@ red ={"mrk335":0.0258, "mrk1044":0.0165, "iras":0.0889, "mrk382":0.0337, "mrk142
       "irasf":0.0435,  "mrk486":0.0389,  "mrk493":0.0313, "1h0323":0.061}
 def plottran(ichimin):
   print(red)
-  obj = "mrk486"
+  obj = "1h0323"
   redshift = red[obj]
   ccf = np.loadtxt("../data/"+ obj +"_vr_lags.txt", skiprows=1)
   print(ccf)
