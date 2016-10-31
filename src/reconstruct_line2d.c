@@ -596,7 +596,7 @@ double prob_line2d(const void *model)
     {
       fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, Tcon_data[i], gsl_acc);
       var2 = Fcerrs_data[i] * Fcerrs_data[i] + exp(pm[num_params_blr]) * exp(num_params_blr);
-      prob += -0.5*pow( (fcon - Fcon_data[i])/Fcerrs_data[i] ,  2.0) - 0.5* (log(2.0*PI) + log(var2) );
+      prob += (-0.5*pow(fcon - Fcon_data[i],2.0)/var2) - 0.5*log(2.0*PI*var2);
     }
 
     prob_con_particles_perturb[which_particle_update] = prob;
