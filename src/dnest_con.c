@@ -87,22 +87,28 @@ double perturb_con(void *model)
   
   which_parameter_update = which;
   
-  if(which_level_update !=0 || which_level_update < 10)
+  // swith off level-dependent MCMC proposal; if want to use this function, comment the below line
+  which_level_update = 0;
+
+  if(which_level_update !=0 )
   {
-    limit1 = limits[(which_level_update-1) * num_params *2 + which *2];
-    limit2 = limits[(which_level_update-1) * num_params *2 + which *2 + 1];
-    width = limit2 - limit1;
-  }
-  else
-  {
-    limit1 = limits[(10-1) * num_params *2 + which *2];
-    limit2 = limits[(10-1) * num_params *2 + which *2 + 1];
-    width = limit2 - limit1;
+    if(which_level_update < 10)
+    {
+      limit1 = limits[(which_level_update-1) * num_params *2 + which *2];
+      limit2 = limits[(which_level_update-1) * num_params *2 + which *2 + 1];
+      width = limit2 - limit1;
+    }
+    else
+    {
+      limit1 = limits[(10-1) * num_params *2 + which *2];
+      limit2 = limits[(10-1) * num_params *2 + which *2 + 1];
+      width = limit2 - limit1;
+    }
   }
 
   switch(which)
   {
-    case 0:
+    case 0: // systematic error of continuum; constrain the minimum step size 
       if(which_level_update == 0)
       {
         width = var_range_model[0][1] - var_range_model[0][0];
@@ -111,7 +117,7 @@ double perturb_con(void *model)
       wrap(&(pm[0]), var_range_model[0][0], var_range_model[0][1]);
       break;
     
-    case 1:
+    case 1: // sigma
       if(which_level_update == 0)
       {
         width = var_range_model[1][1] - var_range_model[1][0];
@@ -120,7 +126,7 @@ double perturb_con(void *model)
       wrap(&(pm[1]), var_range_model[1][0] , var_range_model[1][1] );
       break;
 
-    case 2:
+    case 2: // tau
       if(which_level_update == 0)
       {
         width = var_range_model[2][1] - var_range_model[2][0];
@@ -129,7 +135,7 @@ double perturb_con(void *model)
       wrap(&(pm[2]), var_range_model[2][0], var_range_model[2][1]);
       break;
 
-    case 3:
+    case 3: // mean value
       if(which_level_update == 0)
       {
         width = var_range_model[3][1] - var_range_model[3][0];
@@ -138,7 +144,7 @@ double perturb_con(void *model)
       wrap(&(pm[3]), var_range_model[3][0], var_range_model[3][1]);
       break;
 
-    default:
+    default: // light curve points
       if(which_level_update == 0)
       {
         width = var_range_model[4][1] - var_range_model[4][0];

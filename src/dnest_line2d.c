@@ -32,7 +32,6 @@
 int dnest_line2d(int argc, char **argv)
 {
   int i;
-  double temperature;
 
   num_params_var = 4; 
   num_params_blr = 12;
@@ -129,23 +128,29 @@ double perturb_line2d(void *model)
   }
   
   which_parameter_update = which;
+  
+  // swith off level-dependent MCMC proposal; if want to use this function, comment the below line
+  which_level_update = 0;
 
-  if(which_level_update !=0 && which_level_update < 10)
+  if(which_level_update != 0)
   {
-    limit1 = limits[(which_level_update-1) * num_params *2 + which *2];
-    limit2 = limits[(which_level_update-1) * num_params *2 + which *2 + 1];
-    width = limit2 - limit1;
-  }
-  else
-  {
-    limit1 = limits[(10-1) * num_params *2 + which *2];
-    limit2 = limits[(10-1) * num_params *2 + which *2 + 1];
-    width = limit2 - limit1;
+    if(which_level_update < 10)
+    {
+      limit1 = limits[(which_level_update-1) * num_params *2 + which *2];
+      limit2 = limits[(which_level_update-1) * num_params *2 + which *2 + 1];
+      width = limit2 - limit1;
+    }
+    else
+    {
+      limit1 = limits[(10-1) * num_params *2 + which *2];
+      limit2 = limits[(10-1) * num_params *2 + which *2 + 1];
+      width = limit2 - limit1;
+    }
   }
 
   switch(which)
   {
-  	case 0:
+  	case 0: // mu
       if(which_level_update == 0)
       {
         limit1 = range_model[0].mu;
@@ -157,7 +162,7 @@ double perturb_line2d(void *model)
       wrap(&(pm[0]), range_model[0].mu, range_model[1].mu);
       break;
     
-    case 1:
+    case 1: // beta
       if(which_level_update == 0)
       {
         limit1 = range_model[0].beta;
@@ -168,7 +173,7 @@ double perturb_line2d(void *model)
       wrap(&(pm[1]), range_model[0].beta, range_model[1].beta);
       break;
 
-    case 2:
+    case 2: // F
       if(which_level_update == 0)
       {
         limit1 = range_model[0].F;
@@ -179,7 +184,7 @@ double perturb_line2d(void *model)
       wrap(&(pm[2]), range_model[0].F, range_model[1].F );
       break;
 
-    case 3:
+    case 3: // inclination
       if(which_level_update == 0)
       {
         limit1 = range_model[0].inc;
@@ -190,7 +195,7 @@ double perturb_line2d(void *model)
       wrap(&(pm[3]), range_model[0].inc, range_model[1].inc );
       break;
 
-    case 4:
+    case 4: // openning angle
       if(which_level_update == 0)
       {
         limit1 = range_model[0].opn;
@@ -201,7 +206,7 @@ double perturb_line2d(void *model)
       wrap(&(pm[4]), range_model[0].opn, range_model[1].opn );
       break;
 
-    case 5:
+    case 5: // A
       if(which_level_update == 0)
       {
         limit1 = range_model[0].A;
@@ -212,7 +217,7 @@ double perturb_line2d(void *model)
       wrap(&(pm[5]), range_model[0].A, range_model[1].A);
       break;
 
-    case 6:
+    case 6: // Ag
       if(which_level_update == 0)
       {
         limit1 = range_model[0].Ag;
@@ -223,7 +228,7 @@ double perturb_line2d(void *model)
       wrap(&(pm[6]), range_model[0].Ag, range_model[1].Ag);
       break;
 
-    case 7:
+    case 7: // k
       if(which_level_update == 0)
       {
         limit1 = range_model[0].k;
@@ -234,7 +239,7 @@ double perturb_line2d(void *model)
       wrap(&(pm[7]), range_model[0].k, range_model[1].k);
       break;
 
-    case 8:
+    case 8: // black hole mass
       if(which_level_update == 0)
       {
         limit1 = range_model[0].mbh;
@@ -245,7 +250,7 @@ double perturb_line2d(void *model)
       wrap(&(pm[8]), range_model[0].mbh, range_model[1].mbh);
       break;
 
-    case 9:
+    case 9: // lambda
       if(which_level_update == 0)
       {
         limit1 = range_model[0].lambda;
@@ -256,7 +261,7 @@ double perturb_line2d(void *model)
       wrap(&(pm[9]), range_model[0].lambda, range_model[1].lambda);
       break;
 
-    case 10:
+    case 10: // q
       if(which_level_update == 0)
       {
         limit1 = range_model[0].q;
@@ -267,7 +272,7 @@ double perturb_line2d(void *model)
       wrap(&(pm[10]), range_model[0].q, range_model[1].q);
       break;
 
-    case 11:
+    case 11: // systematic error of line
       if(which_level_update == 0)
       {
         limit1 = range_model[0].logse;
@@ -279,7 +284,7 @@ double perturb_line2d(void *model)
       wrap_limit(&(pm[11]), range_model[0].logse, range_model[1].logse);
       break;
 
-    case 12:
+    case 12: // systematic error of continuum
       if(which_level_update == 0)
       {
         limit1 = var_range_model[0][0];
@@ -287,11 +292,11 @@ double perturb_line2d(void *model)
         width = ( limit2 - limit1 );
       }
       /* limit the step size of systematic error, like simulated annealing */
-      pm[12] += dnest_randh() * fmin(width, (var_range_model[0][1] - var_range_model[0][0]) * 0.01);
+      pm[12] += dnest_randh() * fmin(width, (var_range_model[0][1] - var_range_model[0][0]) * 0.001);
       wrap(&(pm[12]), var_range_model[0][0], var_range_model[0][1] );
       break;
     
-    case 13:
+    case 13: // sigma
       if(which_level_update == 0)
       {
         limit1 = var_range_model[1][0];
@@ -302,7 +307,7 @@ double perturb_line2d(void *model)
       wrap(&(pm[13]), var_range_model[1][0], var_range_model[1][1]);
       break;
 
-    case 14:
+    case 14: // mu
       if(which_level_update == 0)
       {
         limit1 = var_range_model[2][0];
@@ -313,7 +318,7 @@ double perturb_line2d(void *model)
       wrap(&(pm[14]), var_range_model[2][0], var_range_model[2][1]);
       break;
 
-    case 15:
+    case 15: // mean value of continuum
       if(which_level_update == 0)
       {
         limit1 = var_range_model[2][0];
@@ -324,7 +329,7 @@ double perturb_line2d(void *model)
       wrap(&(pm[15]), var_range_model[3][0], var_range_model[3][1]);
       break;
 
-    default:
+    default: // light curve points
       if(which_level_update == 0)
       {
         limit1 = var_range_model[4][0];

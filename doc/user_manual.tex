@@ -1,5 +1,40 @@
-\documentclass{aastex}
+\documentclass{book}
+\usepackage{apjfonts}
 
 \begin{document}
+
+\title{\bf BRAINS:\\
+Bayesian Reverberation-mapping Analysis Integrated
+with Nested Sampling}
+\author{Yan-Rong Li\\
+Institute of High Energy Physics}
+
+\maketitle
+
+\chapter{BLR modeling}
+
+\section{Coordinate rotation}
+
+In right-handed coordinate frame, we perform a rotation around $y$-axis by an angle of $l_\theta$ and 
+then a rotation around $z$-axis by an angle of $l_\phi$. The transformation matrix is
+\begin{equation}
+\left[\begin{array}{ccc}
+\cos l_\phi & \sin l_\phi & 0 \\
+-\sin l_\phi &  \cos l_\phi & 0 \\
+     0      &      0       & 1 
+\end{array}\right]
+\left[\begin{array}{ccc}
+\cos l_\theta  & 0  & -\sin l_\theta\\
+   0      &      1        &  0  \\
+\sin l_\theta &  0  & \cos l_\theta 
+\end{array}\right]=
+\left[\begin{array}{ccc}
+\cos l_\phi\cos l_\theta  & \sin l_\phi  & -\cos l_\phi\sin l_\theta\\
+-\sin l_\phi\cos l_\theta      & \cos l_\phi        &  \sin l_\phi\sin l_\theta  \\
+\sin l_\theta &  0  & \cos l_\theta 
+\end{array}\right]
+.
+\end{equation}
+
 
 \end{document}

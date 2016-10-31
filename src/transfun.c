@@ -118,9 +118,6 @@ void transfun_1d_cloud_direct(const void *pm)
     {
       rnd = clouds_particles[which_particle_update][i];
       r = mu * F + (1.0-F) * s * rnd;
-
-      //update perturb value
-      //clouds_particles_perturb[which_particle_update][i] = rnd;
     }
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
@@ -131,14 +128,14 @@ void transfun_1d_cloud_direct(const void *pm)
 /* first rotate around y axis by an angle of Lthe, then roate around z axis 
  * by an angle of Lphi
  */
-    xb = cos(Lthe)*cos(Lphi) * x - sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
-    yb = cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y - sin(Lthe)*sin(Lphi) * z;
+    xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
+    yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
     zb = sin(Lthe) * x + cos(Lthe) * z;
 
-// rotate around y
-    x = xb * cos(PI/2.0-inc) - zb * sin(PI/2.0-inc);
+// conter-rotate around y 
+    x = xb * cos(PI/2.0-inc) + zb * sin(PI/2.0-inc);
     y = yb;
-    z = xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
+    z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
 
     dis = r - x;
 
@@ -328,14 +325,14 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
     z = 0.0;
 
 
-    xb = cos(Lthe)*cos(Lphi) * x - sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
-    yb = cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y - sin(Lthe)*sin(Lphi) * z;
-    zb = sin(Lthe) * x + cos(Lthe) * z;
+    xb =  cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
+    yb = -cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
+    zb =  sin(Lthe) * x + cos(Lthe) * z;
 
-// rotate around y
-    x = xb * cos(PI/2.0-inc) - zb * sin(PI/2.0-inc);
+// conter-rotate around y
+    x = xb * cos(PI/2.0-inc) + zb * sin(PI/2.0-inc);
     y = yb;
-    z = xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
+    z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
 
     dis = r - x;
 
@@ -384,13 +381,13 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
       vy = Vr * sin(phi) + Vph * cos(phi);
       vz = 0.0;     
 
-      vxb = cos(Lthe)*cos(Lphi) * vx - sin(Lphi) * vy - sin(Lthe)*cos(Lphi) * vz;
-      vyb = cos(Lthe)*sin(Lphi) * vx + cos(Lphi) * vy - sin(Lthe)*sin(Lphi) * vz;
+      vxb = cos(Lthe)*cos(Lphi) * vx + sin(Lphi) * vy - sin(Lthe)*cos(Lphi) * vz;
+      vyb =-cos(Lthe)*sin(Lphi) * vx + cos(Lphi) * vy + sin(Lthe)*sin(Lphi) * vz;
       vzb = sin(Lthe) * vx + cos(Lthe) * vz;
     
-      vx = vxb * cos(PI/2.0-inc) - vzb * sin(PI/2.0-inc);
+      vx = vxb * cos(PI/2.0-inc) + vzb * sin(PI/2.0-inc);
       vy = vyb;
-      vz = vxb * sin(PI/2.0-inc) + vzb * cos(PI/2.0-inc);
+      vz =-vxb * sin(PI/2.0-inc) + vzb * cos(PI/2.0-inc);
 
       vcloud_max = fmax(vx, vcloud_max);
       vcloud_min = fmin(vx, vcloud_min);
