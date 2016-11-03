@@ -23,8 +23,11 @@
 #include "allvars.h"
 #include "proto.h"
 
-/* note that the light curves has been obtained in advance */
-
+/*!
+ * This function calculate 1d line from a given BLR model.
+ *
+ * Note that the light curves has been obtained in advance 
+ */
 void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl)
 {
   int i, j;
@@ -43,17 +46,19 @@ void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl
   	  tc = tl - tau;
   	  if(tc>=Tcon_min && tc <=Tcon_max)
   	  {
-  		  fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, tc, gsl_acc);
-  			fline += Trans1D[j] * fcon * pow(fabs(fcon), model->Ag);
-        //fline += Trans1D[j] * fcon;
+  		  fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, tc, gsl_acc); /* interpolation */
+  			fline += Trans1D[j] * fcon * pow(fabs(fcon), model->Ag);     /*  line response */
   	  }
   	}
   	fline *= dTransTau * A;
   	Fl[i] = fline;
   }
-
+  return;
 }
 
+/* 
+ * This function caclulate 1d transfer function.
+ */
 void transfun_1d_cloud_direct(const void *pm)
 {
   int i, idt;
@@ -64,25 +69,18 @@ void transfun_1d_cloud_direct(const void *pm)
   double Anorm, weight, rnd;
   BLRmodel *model = (BLRmodel *)pm;
 
-  Lopn_cos = cos(model->opn*PI/180.0);
-  inc = model->inc * PI/180.0;
-  beta = model->beta;
+  Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
+  inc = model->inc * PI/180.0;         /* inclination angle in rad */
+  beta = model->beta;         
   F = model->F;
-  mu = exp(model->mu);
+  mu = exp(model->mu);                 /* mean radius */
   k = model->k;  
   gam = model-> Ag;
 
   a = 1.0/beta/beta;
   s = mu/a;
   
-  /* according to the perturb information of each particle at the previous step,
-   * only record the perturb radial locations when the previous step is accepted and 
-   * the pervious updated paramete is beta.
-   */
-  if(perturb_accept[which_particle_update] == 1 && which_parameter_update_prev[which_particle_update] == 1)
-    memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
-      parset.n_cloud_per_task * sizeof(double));
-
+  /* reset transfer function */
   for(i=0; i<parset.n_tau; i++)
   {
     Trans1D[i] = 0.0;
@@ -90,7 +88,7 @@ void transfun_1d_cloud_direct(const void *pm)
   
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
-// generate a direction of the angular momentum     
+// generate a direction of the angular momentum of the orbit   
     Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
     if(Lopn_cos<1.0)
     {
@@ -99,40 +97,30 @@ void transfun_1d_cloud_direct(const void *pm)
     else
       Lthe = 0.0;
     
-    /* note a only depends on beta, so resample the radial
-     * locations when beta is updated or forced to update
-     */
-    if(which_parameter_update == 1 || which_parameter_update == -1) //
-    {
-      r = rcloud_max_set+1.0;
-      //while(r>rcloud_max_set || r<rcloud_min_set)
-      //{
-        rnd = gsl_ran_gamma(gsl_r, a, 1.0);
-//        r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, mu/beta, beta);
-//        r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
-        r = mu * F + (1.0-F) * s * rnd;
-      //}
-      clouds_particles_perturb[which_particle_update][i] = rnd;
-    }
-    else
-    {
-      rnd = clouds_particles[which_particle_update][i];
+    //r = rcloud_max_set+1.0;
+    //while(r>rcloud_max_set || r<rcloud_min_set)
+    //{
+      rnd = gsl_ran_gamma(gsl_r, a, 1.0);
+//      r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, mu/beta, beta);
+//      r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
       r = mu * F + (1.0-F) * s * rnd;
-    }
+    //}
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
+    /* Polar coordinates to Cartesian coordinate */
     x = r * cos(phi); 
     y = r * sin(phi);
     z = 0.0;
 
-/* first rotate around y axis by an angle of Lthe, then roate around z axis 
+/* right-handed framework
+ * first rotate around y axis by an angle of Lthe, then roate around z axis 
  * by an angle of Lphi
  */
     xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
     yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
     zb = sin(Lthe) * x + cos(Lthe) * z;
 
-// conter-rotate around y 
+// conter-rotate around y, LOS is x-axis 
     x = xb * cos(PI/2.0-inc) + zb * sin(PI/2.0-inc);
     y = yb;
     z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
@@ -150,13 +138,6 @@ void transfun_1d_cloud_direct(const void *pm)
     //Trans1D[idt] += pow(1.0/r, 2.0*(1 + gam)) * weight;
     Trans1D[idt] += weight;
   }
-
-  /* record the previous beta to save comupational time
-   * when forced to update
-   */
-  if(which_parameter_update == -1)
-    memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
-      parset.n_cloud_per_task * sizeof(double));
 
   /* normalize transfer function */
   Anorm = 0.0;
@@ -218,13 +199,17 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
 // smooth the line profile
   line_gaussian_smooth_2D_FFT(transv, fl2d, nl, nv);
 // add narrow line
-/*  for(j = 0; j<nl; j++)
+  if(parset.flag_narrowline == 1)
   {
-    for(i=0; i<nv; i++)
+    for(j = 0; j<nl; j++)
     {
-      fl2d[j*nv + i] += 3.38*0.15 * exp( -0.5 * pow( (transv[i] + 160.0/VelUnit)/(355.0/VelUnit), 2.0)) * line_scale;
-    }
-  }  */
+      for(i=0; i<nv; i++)
+      {
+        fl2d[j*nv + i] += parset.flux_narrowline * 
+        exp( -0.5 * pow( (transv[i] - parset.shift_narrowline)/(parset.width_narrowline), 2.0) ) * line_scale;
+      }
+    } 
+  }
 }
 
 /*! 
@@ -268,15 +253,6 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
   vcloud_max = -DBL_MAX;
   vcloud_min = DBL_MAX;
 
-
-   /* according to the perturb information of each particle at the previous step,
-   * only record the perturb radial locations when the previous step is accepted and 
-   * the pervious updated paramete is beta.
-   */
-  if(perturb_accept[which_particle_update] == 1 && which_parameter_update_prev[which_particle_update] == 1)
-    memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
-      parset.n_cloud_per_task * sizeof(double));
-
   if(flag_save && thistask == roottask)
   {
     char fname[200];
@@ -301,23 +277,14 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
       Lthe = 0.0;
     //Lthe = gsl_rng_uniform(gsl_r) * model->opn*PI/180.0;
 
-    if(which_parameter_update == 1 || which_parameter_update == -1) // beta updated
+    r = rcloud_max_set+1.0;
+    //while(r>rcloud_max_set || r<rcloud_min_set)
     {
-      r = rcloud_max_set+1.0;
-      //while(r>rcloud_max_set || r<rcloud_min_set)
-      {
-        rnd = gsl_ran_gamma(gsl_r, a, 1.0);
-//        r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, mu/beta, beta);
-//        r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
-        r = mu * F + (1.0-F) * s * rnd;
-      } 
-      clouds_particles_perturb[which_particle_update][i] = rnd;
-    }
-    else
-    {
-      rnd = clouds_particles[which_particle_update][i];
+      rnd = gsl_ran_gamma(gsl_r, a, 1.0);
+//      r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, mu/beta, beta);
+//      r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
       r = mu * F + (1.0-F) * s * rnd;
-    }
+    } 
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
     x = r * cos(phi); 
@@ -409,12 +376,6 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
       trans2d[idt*n_vel + idV] += weight;
     }
   }
-  
-  
-  // force to record the previous values
-  if(which_parameter_update == -1)
-    memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
-      parset.n_cloud_per_task * sizeof(double));
 
   /* normalize transfer function */
   Anorm = 0.0;
@@ -445,16 +406,6 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
       }
     }
   }
-  
-
-  /*vrange = vcloud_max - vcloud_min;
-  if(vrange<=0.0)
-  {
-    fprintf(stderr, "No velocity-resolved lag for given BLR model!\n");
-    //printf("%f %f %f %f %f\n", model->inc, model->opn, model->lambda, model->F, model->beta);
-    //printf("%f %f %f\n", model->k, model->q, model->mu);
-    //printf("%e %e %f %f %f\n", vcloud_max, vcloud_min, V, Vr, Vph);
-  }*/
 
   if(flag_save && thistask == roottask)
     fclose(fcloud_out);

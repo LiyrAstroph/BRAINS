@@ -101,7 +101,7 @@ void init()
   range_model[1].logse = log(1.0e6);
 
   range_model[1].mu = fmin(range_model[1].mu, log(rcloud_max_set));
-  range_model[1].mu = fmin(range_model[1].mu, log(Tcon_data[n_con_data-1] - Tcon_data[0]));
+  //range_model[1].mu = fmin(range_model[1].mu, log(Tcon_data[n_con_data-1] - Tcon_data[0]));
 }
 
 /*!

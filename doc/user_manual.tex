@@ -1,5 +1,10 @@
-\documentclass{book}
+\documentclass[oneside]{book}
 \usepackage{apjfonts}
+\usepackage{geometry}
+\usepackage{graphicx}
+
+\DeclareMathAlphabet{\mathbi}{OT1}{cmr}{bx}{it}
+\SetMathAlphabet\mathbi{bold}{OT1}{cmr}{bx}{it}
 
 \begin{document}
 
@@ -14,6 +19,67 @@ Institute of High Energy Physics}
 \chapter{BLR modeling}
 
 \section{Coordinate rotation}
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.5\textwidth]{coord.pdf}
+\end{figure}
+
+Rotate an coordinate (XOY) by an angle of $\theta$ to (X'OY'), there are relations
+\begin{equation}
+\left[\begin{array}{c}
+\mathbi{e}_{x'} \\
+\mathbi{e}_{y'}
+\end{array}\right]=\left[\begin{array}{cc}
+\cos\theta & \sin \theta  \\
+-\sin\theta &  \cos \theta       
+\end{array}\right]\left[\begin{array}{c}
+\mathbi{e}_{x} \\
+\mathbi{e}_{y}
+\end{array}\right].
+\end{equation}
+and 
+\begin{equation}
+\left[\begin{array}{c}
+\mathbi{e}_{x} \\
+\mathbi{e}_{y}
+\end{array}\right]=\left[\begin{array}{cc}
+\cos\theta & -\sin \theta  \\
+\sin\theta &  \cos \theta       
+\end{array}\right]\left[\begin{array}{c}
+\mathbi{e}_{x'} \\
+\mathbi{e}_{y'}
+\end{array}\right].
+\end{equation}
+Therefore, for a vector $A$, its components in (XOY) and (X'OY') have relation 
+\begin{equation}
+A=[x', y'] \left[\begin{array}{c}
+\mathbi{e}_{x'} \\
+\mathbi{e}_{y'}
+\end{array}\right] = [x, y]\left[\begin{array}{c}
+\mathbi{e}_{x} \\
+\mathbi{e}_{y}
+\end{array}\right]=[x, y] \left[\begin{array}{cc}
+\cos\theta & -\sin \theta  \\
+\sin\theta &  \cos \theta       
+\end{array}\right]\left[\begin{array}{c}
+\mathbi{e}_{x'} \\
+\mathbi{e}_{y'}
+\end{array}\right].
+\end{equation}
+This yields
+\begin{equation}
+\left[\begin{array}{c}
+x' \\
+y'
+\end{array}\right]=\left[\begin{array}{cc}
+\cos\theta & \sin \theta  \\
+-\sin\theta &  \cos \theta       
+\end{array}\right]\left[\begin{array}{c}
+x \\
+y
+\end{array}\right].
+\end{equation}
+
 
 In right-handed coordinate frame, we perform a rotation around $y$-axis by an angle of $l_\theta$ and 
 then a rotation around $z$-axis by an angle of $l_\phi$. The transformation matrix is
@@ -36,5 +102,19 @@ then a rotation around $z$-axis by an angle of $l_\phi$. The transformation matr
 .
 \end{equation}
 
+\section{Time Lag}
+The obsever is located at $(D\rightarrow\infty, 0, 0)$, i.e., the line of sight is along $x-$axis. 
+For a cloud at $(x, y, z)$, its time lag is
+\begin{equation}
+\tau =\sqrt{x^2+y^2+z^2} + \sqrt{(D-x)^2+y^2+z^2} - D \approx r + D(1-x/D) - D \approx r - x,
+\end{equation}
+where $r=\sqrt{x^2+y^2+z^2}$.
+
+The angle between the line of sight and the line of cloud is
+\begin{equation}
+ \cos \varphi = \frac{D\cdot x}{D\cdot r} = \frac{x}{r}.
+\end{equation}
+
 
 \end{document}
+

@@ -25,7 +25,8 @@ char proc_name[MPI_MAX_PROCESSOR_NAME];
 PARSET parset;
 
 
-double VelUnit;
+double VelUnit;    /*!< Velocity unit = \f$\sqrt{\frac{G\cdot 10^6M_\odot}{1~\rm light-day}}/10^5\f$km/s, 
+                        with \f$ M_\bullet = \f$ and \f$r=1\f$light day.*/
 
 /* Data */
 int n_con_data;    /*!< number of continuum data points */
@@ -62,6 +63,7 @@ BLRmodel range_model[2];    /*!< define the range of BLR model parameters */
 int *par_fix, npar_fix;
 double *par_fix_val;
 
+
 int num_params, num_params_blr, num_params_var;
 
 // continuum variation
@@ -73,11 +75,6 @@ double dTransTau, dTransV;
 double rcloud_min_set, rcloud_max_set;
 
 double **Fcon_particles, **Fcon_particles_perturb;
-double **Trans1D_particles, **Trans2D_at_veldata_particles;
-double **Trans1D_particles_perturb, **Trans2D_at_veldata_particles_perturb;
-double **Fline_at_data_particles, **Fline_at_data_particles_perturb;
-double *prob_line_particles, *prob_line_particles_perturb;
-double **clouds_particles, **clouds_particles_perturb;
 double *prob_con_particles, *prob_con_particles_perturb;
 
 /* GSL */

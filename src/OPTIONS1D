@@ -3,18 +3,18 @@
 # Do not change the order of lines.
 # Lines beginning with '#' are regarded as comments.
 
-2	# Number of particles
+2	    # Number of particles
 5000	# new level interval
 5000	# save interval
-200	# threadSteps - how many steps each thread should do independently before communication
-300	# maximum number of levels
-10	# Backtracking scale length (lambda in the paper)
-100	# Strength of effect to force histogram to equal push. 0-10 is best. (beta in the paper)
-5000	# Maximum number of saves (0 = infinite)
-data/sample1d.txt  # sample file
-data/sample_info1d.txt # sample_info file
-data/levels1d.txt  #
-data/sampler_state1d.txt  # 
-data/posterior_sample1d.txt  #
-data/posterior_sample_info1d.txt  #
-data/limits1d.txt
+200	  # threadSteps - how many steps each thread should do independently before communication
+300	  # maximum number of levels
+10	  # Backtracking scale length (lambda in the paper)
+100	  # Strength of effect to force histogram to equal push. 0-10 is best. (beta in the paper)
+2000	# Maximum number of saves (0 = infinite)
+data/sample1d.txt                 # sample file
+data/sample_info1d.txt            # sample_info file
+data/levels1d.txt                 # level file
+data/sampler_state1d.txt          # sample state file
+data/posterior_sample1d.txt       # posterior sample file
+data/posterior_sample_info1d.txt  # posterior sample info file
+data/limits1d.txt                 # limits file

@@ -75,6 +75,10 @@ void postprocess_con()
     post_model = malloc(size_of_modeltype);
     posterior_sample = malloc(num_ps * size_of_modeltype);
 
+    which_parameter_update = -1;
+    which_particle_update = 0;
+    Fcon = Fcon_particles[which_particle_update];
+
     for(i=0; i<num_ps; i++)
     {
       for(j=0; j<num_params; j++)
@@ -249,11 +253,29 @@ void reconstruct_con_from_varmodel(double sigma, double tau, double alpha)
 double prob_con_variability(const void *model)
 {
   double prob = 0.0, fcon, var2;
-  int i;
+  int i, param;
   double *pm = (double *)model;
   
-  calculate_con_from_model(model);
-  
+  if(perturb_accept[which_particle_update] == 1)
+  {
+    param = which_parameter_update_prev[which_particle_update];
+    /* when systematic error is updated, Fcon needs not to be updated */
+    if(param > 0)
+    {
+      memcpy(Fcon_particles[which_particle_update], Fcon_particles_perturb[which_particle_update], 
+        parset.n_con_recon*sizeof(double));
+    }
+  }
+
+  if(which_parameter_update > 0)
+  {
+    Fcon = Fcon_particles_perturb[which_particle_update];
+    calculate_con_from_model(model);
+  }
+  else  /* only systematic error is updated */
+  {
+     Fcon = Fcon_particles[which_particle_update];
+  }
   gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
   
   for(i=0; i<n_con_data; i++)
@@ -263,6 +285,8 @@ double prob_con_variability(const void *model)
     prob += (-0.5*pow(fcon - Fcon_data[i], 2.0)/var2) - 0.5*log(2.0*PI*var2);
   }
 
+  /* record the parameter being updated */
+  which_parameter_update_prev[which_particle_update] = which_parameter_update;
   return prob;
 }
 
@@ -340,7 +364,7 @@ void reconstruct_con_init()
     Tcon[i] = Tcon_min + i*dT;
   }
 
-  Fcon = malloc(parset.n_con_recon * sizeof(double));
+  //Fcon = malloc(parset.n_con_recon * sizeof(double));
 
   sprintf(dnest_options_file, "%s/%s", parset.file_dir, "src/OPTIONSCON");
   if(thistask == roottask)
@@ -350,16 +374,39 @@ void reconstruct_con_init()
   MPI_Bcast(&parset.num_particles, 1, MPI_INT, roottask, MPI_COMM_WORLD);
 
   perturb_accept = malloc(parset.num_particles * sizeof(int));
+  which_parameter_update_prev = malloc(parset.num_particles * sizeof(int));
   for(i=0; i<parset.num_particles; i++)
+  {
     perturb_accept[i] = 0;
+    which_parameter_update_prev[i] = -1;
+  }
 
+  Fcon_particles = malloc(parset.num_particles * sizeof(double *));
+  Fcon_particles_perturb = malloc(parset.num_particles * sizeof(double *));
+  for(i=0; i<parset.num_particles; i++)
+  {
+    Fcon_particles[i] = malloc(parset.n_con_recon * sizeof(double));
+    Fcon_particles_perturb[i] = malloc(parset.n_con_recon * sizeof(double));
+  }
+  prob_con_particles = malloc(parset.num_particles * sizeof(double));
+  prob_con_particles_perturb = malloc(parset.num_particles * sizeof(double));
   return;
 }
 
 void reconstruct_con_end()
 {
-  free(Fcon);
+  int i;
+  //free(Fcon);
+  for(i=0; i<parset.num_particles; i++)
+  {
+    free(Fcon_particles[i]);
+    free(Fcon_particles_perturb[i]);
+  }
+  free(Fcon_particles);
+  free(Fcon_particles_perturb);
+
   free(perturb_accept);
+  free(which_parameter_update_prev);
   free(best_model_con);
   free(best_model_std_con);
   return;

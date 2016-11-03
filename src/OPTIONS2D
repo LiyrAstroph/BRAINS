@@ -3,18 +3,18 @@
 # Do not change the order of lines.
 # Lines beginning with '#' are regarded as comments.
 
-2	# Number of particles
-5000	# new level interval
-5000	# save interval
-200	# threadSteps - how many steps each thread should do independently before communication
-150	# maximum number of levels
-10	# Backtracking scale length (lambda in the paper)
-100	# Strength of effect to force histogram to equal push. 0-10 is best. (beta in the paper)
-5000	# Maximum number of saves (0 = infinite)
-data/sample2d.txt  # sample file
-data/sample_info2d.txt # sample_info file
-data/levels2d.txt  #
-data/sampler_state2d.txt  # 
-data/posterior_sample2d.txt  #
-data/posterior_sample_info2d.txt  #
-data/limits2d.txt
+2	    # Number of particles
+1000	# new level interval
+1000	# save interval
+200	  # threadSteps - how many steps each thread should do independently before communication
+150	  # maximum number of levels
+10	  # Backtracking scale length (lambda in the paper)
+100	  # Strength of effect to force histogram to equal push. 0-10 is best. (beta in the paper)
+1000	# Maximum number of saves (0 = infinite)
+data/sample2d.txt                 # sample file
+data/sample_info2d.txt            # sample_info file
+data/levels2d.txt                 # level file
+data/sampler_state2d.txt          # sample state file
+data/posterior_sample2d.txt       # posterior sample file
+data/posterior_sample_info2d.txt  # posterior sample info file
+data/limits2d.txt                 # limits file

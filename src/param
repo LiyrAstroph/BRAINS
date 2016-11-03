@@ -1,11 +1,11 @@
 % parameter file
-% lines beginning with '%' are regarded as comments and are neglected
+% blank lines and lines beginning with '%' are regarded as comments and are neglected
 % 
 
 %FileDir                     /home/liyropt/Projects/GIT/BRAINS
 FileDir                     ./
 
-FlagDim                     2                          % 0, only continuum; 1, 1d line; 2, 2d line
+FlagDim                     2                           % 0, only continuum; 1, 1d line; 2, 2d line
 %===============================
 % data file
 ContinnumFile               data/arp151_con.txt         % file for contnnum data
@@ -24,19 +24,27 @@ NVelRecon                   100                         % number of points for l
 Line2DConstructFileOut      data/pline2d.txt            % output filename  
 Line2DDataConstructFileOut  data/pline2d_data.txt       % output filename for 2d transfer function at points same with data
 Tran2DFileOut               data/tran2d.txt             % output filename for 2d transfer function
-Tran2DDataFileOut               data/tran2d-data.txt             % output filename for 2d transfer function
+Tran2DDataFileOut           data/tran2d_data.txt        % output filename for 2d transfer function at points same with data
 
 NCloudPerCore               1000
 NVPerCloud                  10                          % number of velocities per cloud
 
 NTau                        100                         % number of time-lag points calculated in transfer function
 TauMinSet                   0.0                         % minimum time lag calculated
-TauMaxSet                   10.0                        % maximum time lag calculated
+TauMaxSet                   20.0                        % maximum time lag calculated
 
 FlagCloudsOut               0                           % 1, save clouds at the last run; 0, do not save
 CloudsFileOut               data/clouds.txt             % output filename for clouds 
 
-InstRes                     220                         % instrument resolution, in km/s
+InstRes                     405                         % km/s, instrument resolution
+
+%===============================
+% narrow-line component
+% use a gaussian to model the narrow-line component
+FlagNarrowLine              1                           % 0, no narrow line; 1, add narrow line
+FluxNarrowLine              0.507                       % 
+WidthNarrowLine             355                         % km/s
+ShiftNarrowLine             -160                        % km/s, with respect to broad line center.  
 
 %===============================
 % set fixed BLR parameters and their fixed values
@@ -44,5 +52,5 @@ InstRes                     220                         % instrument resolution,
 % 1: fixed; 0: not fixed;
 % values are separated by ":"
 
-BLRParFix                   0000000000
-BLRParFixVal                1.38:22.0:34.5           
+BLRParFix                   1101101000
+BLRParFixVal                1.38:1.0:22.0:34.5:0.0          

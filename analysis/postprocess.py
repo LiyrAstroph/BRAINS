@@ -24,7 +24,7 @@ def postprocess(ndim):
   numResampleLogX=1
   compression_bias_min=1.
   compression_scatter=0.
-  temperature = 10
+  temperature = 1
   zoom_in = True
   moreSamples = 1
  

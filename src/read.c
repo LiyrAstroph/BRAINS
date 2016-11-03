@@ -127,6 +127,22 @@ void read_parset()
     addr[nt] = &parset.InstRes;
     id[nt++] = DOUBLE;
 
+    strcpy(tag[nt], "FlagNarrowLine");
+    addr[nt] = &parset.flag_narrowline;
+    id[nt++] = INT;
+
+    strcpy(tag[nt], "FluxNarrowLine");
+    addr[nt] = &parset.flux_narrowline;
+    id[nt++] = DOUBLE;
+
+    strcpy(tag[nt], "WidthNarrowLine");
+    addr[nt] = &parset.width_narrowline;
+    id[nt++] = DOUBLE;
+
+    strcpy(tag[nt], "ShiftNarrowLine");
+    addr[nt] = &parset.shift_narrowline;
+    id[nt++] = DOUBLE;
+
     strcpy(tag[nt], "BLRParFix");
     addr[nt] = &parset.str_par_fix;
     id[nt++] = STRING;
@@ -191,6 +207,14 @@ void read_parset()
     {
       fprintf(stderr, "# Error in flag_dim: value %d is not allowed.\n", parset.flag_dim);
       exit(0);
+    }
+
+    if(parset.flag_narrowline == 1)
+    {
+      printf("# add narrow-line: flux=%e, width=%fkm/s, shift=%fkm/s.\n", parset.flux_narrowline, 
+        parset.width_narrowline, parset.shift_narrowline);
+      parset.width_narrowline /= VelUnit;
+      parset.shift_narrowline /= VelUnit;
     }
   }
   
