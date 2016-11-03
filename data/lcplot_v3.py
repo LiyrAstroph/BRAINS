@@ -4,6 +4,8 @@ from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 from matplotlib.ticker import FuncFormatter
 import copy
 
+VelUnit = np.sqrt( 6.672e-8 * 1.0e6 * 1.989e33 / (2.9979e10*8.64e4)) / 1.0e5
+
 def set_cov_Pmat(sigma, tau, alpha, Tcon):
   Pmat = np.zeros((Tcon.shape[0], Tcon.shape[0]))
   xv, yv = np.meshgrid(Tcon, Tcon)
@@ -13,7 +15,7 @@ def set_cov_Pmat(sigma, tau, alpha, Tcon):
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif', size=15)
 
-obj = "1h0323"
+obj = "mrk493"
 
 fp=open(obj + "_hb2d.txt", "r")
 line=fp.readline()
@@ -38,7 +40,7 @@ for j in range(0, nt):
 
 fp.close()
 grid_wave = grid_vel / 3e5 * 4861.0 + 4861.0
-dV = (grid_vel[1]-grid_vel[0]) * 4861/3e5
+dV = (grid_vel[1]-grid_vel[0]) / VelUnit
 
 # read sim
 fp=open("pline2d_data.txt", "r")
@@ -77,8 +79,8 @@ grid_vel /= 1.0e3
 grid_vel_sim /= 1.0e3
 
 # read sample
-con_scale = np.mean(conlc[:, 1])
-line_scale = np.mean(hblc[:, 0])
+con_scale = 1.0/np.mean(conlc[:, 1])
+line_scale = 1.0/np.mean(hblc[:, 1])
 hd=np.loadtxt("sample2d.txt", skiprows=1)
 phd = np.loadtxt("posterior_sample2d.txt")
 hd_info = np.loadtxt("sample_info2d.txt", skiprows=1)
@@ -92,7 +94,8 @@ print(mbh1, mbh2)
 syserr_con = np.exp(np.mean(phd[:, 12]))/con_scale
 syserr = np.exp(np.mean(phd[:, 11]))/line_scale
 
-print(syserr, syserr_con)
+print("scale:", con_scale, line_scale)
+print("syserr:", syserr_con, syserr)
 
 logP = np.loadtxt("posterior_sample_info2d.txt", skiprows=1)
 nmax = np.argmax(logP)
@@ -184,10 +187,11 @@ for i in range(len(logP)):
     date[j], con[j] = line.split()
   
   confit = np.interp(conlc[:, 0], date, con)
-  chi[i] = np.sum( (confit - conlc[:, 1]) * (confit - conlc[:, 1]) )
+  chi[i] = np.sum( (confit - conlc[:, 1]) * (confit - conlc[:, 1]) / conlc[:, 2]/conlc[:, 2])
   fp.readline()
 
 fp.close()
+print(chi[ichimin])
 
 plotnum = 0
 fp = open("con_rec.txt", "r")
@@ -198,8 +202,8 @@ for i in range(len(logP)):
   if(i==ichimin):
     con_max = copy.copy(con)  
   fp.readline()
-  if (chi[i] < chi[ichimin] * (1.0 + 0.001)) and (plotnum < 100):
-    #ax4.plot(date-date0, con, color='grey', linewidth=0.1)
+  if (chi[i] < chi[ichimin] * (1.0 + 0.01)) and (plotnum < 100):
+    ax4.plot(date-date0, con, color='grey', linewidth=0.1)
     plotnum += 1
 
 fp.close()
@@ -212,7 +216,7 @@ plt.plot(date-date0, con, color='red')
 ax4.set_xlim(conlc_sim[0, 0], conlc_sim[-1, 0])
 ymax = np.max(conlc[:, 1])
 ymin = np.min(conlc[:, 1])
-ax4.set_ylim(ymin - 0.2*(ymax-ymin), ymax + 0.2*(ymax- ymin))
+#ax4.set_ylim(ymin - 0.2*(ymax-ymin), ymax + 0.2*(ymax- ymin))
 ax4.set_ylabel(r'$F_{\rm 5100}$')
 #ax4.set_ylim([30, 95])
 
