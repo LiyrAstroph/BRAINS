@@ -424,13 +424,13 @@ double prob_line1d(const void *model)
 
   /* only update continuum reconstruction when the corresponding parameters are updated
    */
-  if((which_parameter_update >= num_params_blr ))
+  if((which_parameter_update >= num_params_blr ) || (which_parameter_update == -1) )
   {
     /* the num_params_blr-th parameter is systematic error of continuum, which 
      * only appears at the stage of calculating likelihood probability.
      * when this paramete is updated, no need to re-calculate the contionuum.  
      */
-    if( which_parameter_update > num_params_blr)
+    if( (which_parameter_update > num_params_blr) || (which_parameter_update == -1) )
     {
       Fcon = Fcon_particles_perturb[which_particle_update];
       calculate_con_from_model(model + num_params_blr*sizeof(double));

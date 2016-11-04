@@ -121,7 +121,8 @@ double perturb_line1d(void *model)
     exit(0);
   }
   
-  which_parameter_update = which;
+  //which_parameter_update = which;
+  which_parameter_update = -1;
 
   // swith off level-dependent MCMC proposal; if want to use this function, comment the below line
   which_level_update = 0;

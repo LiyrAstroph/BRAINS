@@ -267,7 +267,7 @@ double prob_con_variability(const void *model)
     }
   }
 
-  if(which_parameter_update > 0)
+  if( (which_parameter_update > 0) || (which_parameter_update == -1))
   {
     Fcon = Fcon_particles_perturb[which_particle_update];
     calculate_con_from_model(model);

@@ -521,9 +521,9 @@ double prob_line2d(const void *model)
     }
   }
 
-  if(which_parameter_update >= num_params_blr)
+  if((which_parameter_update >= num_params_blr) || (which_parameter_update == -1))
   {
-    if( which_parameter_update > num_params_blr)
+    if( (which_parameter_update > num_params_blr) || (which_parameter_update == -1) )
     {
       Fcon = Fcon_particles_perturb[which_particle_update];
       calculate_con_from_model(model + num_params_blr*sizeof(double));
