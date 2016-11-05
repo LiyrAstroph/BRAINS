@@ -256,25 +256,27 @@ double prob_con_variability(const void *model)
   int i, param;
   double *pm = (double *)model;
   
-  if(perturb_accept[which_particle_update] == 1)
+  if(perturb_accept[which_particle_update] == 1 )
   {
     param = which_parameter_update_prev[which_particle_update];
-    /* when systematic error is updated, Fcon needs not to be updated */
-    if(param > 0)
+    /* when systematic error is updated, Fcon needs not to be updated 
+     * or when all the parameters are updated, needs to update Fcon
+     */
+    if( param > 0) 
     {
       memcpy(Fcon_particles[which_particle_update], Fcon_particles_perturb[which_particle_update], 
         parset.n_con_recon*sizeof(double));
     }
   }
 
-  if( (which_parameter_update > 0) || (which_parameter_update == -1))
+  if( which_parameter_update > 0)
   {
     Fcon = Fcon_particles_perturb[which_particle_update];
     calculate_con_from_model(model);
   }
   else  /* only systematic error is updated */
   {
-     Fcon = Fcon_particles[which_particle_update];
+    Fcon = Fcon_particles[which_particle_update];
   }
   gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
   
@@ -287,6 +289,29 @@ double prob_con_variability(const void *model)
 
   /* record the parameter being updated */
   which_parameter_update_prev[which_particle_update] = which_parameter_update;
+  return prob;
+}
+
+/*!
+ * this function calculates likelihood at initital step.
+ */
+double prob_con_variability_initial(const void *model)
+{
+  double prob = 0.0, fcon, var2;
+  int i;
+  double *pm = (double *)model;
+
+  Fcon = Fcon_particles_perturb[which_particle_update];
+  calculate_con_from_model(model);
+
+  gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
+  
+  for(i=0; i<n_con_data; i++)
+  {
+    fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, Tcon_data[i], gsl_acc);
+    var2 = Fcerrs_data[i] * Fcerrs_data[i] + exp(pm[0])*exp(pm[0]);
+    prob += (-0.5*pow(fcon - Fcon_data[i], 2.0)/var2) - 0.5*log(2.0*PI*var2);
+  }
   return prob;
 }
 

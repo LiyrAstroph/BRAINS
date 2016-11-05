@@ -36,6 +36,7 @@ int dnest_con(int argc, char **argv)
   /* setup functions used for dnest*/
   from_prior = from_prior_con;
   log_likelihoods_cal = log_likelihoods_cal_con;
+  log_likelihoods_cal_initial = log_likelihoods_cal_initial_con;
   perturb = perturb_con;
   print_particle = print_particle_con;
   copy_model = copy_model_con;
@@ -64,12 +65,21 @@ void from_prior_con(void *model)
 
   for(i=0; i<parset.n_con_recon; i++)
     pm[i+num_params_var] = dnest_randn();
+
+  which_parameter_update = -1;
 }
 
 double log_likelihoods_cal_con(const void *model)
 {
   double logL;
   logL = prob_con_variability(model);
+  return logL;
+}
+
+double log_likelihoods_cal_initial_con(const void *model)
+{
+  double logL;
+  logL = prob_con_variability_initial(model);
   return logL;
 }
 
@@ -85,8 +95,7 @@ double perturb_con(void *model)
     exit(0);
   }
   
-  //which_parameter_update = which;
-  which_parameter_update = -1;
+  which_parameter_update = which;
   
   // swith off level-dependent MCMC proposal; if want to use this function, comment the below line
   which_level_update = 0;

@@ -424,13 +424,13 @@ double prob_line1d(const void *model)
 
   /* only update continuum reconstruction when the corresponding parameters are updated
    */
-  if((which_parameter_update >= num_params_blr ) || (which_parameter_update == -1) )
+  if( which_parameter_update >= num_params_blr )
   {
     /* the num_params_blr-th parameter is systematic error of continuum, which 
      * only appears at the stage of calculating likelihood probability.
      * when this paramete is updated, no need to re-calculate the contionuum.  
      */
-    if( (which_parameter_update > num_params_blr) || (which_parameter_update == -1) )
+    if( which_parameter_update > num_params_blr )
     {
       Fcon = Fcon_particles_perturb[which_particle_update];
       calculate_con_from_model(model + num_params_blr*sizeof(double));
@@ -472,5 +472,40 @@ double prob_line1d(const void *model)
 
   /* add up line probability */
   prob += prob_line;
+  return prob;
+}
+
+double prob_initial_line1d(const void *model)
+{
+  double prob = 0.0, prob_line=0.0, fcon, var2, dy;
+  int i, param;
+  double *pm = (double *)model;
+  
+  Fcon = Fcon_particles_perturb[which_particle_update];
+  calculate_con_from_model(model + num_params_blr*sizeof(double));
+  
+  gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
+
+  for(i=0; i<n_con_data; i++)
+  {
+    fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, Tcon_data[i], gsl_acc);
+    var2 = Fcerrs_data[i] * Fcerrs_data[i] + exp(pm[num_params_blr]) * exp(num_params_blr);
+    prob += (-0.5*pow(fcon - Fcon_data[i], 2.0)/var2) - 0.5*log(2.0*PI*var2);
+  }
+  prob_con_particles_perturb[which_particle_update] = prob;
+
+  transfun_1d_cloud_direct(model);
+  calculate_line_from_blrmodel(model, Tline_data, Fline_at_data, n_line_data);
+
+  for(i=0; i<n_line_data; i++)
+  {
+    dy = Fline_data[i] - Fline_at_data[i] ;
+    var2 = Flerrs_data[i]*Flerrs_data[i];
+    var2 += exp(pm[num_params_blr-1]) * exp(pm[num_params_blr-1]);
+    prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
+  }
+
+  prob += prob_line;
+
   return prob;
 }

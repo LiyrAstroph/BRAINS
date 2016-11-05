@@ -42,6 +42,7 @@ char dnest_options_file[BRAINS_MAX_STR_LENGTH];
 int which_parameter_update;  /*!< which parameter being updated */
 int which_particle_update;   /*!< which particle being updated */
 int which_level_update;      /*!< which level of the particle */
+unsigned long long int which_mcmc_steps;//mcmc steps 
 int *perturb_accept, *which_parameter_update_prev;
 
 /* continuum reconstruction */

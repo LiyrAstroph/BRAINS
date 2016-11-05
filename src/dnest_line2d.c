@@ -43,6 +43,7 @@ int dnest_line2d(int argc, char **argv)
   /* setup functions used for dnest*/
   from_prior = from_prior_line2d;
   log_likelihoods_cal = log_likelihoods_cal_line2d;
+  log_likelihoods_cal_initial = log_likelihoods_cal_initial_line2d;
   perturb = perturb_line2d;
   print_particle = print_particle_line2d;
   copy_model = copy_model_line2d;
@@ -98,13 +99,20 @@ void from_prior_line2d(void *model)
   for(i=0; i<parset.n_con_recon; i++)
     pm[i + num_params_var + num_params_blr ] = dnest_randn();
   
-  which_parameter_update = -1; // force to update all the perturb values
+  which_parameter_update = -1;
 }
 
 double log_likelihoods_cal_line2d(const void *model)
 {
   double logL;
   logL = prob_line2d(model);
+  return logL;
+}
+
+double log_likelihoods_cal_initial_line2d(const void *model)
+{
+  double logL;
+  logL = prob_initial_line2d(model);
   return logL;
 }
 
@@ -127,8 +135,7 @@ double perturb_line2d(void *model)
     exit(0);
   }
   
-  //which_parameter_update = which;
-  which_parameter_update = -1;
+  which_parameter_update = which;
   
   // swith off level-dependent MCMC proposal; if want to use this function, comment the below line
   which_level_update = 0;
