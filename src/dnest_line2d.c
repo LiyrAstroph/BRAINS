@@ -137,23 +137,16 @@ double perturb_line2d(void *model)
   
   which_parameter_update = which;
   
-  // swith off level-dependent MCMC proposal; if want to use this function, comment the below line
-  which_level_update = 0;
-
-  if(which_level_update != 0)
+  if( which_mcmc_steps > 500 && which_level_update != 0)
   {
-    if(which_level_update < 10)
-    {
-      limit1 = limits[(which_level_update-1) * num_params *2 + which *2];
-      limit2 = limits[(which_level_update-1) * num_params *2 + which *2 + 1];
-      width = limit2 - limit1;
-    }
-    else
-    {
-      limit1 = limits[(10-1) * num_params *2 + which *2];
-      limit2 = limits[(10-1) * num_params *2 + which *2 + 1];
-      width = limit2 - limit1;
-    }
+    which_level_update = which_level_update > 20?20:which_level_update;
+    limit1 = limits[(which_level_update-1) * num_params *2 + which *2];
+    limit2 = limits[(which_level_update-1) * num_params *2 + which *2 + 1];
+    width = limit2 - limit1;
+  }
+  else
+  {
+    which_level_update = 0;
   }
 
   switch(which)
@@ -300,7 +293,7 @@ double perturb_line2d(void *model)
         width = ( limit2 - limit1 );
       }
       /* limit the step size of systematic error, like simulated annealing */
-      pm[12] += dnest_randh() * fmin(width, (var_range_model[0][1] - var_range_model[0][0]) * 0.001);
+      pm[12] += dnest_randh() * fmin(width, (var_range_model[0][1] - var_range_model[0][0]) * 0.1);
       wrap(&(pm[12]), var_range_model[0][0], var_range_model[0][1] );
       break;
     

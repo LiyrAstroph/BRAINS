@@ -97,23 +97,16 @@ double perturb_con(void *model)
   
   which_parameter_update = which;
   
-  // swith off level-dependent MCMC proposal; if want to use this function, comment the below line
-  which_level_update = 0;
-
-  if(which_level_update !=0 )
+  if( which_mcmc_steps > 500 && which_level_update != 0)
   {
-    if(which_level_update < 10)
-    {
-      limit1 = limits[(which_level_update-1) * num_params *2 + which *2];
-      limit2 = limits[(which_level_update-1) * num_params *2 + which *2 + 1];
-      width = limit2 - limit1;
-    }
-    else
-    {
-      limit1 = limits[(10-1) * num_params *2 + which *2];
-      limit2 = limits[(10-1) * num_params *2 + which *2 + 1];
-      width = limit2 - limit1;
-    }
+    which_level_update = which_level_update > 20?20:which_level_update;
+    limit1 = limits[(which_level_update-1) * num_params *2 + which *2];
+    limit2 = limits[(which_level_update-1) * num_params *2 + which *2 + 1];
+    width = limit2 - limit1;
+  }
+  else
+  {
+    which_level_update = 0;
   }
 
   switch(which)
