@@ -301,7 +301,7 @@ double prob_con_variability_initial(const void *model)
   int i;
   double *pm = (double *)model;
 
-  Fcon = Fcon_particles_perturb[which_particle_update];
+  Fcon = Fcon_particles[which_particle_update];
   calculate_con_from_model(model);
 
   gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);

@@ -481,7 +481,7 @@ double prob_initial_line1d(const void *model)
   int i, param;
   double *pm = (double *)model;
   
-  Fcon = Fcon_particles_perturb[which_particle_update];
+  Fcon = Fcon_particles[which_particle_update];
   calculate_con_from_model(model + num_params_blr*sizeof(double));
   
   gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
@@ -492,7 +492,7 @@ double prob_initial_line1d(const void *model)
     var2 = Fcerrs_data[i] * Fcerrs_data[i] + exp(pm[num_params_blr]) * exp(num_params_blr);
     prob += (-0.5*pow(fcon - Fcon_data[i], 2.0)/var2) - 0.5*log(2.0*PI*var2);
   }
-  prob_con_particles_perturb[which_particle_update] = prob;
+  prob_con_particles[which_particle_update] = prob;
 
   transfun_1d_cloud_direct(model);
   calculate_line_from_blrmodel(model, Tline_data, Fline_at_data, n_line_data);
