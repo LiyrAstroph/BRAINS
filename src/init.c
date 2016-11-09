@@ -56,7 +56,7 @@ void init()
   var_range_model[2][1] = 10.0; 
 
   var_range_model[3][0] = 0.0; // mean value
-  var_range_model[3][1] = 2.0; 
+  var_range_model[3][1] = 10.0; 
 
   var_range_model[4][0] = -10.0; // light curve values
   var_range_model[4][1] = 10.0; 
