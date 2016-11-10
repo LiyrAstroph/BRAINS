@@ -136,7 +136,7 @@ void postprocess1d()
       }
       
 
-      if(i % (num_ps/10+1) == 0)
+      //if(i % (num_ps/10+1) == 0)
       {
         for(j=0; j<parset.n_con_recon; j++)
         {

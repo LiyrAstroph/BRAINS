@@ -8,9 +8,9 @@ FileDir                     /home/liyropt/Projects/GIT/BRAINS
 FlagDim                     1                           % 0, only continuum; 1, 1d line; 2, 2d line
 %===============================
 % data file
-ContinnumFile               data/arp151_con.txt         % file for contnnum data
-LineFile                    data/arp151_hb.txt          % file for line data
-Line2DFile                  data/arp151_hb2d.txt        % file for line 2d data
+ContinnumFile               data/mrk493_con.txt         % file for contnnum data
+LineFile                    data/mrk493_hb.txt          % file for line data
+Line2DFile                  data/mrk493_hb2d.txt        % file for line 2d data
 %===============================
 % reconstruction
 NConRecon                   100                         % number of points for continuum reconstruction
@@ -31,7 +31,7 @@ NVPerCloud                  10                          % number of velocities p
 
 NTau                        100                         % number of time-lag points calculated in transfer function
 TauMinSet                   0.0                         % minimum time lag calculated
-TauMaxSet                   20.0                        % maximum time lag calculated
+TauMaxSet                   100.0                        % maximum time lag calculated
 
 FlagCloudsOut               0                           % 1, save clouds at the last run; 0, do not save
 CloudsFileOut               data/clouds.txt             % output filename for clouds 

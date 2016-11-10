@@ -45,6 +45,8 @@ void init()
   gsl_acc = gsl_interp_accel_alloc();
   gsl_linear = gsl_interp_alloc(gsl_interp_linear, parset.n_con_recon);
 
+  parset.tau_max_set = fmin(parset.tau_max_set, Tcon_data[n_con_data-1] - Tcon_data[0]);
+
   /* set the range of continuum variation  */
   var_range_model[0][0] = log(1.0e-10);; // systematic error in continuum
   var_range_model[0][1] = log(1.0e0);;
@@ -102,7 +104,7 @@ void init()
   range_model[1].logse = log(1.0e0);
 
   range_model[1].mu = fmin(range_model[1].mu, log(rcloud_max_set));
-  //range_model[1].mu = fmin(range_model[1].mu, log(Tcon_data[n_con_data-1] - Tcon_data[0]));
+  range_model[1].mu = fmin(range_model[1].mu, log(Tcon_data[n_con_data-1] - Tcon_data[0]));
 }
 
 /*!

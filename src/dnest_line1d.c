@@ -130,18 +130,15 @@ double perturb_line1d(void *model)
   }
   
   which_parameter_update = which;
-  
-  if( which_mcmc_steps > 1000 && which_level_update != 0)
+
+  which_level_update = which_level_update > (size_levels - 20)?(size_levels-20):which_level_update;
+  which_level_update = which_level_update <0?0:which_level_update;
+
+  if( which_level_update != 0)
   {
-    which_level_update = which_level_update > (size_levels - 20)?(size_levels-20):which_level_update;
-    which_level_update = which_level_update <1?1:which_level_update;
     limit1 = limits[(which_level_update-1) * num_params *2 + which *2];
     limit2 = limits[(which_level_update-1) * num_params *2 + which *2 + 1];
     width = limit2 - limit1;
-  }
-  else
-  {
-    which_level_update = 0;
   }
 
   switch(which)
