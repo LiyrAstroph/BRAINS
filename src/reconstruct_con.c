@@ -64,7 +64,7 @@ void postprocess_con()
       fprintf(stderr, "# Error: Cannot open file %s.\n", fname);
       exit(0);
     }
-
+    // read numbers of points in posterior sample
     if(fscanf(fp, "# %d", &num_ps) < 1)
     {
       fprintf(stderr, "# Error: Cannot read file %s.\n", posterior_sample_file);

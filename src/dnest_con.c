@@ -27,6 +27,10 @@
 #include "proto.h"
 
 
+/*!
+ *  This function run denst sampling for continuum.
+ */
+
 int dnest_con(int argc, char **argv)
 {
   num_params_var = 4;
@@ -44,7 +48,6 @@ int dnest_con(int argc, char **argv)
   get_num_params = get_num_params_con;
   
   strcpy(options_file, dnest_options_file);
-  
   dnest(argc, argv);
   
   return 0;
@@ -97,9 +100,9 @@ double perturb_con(void *model)
   
   which_parameter_update = which;
   
+  /* level-dependent width */
   which_level_update = which_level_update > (size_levels - 20)?(size_levels-20):which_level_update;
   which_level_update = which_level_update <0?0:which_level_update;
-
   if( which_level_update != 0)
   {
     limit1 = limits[(which_level_update-1) * num_params *2 + which *2];
@@ -156,7 +159,6 @@ double perturb_con(void *model)
       logH += (-0.5*pow(pm[which], 2.0) );
       break;
   }
-
   return logH;
 }
 

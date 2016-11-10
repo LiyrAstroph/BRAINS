@@ -26,7 +26,6 @@
 /*! 
  * This function initialize the program.
  */
-
 void init()
 {
   allocate_memory();
@@ -45,6 +44,7 @@ void init()
   gsl_acc = gsl_interp_accel_alloc();
   gsl_linear = gsl_interp_alloc(gsl_interp_linear, parset.n_con_recon);
 
+  /* maximum tau of transfer function should be smaller than the time span of the dataset. */
   parset.tau_max_set = fmin(parset.tau_max_set, Tcon_data[n_con_data-1] - Tcon_data[0]);
 
   /* set the range of continuum variation  */
@@ -103,6 +103,7 @@ void init()
   range_model[0].logse = log(1.0e-10);
   range_model[1].logse = log(1.0e0);
 
+  /* setup extra limits to the range of mu */
   range_model[1].mu = fmin(range_model[1].mu, log(rcloud_max_set));
   range_model[1].mu = fmin(range_model[1].mu, log(Tcon_data[n_con_data-1] - Tcon_data[0]));
 }

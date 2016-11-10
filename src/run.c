@@ -23,8 +23,7 @@ void begin_run()
 {
   /*   Velocity unit 
    *   This unit should be determined in the beginning because the data velocity
-   *   needs to be converted using this unit in read.c.
-   *   
+   *   needs to be converted using this unit in read.c. 
    */
   VelUnit = sqrt( GRAVITY * 1.0e6 * SOLAR_MASS / CM_PER_LD ) / 1.0e5; 
 
@@ -40,17 +39,17 @@ void begin_run()
   
   /* now run dnest and reconstruct the model. */
   MPI_Barrier(MPI_COMM_WORLD);
-  if(parset.flag_dim == 0)
+  if(parset.flag_dim == 0) /* only continuum */
   {
     reconstruct_con();
   }
 
-  if(parset.flag_dim == 1)
+  if(parset.flag_dim == 1) /* 1d line */
   {
   	reconstruct_line1d();
   }
 
-  if(parset.flag_dim == 2)
+  if(parset.flag_dim == 2) /* 2d line */
   {
     reconstruct_line2d();
   }

@@ -26,7 +26,7 @@ Line2DDataConstructFileOut  data/pline2d_data.txt       % output filename for 2d
 Tran2DFileOut               data/tran2d.txt             % output filename for 2d transfer function
 Tran2DDataFileOut           data/tran2d_data.txt             % output filename for 2d transfer function
 
-NCloudPerCore               1000                        % number of clouds per task
+NCloudPerCore               2000                        % number of clouds per task
 NVPerCloud                  10                          % number of velocities per cloud
 
 NTau                        100                         % number of time-lag points calculated in transfer function

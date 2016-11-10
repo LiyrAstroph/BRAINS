@@ -6,6 +6,7 @@
 
 #include <stdio.h>
 #include <stdlib.h> 
+#include <unistd.h>
 #include <mpi.h>
 #include <string.h>
 
@@ -205,5 +206,19 @@ and a \ref optionsfile "optionfile" needs to be specified.
  */
 
 /*! \page BRAINS-Makefile  Makefile of BRAINS
- 
+ Makefile
+ --------
+
+ <table>
+ <tr><th> Command                     <th> Note 
+ <tr><td>SHELL=/bin/bash              <td> Bash shell
+ <tr><td>CC       = mpicc             <td> MPI C Compiler
+ <tr><td>OPTIMIZE = -O2 -Wall         <td> Compile option
+ <tr><td>#OPTIMIZE += -DDebug         <td> Debug with fixed random seed
+ <tr><td>
+     #SYSTEM="Darwin"\n
+      SYSTEM="Linux" \n
+     #SYSTEM="Cluster" \n                 <td> Target system
+ </table>
+
  */
