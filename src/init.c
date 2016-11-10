@@ -46,8 +46,8 @@ void init()
   gsl_linear = gsl_interp_alloc(gsl_interp_linear, parset.n_con_recon);
 
   /* set the range of continuum variation  */
-  var_range_model[0][0] = log(1.0e-12);; // systematic error in continuum
-  var_range_model[0][1] = log(1.0e6);;
+  var_range_model[0][0] = log(1.0e-10);; // systematic error in continuum
+  var_range_model[0][1] = log(1.0e0);;
 
   var_range_model[1][0] = -3.0; // log(sigma)
   var_range_model[1][1] = 1.0; 
@@ -56,7 +56,7 @@ void init()
   var_range_model[2][1] = 10.0; 
 
   var_range_model[3][0] = 0.0; // mean value
-  var_range_model[3][1] = 10.0; 
+  var_range_model[3][1] = 2.0; 
 
   var_range_model[4][0] = -10.0; // light curve values
   var_range_model[4][1] = 10.0; 
@@ -98,8 +98,8 @@ void init()
   range_model[0].q = 0.0;
   range_model[1].q = 1.0;
 
-  range_model[0].logse = log(1.0e-12);
-  range_model[1].logse = log(1.0e6);
+  range_model[0].logse = log(1.0e-10);
+  range_model[1].logse = log(1.0e0);
 
   range_model[1].mu = fmin(range_model[1].mu, log(rcloud_max_set));
   //range_model[1].mu = fmin(range_model[1].mu, log(Tcon_data[n_con_data-1] - Tcon_data[0]));

@@ -5,7 +5,7 @@
 FileDir                     /home/liyropt/Projects/GIT/BRAINS
 %FileDir                     /ihepbatch/mbhd01/user/liyanrong/RM/MCMC_BRAINS/mrk493
 
-FlagDim                     2                           % 0, only continuum; 1, 1d line; 2, 2d line
+FlagDim                     1                           % 0, only continuum; 1, 1d line; 2, 2d line
 %===============================
 % data file
 ContinnumFile               data/arp151_con.txt         % file for contnnum data
@@ -31,7 +31,7 @@ NVPerCloud                  10                          % number of velocities p
 
 NTau                        100                         % number of time-lag points calculated in transfer function
 TauMinSet                   0.0                         % minimum time lag calculated
-TauMaxSet                   50.0                        % maximum time lag calculated
+TauMaxSet                   20.0                        % maximum time lag calculated
 
 FlagCloudsOut               0                           % 1, save clouds at the last run; 0, do not save
 CloudsFileOut               data/clouds.txt             % output filename for clouds 
