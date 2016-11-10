@@ -49,11 +49,12 @@ int main(int argc, char **argv)
     return 0;
   }
 
-  /* cope with command arguments. */
+  /* cope with command options. */
   if(thistask == roottask)
   {
     opterr = 0;
-    parset.flag_postprc = 0;
+    parset.flag_postprc = 0; /* default value */
+    parset.temperature = 1.0; /* default value */
     while( (opt = getopt(argc, argv, "pt:")) != -1)
     {
       switch(opt)
