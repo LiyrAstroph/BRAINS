@@ -23,6 +23,7 @@
 int main(int argc, char **argv)
 {
   double t0, t1, dt;
+  int opt;
   /* initialize MPI */
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &thistask);
@@ -48,7 +49,43 @@ int main(int argc, char **argv)
     return 0;
   }
 
-  strcpy(parset.param_file, argv[1]); /* copy input parameter file */
+  /* cope with command arguments. */
+  if(thistask == roottask)
+  {
+    opterr = 0;
+    parset.flag_postprc = 0;
+    while( (opt = getopt(argc, argv, "pt:")) != -1)
+    {
+      switch(opt)
+      {
+        case 'p':
+          parset.flag_postprc = 1;
+          printf("# MCMC samples available, only do post-process.\n");
+          break;
+        case 't':
+          parset.temperature = atof(optarg);
+          printf("# Set a temperature %f.\n", parset.temperature);
+          if(parset.temperature == 0.0)
+          {
+            printf("# Incorrect option -t %s.\n", optarg);
+            exit(0);
+          }
+          if(parset.temperature < 1.0)
+          {
+            printf("# Temperature should >= 1.0\n");
+            exit(0);
+          }
+          break;
+        case '?':
+          printf("# Incorrect option -%c %s.\n", optopt, optarg);
+          exit(0);
+          break;
+        default:
+          break;
+      }
+    }
+    strcpy(parset.param_file, argv[optind]); /* copy input parameter file */
+  }
 
   begin_run();    /* implementation run */
 

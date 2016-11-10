@@ -78,6 +78,9 @@ double rcloud_min_set, rcloud_max_set;
 double **Fcon_particles, **Fcon_particles_perturb;
 double *prob_con_particles, *prob_con_particles_perturb;
 
+
+int postprc;
+
 /* GSL */
 const gsl_rng_type * gsl_T;
 gsl_rng * gsl_r;

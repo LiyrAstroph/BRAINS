@@ -41,7 +41,7 @@ void postprocess1d()
   best_model_std_line1d = malloc(size_of_modeltype);
 
 // generate posterior sample 
-  temperature = 1.0; 
+  temperature = parset.temperature; 
   dnest_postprocess(temperature);
 
   if(thistask == roottask)

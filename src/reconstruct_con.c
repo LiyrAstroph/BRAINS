@@ -39,7 +39,7 @@ void postprocess_con()
   best_model_con = malloc(size_of_modeltype);
   best_model_std_con = malloc(size_of_modeltype);
 
-  temperature = 1.0;
+  temperature = parset.temperature;
   dnest_postprocess(temperature);
   
   if(thistask == roottask)

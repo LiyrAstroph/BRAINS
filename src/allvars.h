@@ -94,6 +94,9 @@ typedef struct
 
   int flag_narrowline;
   double flux_narrowline, width_narrowline, shift_narrowline;
+
+  int flag_postprc;
+  double temperature;
 }PARSET;
 extern PARSET parset;
 
@@ -162,6 +165,8 @@ extern double rcloud_min_set, rcloud_max_set;
 
 extern double **Fcon_particles, **Fcon_particles_perturb;
 extern double *prob_con_particles, *prob_con_particles_perturb;
+
+extern int postprc;
 
 /* GSL */
 extern const gsl_rng_type * gsl_T;

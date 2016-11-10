@@ -59,7 +59,11 @@ int dnest_line2d(int argc, char **argv)
   }
 
   strcpy(options_file, dnest_options_file);
-  dnest(argc, argv);
+
+  if(parset.flag_postprc == 0)
+  {
+    dnest(argc, argv);
+  }
   
   return 0;
 }
