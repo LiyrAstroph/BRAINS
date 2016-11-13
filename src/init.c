@@ -65,13 +65,13 @@ void init()
 
   /* set the range of cloud radial distribution */
   rcloud_min_set = parset.tau_min_set;
-  rcloud_max_set = parset.tau_max_set*10.0;
+  rcloud_max_set = parset.tau_max_set*2.0;
 
   range_model[0].mbh = log(0.1);
   range_model[1].mbh = log(1000.0);
 
   range_model[0].mu = log(0.1);
-  range_model[1].mu = log(parset.tau_max_set*10.0);
+  range_model[1].mu = log(parset.tau_max_set*2.0);
 
   range_model[0].beta = 0.001;
   range_model[1].beta = 1.0;
@@ -105,7 +105,7 @@ void init()
 
   /* setup extra limits to the range of mu */
   range_model[1].mu = fmin(range_model[1].mu, log(rcloud_max_set));
-  range_model[1].mu = fmin(range_model[1].mu, log(Tcon_data[n_con_data-1] - Tcon_data[0]));
+  //range_model[1].mu = fmin(range_model[1].mu, log(Tcon_data[n_con_data-1] - Tcon_data[0]));
 }
 
 /*!

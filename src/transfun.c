@@ -61,7 +61,7 @@ void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl
  */
 void transfun_1d_cloud_direct(const void *pm)
 {
-  int i, idt;
+  int i, idt, nc;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb;
   double inc, F, beta, mu, k, gam, a, s;
@@ -97,14 +97,21 @@ void transfun_1d_cloud_direct(const void *pm)
     else
       Lthe = 0.0;
     
-    //r = rcloud_max_set+1.0;
-    //while(r>rcloud_max_set || r<rcloud_min_set)
-    //{
+    nc = 0.0;
+    r = rcloud_max_set+1.0;
+    while(r>rcloud_max_set || r<rcloud_min_set)
+    {
+      if(nc > 1000)
+      {
+        printf("# Error, too many tries to generate r.\n");
+        exit(0);
+      }
       rnd = gsl_ran_gamma(gsl_r, a, 1.0);
 //      r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, mu/beta, beta);
 //      r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
       r = mu * F + (1.0-F) * s * rnd;
-    //}
+      nc++;
+    }
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
     /* Polar coordinates to Cartesian coordinate */
@@ -218,7 +225,7 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
  */
 void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
-  int i, j, idV, idt;
+  int i, j, idV, idt, nc;
   double vrange, r, phi, dis, Lopn_cos, u;
   double x, y, z, xb, yb, zb, vx, vy, vz, vxb, vyb, vzb;
   double inc, F, beta, mu, k, gam, a, s;
@@ -277,13 +284,22 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
       Lthe = 0.0;
     //Lthe = gsl_rng_uniform(gsl_r) * model->opn*PI/180.0;
 
+    nc = 0;
     r = rcloud_max_set+1.0;
-    //while(r>rcloud_max_set || r<rcloud_min_set)
+    while(r>rcloud_max_set || r<rcloud_min_set)
     {
+      if(nc > 1000)
+      {
+        printf("# Error, too many tries to generate r.\n");
+        exit(0);
+      }
+
       rnd = gsl_ran_gamma(gsl_r, a, 1.0);
 //      r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, mu/beta, beta);
 //      r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
       r = mu * F + (1.0-F) * s * rnd;
+
+      nc++;
     } 
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
