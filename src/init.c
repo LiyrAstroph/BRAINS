@@ -49,7 +49,7 @@ void init()
 
   /* set the range of continuum variation  */
   var_range_model[0][0] = log(1.0e-10);; // systematic error in continuum
-  var_range_model[0][1] = log(1.0e0);;
+  var_range_model[0][1] = log(1.0e6);;
 
   var_range_model[1][0] = -3.0; // log(sigma)
   var_range_model[1][1] = 1.0; 
@@ -65,7 +65,7 @@ void init()
 
   /* set the range of cloud radial distribution */
   rcloud_min_set = parset.tau_min_set;
-  rcloud_max_set = parset.tau_max_set*2.0;
+  rcloud_max_set = parset.tau_max_set*4.0;
 
   range_model[0].mbh = log(0.1);
   range_model[1].mbh = log(1000.0);
@@ -101,7 +101,7 @@ void init()
   range_model[1].q = 1.0;
 
   range_model[0].logse = log(1.0e-10);
-  range_model[1].logse = log(1.0e0);
+  range_model[1].logse = log(1.0e6);
 
   /* setup extra limits to the range of mu */
   range_model[1].mu = fmin(range_model[1].mu, log(rcloud_max_set));

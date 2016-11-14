@@ -96,11 +96,15 @@ void postprocess2d()
     post_model = malloc(size_of_modeltype);
     posterior_sample = malloc(num_ps * size_of_modeltype);
 
+    force_update = 1;
     which_parameter_update = -1; // force to update the transfer function
     which_particle_update = 0;
-    Fcon = Fcon_particles[which_particle_update];
     mean_lag = 0.0;
     nc = 0;
+
+    Fcon = Fcon_particles[which_particle_update];
+    Trans2D_at_veldata = Trans2D_at_veldata_particles[which_particle_update];
+    Fline2d_at_data = Fline_at_data_particles[which_particle_update];
 
     for(i=0; i<num_ps; i++)
     {
@@ -252,10 +256,13 @@ void reconstruct_line2d()
 
   // calculate light curves using the best model
   if(thistask == roottask)
-  {    
+  {
+    force_update = 1; 
     which_parameter_update = -1;
     which_particle_update = 0;
     Fcon = Fcon_particles[which_particle_update];
+    Trans2D_at_veldata = Trans2D_at_veldata_particles[which_particle_update];
+    Fline2d_at_data = Fline_at_data_particles[which_particle_update];
     
     calculate_con_from_model(best_model_line2d + num_params_blr *sizeof(double));
     gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
@@ -395,13 +402,13 @@ void reconstruct_line2d_init()
   }
 
   TransTau = malloc(parset.n_tau * sizeof(double));
-  Trans2D_at_veldata = malloc(parset.n_tau * n_vel_data * sizeof(double));
+  //Trans2D_at_veldata = malloc(parset.n_tau * n_vel_data * sizeof(double));
 
 
   TransV = malloc(parset.n_vel_recon * sizeof(double));
   Trans2D = malloc(parset.n_line_recon * parset.n_vel_recon * sizeof(double));
   
-  Fline2d_at_data = malloc(n_line_data * n_vel_data * sizeof(double));
+  //Fline2d_at_data = malloc(n_line_data * n_vel_data * sizeof(double));
 
   Tline = malloc(parset.n_line_recon * sizeof(double));
   Fline2d = malloc(parset.n_line_recon * parset.n_vel_recon * sizeof(double));
@@ -459,19 +466,46 @@ void reconstruct_line2d_init()
 
   prob_con_particles = malloc(parset.num_particles * sizeof(double));
   prob_con_particles_perturb = malloc(parset.num_particles * sizeof(double));
+
+  clouds_particles = malloc(parset.num_particles * sizeof(double *));
+  clouds_particles_perturb = malloc(parset.num_particles * sizeof(double *));
+  for(i=0; i<parset.num_particles; i++)
+  {
+    clouds_particles[i] = malloc(parset.n_cloud_per_task * sizeof(double));
+    clouds_particles_perturb[i] = malloc(parset.n_cloud_per_task * sizeof(double));
+  }
+
+  Trans2D_at_veldata_particles = malloc(parset.num_particles * sizeof(double *));
+  Trans2D_at_veldata_particles_perturb = malloc(parset.num_particles * sizeof(double *));
+  for(i=0; i<parset.num_particles; i++)
+  {
+    Trans2D_at_veldata_particles[i] = malloc(parset.n_tau * n_vel_data * sizeof(double));
+    Trans2D_at_veldata_particles_perturb[i] = malloc(parset.n_tau * n_vel_data * sizeof(double));
+  }
+
+  Fline_at_data_particles = malloc(parset.num_particles * sizeof(double *));
+  Fline_at_data_particles_perturb = malloc(parset.num_particles * sizeof(double *));
+  for(i=0; i<parset.num_particles; i++)
+  {
+    Fline_at_data_particles[i] = malloc(n_line_data * n_vel_data * sizeof(double));
+    Fline_at_data_particles_perturb[i] = malloc(n_line_data * n_vel_data * sizeof(double));
+  }
+  prob_line_particles = malloc(parset.num_particles * sizeof(double));
+  prob_line_particles_perturb = malloc(parset.num_particles * sizeof(double));
+
   return;
 }
 
 void reconstruct_line2d_end()
 {
   free(Tline);
-  free(Fline2d_at_data);
+  //free(Fline2d_at_data);
   free(Fline2d);
 
   free(TransTau);
   free(TransV);
   free(Trans2D);
-  free(Trans2D_at_veldata);
+  //free(Trans2D_at_veldata);
   int i;
   for(i=0; i<parset.num_particles; i++)
   {
@@ -493,6 +527,25 @@ void reconstruct_line2d_end()
 
   free(best_model_line2d);
   free(best_model_std_line2d);
+
+  for(i=0; i<parset.num_particles; i++)
+  {
+    free(clouds_particles[i]);
+    free(clouds_particles_perturb[i]);
+    free(Trans2D_at_veldata_particles[i]);
+    free(Trans2D_at_veldata_particles_perturb[i]);
+    free(Fline_at_data_particles[i]);
+    free(Fline_at_data_particles_perturb[i]);
+  }
+  free(clouds_particles);
+  free(clouds_particles_perturb);
+  free(Trans2D_at_veldata_particles);
+  free(Trans2D_at_veldata_particles_perturb);
+  free(Fline_at_data_particles);
+  free(Fline_at_data_particles_perturb);
+  free(prob_line_particles);
+  free(prob_line_particles_perturb);
+
   return;
 }
 
@@ -519,6 +572,21 @@ double prob_line2d(const void *model)
           parset.n_con_recon*sizeof(double));
       }
     }
+    else
+    {
+      if(force_update != 1)
+      {
+        prob_line_particles[which_particle_update] = prob_line_particles_perturb[which_particle_update];
+        if(param < num_params_blr -1 )
+        {
+          memcpy(Trans2D_at_veldata_particles[which_particle_update], Trans2D_at_veldata_particles_perturb[which_particle_update], 
+            parset.n_tau * n_vel_data * sizeof(double));
+
+          memcpy(Fline_at_data_particles[which_particle_update], Fline_at_data_particles_perturb[which_particle_update],
+            n_line_data * n_vel_data * sizeof(double));
+        }
+      }
+    } 
   }
 
   if(which_parameter_update >= num_params_blr)
@@ -549,15 +617,51 @@ double prob_line2d(const void *model)
     prob += prob_con_particles[which_particle_update];
   }
   
-  transfun_2d_cloud_direct(model, Vline_data, Trans2D_at_veldata, n_vel_data, 0);
-  calculate_line2d_from_blrmodel(model, Tline_data, Vline_data, Trans2D_at_veldata, Fline2d_at_data, n_line_data, n_vel_data);
-
-  for(i=0; i<n_line_data*n_vel_data; i++)
+   // only update transfer function when BLR model is changed.
+  if( (which_parameter_update < num_params_blr-1) || force_update == 1)
   {
-    dy = Fline2d_data[i] - Fline2d_at_data[i] ;
-    var2 = Flerrs2d_data[i]*Flerrs2d_data[i];
-    var2 += exp(pm[num_params_blr-1])*exp(pm[num_params_blr-1]);
-    prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
+    Trans2D_at_veldata = Trans2D_at_veldata_particles_perturb[which_particle_update];
+    transfun_2d_cloud_direct(model, Vline_data, Trans2D_at_veldata, n_vel_data, 0);
+  }
+  else
+  {
+    Trans2D_at_veldata = Trans2D_at_veldata_particles[which_particle_update];
+  }
+
+  if( (which_parameter_update!= num_params_blr-1 && which_parameter_update!= num_params_blr) || force_update == 1 )
+  {
+    Fline2d_at_data = Fline_at_data_particles_perturb[which_particle_update];
+    calculate_line2d_from_blrmodel(model, Tline_data, Vline_data, Trans2D_at_veldata, Fline2d_at_data, n_line_data, n_vel_data);
+
+    for(i=0; i<n_line_data*n_vel_data; i++)
+    {
+      dy = Fline2d_data[i] - Fline2d_at_data[i];
+      var2 = Flerrs2d_data[i]*Flerrs2d_data[i];
+      var2 += exp(pm[num_params_blr-1])*exp(pm[num_params_blr-1]);
+      prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
+    }
+    prob_line_particles_perturb[which_particle_update] = prob_line;
+  }
+  else
+  {
+    if( which_parameter_update == num_params_blr )
+    {
+      prob_line = prob_line_particles[which_particle_update];
+    }
+    else  /* line systematic error is updated */
+    {
+      /* re-point */
+      Fline2d_at_data = Fline_at_data_particles[which_particle_update];
+      for(i=0; i<n_line_data; i++)
+      {
+        dy = Fline2d_data[i] - Fline2d_at_data[i] ;
+        var2 = Flerrs2d_data[i]*Flerrs2d_data[i];
+        var2 += exp(pm[num_params_blr-1])*exp(pm[num_params_blr-1]);
+        prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
+      }
+      /* backup prob_line */
+      prob_line_particles_perturb[which_particle_update] = prob_line;
+    }
   }
 
   which_parameter_update_prev[which_particle_update] = which_parameter_update;
@@ -572,7 +676,6 @@ double prob_initial_line2d(const void *model)
   int i;
   double *pm = (double *)model;
   
-
   Fcon = Fcon_particles[which_particle_update];
   calculate_con_from_model(model + num_params_blr*sizeof(double));
   gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
@@ -584,7 +687,9 @@ double prob_initial_line2d(const void *model)
     prob += (-0.5*pow(fcon - Fcon_data[i],2.0)/var2) - 0.5*log(2.0*PI*var2);
   }
   prob_con_particles[which_particle_update] = prob;
-   
+  
+  Trans2D_at_veldata = Trans2D_at_veldata_particles[which_particle_update];
+  Fline2d_at_data = Fline_at_data_particles[which_particle_update];
   transfun_2d_cloud_direct(model, Vline_data, Trans2D_at_veldata, n_vel_data, 0);
   calculate_line2d_from_blrmodel(model, Tline_data, Vline_data, Trans2D_at_veldata, Fline2d_at_data, n_line_data, n_vel_data);
 
@@ -595,6 +700,7 @@ double prob_initial_line2d(const void *model)
     var2 += exp(pm[num_params_blr-1])*exp(pm[num_params_blr-1]);
     prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
   }
+  prob_line_particles[which_particle_update] = prob_line;
 
   prob += prob_line;
   return prob;

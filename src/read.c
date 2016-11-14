@@ -209,7 +209,7 @@ void read_parset()
       exit(0);
     }
 
-    if(parset.flag_narrowline == 1)
+    if(parset.flag_narrowline == 1 && parset.flag_dim == 2)
     {
       printf("# add narrow-line: flux=%e, width=%fkm/s, shift=%fkm/s.\n", parset.flux_narrowline, 
         parset.width_narrowline, parset.shift_narrowline);

@@ -59,6 +59,7 @@ int dnest_line1d(int argc, char **argv)
   
   if(parset.flag_postprc == 0)
   {
+    force_update = 0;
     dnest(argc, argv);
   }
     
@@ -134,7 +135,7 @@ double perturb_line1d(void *model)
   
   which_parameter_update = which;
 
-  which_level_update = which_level_update > (size_levels - 20)?(size_levels-20):which_level_update;
+  which_level_update = which_level_update > 10?10:which_level_update;
   which_level_update = which_level_update <0?0:which_level_update;
 
   if( which_level_update != 0)
@@ -224,7 +225,7 @@ double perturb_line1d(void *model)
       {
         width =  ( range_model[1].logse - range_model[0].logse );
       }
-      pm[8] += dnest_randh() * fmin(width, (range_model[1].logse - range_model[0].logse)*0.001 );
+      pm[8] += dnest_randh() * fmin(width, (range_model[1].logse - range_model[0].logse)*0.01 );
       wrap_limit(&(pm[which]), range_model[0].logse, range_model[1].logse);
       break;
 
@@ -233,7 +234,7 @@ double perturb_line1d(void *model)
       {
         width = var_range_model[0][1] - var_range_model[0][0];
       }
-      pm[9] += dnest_randh() * fmin(width, (var_range_model[0][1] - var_range_model[0][0]) * 0.001);
+      pm[9] += dnest_randh() * fmin(width, (var_range_model[0][1] - var_range_model[0][0]) * 0.01);
       wrap(&(pm[9]), var_range_model[0][0], var_range_model[0][1]);
       break;
     

@@ -80,6 +80,10 @@ void transfun_1d_cloud_direct(const void *pm)
   a = 1.0/beta/beta;
   s = mu/a;
   
+  if(perturb_accept[which_particle_update] == 1 && which_parameter_update_prev[which_particle_update] == 1)
+    memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
+      parset.n_cloud_per_task * sizeof(double));
+
   /* reset transfer function */
   for(i=0; i<parset.n_tau; i++)
   {
@@ -97,20 +101,30 @@ void transfun_1d_cloud_direct(const void *pm)
     else
       Lthe = 0.0;
     
-    nc = 0.0;
-    r = rcloud_max_set+1.0;
-    while(r>rcloud_max_set || r<rcloud_min_set)
+    // "which_parameter_update = -1" means that all parameters are updated, usually occurs at the 
+    // initial step.
+    if(which_parameter_update == 1 || force_update == 1 || which_parameter_update == -1 ) //
     {
-      if(nc > 1000)
+      nc = 0;
+      r = rcloud_max_set+1.0;
+      while(r>rcloud_max_set || r<rcloud_min_set)
       {
-        printf("# Error, too many tries to generate r.\n");
-        exit(0);
-      }
-      rnd = gsl_ran_gamma(gsl_r, a, 1.0);
-//      r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, mu/beta, beta);
+        if(nc > 1000)
+        {
+          printf("# Error, too many tries in generating ridial localtion of clouds.\n");
+          exit(0);
+        }
+        rnd = gsl_ran_gamma(gsl_r, a, 1.0);
 //      r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
+        r = mu * F + (1.0-F) * s * rnd;
+        nc++;
+      }
+      clouds_particles_perturb[which_particle_update][i] = rnd;
+    }
+    else
+    {
+      rnd = clouds_particles[which_particle_update][i];
       r = mu * F + (1.0-F) * s * rnd;
-      nc++;
     }
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
@@ -145,6 +159,10 @@ void transfun_1d_cloud_direct(const void *pm)
     //Trans1D[idt] += pow(1.0/r, 2.0*(1 + gam)) * weight;
     Trans1D[idt] += weight;
   }
+
+  if(which_parameter_update == -1)
+    memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
+      parset.n_cloud_per_task * sizeof(double));
 
   /* normalize transfer function */
   /*Anorm = 0.0;
@@ -251,6 +269,10 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
   lambda = model->lambda;
   q = model->q;
   
+  if(perturb_accept[which_particle_update] == 1 && which_parameter_update_prev[which_particle_update] == 1)
+    memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
+      parset.n_cloud_per_task * sizeof(double));
+
   dV =(transv[1] - transv[0]); // velocity grid width
 
   for(i=0; i<parset.n_tau; i++)
@@ -282,25 +304,31 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
     }
     else
       Lthe = 0.0;
-    //Lthe = gsl_rng_uniform(gsl_r) * model->opn*PI/180.0;
 
-    nc = 0;
-    r = rcloud_max_set+1.0;
-    while(r>rcloud_max_set || r<rcloud_min_set)
+    // which_parameter_update == 1 ==> beta is being updated.
+    if(which_parameter_update == 1 || force_update == 1 || which_parameter_update == -1 )
     {
-      if(nc > 1000)
+      nc = 0;
+      r = rcloud_max_set+1.0;
+      while(r>rcloud_max_set || r<rcloud_min_set)
       {
-        printf("# Error, too many tries to generate r.\n");
-        exit(0);
-      }
-
-      rnd = gsl_ran_gamma(gsl_r, a, 1.0);
-//      r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, mu/beta, beta);
+        if(nc > 1000)
+        {
+          printf("# Error, too many tries in generating ridial localtion of clouds.\n");
+          exit(0);
+        }
+        rnd = gsl_ran_gamma(gsl_r, a, 1.0);
 //      r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
+        r = mu * F + (1.0-F) * s * rnd;
+        nc++;
+      }
+      clouds_particles_perturb[which_particle_update][i] = rnd;
+    }
+    else
+    {
+      rnd = clouds_particles[which_particle_update][i];
       r = mu * F + (1.0-F) * s * rnd;
-
-      nc++;
-    } 
+    }
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
     x = r * cos(phi); 
@@ -392,6 +420,10 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
       trans2d[idt*n_vel + idV] += weight;
     }
   }
+
+  if(which_parameter_update == -1)
+    memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
+      parset.n_cloud_per_task * sizeof(double));
 
   /* normalize transfer function */
   /*Anorm = 0.0;

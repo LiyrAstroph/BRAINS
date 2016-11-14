@@ -62,6 +62,7 @@ int dnest_line2d(int argc, char **argv)
 
   if(parset.flag_postprc == 0)
   {
+    force_update = 0;
     dnest(argc, argv);
   }
   
@@ -141,7 +142,7 @@ double perturb_line2d(void *model)
   
   which_parameter_update = which;
   
-  which_level_update = which_level_update > (size_levels - 20)?(size_levels-20):which_level_update;
+  which_level_update = which_level_update > 10?10:which_level_update;
   which_level_update = which_level_update <0?0:which_level_update;
 
   if( which_level_update != 0)
@@ -151,7 +152,6 @@ double perturb_line2d(void *model)
     width = limit2 - limit1;
   }
   
-
   switch(which)
   {
   	case 0: // mu
