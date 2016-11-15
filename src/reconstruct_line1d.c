@@ -513,7 +513,8 @@ double prob_line1d(const void *model)
     for(i=0; i<n_con_data; i++)
     {
       fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, Tcon_data[i], gsl_acc);
-      var2 = Fcerrs_data[i] * Fcerrs_data[i] + exp(pm[num_params_blr]) * exp(num_params_blr);
+      var2 = Fcerrs_data[i] * Fcerrs_data[i];
+      var2+= exp(pm[num_params_blr]) * exp(num_params_blr);
       prob += (-0.5*pow(fcon - Fcon_data[i], 2.0)/var2) - 0.5*log(2.0*PI*var2);
     }
 

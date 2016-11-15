@@ -93,9 +93,15 @@ double log_likelihoods_cal_initial_con(const void *model)
 double perturb_con(void *model)
 {
   double *pm = (double *)model;
-  double logH = 0.0, limit1, limit2, width;
+  double logH = 0.0, limit1, limit2, width, rnd;
+  int which;
   
-  int which = dnest_rand_int(num_params);
+  rnd = dnest_rand();
+  if(rnd < 0.5)
+    which = dnest_rand_int(num_params_var);
+  else
+    which = dnest_rand_int(parset.n_con_recon) + num_params_var;
+
   if(which >= num_params || which < 0)
   {
     printf("# Error: Incorrect which.\n");
@@ -105,7 +111,7 @@ double perturb_con(void *model)
   which_parameter_update = which;
   
   /* level-dependent width */
-  which_level_update = which_level_update > (size_levels - 20)?(size_levels-20):which_level_update;
+  which_level_update = which_level_update > (size_levels - 10)?(size_levels-10):which_level_update;
   which_level_update = which_level_update <0?0:which_level_update;
   if( which_level_update != 0)
   {

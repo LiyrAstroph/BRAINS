@@ -140,7 +140,7 @@ double perturb_line1d(void *model)
   
   which_parameter_update = which;
 
-  which_level_update = which_level_update > 10?10:which_level_update;
+  which_level_update = which_level_update > (size_levels - 10)?(size_levels -10):which_level_update;
   which_level_update = which_level_update <0?0:which_level_update;
 
   if( which_level_update != 0)

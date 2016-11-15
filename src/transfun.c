@@ -157,12 +157,13 @@ void transfun_1d_cloud_direct(const void *pm)
   }
 
   /* normalize transfer function */
-  /*Anorm = 0.0;
+  Anorm = 0.0;
   for(i=0;i<parset.n_tau;i++)
   {
-    Anorm += Trans1D[i] * dTransTau;
-  }*/
-  Anorm = 0.5*parset.n_cloud_per_task * dTransTau;
+    Anorm += Trans1D[i];
+  }
+  Anorm *= dTransTau;
+  //Anorm = 0.5*parset.n_cloud_per_task * dTransTau;
   /* check if we get a zero transfer function */
   if(Anorm > 0.0)
   {
@@ -411,14 +412,14 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
   }
 
   /* normalize transfer function */
-  /*Anorm = 0.0;
+  Anorm = 0.0;
   for(i=0; i<parset.n_tau; i++)
     for(j=0; j<n_vel; j++)
     {
-      Anorm += trans2d[i*n_vel+j] * dV * dTransTau;
-    }*/
-  
-  Anorm = 0.5*parset.n_cloud_per_task * parset.n_vel_per_cloud * dV * dTransTau;
+      Anorm += trans2d[i*n_vel+j];
+    }
+  Anorm *= (dV * dTransTau);
+  //Anorm = 0.5*parset.n_cloud_per_task * parset.n_vel_per_cloud * dV * dTransTau;
   /* check if we get a zero transfer function */
   if(Anorm > 0.0)
   {

@@ -630,7 +630,7 @@ double prob_line2d(const void *model)
     Trans2D_at_veldata = Trans2D_at_veldata_particles[which_particle_update];
   }
 
-  if( (which_parameter_update!= num_params_blr-1 && which_parameter_update!= num_params_blr) || force_update == 1 )
+  if( which_parameter_update < num_params_blr-1 || which_parameter_update > num_params_blr || force_update == 1 )
   {
     Fline2d_at_data = Fline_at_data_particles_perturb[which_particle_update];
     calculate_line2d_from_blrmodel(model, Tline_data, Vline_data, Trans2D_at_veldata, Fline2d_at_data, n_line_data, n_vel_data);

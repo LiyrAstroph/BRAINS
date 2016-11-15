@@ -5,12 +5,12 @@
 FileDir                     /home/liyropt/Projects/GIT/BRAINS
 %FileDir                     /ihepbatch/mbhd01/user/liyanrong/RM/MCMC_BRAINS/mrk493
 
-FlagDim                     2                           % 0, only continuum; 1, 1d line; 2, 2d line
+FlagDim                     1                           % 0, only continuum; 1, 1d line; 2, 2d line
 %===============================
 % data file
-ContinnumFile               data/arp151_con.txt         % file for contnnum data
-LineFile                    data/arp151_hb.txt          % file for line data
-Line2DFile                  data/arp151_hb2d.txt        % file for line 2d data
+ContinnumFile               data/mrk493_con.txt         % file for contnnum data
+LineFile                    data/mrk493_hb.txt          % file for line data
+Line2DFile                  data/mrk493_hb2d.txt        % file for line 2d data
 %===============================
 % reconstruction
 NConRecon                   100                         % number of points for continuum reconstruction
@@ -26,12 +26,12 @@ Line2DDataConstructFileOut  data/pline2d_data.txt       % output filename for 2d
 Tran2DFileOut               data/tran2d.txt             % output filename for 2d transfer function
 Tran2DDataFileOut           data/tran2d_data.txt             % output filename for 2d transfer function
 
-NCloudPerCore               1000                        % number of clouds per task
+NCloudPerCore               5000                        % number of clouds per task
 NVPerCloud                  10                          % number of velocities per cloud
 
 NTau                        100                         % number of time-lag points calculated in transfer function
 TauMinSet                   0.0                         % minimum time lag calculated
-TauMaxSet                   20.0                        % maximum time lag calculated
+TauMaxSet                   50.0                        % maximum time lag calculated
 
 FlagCloudsOut               0                           % 1, save clouds at the last run; 0, do not save
 CloudsFileOut               data/clouds.txt             % output filename for clouds 
@@ -41,7 +41,7 @@ InstRes                     220                         % instrument resolution,
 %===============================
 % narrow-line component
 % use a gaussian to model the narrow-line component
-FlagNarrowLine              1                           % 0, no narrow line; 1, add narrow line
+FlagNarrowLine              0                           % 0, no narrow line; 1, add narrow line
 FluxNarrowLine              0.507                       % 
 WidthNarrowLine             355                         % km/s
 ShiftNarrowLine             -160                        % km/s, with respect to broad line center.  
@@ -52,5 +52,5 @@ ShiftNarrowLine             -160                        % km/s, with respect to 
 % 1: fixed; 0: not fixed;
 % values are separated by ":"
 
-BLRParFix                   1101100000
+BLRParFix                   0000000000
 BLRParFixVal                1.38:1.0:22.0:34.5           
