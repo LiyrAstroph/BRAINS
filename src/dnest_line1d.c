@@ -119,12 +119,17 @@ double log_likelihoods_cal_initial_line1d(const void *model)
 double perturb_line1d(void *model)
 {
   double *pm = (double *)model;
-  double logH = 0.0, limit1, limit2, width;
+  double logH = 0.0, limit1, limit2, width, rnd;
   int which;
 
   do
   {
-    which = dnest_rand_int(num_params);
+    rnd = dnest_rand();
+    if(rnd < 0.5)
+      which = dnest_rand_int(num_params_blr + num_params_var);
+    else
+      which = dnest_rand_int(parset.n_con_recon) + num_params_blr + num_params_var;
+
   }while(par_fix[which]==1);
 
   if(which >= num_params || which < 0)

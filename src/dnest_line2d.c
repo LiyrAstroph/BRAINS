@@ -124,13 +124,17 @@ double log_likelihoods_cal_initial_line2d(const void *model)
 double perturb_line2d(void *model)
 {
   double *pm = (double *)model;
-  double logH = 0.0, limit1, limit2, width;
+  double logH = 0.0, limit1, limit2, width, rnd;
   int which; 
 
   /* fixed parameters need not to update */
   do
   {
-    which = dnest_rand_int(num_params);
+    rnd = dnest_rand();
+    if(rnd < 0.5)
+      which = dnest_rand_int(num_params_blr + num_params_var);
+    else
+      which = dnest_rand_int(parset.n_con_recon) + num_params_blr + num_params_var;
   }while(par_fix[which] == 1);
  
 
@@ -142,7 +146,7 @@ double perturb_line2d(void *model)
   
   which_parameter_update = which;
   
-  which_level_update = which_level_update > 10?10:which_level_update;
+  which_level_update = which_level_update > (size_levels-10)?(size_levels-10):which_level_update;
   which_level_update = which_level_update <0?0:which_level_update;
 
   if( which_level_update != 0)

@@ -574,17 +574,18 @@ double prob_line2d(const void *model)
     }
     else
     {
-      if(force_update != 1)
+      prob_line_particles[which_particle_update] = prob_line_particles_perturb[which_particle_update];
+      if(param < num_params_blr -1 )
       {
-        prob_line_particles[which_particle_update] = prob_line_particles_perturb[which_particle_update];
-        if(param < num_params_blr -1 )
-        {
-          memcpy(Trans2D_at_veldata_particles[which_particle_update], Trans2D_at_veldata_particles_perturb[which_particle_update], 
+        memcpy(Trans2D_at_veldata_particles[which_particle_update], Trans2D_at_veldata_particles_perturb[which_particle_update], 
             parset.n_tau * n_vel_data * sizeof(double));
 
-          memcpy(Fline_at_data_particles[which_particle_update], Fline_at_data_particles_perturb[which_particle_update],
+        memcpy(Fline_at_data_particles[which_particle_update], Fline_at_data_particles_perturb[which_particle_update],
             n_line_data * n_vel_data * sizeof(double));
-        }
+
+        if(param == 1)
+          memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
+            parset.n_cloud_per_task * sizeof(double));
       }
     } 
   }
@@ -605,7 +606,8 @@ double prob_line2d(const void *model)
     for(i=0; i<n_con_data; i++)
     {
       fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, Tcon_data[i], gsl_acc);
-      var2 = Fcerrs_data[i] * Fcerrs_data[i] + exp(pm[num_params_blr]) * exp(num_params_blr);
+      var2 = Fcerrs_data[i] * Fcerrs_data[i];
+      var2+= exp(pm[num_params_blr]) * exp(num_params_blr);
       prob += (-0.5*pow(fcon - Fcon_data[i],2.0)/var2) - 0.5*log(2.0*PI*var2);
     }
     prob_con_particles_perturb[which_particle_update] = prob;
@@ -701,6 +703,9 @@ double prob_initial_line2d(const void *model)
     prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
   }
   prob_line_particles[which_particle_update] = prob_line;
+
+  memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
+            parset.n_cloud_per_task * sizeof(double));
 
   prob += prob_line;
   return prob;

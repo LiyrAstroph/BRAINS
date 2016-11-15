@@ -475,17 +475,18 @@ double prob_line1d(const void *model)
      * Note that the (num_par_blr-1)-th parameter is systematic error of line.
      * when this parameter is updated, Trans1D and Fline are unchanged.
      */
-      if(force_update != 1)
+      prob_line_particles[which_particle_update] = prob_line_particles_perturb[which_particle_update];
+      if( param < num_params_blr-1 )
       {
-        prob_line_particles[which_particle_update] = prob_line_particles_perturb[which_particle_update];
-        if( param < num_params_blr-1 )
-        {
-          memcpy(Trans1D_particles[which_particle_update], Trans1D_particles_perturb[which_particle_update], 
+        memcpy(Trans1D_particles[which_particle_update], Trans1D_particles_perturb[which_particle_update], 
             parset.n_tau * sizeof(double));
 
-          memcpy(Fline_at_data_particles[which_particle_update], Fline_at_data_particles_perturb[which_particle_update], 
+        memcpy(Fline_at_data_particles[which_particle_update], Fline_at_data_particles_perturb[which_particle_update], 
             n_line_data * sizeof(double));
-        }
+
+        if(param == 1)
+          memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
+            parset.n_cloud_per_task * sizeof(double));
       }
     }  
   }
@@ -544,7 +545,7 @@ double prob_line1d(const void *model)
   /* no need to calculate line when only systematic error parameters are updated.
    * otherwise, always need to calculate line.
    */
-  if( (which_parameter_update!= num_params_blr-1 && which_parameter_update!= num_params_blr) || force_update == 1 )
+  if( which_parameter_update < num_params_blr-1 || which_parameter_update > num_params_blr || force_update == 1 )
   {
     /* re-point */
     Fline_at_data = Fline_at_data_particles_perturb[which_particle_update];
@@ -622,6 +623,9 @@ double prob_initial_line1d(const void *model)
     prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
   }
   prob_line_particles[which_particle_update] = prob_line;
+
+  memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
+            parset.n_cloud_per_task * sizeof(double));
 
   prob += prob_line;
   return prob;
