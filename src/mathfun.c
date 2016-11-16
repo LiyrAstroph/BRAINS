@@ -99,6 +99,35 @@ void multiply_vec2mat(double * x, double * a, int n)
 
 /*!
  * This function calculate determinant of matrix A.
+ * There are two versions in the internet, the main difference lies at dealing with the sign of det.
+ * The version II is verifed to be INCORRECT.
+ * Note that LAPACK is written in C, the indix diffes by 1 with that in C.
+ * ================================
+ * Version I:
+ * ================================
+ *  det = 1.0;
+ *  for(i=0; i<n; i++)
+ * {
+ *   det *= a[i*n+i];
+ *   if (ipiv[i] != i+1) 
+ *   {
+ *     det = -det;
+ *   }
+ * }
+ * ================================
+ * Version II:
+ * ================================
+ *  det = 1.0;
+ *  for(i=0; i<n; i++)
+ * {
+ *   det *= a[i*n+i];
+ *   if (ipiv[i] != i+1) 
+ *   {
+ *     ipiv[ipiv[i]-1] = ipiv[i];
+ *     det = -det;
+ *   }
+ * }
+ * =================================
  */
 double det_mat(double *a, int n, int *info)
 {
@@ -119,16 +148,15 @@ double det_mat(double *a, int n, int *info)
   det = 1.0;
   for(i=0; i<n; i++)
   {
+    printf("%d\n", ipiv[i]);
     det *= a[i*n+i];
-    if (ipiv[i] != i+1)
+    if (ipiv[i] != i+1) // note that LAPACK is written in C, the indix diffes by 1 with C.
     {
-      //ipiv[ipiv[i]] = ipiv[i];
       det = -det;
     }
   }
-  det=fabs(det);
+  //det=fabs(det);
   free(ipiv);
-
   return det;
 }
 
@@ -259,4 +287,26 @@ double * array_malloc(int n)
   }
 
   return array;
+}
+
+void test_mathfun()
+{
+  double *A, det;
+  int n = 3, info;
+  A = malloc(n*n*sizeof(double));
+
+  A[0*n+0] = 1.0;
+  A[0*n+1] = 10.3;
+  A[0*n+2] = 6.3;
+
+  A[1*n+0] = -8.3;
+  A[1*n+1] = -8.0;
+  A[1*n+2] = 5.3;
+
+  A[2*n+0] = 0.3;
+  A[2*n+1] = -9.3;
+  A[2*n+2] = -3.0;
+  
+  det = det_mat(A, n, &info);
+  printf("%f\n", det);
 }

@@ -91,3 +91,4 @@ void Chol_decomp_U(double *a, int n, int *info);
 void Chol_decomp_L(double *a, int n, int *info);
 double ** matrix_malloc(int n1, int n2);
 double * array_malloc(int n);
+void test_mathfun();
