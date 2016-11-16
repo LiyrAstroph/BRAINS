@@ -26,11 +26,9 @@
 #include "dnest_con.h"
 #include "proto.h"
 
-
 /*!
  *  This function run denst sampling for continuum.
  */
-
 int dnest_con(int argc, char **argv)
 {
   num_params_var = 4;
@@ -57,9 +55,9 @@ int dnest_con(int argc, char **argv)
   return 0;
 }
 
-/*===========================================*/
-// users responsible for following struct definitions
-
+/*!
+ * This function generate a sample from the prior.
+ */
 void from_prior_con(void *model)
 {
   int i;
@@ -73,9 +71,13 @@ void from_prior_con(void *model)
   for(i=0; i<parset.n_con_recon; i++)
     pm[i+num_params_var] = dnest_randn();
 
+  /* all parameters need to update at the initial step */
   which_parameter_update = -1;
 }
 
+/*!
+ * This function calculate log likelihood probability.
+ */
 double log_likelihoods_cal_con(const void *model)
 {
   double logL;
@@ -83,6 +85,9 @@ double log_likelihoods_cal_con(const void *model)
   return logL;
 }
 
+/*!
+ * This function calculate log likelihood probability at the initial step.
+ */
 double log_likelihoods_cal_initial_con(const void *model)
 {
   double logL;
@@ -90,12 +95,16 @@ double log_likelihoods_cal_initial_con(const void *model)
   return logL;
 }
 
+/*!
+ * This function generate a new move of parameters.
+ */
 double perturb_con(void *model)
 {
   double *pm = (double *)model;
   double logH = 0.0, limit1, limit2, width, rnd;
   int which;
   
+  /* sample variability parameter more frequently */
   rnd = dnest_rand();
   if(rnd < 0.5)
     which = dnest_rand_int(num_params_var);
@@ -172,6 +181,9 @@ double perturb_con(void *model)
   return logH;
 }
 
+/*!
+ * This function print the particle into the file.
+ */
 void print_particle_con(FILE *fp, const void *model)
 {
   int i;
@@ -184,16 +196,25 @@ void print_particle_con(FILE *fp, const void *model)
   fprintf(fp, "\n");
 }
 
+/*!
+ * This function copy the model from src to dest.
+ */
 void copy_model_con(void *dest, const void *src)
 {
   memcpy(dest, src, size_of_modeltype);
 }
 
+/*!
+ * This function create a model.
+ */
 void *create_model_con()
 {
   return (void *)malloc( size_of_modeltype );
 }
 
+/*!
+ * This function return the number of parameters.
+ */
 int get_num_params_con()
 {
   return num_params;

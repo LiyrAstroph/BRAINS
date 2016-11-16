@@ -466,16 +466,21 @@ double prob_line1d(const void *model)
        * when this paramete is updated, Fcon is unchanged.  
        */
       if( param > num_params_blr )
+      {
         memcpy(Fcon_particles[which_particle_update], Fcon_particles_perturb[which_particle_update], 
           parset.n_con_recon*sizeof(double));
+
+        memcpy(Fline_at_data_particles[which_particle_update], Fline_at_data_particles_perturb[which_particle_update], 
+            n_line_data * sizeof(double));
+      }
     }
     else 
     {
       /* BLR parameter is udated 
-     * Note that the (num_par_blr-1)-th parameter is systematic error of line.
+     * Note a) that the (num_par_blr-1)-th parameter is systematic error of line.
      * when this parameter is updated, Trans1D and Fline are unchanged.
+     *      b) Fline is always changed, except param = num_params_blr-1 or num_params_blr.
      */
-      prob_line_particles[which_particle_update] = prob_line_particles_perturb[which_particle_update];
       if( param < num_params_blr-1 )
       {
         memcpy(Trans1D_particles[which_particle_update], Trans1D_particles_perturb[which_particle_update], 
@@ -488,7 +493,10 @@ double prob_line1d(const void *model)
           memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
             parset.n_cloud_per_task * sizeof(double));
       }
-    }  
+    }      
+
+    if( param != num_params_blr )
+      prob_line_particles[which_particle_update] = prob_line_particles_perturb[which_particle_update];  
   }
 
   /* only update continuum reconstruction when the corresponding parameters are updated

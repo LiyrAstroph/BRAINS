@@ -14,12 +14,7 @@
 
 #include <stdbool.h>
 
-/*===========================================*/
-// users responsible for following struct definitions 
-
-// model
-
-/*==========================================*/
+/* size of the model type */
 extern int size_of_modeltype;
 
 /* best model */
@@ -43,4 +38,5 @@ double (*perturb)(void *model);
 void (*copy_model)(void *dest, const void *src);
 void* (*create_model)();
 int (*get_num_params)();
+
 #endif

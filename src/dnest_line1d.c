@@ -67,9 +67,9 @@ int dnest_line1d(int argc, char **argv)
 
 }
 
-
-/*===========================================*/
-// users responsible for following struct definitions
+/*!
+ * This function generate a sample from the prior.
+ */
 void from_prior_line1d(void *model)
 {
   int i;
@@ -98,10 +98,14 @@ void from_prior_line1d(void *model)
   for(i=0; i<parset.n_con_recon; i++)
     pm[i+num_params_var+num_params_blr] = dnest_randn();
 
+  /* all parameters need to update at the initial step */
   which_parameter_update = -1;
 
 }
 
+/*!
+ * This function calculate log likelihood probability.
+ */
 double log_likelihoods_cal_line1d(const void *model)
 {
   double logL;
@@ -109,6 +113,9 @@ double log_likelihoods_cal_line1d(const void *model)
   return logL;
 }
 
+/*!
+ * This function calculate log likelihood probability at the initial step.
+ */
 double log_likelihoods_cal_initial_line1d(const void *model)
 {
   double logL;
@@ -122,6 +129,10 @@ double perturb_line1d(void *model)
   double logH = 0.0, limit1, limit2, width, rnd;
   int which;
 
+  /*
+   * sample BLR and variability parameters more frequently; 
+   * fixed parameter needs not to update.
+   */
   do
   {
     rnd = dnest_rand();
@@ -140,6 +151,7 @@ double perturb_line1d(void *model)
   
   which_parameter_update = which;
 
+  /* level-dependent width */
   which_level_update = which_level_update > (size_levels - 10)?(size_levels -10):which_level_update;
   which_level_update = which_level_update <0?0:which_level_update;
 
@@ -157,7 +169,6 @@ double perturb_line1d(void *model)
       {
         width = ( range_model[1].mu - range_model[0].mu );
       }
-
       pm[0] += dnest_randh() * width;
       wrap(&(pm[0]), range_model[0].mu, range_model[1].mu);
       break;
@@ -284,6 +295,9 @@ double perturb_line1d(void *model)
   return logH;
 }
 
+/*!
+ * This function print the particle into the file.
+ */
 void print_particle_line1d(FILE *fp, const void *model)
 {
   int i;
@@ -296,16 +310,25 @@ void print_particle_line1d(FILE *fp, const void *model)
   fprintf(fp, "\n");
 }
 
+/*!
+ * This function copy the model from src to dest.
+ */
 void copy_model_line1d(void *dest, const void *src)
 {
   memcpy(dest, src, size_of_modeltype);
 }
 
+/*!
+ * This function create a model.
+ */
 void *create_model_line1d()
 {
   return (void *)malloc( size_of_modeltype );
 }
 
+/*!
+ * This function return the number of parameters.
+ */
 int get_num_params_line1d()
 {
   return num_params;

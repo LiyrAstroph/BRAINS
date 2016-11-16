@@ -97,19 +97,22 @@ void multiply_vec2mat(double * x, double * a, int n)
     }
 }
 
-/* get determinant of matrix A */
+/*!
+ * This function calculate determinant of matrix A.
+ */
 double det_mat(double *a, int n, int *info)
 {
   int * ipiv;
   int i;
   double det;
   ipiv=malloc(n*sizeof(int));
-
+  
+  /* LU decomposition */
 //  dgetrf_(&n, &n, a, &n, ipiv, info);
   *info=LAPACKE_dgetrf(LAPACK_ROW_MAJOR, n, n, a, n, ipiv);
   if(*info!=0)
   {
-    printf("Wrong!\n");
+    printf("# Error, Wrong in det_mat!\n");
     exit(-1);
   }
 
@@ -117,30 +120,14 @@ double det_mat(double *a, int n, int *info)
   for(i=0; i<n; i++)
   {
     det *= a[i*n+i];
-    if (ipiv[i] != i)
+    if (ipiv[i] != i+1)
     {
-      ipiv[ipiv[i]] = ipiv[i];
+      //ipiv[ipiv[i]] = ipiv[i];
       det = -det;
     }
   }
   det=fabs(det);
   free(ipiv);
-/*  char uplo='U';
-  int i;
-  double det;
-//  dpotrf_(&uplo, &n, a, &n, info);
-  LAPACKE_dpotrf(LAPACK_ROW_MAJOR, uplo, n, a, n);
-  det=1.0;
-  for(i=0;i<n;i++)
-    det *= a[i*n+i];
-  det *=det;*/
-
-/*  int s;
-  double det;
-  gsl_matrix_view m = gsl_matrix_view_array (a, n, n);
-  gsl_permutation * p = gsl_permutation_alloc (n);
-  gsl_linalg_LU_decomp(&m.matrix, p, &s );
-  det = gsl_linalg_LU_det(&m.matrix, s);*/
 
   return det;
 }
@@ -152,6 +139,7 @@ double lndet_mat(double *a, int n, int *info)
   double lndet;
   ipiv=malloc(n*sizeof(int));
 
+  /* LU factorization */
 //  dgetrf_(&n, &n, a, &n, ipiv, info);
   *info=LAPACKE_dgetrf(LAPACK_ROW_MAJOR, n, n, a, n, ipiv);
   if(*info!=0)

@@ -69,8 +69,6 @@ int dnest_line2d(int argc, char **argv)
   return 0;
 }
 
-/*===========================================*/
-// users responsible for following struct definitions
 
 void from_prior_line2d(void *model)
 {
@@ -146,6 +144,7 @@ double perturb_line2d(void *model)
   
   which_parameter_update = which;
   
+  /* level-dependent width */
   which_level_update = which_level_update > (size_levels-10)?(size_levels-10):which_level_update;
   which_level_update = which_level_update <0?0:which_level_update;
 
@@ -165,7 +164,6 @@ double perturb_line2d(void *model)
         limit2 = range_model[1].mu;
         width = ( limit2 - limit1 );
       }
-
       pm[0] += dnest_randh() * width;
       wrap(&(pm[0]), range_model[0].mu, range_model[1].mu);
       break;

@@ -570,11 +570,13 @@ double prob_line2d(const void *model)
       {
         memcpy(Fcon_particles[which_particle_update], Fcon_particles_perturb[which_particle_update], 
           parset.n_con_recon*sizeof(double));
+
+        memcpy(Fline_at_data_particles[which_particle_update], Fline_at_data_particles_perturb[which_particle_update],
+            n_line_data * n_vel_data * sizeof(double));
       }
     }
     else
     {
-      prob_line_particles[which_particle_update] = prob_line_particles_perturb[which_particle_update];
       if(param < num_params_blr -1 )
       {
         memcpy(Trans2D_at_veldata_particles[which_particle_update], Trans2D_at_veldata_particles_perturb[which_particle_update], 
@@ -588,6 +590,9 @@ double prob_line2d(const void *model)
             parset.n_cloud_per_task * sizeof(double));
       }
     } 
+    
+    if( param != num_params_blr)
+      prob_line_particles[which_particle_update] = prob_line_particles_perturb[which_particle_update];
   }
 
   if(which_parameter_update >= num_params_blr)

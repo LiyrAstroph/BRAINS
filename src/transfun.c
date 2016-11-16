@@ -163,7 +163,6 @@ void transfun_1d_cloud_direct(const void *pm)
     Anorm += Trans1D[i];
   }
   Anorm *= dTransTau;
-  //Anorm = 0.5*parset.n_cloud_per_task * dTransTau;
   /* check if we get a zero transfer function */
   if(Anorm > 0.0)
   {
@@ -183,6 +182,9 @@ void transfun_1d_cloud_direct(const void *pm)
   return;
 }
 
+/*!
+ * This function caclulate 2d line from obtained transfer function.
+ */
 void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const double *transv, const double *trans2d, 
                                               double *fl2d, int nl, int nv)
 {
@@ -223,8 +225,8 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
     {
       for(i=0; i<nv; i++)
       {
-        fl2d[j*nv + i] += parset.flux_narrowline * 
-        exp( -0.5 * pow( (transv[i] - parset.shift_narrowline)/(parset.width_narrowline), 2.0) ) * line_scale;
+        fl2d[j*nv + i] += parset.flux_narrowline  
+               * exp( -0.5 * pow( (transv[i] - parset.shift_narrowline)/(parset.width_narrowline), 2.0) ) * line_scale;
       }
     } 
   }
@@ -419,7 +421,6 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
       Anorm += trans2d[i*n_vel+j];
     }
   Anorm *= (dV * dTransTau);
-  //Anorm = 0.5*parset.n_cloud_per_task * parset.n_vel_per_cloud * dV * dTransTau;
   /* check if we get a zero transfer function */
   if(Anorm > 0.0)
   {
