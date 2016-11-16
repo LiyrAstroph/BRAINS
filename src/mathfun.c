@@ -22,39 +22,60 @@
 #include "allvars.h"
 #include "proto.h"
 
+/*!
+ * This function calculates matrix multiply C(nxn) = A(nxn) * B(nxn).
+ */
 void multiply_mat(double * a, double *b, double *c, int n)
 {
   cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, n, n, n, 1.0f
                              , a, n, b, n, 0.0f, c, n);
 }
+
+/*!
+ * This function calculates matrix multiply C(nxn) = A^T(nxn) * B(nxn).
+ */
 void multiply_mat_transposeA(double * a, double *b, double *c, int n)
 {
   cblas_dgemm(CblasRowMajor, CblasTrans, CblasNoTrans, n, n, n, 1.0f
                              , a, n, b, n, 0.0f, c, n);
 }
 
+/*!
+ * This function calculates matrix multiply C(nxn) = A(nxn) * B^T(nxn).
+ */
 void multiply_mat_transposeB(double * a, double *b, double *c, int n)
 {
   cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasTrans, n, n, n, 1.0f
                              , a, n, b, n, 0.0f, c, n);
 }
 
+/*!
+ * This function calculates matrix multiply Y(n) = A^T(nxn) * X(n).
+ */
 void multiply_matvec_transposeA(double *a, double *x, int n, double *y)
 {
   cblas_dgemv(CblasRowMajor, CblasTrans, n, n, 1.0f, a, n, x, 1, 0.0f, y, 1);
 }
 
+/*!
+ * This function calculates matrix multiply Y(n) = A(nxn) * X(n).
+ */
 void multiply_matvec(double *a, double *x, int n, double *y)
 {
   cblas_dgemv(CblasRowMajor, CblasNoTrans, n, n, 1.0f, a, n, x, 1, 0.0f, y, 1);
 }
 
-/* y(m) = a(m, n) * x(n) */
+/*!
+ * This function calculates  Y(m) = A(m, n) * X(n).
+ */
 void multiply_matvec_MN(double * a, int m, int n, double *x, double *y)
 {
   cblas_dgemv(CblasRowMajor, CblasNoTrans, m, n, 1.0f, a, n, x, 1, 0.0f, y, 1);
 }
 
+/*!
+ * This functions calculate A^-1(nxn).
+ */
 void inverse_mat(double * a, int n, int *info)
 {
   int * ipiv;
@@ -70,6 +91,9 @@ void inverse_mat(double * a, int n, int *info)
   return;
 }
 
+/*!
+ * This function calculate eigenvectors and eigenvalues of matrix.
+ */
 void eigen_sym_mat(double *a, int n, double *val, int *info)
 {
     char jobz='V', uplo='U';
@@ -86,6 +110,9 @@ void eigen_sym_mat(double *a, int n, double *val, int *info)
     return;
 }
 
+/*!
+ * This function calculate A(nxn) = X^T(1xn)*X(1xn)
+ */
 void multiply_vec2mat(double * x, double * a, int n)
 {
 //  cblas_dsyr(CblasRowMajor, CblasUpper, n, 1.0f, x, 1, a, n);
@@ -98,36 +125,38 @@ void multiply_vec2mat(double * x, double * a, int n)
 }
 
 /*!
- * This function calculate determinant of matrix A.
- * There are two versions in the internet, the main difference lies at dealing with the sign of det.
- * The version II is verifed to be INCORRECT.
+ * This function calculates determinant of matrix A. \n
+ * There are two versions in the internet, the main difference lies at dealing with the sign of det. \n
+ * The version II is verifed to be \b INCORRECT. \n
  * Note that LAPACK is written in C, the indix diffes by 1 with that in C.
- * ================================
+ * ********************************
  * Version I:
- * ================================
- *  det = 1.0;
+ * \code{.sh}
+ *  det = 1.0; 
  *  for(i=0; i<n; i++)
- * {
+ *  {
  *   det *= a[i*n+i];
  *   if (ipiv[i] != i+1) 
  *   {
  *     det = -det;
  *   }
- * }
- * ================================
+ *  }
+ * \endcode
+ * ********************************
  * Version II:
- * ================================
+ * \code{.sh}
  *  det = 1.0;
  *  for(i=0; i<n; i++)
- * {
+ *  {
  *   det *= a[i*n+i];
  *   if (ipiv[i] != i+1) 
  *   {
  *     ipiv[ipiv[i]-1] = ipiv[i];
  *     det = -det;
  *   }
- * }
- * =================================
+ *  }
+ * \endcode
+ * ********************************
  */
 double det_mat(double *a, int n, int *info)
 {
@@ -160,6 +189,9 @@ double det_mat(double *a, int n, int *info)
   return det;
 }
 
+/*!
+ * This function calculates logarithm determinant of matrix.
+ */
 double lndet_mat(double *a, int n, int *info)
 {
   int * ipiv;
@@ -185,7 +217,9 @@ double lndet_mat(double *a, int n, int *info)
   return lndet;
 }
 
-/* Cholesky decomposition into upper triangle matrix*/
+/*!
+ * This function performs Cholesky decomposition of matrix into upper triangle matrixs
+ */
 void Chol_decomp_U(double *a, int n, int *info)
 {
   int i,j;
@@ -213,7 +247,9 @@ void Chol_decomp_U(double *a, int n, int *info)
   return;
 }
 
-/* Cholesky decomposition into lower triangle matrix */
+/*!
+ * This function performs Cholesky decomposition of matrix into lower triangle matrixs
+ */
 void Chol_decomp_L(double *a, int n, int *info)
 {
   int i,j;
@@ -241,6 +277,9 @@ void Chol_decomp_L(double *a, int n, int *info)
   return;
 }
 
+/*!
+ * This function display matrix on the screen.
+ */
 void display_mat(double *a, int m, int n)
 {
     int i, j;
@@ -254,6 +293,9 @@ void display_mat(double *a, int m, int n)
     }
 }
 
+/*!
+ * This function allocates memory for matrix.
+ */
 double ** matrix_malloc(int n1, int n2)
 {
   double ** mat;
@@ -276,6 +318,9 @@ double ** matrix_malloc(int n1, int n2)
   return mat;
 }
 
+/*!
+ * This function allocates memory for array.
+ */
 double * array_malloc(int n)
 {
   double *array;
@@ -289,6 +334,9 @@ double * array_malloc(int n)
   return array;
 }
 
+/*!
+ * This function is to test the functions defined in mathfun.c.
+ */
 void test_mathfun()
 {
   double *A, det;
