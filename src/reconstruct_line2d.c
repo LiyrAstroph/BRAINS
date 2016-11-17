@@ -659,7 +659,7 @@ double prob_line2d(const void *model)
     {
       /* re-point */
       Fline2d_at_data = Fline_at_data_particles[which_particle_update];
-      for(i=0; i<n_line_data; i++)
+      for(i=0; i<n_line_data * n_vel_data; i++)
       {
         dy = Fline2d_data[i] - Fline2d_at_data[i] ;
         var2 = Flerrs2d_data[i]*Flerrs2d_data[i];
