@@ -104,9 +104,9 @@ double perturb_con(void *model)
   double logH = 0.0, limit1, limit2, width, rnd;
   int which;
   
-  /* sample variability parameter more frequently */
+  /* sample variability parameters more frequently */
   rnd = dnest_rand();
-  if(rnd < 0.5)
+  if(rnd < 0.1)
     which = dnest_rand_int(num_params_var);
   else
     which = dnest_rand_int(parset.n_con_recon) + num_params_var;

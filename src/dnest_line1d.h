@@ -16,7 +16,7 @@
 #include <stdbool.h>
 
 
-/*==========================================*/
+/* size of model type */
 extern int size_of_modeltype;
 
 /* functions */

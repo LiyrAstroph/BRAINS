@@ -25,7 +25,8 @@
 #include "proto.h"
 
 
-void *best_model_line1d, *best_model_std_line1d;
+void *best_model_line1d;     /*!< best model */
+void *best_model_std_line1d; /*!< standard deviation of the best model */
 
 void postprocess1d()
 {

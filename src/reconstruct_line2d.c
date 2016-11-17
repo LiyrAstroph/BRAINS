@@ -23,7 +23,8 @@
 #include "allvars.h"
 #include "proto.h"
 
-void *best_model_line2d, *best_model_std_line2d;
+void *best_model_line2d;      /*!< best model */
+void *best_model_std_line2d;  /*!< standard deviation of the best model */
 
 void postprocess2d()
 {

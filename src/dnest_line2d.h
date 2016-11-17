@@ -15,12 +15,8 @@
 
 #include <stdbool.h>
 
-
-/*==========================================*/
+/* size of model type */
 extern int size_of_modeltype;
-
-/* best model */
-extern void *best_model_line2d, *best_model_std_line2d;
 
 /* functions */
 void from_prior_line2d(void *model);

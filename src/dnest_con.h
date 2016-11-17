@@ -14,11 +14,8 @@
 
 #include <stdbool.h>
 
-/* size of the model type */
+/* size of model type */
 extern int size_of_modeltype;
-
-/* best model */
-extern void *best_model_con, *best_model_std_con;
 
 /* functions */
 void from_prior_con(void *model);
