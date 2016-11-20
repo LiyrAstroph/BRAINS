@@ -175,6 +175,8 @@ extern double *prob_line_particles, *prob_line_particles_perturb;
 
 extern int postprc;
 
+extern double prob_scale_con, prob_scale_line;
+
 /* GSL */
 extern const gsl_rng_type * gsl_T;
 extern gsl_rng * gsl_r;

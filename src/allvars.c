@@ -87,6 +87,8 @@ double *prob_line_particles, *prob_line_particles_perturb;
 
 int postprc;
 
+double prob_scale_con, prob_scale_line;
+
 /* GSL */
 const gsl_rng_type * gsl_T;
 gsl_rng * gsl_r;

@@ -390,6 +390,17 @@ void reconstruct_line1d_init()
   }
   prob_line_particles = malloc(parset.num_particles * sizeof(double));
   prob_line_particles_perturb = malloc(parset.num_particles * sizeof(double));
+
+  if(n_line_data >= n_con_data)
+  {
+    prob_scale_con = ((double)n_line_data)/n_con_data;
+    prob_scale_line = 1.0;
+  }
+  else
+  {
+    prob_scale_con = 1.0;
+    prob_scale_line = ((double)n_con_data)/n_line_data;
+  }
 }
 
 void reconstruct_line1d_end()
@@ -526,7 +537,7 @@ double prob_line1d(const void *model)
       var2+= exp(pm[num_params_blr]) * exp(num_params_blr);
       prob += (-0.5*pow(fcon - Fcon_data[i], 2.0)/var2) - 0.5*log(2.0*PI*var2);
     }
-
+    prob *= prob_scale_con;
     prob_con_particles_perturb[which_particle_update] = prob;
   }
   else /* continuum has no change, use the previous values */
@@ -569,6 +580,7 @@ double prob_line1d(const void *model)
       prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
     }
     /* backup prob_line */
+    prob_line *= prob_scale_line;
     prob_line_particles_perturb[which_particle_update] = prob_line;
   }
   else
@@ -590,6 +602,7 @@ double prob_line1d(const void *model)
         prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
       }
       /* backup prob_line */
+      prob_line *= prob_scale_line;
       prob_line_particles_perturb[which_particle_update] = prob_line;
     }
   }
@@ -618,6 +631,7 @@ double prob_initial_line1d(const void *model)
     var2 = Fcerrs_data[i] * Fcerrs_data[i] + exp(pm[num_params_blr]) * exp(num_params_blr);
     prob += (-0.5*pow(fcon - Fcon_data[i], 2.0)/var2) - 0.5*log(2.0*PI*var2);
   }
+  prob *= prob_scale_con;
   prob_con_particles[which_particle_update] = prob;
 
   Trans1D = Trans1D_particles[which_particle_update];
@@ -632,6 +646,7 @@ double prob_initial_line1d(const void *model)
     var2 += exp(pm[num_params_blr-1]) * exp(pm[num_params_blr-1]);
     prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
   }
+  prob_line *= prob_scale_line;
   prob_line_particles[which_particle_update] = prob_line;
 
   memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
