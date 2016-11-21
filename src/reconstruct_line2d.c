@@ -48,7 +48,11 @@ void postprocess2d()
     // initialize smooth work space
     smooth_init(n_vel_data);
     char fname[200];
-    FILE *fp, *fcon, *fline, *ftran;
+    FILE *fp, *fcon, *fline, *ftran, *fline1d;
+    double *Fline1d, dV;
+
+    dV = (Vline_data[n_vel_data-1]-Vline_data[0])/(n_vel_data-1);
+    Fline1d = malloc(n_line_data * sizeof(double));
 
     // get number of lines in posterior sample file
     get_posterior_sample_file(dnest_options_file, posterior_sample_file);
@@ -76,6 +80,16 @@ void postprocess2d()
       fprintf(stderr, "# Error: Cannot open file %s.\n", fname);
       exit(0);
     }
+
+    //file for line reconstruction
+    sprintf(fname, "%s/%s", parset.file_dir, "data/line_rec.txt");
+    fline1d = fopen(fname, "w");
+    if(fline1d == NULL)
+    {
+      fprintf(stderr, "# Error: Cannot open file %s.\n", fname);
+      exit(0);
+    }
+
     //file for transfer function
     sprintf(fname, "%s/%s", parset.file_dir, "data/tran2d_rec.txt");
     ftran = fopen(fname, "w");
@@ -131,6 +145,15 @@ void postprocess2d()
       calculate_line2d_from_blrmodel(post_model, Tline_data, Vline_data, Trans2D_at_veldata, 
                                       Fline2d_at_data, n_line_data, n_vel_data);
 
+      for(j = 0; j < n_line_data; j++)
+      {
+        Fline1d[j] = 0.0;
+        for(k=0; k<n_vel_data; k++)
+        {
+          Fline1d[j] += Fline2d_at_data[j * n_vel_data + k] * dV/line_scale;
+        }
+      }
+
       sum1 = 0.0;
       sum2 = 0.0;
       for(j=0; j<parset.n_tau; j++)
@@ -179,6 +202,12 @@ void postprocess2d()
           fprintf(ftran, "\n");
         }
         fprintf(ftran, "\n");
+
+        for(j = 0; j<n_vel_data; j++)
+        {
+          fprintf(fline1d, "%f %f\n", Tline_data[j], Fline1d[j]);
+        }
+        fprintf(fline1d, "\n");
       }
     }
 
@@ -188,6 +217,7 @@ void postprocess2d()
     fclose(fcon);
     fclose(fline);
     fclose(ftran);
+    fclose(fline1d);
 
     /* calculate mean lags */
     mean_lag /= (nc);
@@ -239,6 +269,7 @@ void postprocess2d()
     free(lag);
     free(post_model);
     free(posterior_sample);
+    free(Fline1d);
   }
   return;
 }
