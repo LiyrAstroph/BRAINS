@@ -203,7 +203,7 @@ void postprocess2d()
         }
         fprintf(ftran, "\n");
 
-        for(j = 0; j<n_vel_data; j++)
+        for(j = 0; j<n_line_data; j++)
         {
           fprintf(fline1d, "%f %f\n", Tline_data[j], Fline1d[j]);
         }
