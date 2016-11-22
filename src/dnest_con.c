@@ -136,8 +136,8 @@ double perturb_con(void *model)
       {
         width = var_range_model[0][1] - var_range_model[0][0];
       }
-      pm[0] += fmin(width, (var_range_model[0][1] - var_range_model[0][0]) * 0.1) * dnest_randh();
-      wrap(&(pm[0]), var_range_model[0][0], var_range_model[0][1]);
+      pm[which] += fmin(width, (var_range_model[0][1] - var_range_model[0][0]) * 0.1) * dnest_randh();
+      wrap(&(pm[which]), var_range_model[0][0], var_range_model[0][1]);
       break;
     
     case 1: // sigma
@@ -145,8 +145,8 @@ double perturb_con(void *model)
       {
         width = var_range_model[1][1] - var_range_model[1][0];
       }
-      pm[1] += width*dnest_randh();
-      wrap(&(pm[1]), var_range_model[1][0] , var_range_model[1][1] );
+      pm[which] += width*dnest_randh();
+      wrap(&(pm[which]), var_range_model[1][0] , var_range_model[1][1] );
       break;
 
     case 2: // tau
@@ -154,8 +154,8 @@ double perturb_con(void *model)
       {
         width = var_range_model[2][1] - var_range_model[2][0];
       }
-      pm[2] += width*dnest_randh();
-      wrap(&(pm[2]), var_range_model[2][0], var_range_model[2][1]);
+      pm[which] += width*dnest_randh();
+      wrap(&(pm[which]), var_range_model[2][0], var_range_model[2][1]);
       break;
 
     case 3: // mean value
@@ -163,8 +163,8 @@ double perturb_con(void *model)
       {
         width = var_range_model[3][1] - var_range_model[3][0];
       }
-      pm[3] += width*dnest_randh();
-      wrap(&(pm[3]), var_range_model[3][0], var_range_model[3][1]);
+      pm[which] += width*dnest_randh();
+      wrap(&(pm[which]), var_range_model[3][0], var_range_model[3][1]);
       break;
 
     default: // light curve points

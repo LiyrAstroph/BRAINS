@@ -164,8 +164,8 @@ double perturb_line2d(void *model)
         limit2 = range_model[1].mu;
         width = ( limit2 - limit1 );
       }
-      pm[0] += dnest_randh() * width;
-      wrap(&(pm[0]), range_model[0].mu, range_model[1].mu);
+      pm[which] += dnest_randh() * width;
+      wrap(&(pm[which]), range_model[0].mu, range_model[1].mu);
       break;
     
     case 1: // beta
@@ -175,8 +175,8 @@ double perturb_line2d(void *model)
         limit2 = range_model[1].beta;
         width =  ( limit2 - limit1 );
       }
-      pm[1] += dnest_randh() * width;
-      wrap(&(pm[1]), range_model[0].beta, range_model[1].beta);
+      pm[which] += dnest_randh() * width;
+      wrap(&(pm[which]), range_model[0].beta, range_model[1].beta);
       break;
 
     case 2: // F
@@ -186,8 +186,8 @@ double perturb_line2d(void *model)
         limit2 = range_model[1].F;
         width = ( limit2 - limit1 );
       }
-      pm[2] += dnest_randh() * width;
-      wrap(&(pm[2]), range_model[0].F, range_model[1].F );
+      pm[which] += dnest_randh() * width;
+      wrap(&(pm[which]), range_model[0].F, range_model[1].F );
       break;
 
     case 3: // inclination
@@ -197,8 +197,8 @@ double perturb_line2d(void *model)
         limit2 = range_model[1].inc;
         width = ( limit2 - limit1 );
       }
-      pm[3] += dnest_randh() * width;
-      wrap(&(pm[3]), range_model[0].inc, range_model[1].inc );
+      pm[which] += dnest_randh() * width;
+      wrap(&(pm[which]), range_model[0].inc, range_model[1].inc );
       break;
 
     case 4: // openning angle
@@ -208,8 +208,8 @@ double perturb_line2d(void *model)
         limit2 = range_model[1].opn;
         width = ( limit2 - limit1 );
       }
-      pm[4] += dnest_randh() * width;
-      wrap(&(pm[4]), range_model[0].opn, range_model[1].opn );
+      pm[which] += dnest_randh() * width;
+      wrap(&(pm[which]), range_model[0].opn, range_model[1].opn );
       break;
 
     case 5: // A
@@ -219,8 +219,8 @@ double perturb_line2d(void *model)
         limit2 = range_model[1].A;
         width = ( limit2 - limit1 );
       }
-      pm[5] += dnest_randh() * width;
-      wrap(&(pm[5]), range_model[0].A, range_model[1].A);
+      pm[which] += dnest_randh() * width;
+      wrap(&(pm[which]), range_model[0].A, range_model[1].A);
       break;
 
     case 6: // Ag
@@ -230,8 +230,8 @@ double perturb_line2d(void *model)
         limit2 = range_model[1].Ag;
         width = ( limit2 - limit1 );
       }
-      pm[6] += dnest_randh() * width;
-      wrap(&(pm[6]), range_model[0].Ag, range_model[1].Ag);
+      pm[which] += dnest_randh() * width;
+      wrap(&(pm[which]), range_model[0].Ag, range_model[1].Ag);
       break;
 
     case 7: // k
@@ -241,8 +241,8 @@ double perturb_line2d(void *model)
         limit2 = range_model[1].k;
         width = ( limit2 - limit1 );
       }
-      pm[7] += dnest_randh() * width;
-      wrap(&(pm[7]), range_model[0].k, range_model[1].k);
+      pm[which] += dnest_randh() * width;
+      wrap(&(pm[which]), range_model[0].k, range_model[1].k);
       break;
 
     case 8: // black hole mass
@@ -252,8 +252,8 @@ double perturb_line2d(void *model)
         limit2 = range_model[1].mbh;
         width = ( limit2 - limit1 );
       }
-      pm[8] += dnest_randh() * width;
-      wrap(&(pm[8]), range_model[0].mbh, range_model[1].mbh);
+      pm[which] += dnest_randh() * width;
+      wrap(&(pm[which]), range_model[0].mbh, range_model[1].mbh);
       break;
 
     case 9: // lambda
@@ -263,8 +263,8 @@ double perturb_line2d(void *model)
         limit2 = range_model[1].lambda;
         width = ( limit2 - limit1 );
       }
-      pm[9] += dnest_randh() * width;
-      wrap(&(pm[9]), range_model[0].lambda, range_model[1].lambda);
+      pm[which] += dnest_randh() * width;
+      wrap(&(pm[which]), range_model[0].lambda, range_model[1].lambda);
       break;
 
     case 10: // q
@@ -274,8 +274,8 @@ double perturb_line2d(void *model)
         limit2 = range_model[1].q;
         width = ( limit2 - limit1 );
       }
-      pm[10] += dnest_randh() * width;
-      wrap(&(pm[10]), range_model[0].q, range_model[1].q);
+      pm[which] += dnest_randh() * width;
+      wrap(&(pm[which]), range_model[0].q, range_model[1].q);
       break;
 
     case 11: // systematic error of line
@@ -286,8 +286,8 @@ double perturb_line2d(void *model)
         width =  ( limit2 - limit1 );
       }
       /* limit the step size of systematic error, like simulated annealing */
-      pm[11] += dnest_randh() * fmin(width, (range_model[1].logse - range_model[0].logse)*0.001 );
-      wrap_limit(&(pm[11]), range_model[0].logse, range_model[1].logse);
+      pm[which] += dnest_randh() * fmin(width, (range_model[1].logse - range_model[0].logse)*0.001 );
+      wrap_limit(&(pm[which]), range_model[0].logse, range_model[1].logse);
       break;
 
     case 12: // systematic error of continuum
@@ -298,8 +298,8 @@ double perturb_line2d(void *model)
         width = ( limit2 - limit1 );
       }
       /* limit the step size of systematic error, like simulated annealing */
-      pm[12] += dnest_randh() * fmin(width, (var_range_model[0][1] - var_range_model[0][0]) * 0.1);
-      wrap(&(pm[12]), var_range_model[0][0], var_range_model[0][1] );
+      pm[which] += dnest_randh() * fmin(width, (var_range_model[0][1] - var_range_model[0][0]) * 0.1);
+      wrap(&(pm[which]), var_range_model[0][0], var_range_model[0][1] );
       break;
     
     case 13: // sigma
@@ -309,8 +309,8 @@ double perturb_line2d(void *model)
         limit2 = var_range_model[1][1];
         width = ( limit2 - limit1 );
       }
-      pm[13] += dnest_randh() * width;
-      wrap(&(pm[13]), var_range_model[1][0], var_range_model[1][1]);
+      pm[which] += dnest_randh() * width;
+      wrap(&(pm[which]), var_range_model[1][0], var_range_model[1][1]);
       break;
 
     case 14: // mu
@@ -320,19 +320,19 @@ double perturb_line2d(void *model)
         limit2 = var_range_model[2][1];
         width = ( limit2 - limit1 );
       }
-      pm[14] += dnest_randh() * width;
-      wrap(&(pm[14]), var_range_model[2][0], var_range_model[2][1]);
+      pm[which] += dnest_randh() * width;
+      wrap(&(pm[which]), var_range_model[2][0], var_range_model[2][1]);
       break;
 
     case 15: // mean value of continuum
       if(which_level_update == 0)
       {
-        limit1 = var_range_model[2][0];
-        limit2 = var_range_model[2][1];
+        limit1 = var_range_model[3][0];
+        limit2 = var_range_model[3][1];
         width = ( limit2 - limit1 );
       }
-      pm[15] += dnest_randh() * width;
-      wrap(&(pm[15]), var_range_model[3][0], var_range_model[3][1]);
+      pm[which] += dnest_randh() * width;
+      wrap(&(pm[which]), var_range_model[3][0], var_range_model[3][1]);
       break;
 
     default: // light curve points

@@ -391,16 +391,8 @@ void reconstruct_line1d_init()
   prob_line_particles = malloc(parset.num_particles * sizeof(double));
   prob_line_particles_perturb = malloc(parset.num_particles * sizeof(double));
 
-  if(n_line_data >= n_con_data)
-  {
-    prob_scale_con = ((double)n_line_data)/n_con_data;
-    prob_scale_line = 1.0;
-  }
-  else
-  {
-    prob_scale_con = 1.0;
-    prob_scale_line = ((double)n_con_data)/n_line_data;
-  }
+  prob_scale_con = 1.0;
+  prob_scale_line = 1.0;
 }
 
 void reconstruct_line1d_end()

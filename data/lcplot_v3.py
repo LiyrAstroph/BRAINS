@@ -85,7 +85,7 @@ hd=np.loadtxt("sample2d.txt", skiprows=1)
 phd = np.loadtxt("posterior_sample2d.txt")
 hd_info = np.loadtxt("sample_info2d.txt", skiprows=1)
 level = np.loadtxt("levels2d.txt", skiprows=1)
-idx_mbh = np.where(hd_info[:, 0]>level.shape[0] - 30)
+idx_mbh = np.where(hd_info[:, 0]>level.shape[0] - 40)
 hd_sort=np.sort(hd[idx_mbh[0], 8]/np.log(10.0)+6.0)
 mbh1=hd_sort[len(hd_sort)*0.1585]
 mbh2=hd_sort[len(hd_sort)*(1.0-0.1585)]
@@ -131,6 +131,7 @@ fp.close()
 
 fp = open("line2d_rec.txt", "r")
 ichimin = np.argmin(chi)
+ichimin = nmax
 print(ichimin, chi[ichimin])
 print(ichimin, logP[ichimin])
 print(nmax, phd[nmax, 11])
@@ -151,21 +152,25 @@ for i in range(len(logP)):
     line_rec_max = copy.copy(line_rec)
 
   fp.readline()
-  if (chi[i] < chi[ichimin] * (1.0 + 0.5)) and (plotnum < 100):
-    ax5.plot(date_hb, line_rec, color='grey', lw=0.5)
-    plotnum += 1
+  #if (chi[i] < chi[ichimin] * (1.0 + 0.5)) and (plotnum < 100):
+  ax5.plot(date_hb, line_rec* 4861*VelUnit/3e5, color='grey', lw=0.1, alpha=0.1)
+  plotnum += 1
     
 fp.close()
 
-plt.errorbar(hblc[:, 0], hblc[:, 1], yerr=np.sqrt(hblc[:, 2]*hblc[:, 2] + syserr * syserr)*dV, marker='o', markersize=3, ls='none', lw=1, capsize=1, markeredgewidth=0.5)
-plt.plot(date_hb, line_rec_max, color='red')
+plt.errorbar(hblc[:, 0], hblc[:, 1] * 4861*VelUnit/3e5, yerr=np.sqrt(hblc[:, 2]*hblc[:, 2] + syserr * syserr * dV*dV)* 4861*VelUnit/3e5, marker='None', markersize=3, ls='none', lw=1.0, capsize=0.7, markeredgewidth=0.5, zorder=32)
+plt.plot(date_hb, line_rec_max* 4861*VelUnit/3e5, color='red')
 
 ax5.set_xlabel(r'$\rm HJD\ (+2\ 450\ 500)$')
 ax5.set_ylabel(r'$F_{\rm H\beta}$')
 
-ymax = np.max(hblc[:, 1])
-ymin = np.min(hblc[:, 1])
+ymax = np.max(hblc[:, 1]* 4861*VelUnit/3e5)
+ymin = np.min(hblc[:, 1]* 4861*VelUnit/3e5)
 ax5.set_ylim(ymin - 0.2*(ymax-ymin), ymax + 0.2*(ymax- ymin))
+
+xmax = hblc[-1, 0]
+xmin = hblc[0, 0]
+ax5.set_xlim(xmin - 0.2*(xmax-xmin), xmax + 0.1*(xmax- xmin))
 
 #ax5.xaxis.set_minor_locator(MultipleLocator(4.0))
 #ax5.yaxis.set_major_locator(MultipleLocator(0.5))
@@ -202,21 +207,21 @@ for i in range(len(logP)):
   if(i==ichimin):
     con_max = copy.copy(con)  
   fp.readline()
-  if (chi[i] < chi[ichimin] * (1.0 + 0.01)) and (plotnum < 100):
-    ax4.plot(date-date0, con, color='grey', linewidth=0.1)
-    plotnum += 1
+  #if (chi[i] < chi[ichimin] * (1.0 + 0.01)) and (plotnum < 100):
+  ax4.plot(date-date0, con, color='grey', lw=0.1, alpha=0.1)
+  plotnum += 1
 
 fp.close()
 
 con = copy.copy(con_max)
-plt.errorbar(conlc[:, 0], conlc[:, 1], yerr=np.sqrt(conlc[:, 2]*conlc[:, 2] + syserr_con*syserr_con), marker='o', markersize=3, ls='none', lw=1, capsize=1, markeredgewidth=0.5)
+plt.errorbar(conlc[:, 0], conlc[:, 1], yerr=np.sqrt(conlc[:, 2]*conlc[:, 2] + syserr_con*syserr_con), marker='None', markersize=3, ls='none', lw=1.0, capsize=1, markeredgewidth=0.5, zorder=32)
 plt.plot(date-date0, con, color='red')
 #plt.plot(conlc_sim[:, 0], conlc_sim[:, 1]+conlc_sim[:, 2], ls='dotted', color='red')
 #plt.plot(conlc_sim[:, 0], conlc_sim[:, 1]-conlc_sim[:, 2], ls='dotted', color='red')
 ax4.set_xlim(conlc_sim[0, 0], conlc_sim[-1, 0])
 ymax = np.max(conlc[:, 1])
 ymin = np.min(conlc[:, 1])
-#ax4.set_ylim(ymin - 0.2*(ymax-ymin), ymax + 0.2*(ymax- ymin))
+ax4.set_ylim(ymin - 0.2*(ymax-ymin), ymax + 0.2*(ymax- ymin))
 ax4.set_ylabel(r'$F_{\rm 5100}$')
 #ax4.set_ylim([30, 95])
 
@@ -227,8 +232,8 @@ ax4.set_ylabel(r'$F_{\rm 5100}$')
 
 [i.set_visible(False) for i in ax4.get_xticklabels()]
 
-xlim=ax4.get_xlim()
-ax5.set_xlim([xlim[0], xlim[1]])
+xlim=ax5.get_xlim()
+ax4.set_xlim([xlim[0], xlim[1]])
 
 #========================================================================
 # subfig 1
@@ -277,7 +282,7 @@ idx = np.where(chifit == chifit_sort[0])
 i = idx[0][0]
 j = 0
 print(i)
-plt.errorbar(grid_vel, prof[i, :]+j*offset, yerr=np.sqrt(prof_err[i, :]*prof_err[i, :] + syserr*syserr), ls='none', ecolor='k', capsize=1, markeredgewidth=1)
+plt.errorbar(grid_vel, prof[i, :]+j*offset, yerr=np.sqrt(prof_err[i, :]*prof_err[i, :] + syserr*syserr), ls='none', ecolor='k', capsize=1, markeredgewidth=1, zorder=32)
 plt.plot(grid_vel, prof_rec_max[i, :]+j*offset, color='b', lw=2)
 
 idx = np.where(chifit == chifit_sort[1])
@@ -308,8 +313,8 @@ ylim=ax6.get_ylim()
 
 ax6.set_ylim(ylim)
 #ax6.set_xlim((6.0, 8.5))
-ax6.xaxis.set_major_locator(MultipleLocator(1.0))
+#ax6.xaxis.set_major_locator(MultipleLocator(1.0))
 
 
-plt.savefig('lc.eps', bbox_inches='tight')
+plt.savefig('lc.pdf', bbox_inches='tight')
 #plt.show()

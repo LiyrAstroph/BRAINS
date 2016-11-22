@@ -169,8 +169,8 @@ double perturb_line1d(void *model)
       {
         width = ( range_model[1].mu - range_model[0].mu );
       }
-      pm[0] += dnest_randh() * width;
-      wrap(&(pm[0]), range_model[0].mu, range_model[1].mu);
+      pm[which] += dnest_randh() * width;
+      wrap(&(pm[which]), range_model[0].mu, range_model[1].mu);
       break;
     
     case 1: // beta
@@ -178,8 +178,8 @@ double perturb_line1d(void *model)
       {
         width =  ( range_model[1].beta - range_model[0].beta );
       }
-      pm[1] += dnest_randh() * width;
-      wrap(&(pm[1]), range_model[0].beta, range_model[1].beta);
+      pm[which] += dnest_randh() * width;
+      wrap(&(pm[which]), range_model[0].beta, range_model[1].beta);
       break;
 
     case 2: // F
@@ -187,8 +187,8 @@ double perturb_line1d(void *model)
       {
         width = ( range_model[1].F - range_model[0].F );
       }
-      pm[2] += dnest_randh() * width;
-      wrap(&(pm[2]), range_model[0].F, range_model[1].F);
+      pm[which] += dnest_randh() * width;
+      wrap(&(pm[which]), range_model[0].F, range_model[1].F);
       break;
 
     case 3: // inclination
@@ -196,8 +196,8 @@ double perturb_line1d(void *model)
       {
         width = ( range_model[1].inc - range_model[0].inc );
       }
-      pm[3] += dnest_randh() * width;
-      wrap(&(pm[3]), range_model[0].inc, range_model[1].inc);
+      pm[which] += dnest_randh() * width;
+      wrap(&(pm[which]), range_model[0].inc, range_model[1].inc);
       break;
 
     case 4: // openning angle
@@ -205,8 +205,8 @@ double perturb_line1d(void *model)
       {
         width = ( range_model[1].opn - range_model[0].opn );
       }
-      pm[4] += dnest_randh() * width;
-      wrap(&(pm[4]), range_model[0].opn, range_model[1].opn);
+      pm[which] += dnest_randh() * width;
+      wrap(&(pm[which]), range_model[0].opn, range_model[1].opn);
       break;
 
     case 5: // A, response coefficient
@@ -214,8 +214,8 @@ double perturb_line1d(void *model)
       {
         width = ( range_model[1].A - range_model[0].A );
       }
-      pm[5] += dnest_randh() * width;
-      wrap(&(pm[5]), range_model[0].A, range_model[1].A);
+      pm[which] += dnest_randh() * width;
+      wrap(&(pm[which]), range_model[0].A, range_model[1].A);
       break;
 
     case 6: // Ag, non-linearity
@@ -223,8 +223,8 @@ double perturb_line1d(void *model)
       {
         width = ( range_model[1].Ag - range_model[0].Ag );
       }
-      pm[6] += dnest_randh() * width;
-      wrap(&(pm[6]), range_model[0].Ag, range_model[1].Ag);
+      pm[which] += dnest_randh() * width;
+      wrap(&(pm[which]), range_model[0].Ag, range_model[1].Ag);
       break;
 
     case 7: // k
@@ -232,8 +232,8 @@ double perturb_line1d(void *model)
       {
         width = ( range_model[1].k - range_model[0].k );
       }
-      pm[7] += dnest_randh() * width;
-      wrap(&(pm[7]), range_model[0].k, range_model[1].k);
+      pm[which] += dnest_randh() * width;
+      wrap(&(pm[which]), range_model[0].k, range_model[1].k);
       break;
 
      case 8: // systematic error of line
@@ -241,7 +241,7 @@ double perturb_line1d(void *model)
       {
         width =  ( range_model[1].logse - range_model[0].logse );
       }
-      pm[8] += dnest_randh() * fmin(width, (range_model[1].logse - range_model[0].logse)*0.01 );
+      pm[which] += dnest_randh() * fmin(width, (range_model[1].logse - range_model[0].logse)*0.01 );
       wrap_limit(&(pm[which]), range_model[0].logse, range_model[1].logse);
       break;
 
@@ -250,8 +250,8 @@ double perturb_line1d(void *model)
       {
         width = var_range_model[0][1] - var_range_model[0][0];
       }
-      pm[9] += dnest_randh() * fmin(width, (var_range_model[0][1] - var_range_model[0][0]) * 0.01);
-      wrap(&(pm[9]), var_range_model[0][0], var_range_model[0][1]);
+      pm[which] += dnest_randh() * fmin(width, (var_range_model[0][1] - var_range_model[0][0]) * 0.01);
+      wrap(&(pm[which]), var_range_model[0][0], var_range_model[0][1]);
       break;
     
     case 10: // sigma
@@ -259,8 +259,8 @@ double perturb_line1d(void *model)
       {
         width = var_range_model[1][1] - var_range_model[1][0];
       }
-      pm[10] += dnest_randh() * width;
-      wrap(&(pm[10]), var_range_model[1][0], var_range_model[1][1]);
+      pm[which] += dnest_randh() * width;
+      wrap(&(pm[which]), var_range_model[1][0], var_range_model[1][1]);
       break;
 
     case 11: // tau
@@ -268,8 +268,8 @@ double perturb_line1d(void *model)
       {
         width = var_range_model[2][1] - var_range_model[2][0];
       }
-      pm[11] += dnest_randh() * width;
-      wrap(&(pm[11]), var_range_model[2][0], var_range_model[2][1]);
+      pm[which] += dnest_randh() * width;
+      wrap(&(pm[which]), var_range_model[2][0], var_range_model[2][1]);
       break;
 
     case 12: // mean value
@@ -277,8 +277,8 @@ double perturb_line1d(void *model)
       {
         width = var_range_model[3][1] - var_range_model[3][0];
       }
-      pm[12] += dnest_randh() * width;
-      wrap(&(pm[12]), var_range_model[3][0], var_range_model[3][1]);
+      pm[which] += dnest_randh() * width;
+      wrap(&(pm[which]), var_range_model[3][0], var_range_model[3][1]);
       break;
 
     default: // light curve points
