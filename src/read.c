@@ -18,6 +18,9 @@
 #include "allvars.h"
 #include "proto.h"
 
+/*!
+ * read parameter set from parameter file.
+ */
 void read_parset()
 {
   if(thistask == roottask)
@@ -222,7 +225,9 @@ void read_parset()
   return;
 }
 
-
+/*!
+ * read dataset.
+ */
 void read_data()
 {
   FILE *fp;
@@ -402,6 +407,9 @@ void read_data()
   return;
 }
 
+/*!
+ * allocate data memory. 
+ */
 void allocate_memory_data()
 {
   Tcon_data = malloc(n_con_data * sizeof(double));
@@ -427,6 +435,9 @@ void allocate_memory_data()
   }
 }
 
+/*!
+ * fee data memory.
+ */
 void free_memory_data()
 {
   free(Tcon_data);
@@ -452,7 +463,7 @@ void free_memory_data()
   }
 }
 
-/* 
+/*! 
  * calculate the integrated emission line flux.
  */
 void cal_emission_flux()
@@ -481,6 +492,9 @@ void cal_emission_flux()
   }
 }
 
+/*!
+ * get number of particles.
+ */
 void get_num_particles(char *fname)
 {
   FILE *fp;
@@ -505,6 +519,9 @@ void get_num_particles(char *fname)
   fclose(fp);
 }
 
+/*!
+ * get file name of posterior sample. 
+ */
 void get_posterior_sample_file(char *fname, char *samplefile)
 {
   FILE *fp;

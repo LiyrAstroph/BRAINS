@@ -4,8 +4,8 @@
 # Lines beginning with '#' are regarded as comments.
 
 2	    # Number of particles
-5000	# new level interval
-5000	# save interval
+1000	# new level interval
+1000	# save interval
 100	  # threadSteps - how many steps each thread should do independently before communication
 80	  # maximum number of levels
 10	  # Backtracking scale length (lambda in the paper)

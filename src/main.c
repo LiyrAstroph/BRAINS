@@ -59,11 +59,11 @@ int main(int argc, char **argv)
     {
       switch(opt)
       {
-        case 'p':
+        case 'p':  /* only do postprocess */
           parset.flag_postprc = 1;
           printf("# MCMC samples available, only do post-process.\n");
           break;
-        case 't':
+        case 't': /* temperature for postprocess */
           parset.temperature = atof(optarg);
           printf("# Set a temperature %f.\n", parset.temperature);
           if(parset.temperature == 0.0)

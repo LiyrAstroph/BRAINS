@@ -45,8 +45,13 @@ void init()
   gsl_linear = gsl_interp_alloc(gsl_interp_linear, parset.n_con_recon);
 
   /* maximum tau of transfer function should be smaller than the time span of the dataset. */
-  parset.tau_max_set = fmin(parset.tau_max_set, Tcon_data[n_con_data-1] - Tcon_data[0]);
-
+  if(parset.tau_max_set > Tcon_data[n_con_data-1] - Tcon_data[0])
+  {
+    parset.tau_max_set = Tcon_data[n_con_data-1] - Tcon_data[0];
+    if(thistask == roottask)
+      printf("# Reset tau_max_set to be the time span of the data, Tau_max = %f.\n", Tcon_data[n_con_data-1] - Tcon_data[0]);
+  }
+  
   /* set the range of continuum variation  */
   var_range_model[0][0] = log(1.0e-10);; // systematic error in continuum
   var_range_model[0][1] = log(1.0e6);;
@@ -74,7 +79,7 @@ void init()
   range_model[1].mu = log(parset.tau_max_set*10.0);
 
   range_model[0].beta = 0.001;
-  range_model[1].beta = 1.0;
+  range_model[1].beta = 3.0;
 
   range_model[0].F = 0.001;
   range_model[1].F = 0.999;
@@ -161,7 +166,8 @@ void scale_con_line()
     Fcerrs_data[i] *=con_scale;
   }
 
-  printf("task %d con scale: %e\t%e\n", thistask, con_scale, ave_con);
+  if(thistask == roottask)
+    printf("task %d con scale: %e\t%e\n", thistask, con_scale, ave_con);
   
   if(parset.flag_dim == 0)
   {
@@ -176,7 +182,8 @@ void scale_con_line()
 
   line_scale = 1.0/ave_line;
   
-  printf("task %d line scale: %e\t%e\n", thistask, line_scale, ave_line);
+  if(thistask == roottask)
+    printf("task %d line scale: %e\t%e\n", thistask, line_scale, ave_line);
 
   for(i=0; i<n_line_data; i++)
   {
