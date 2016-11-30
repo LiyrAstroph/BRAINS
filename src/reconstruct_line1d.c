@@ -442,6 +442,12 @@ void reconstruct_line1d_end()
   free(prob_line_particles);
   free(prob_line_particles_perturb);
 
+  for(i=0; i<num_params; i++)
+  {
+    free(par_range_model[i]);
+  }
+  free(par_range_model);
+
   if(thistask == roottask)
   {
     printf("Ends reconstruct_line1d.\n");

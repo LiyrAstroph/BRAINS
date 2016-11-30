@@ -28,6 +28,8 @@
  */
 void init()
 {
+  int i;
+
   allocate_memory();
 
   /* initialize GSL */
@@ -51,6 +53,10 @@ void init()
     if(thistask == roottask)
       printf("# Reset tau_max_set to be the time span of the data, Tau_max = %f.\n", Tcon_data[n_con_data-1] - Tcon_data[0]);
   }
+
+  /* set the range of cloud radial distribution */
+  rcloud_min_set = parset.tau_min_set;
+  rcloud_max_set = parset.tau_max_set*1000.0;
   
   /* set the range of continuum variation  */
   var_range_model[0][0] = log(1.0e-10);; // systematic error in continuum
@@ -68,49 +74,46 @@ void init()
   var_range_model[4][0] = -10.0; // light curve values
   var_range_model[4][1] = 10.0; 
 
-  /* set the range of cloud radial distribution */
-  rcloud_min_set = parset.tau_min_set;
-  rcloud_max_set = parset.tau_max_set*1000.0;
-
-  range_model[0].mbh = log(0.1);
-  range_model[1].mbh = log(1000.0);
-
-  range_model[0].mu = log(0.1);
-  range_model[1].mu = log(parset.tau_max_set*10.0);
-
-  range_model[0].beta = 0.001;
-  range_model[1].beta = 3.0;
-
-  range_model[0].F = 0.001;
-  range_model[1].F = 0.999;
-
-  range_model[0].inc = 0.0;
-  range_model[1].inc = 90.0;
-
-  range_model[0].opn = 0.0;
-  range_model[1].opn = 90.0;
-
-  range_model[0].A = log(0.01);
-  range_model[1].A = log(10.0);
-
-  range_model[0].Ag = -1.0;
-  range_model[1].Ag = 3.0;
-
-  range_model[0].k =-0.5;
-  range_model[1].k = 0.5;
-
-  range_model[0].lambda = 0.0;
-  range_model[1].lambda = 3.0;
-
-  range_model[0].q = 0.0;
-  range_model[1].q = 1.0;
-
-  range_model[0].logse = log(1.0e-10);
-  range_model[1].logse = log(1.0e6);
+  i = 0;
+  //mu
+  blr_range_model[i][0] = log(0.1);
+  blr_range_model[i++][1] = log(parset.tau_max_set*10.0);
+  //beta
+  blr_range_model[i][0] = 0.001;
+  blr_range_model[i++][1] = 3.0;
+  //F
+  blr_range_model[i][0] = 0.001;
+  blr_range_model[i++][1] = 0.999;
+  //inc
+  blr_range_model[i][0] = 0.0;
+  blr_range_model[i++][1] = 90.0;
+  //opn
+  blr_range_model[i][0] = 0.0;
+  blr_range_model[i++][1] = 90.0;
+  //A
+  blr_range_model[i][0] = log(0.01);
+  blr_range_model[i++][1] = log(10.0);
+  //Ag
+  blr_range_model[i][0] = -1.0;
+  blr_range_model[i++][1] = 3.0;
+  //k
+  blr_range_model[i][0] = -0.5;
+  blr_range_model[i++][1] = 0.5;
+  //mbh
+  blr_range_model[i][0] = log(0.1);
+  blr_range_model[i++][1] = log(1000.0);
+  //lambda
+  blr_range_model[i][0] = 0.0;
+  blr_range_model[i++][1] = 3.0;
+  //q
+  blr_range_model[i][0] = 0.0;
+  blr_range_model[i++][1] = 1.0;
+  //logse
+  blr_range_model[i][0] = log(1.0e-10);
+  blr_range_model[i++][1] = log(1.0e6);
 
   /* setup extra limits to the range of mu */
-  range_model[1].mu = fmin(range_model[1].mu, log(rcloud_max_set));
-  //range_model[1].mu = fmin(range_model[1].mu, log(Tcon_data[n_con_data-1] - Tcon_data[0]));
+  blr_range_model[0][1] = fmin(blr_range_model[0][1], log(rcloud_max_set));
 }
 
 /*!
@@ -118,12 +121,20 @@ void init()
  */
 void allocate_memory()
 {
+  int i;
+
   Tcon = malloc(parset.n_con_recon * sizeof(double));
   Fcerrs = malloc(parset.n_con_recon * sizeof(double));
 
   PSmat = malloc(parset.n_con_recon * parset.n_con_recon * sizeof(double));
   USmat = malloc(parset.n_con_recon * n_con_data * sizeof(double));
   PSmat_data = malloc(n_con_data * n_con_data * sizeof(double));
+
+  blr_range_model = malloc(sizeof(BLRmodel)/sizeof(double) * sizeof(double *));
+  for(i=0; i<sizeof(BLRmodel)/sizeof(double); i++)
+  {
+    blr_range_model[i] = malloc(2*sizeof(double));
+  }
 }
 
 /*! 
@@ -131,12 +142,21 @@ void allocate_memory()
  */
 void free_memory()
 {
+  int i;
+
   free(Tcon);
   free(Fcerrs);
 
   free(PSmat);
   free(USmat);
   free(PSmat_data);
+
+  for(i=0; i<sizeof(BLRmodel)/sizeof(double); i++)
+  {
+    free(blr_range_model[i]);
+  }
+  free(blr_range_model);
+  return;
 }
 
 /*!

@@ -38,8 +38,13 @@ int dnest_line1d(int argc, char **argv)
   num_params_blr = 9;
   num_params = parset.n_con_recon + num_params_var + num_params_blr;
   size_of_modeltype = num_params * sizeof(double);
+
   par_fix = (int *) malloc(num_params * sizeof(int));
   par_fix_val = (double *) malloc(num_params * sizeof(double));
+
+  par_range_model = malloc( num_params * sizeof(double *));
+  for(i=0; i<num_params; i++)
+    par_range_model[i] = malloc(2*sizeof(double));
 
   /* setup functions used for dnest*/
   from_prior = from_prior_line1d;
@@ -51,6 +56,7 @@ int dnest_line1d(int argc, char **argv)
   create_model = create_model_line1d;
   get_num_params = get_num_params_line1d;
   
+  set_par_range_model1d();
   set_par_fix(num_params_blr);
   for(i=num_params_blr; i<num_params; i++)
     par_fix[i] = 0;
@@ -62,9 +68,33 @@ int dnest_line1d(int argc, char **argv)
     force_update = 0;
     dnest(argc, argv);
   }
-    
-  return 0;
 
+  return 0;
+}
+
+void set_par_range_model1d()
+{
+  int i;
+
+  for(i=0; i<num_params_blr-1; i++)
+  {
+    par_range_model[i][0] = blr_range_model[i][0];
+    par_range_model[i][1] = blr_range_model[i][1];
+  }
+  i = num_params_blr -1;
+  par_range_model[i][0] = blr_range_model[sizeof(BLRmodel)/sizeof(double)-1][0];
+  par_range_model[i][1] = blr_range_model[sizeof(BLRmodel)/sizeof(double)-1][1];
+
+  for(i=num_params_blr; i<num_params_var + num_params_blr; i++)
+  {
+    par_range_model[i][0] = var_range_model[i-num_params_blr][0];
+    par_range_model[i][1] = var_range_model[i-num_params_blr][1];
+  }
+  for(i=num_params_blr+num_params_var; i<num_params; i++)
+  {
+    par_range_model[i][0] = var_range_model[num_params_var][0];
+    par_range_model[i][1] = var_range_model[num_params_var][1];
+  }
 }
 
 /*!
@@ -75,15 +105,15 @@ void from_prior_line1d(void *model)
   int i;
   double *pm = (double *)model;
 
-  pm[0] = range_model[0].mu + dnest_rand()*( range_model[1].mu - range_model[0].mu );
-  pm[1] = range_model[0].beta + dnest_rand()*( range_model[1].beta - range_model[0].beta );
-  pm[2] = range_model[0].F + dnest_rand()*( range_model[1].F - range_model[0].F );
-  pm[3] = range_model[0].inc + dnest_rand()*( range_model[1].inc - range_model[0].inc );
-  pm[4] = range_model[0].opn + dnest_rand()*( range_model[1].opn - range_model[0].opn );
-  pm[5] = range_model[0].A + dnest_rand()*( range_model[1].A - range_model[0].A );
-  pm[6] = range_model[0].Ag + dnest_rand()*( range_model[1].Ag - range_model[0].Ag );
-  pm[7] = range_model[0].k + dnest_rand()*( range_model[1].k - range_model[0].k );
-  pm[8] = range_model[1].logse - dnest_rand()*( range_model[1].logse - range_model[0].logse )*0.01;
+  for(i=0; i<num_params_blr + num_params_var; i++)
+  {
+    pm[i] = par_range_model[i][0] + dnest_rand() * ( par_range_model[i][1] - par_range_model[i][0]  );
+  }
+
+  i=num_params_blr-1;
+  pm[i] = par_range_model[i][1] - dnest_rand() * ( par_range_model[i][1] - par_range_model[i][0] )*0.01;
+  i=num_params_blr;
+  pm[i] = par_range_model[i][1] - dnest_rand() * ( par_range_model[i][1] - par_range_model[i][0] )*0.01;
 
   for(i=0; i<num_params_blr; i++)
   {
@@ -91,16 +121,11 @@ void from_prior_line1d(void *model)
       pm[i] = par_fix_val[i];
   }
   
-  pm[9] = var_range_model[0][1] - dnest_rand()*(var_range_model[0][1] - var_range_model[0][0]) * 0.01;
-  pm[10] = var_range_model[1][0] + dnest_rand()* (var_range_model[1][1] - var_range_model[1][0]);
-  pm[11] = var_range_model[2][0] + dnest_rand()* (var_range_model[2][1] - var_range_model[2][0]);
-  pm[12] = var_range_model[3][0] + dnest_rand()* (var_range_model[3][1] - var_range_model[3][0]);
   for(i=0; i<parset.n_con_recon; i++)
     pm[i+num_params_var+num_params_blr] = dnest_randn();
 
   /* all parameters need to update at the initial step */
   which_parameter_update = -1;
-
 }
 
 /*!
@@ -161,136 +186,25 @@ double perturb_line1d(void *model)
     limit2 = limits[(which_level_update-1) * num_params *2 + which *2 + 1];
     width = limit2 - limit1;
   }
-
-  switch(which)
+  else
   {
-  	case 0: // mu
-      if(which_level_update == 0)
-      {
-        width = ( range_model[1].mu - range_model[0].mu );
-      }
-      pm[which] += dnest_randh() * width;
-      wrap(&(pm[which]), range_model[0].mu, range_model[1].mu);
-      break;
-    
-    case 1: // beta
-      if(which_level_update == 0)
-      {
-        width =  ( range_model[1].beta - range_model[0].beta );
-      }
-      pm[which] += dnest_randh() * width;
-      wrap(&(pm[which]), range_model[0].beta, range_model[1].beta);
-      break;
+    width = ( par_range_model[which][1] - par_range_model[which][0] );
+  }
 
-    case 2: // F
-      if(which_level_update == 0)
-      {
-        width = ( range_model[1].F - range_model[0].F );
-      }
-      pm[which] += dnest_randh() * width;
-      wrap(&(pm[which]), range_model[0].F, range_model[1].F);
-      break;
+  if(which < num_params_blr + num_params_var)
+  {
+    if(which == num_params_blr-1 || which == num_params_blr )
+       width = fmin(width, (par_range_model[which][1] - par_range_model[which][0])*0.01 );
 
-    case 3: // inclination
-      if(which_level_update == 0)
-      {
-        width = ( range_model[1].inc - range_model[0].inc );
-      }
-      pm[which] += dnest_randh() * width;
-      wrap(&(pm[which]), range_model[0].inc, range_model[1].inc);
-      break;
-
-    case 4: // openning angle
-      if(which_level_update == 0)
-      {
-        width = ( range_model[1].opn - range_model[0].opn );
-      }
-      pm[which] += dnest_randh() * width;
-      wrap(&(pm[which]), range_model[0].opn, range_model[1].opn);
-      break;
-
-    case 5: // A, response coefficient
-      if(which_level_update == 0)
-      {
-        width = ( range_model[1].A - range_model[0].A );
-      }
-      pm[which] += dnest_randh() * width;
-      wrap(&(pm[which]), range_model[0].A, range_model[1].A);
-      break;
-
-    case 6: // Ag, non-linearity
-      if(which_level_update == 0)
-      {
-        width = ( range_model[1].Ag - range_model[0].Ag );
-      }
-      pm[which] += dnest_randh() * width;
-      wrap(&(pm[which]), range_model[0].Ag, range_model[1].Ag);
-      break;
-
-    case 7: // k
-      if(which_level_update == 0)
-      {
-        width = ( range_model[1].k - range_model[0].k );
-      }
-      pm[which] += dnest_randh() * width;
-      wrap(&(pm[which]), range_model[0].k, range_model[1].k);
-      break;
-
-     case 8: // systematic error of line
-      if(which_level_update == 0)
-      {
-        width =  ( range_model[1].logse - range_model[0].logse );
-      }
-      pm[which] += dnest_randh() * fmin(width, (range_model[1].logse - range_model[0].logse)*0.01 );
-      wrap_limit(&(pm[which]), range_model[0].logse, range_model[1].logse);
-      break;
-
-    case 9: // systematic error of continuum
-      if(which_level_update == 0)
-      {
-        width = var_range_model[0][1] - var_range_model[0][0];
-      }
-      pm[which] += dnest_randh() * fmin(width, (var_range_model[0][1] - var_range_model[0][0]) * 0.01);
-      wrap(&(pm[which]), var_range_model[0][0], var_range_model[0][1]);
-      break;
-    
-    case 10: // sigma
-      if(which_level_update == 0)
-      {
-        width = var_range_model[1][1] - var_range_model[1][0];
-      }
-      pm[which] += dnest_randh() * width;
-      wrap(&(pm[which]), var_range_model[1][0], var_range_model[1][1]);
-      break;
-
-    case 11: // tau
-      if(which_level_update == 0)
-      {
-        width = var_range_model[2][1] - var_range_model[2][0];
-      }
-      pm[which] += dnest_randh() * width;
-      wrap(&(pm[which]), var_range_model[2][0], var_range_model[2][1]);
-      break;
-
-    case 12: // mean value
-      if(which_level_update == 0)
-      {
-        width = var_range_model[3][1] - var_range_model[3][0];
-      }
-      pm[which] += dnest_randh() * width;
-      wrap(&(pm[which]), var_range_model[3][0], var_range_model[3][1]);
-      break;
-
-    default: // light curve points
-      if(which_level_update == 0)
-      {
-        width = var_range_model[4][1] - var_range_model[4][0];;
-      }
-      logH -= (-0.5*pow(pm[which], 2.0) );
-      pm[which] += dnest_randh() * width;
-      wrap(&pm[which], var_range_model[4][0], var_range_model[4][1]);
-      logH += (-0.5*pow(pm[which], 2.0) );
-      break;
+    pm[which] += dnest_randh() * width;
+    wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
+  }
+  else
+  {
+    logH -= (-0.5*pow(pm[which], 2.0) );
+    pm[which] += dnest_randh() * width;
+    wrap(&pm[which], par_range_model[which][0], par_range_model[which][1]);
+    logH += (-0.5*pow(pm[which], 2.0) );
   }
   return logH;
 }

@@ -60,10 +60,9 @@ double *Fline2d_at_data;
 double *Fline2d, *Flerrs2d;
 
 // BLR
-BLRmodel range_model[2];    /*!< define the range of BLR model parameters */
 int *par_fix, npar_fix;
 double *par_fix_val;
-
+double **blr_range_model, **par_range_model;
 
 int num_params, num_params_blr, num_params_var;
 

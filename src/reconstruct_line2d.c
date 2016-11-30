@@ -588,6 +588,11 @@ void reconstruct_line2d_end()
   free(prob_line_particles);
   free(prob_line_particles_perturb);
 
+  for(i=0; i<num_params; i++)
+  {
+    free(par_range_model[i]);
+  }
+  free(par_range_model);
   return;
 }
 
