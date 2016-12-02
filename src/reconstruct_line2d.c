@@ -438,7 +438,7 @@ void reconstruct_line2d_init()
 
 
   TransV = malloc(parset.n_vel_recon * sizeof(double));
-  Trans2D = malloc(parset.n_line_recon * parset.n_vel_recon * sizeof(double));
+  Trans2D = malloc(parset.n_tau * parset.n_vel_recon * sizeof(double));
   
   //Fline2d_at_data = malloc(n_line_data * n_vel_data * sizeof(double));
 
