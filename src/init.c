@@ -46,17 +46,9 @@ void init()
   gsl_acc = gsl_interp_accel_alloc();
   gsl_linear = gsl_interp_alloc(gsl_interp_linear, parset.n_con_recon);
 
-  /* maximum tau of transfer function should be smaller than the time span of the dataset. */
-  if(parset.tau_max_set > Tcon_data[n_con_data-1] - Tcon_data[0])
-  {
-    parset.tau_max_set = Tcon_data[n_con_data-1] - Tcon_data[0];
-    if(thistask == roottask)
-      printf("# Reset tau_max_set to be the time span of the data, Tau_max = %f.\n", Tcon_data[n_con_data-1] - Tcon_data[0]);
-  }
-
   /* set the range of cloud radial distribution */
   rcloud_min_set = parset.tau_min_set;
-  rcloud_max_set = parset.tau_max_set*1000.0;
+  rcloud_max_set = parset.tau_max_set*0.5;
   
   /* set the range of continuum variation  */
   var_range_model[0][0] = log(1.0e-10);; // systematic error in continuum
@@ -77,7 +69,7 @@ void init()
   i = 0;
   //mu
   blr_range_model[i][0] = log(0.1);
-  blr_range_model[i++][1] = log(parset.tau_max_set*10.0);
+  blr_range_model[i++][1] = log(Tcon_data[n_con_data-1] - Tcon_data[0]);
   //beta
   blr_range_model[i][0] = 0.001;
   blr_range_model[i++][1] = 3.0;

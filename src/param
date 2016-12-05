@@ -29,7 +29,7 @@ Tran2DDataFileOut           data/tran2d_data.txt             % output filename f
 NCloudPerCore               5000                        % number of clouds per task
 NVPerCloud                  10                          % number of velocities per cloud
 
-NTau                        100                         % number of time-lag points calculated in transfer function
+NTau                        200                         % number of time-lag points calculated in transfer function
 TauMinSet                   0.0                         % minimum time lag calculated
 TauMaxSet                   100.0                        % maximum time lag calculated
 

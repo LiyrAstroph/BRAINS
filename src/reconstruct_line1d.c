@@ -117,7 +117,7 @@ void postprocess1d()
       calculate_con_from_model(post_model + num_params_blr *sizeof(double));
       gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
 
-      transfun_1d_cloud_direct(post_model);
+      transfun_1d_cloud_direct(post_model, 0);
       calculate_line_from_blrmodel(post_model, Tline, Fline, parset.n_line_recon);
 
       sum1 = 0.0;
@@ -257,7 +257,7 @@ void reconstruct_line1d()
     }
     fclose(fp);
 
-    transfun_1d_cloud_direct(best_model_line1d);
+    transfun_1d_cloud_direct(best_model_line1d, 1);
     calculate_line_from_blrmodel(best_model_line1d, Tline, Fline, parset.n_line_recon);
 
     // output reconstructed line light curve
@@ -297,10 +297,12 @@ void reconstruct_line1d()
 void reconstruct_line1d_init()
 {
   int i;
-  double dT;
+  double dT, Tspan;
+
+  Tspan = (Tcon_data[n_con_data-1] - Tcon_data[0]);
 
   /* set time array for continuum */
-  Tcon_min = Tcon_data[0] - fmax(0.05*(Tcon_data[n_con_data -1] - Tcon_data[0]), parset.tau_max_set + (Tcon_data[0] - Tline_data[0]));
+  Tcon_min = Tcon_data[0] - fmax(0.05*Tspan, Tspan + (Tcon_data[0] - Tline_data[0]));
   Tcon_max = Tcon_data[n_con_data-1] + fmax(0.05*(Tcon_data[n_con_data -1] - Tcon_data[0]), 10.0);
   Tcon_max = fmax(Tcon_max, Tline_data[n_line_data -1]);  /* The time span shoud cover that of the emission line data */
 
@@ -320,7 +322,7 @@ void reconstruct_line1d_init()
   Flerrs = malloc(parset.n_line_recon * sizeof(double));
 
   Tline_min = Tline_data[0] - fmin(0.1*(Tline_data[n_line_data - 1] - Tline_data[0]), 10);
-  Tline_min = fmax(Tline_min, Tcon_min + parset.tau_max_set);
+  Tline_min = fmax(Tline_min, Tcon_min + Tspan);
   Tline_max = Tline_data[n_line_data -1] + fmin(0.1*(Tline_data[n_line_data - 1] - Tline_data[0]), 10);
   Tline_max = fmin(Tline_max, Tcon_max);  /* The time span should be within that of the continuum */
   
@@ -553,7 +555,7 @@ double prob_line1d(const void *model)
   {
     /* re-point */
     Trans1D = Trans1D_particles_perturb[which_particle_update]; 
-    transfun_1d_cloud_direct(model);
+    transfun_1d_cloud_direct(model, 0);
   }
   else
   {
@@ -634,7 +636,7 @@ double prob_initial_line1d(const void *model)
 
   Trans1D = Trans1D_particles[which_particle_update];
   Fline_at_data = Fline_at_data_particles[which_particle_update];
-  transfun_1d_cloud_direct(model);
+  transfun_1d_cloud_direct(model, 0);
   calculate_line_from_blrmodel(model, Tline_data, Fline_at_data, n_line_data);
 
   for(i=0; i<n_line_data; i++)

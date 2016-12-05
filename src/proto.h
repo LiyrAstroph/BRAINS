@@ -50,7 +50,7 @@ void reconstruct_line1d_end();
 double prob_line1d(const void *model);
 double prob_initial_line1d(const void *model);
 void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl);
-void transfun_1d_cloud_direct(const void *pm);
+void transfun_1d_cloud_direct(const void *pm, int flag_save);
 void postprocess1d();
 void set_par_range_model1d();
 

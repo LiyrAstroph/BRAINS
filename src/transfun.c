@@ -49,6 +49,11 @@ void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl
   		  fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, tc, gsl_acc); /* interpolation */
   			fline += Trans1D[j] * fcon * pow(fabs(fcon), model->Ag);     /*  line response */
   	  }
+      else
+      {
+        fcon = ((double *)pm)[num_params_blr + num_params_var - 1]; /* mean value */
+        fline += Trans1D[j] * fcon * pow(fabs(fcon), model->Ag);
+      }
   	}
   	fline *= dTransTau * A;
   	Fl[i] = fline;
@@ -59,8 +64,9 @@ void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl
 /* 
  * This function caclulate 1d transfer function.
  */
-void transfun_1d_cloud_direct(const void *pm)
+void transfun_1d_cloud_direct(const void *pm, int flag_save)
 {
+  FILE *fcloud_out;
   int i, idt, nc;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb;
@@ -80,6 +86,18 @@ void transfun_1d_cloud_direct(const void *pm)
   a = 1.0/beta/beta;
   s = mu/a;
   
+  if(flag_save && thistask == roottask)
+  {
+    char fname[200];
+    sprintf(fname, "%s/%s", parset.file_dir, parset.cloud_out_file);
+    fcloud_out = fopen(fname, "w");
+    if(fcloud_out == NULL)
+    {
+      fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+      exit(-1);
+    }
+  }
+
   /* reset transfer function */
   for(i=0; i<parset.n_tau; i++)
   {
@@ -154,6 +172,11 @@ void transfun_1d_cloud_direct(const void *pm)
     //weight = 0.5 + k * x/sqrt(x*x+y*y);
     //Trans1D[idt] += pow(1.0/r, 2.0*(1 + gam)) * weight;
     Trans1D[idt] += weight;
+
+    if(flag_save && thistask==roottask)
+    {
+      fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+    }
   }
 
   /* normalize transfer function */
@@ -173,10 +196,16 @@ void transfun_1d_cloud_direct(const void *pm)
   }
   else
   {
+    printf(" Warning, zero transfer function.\n");
     for(i=0; i<parset.n_tau; i++)
     {
       Trans1D[i] = 0.0;
     }
+  }
+  
+  if(flag_save && thistask==roottask)
+  {
+    fclose(fcloud_out);
   }
 
   return;
@@ -209,6 +238,11 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
           fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, tc, gsl_acc);
           fline += trans2d[k*nv+i] * fcon * pow(fabs(fcon), model->Ag);
           //fline += trans2d[k*nv+i] * fcon;
+        }
+        else
+        {
+          fcon = ((double *)pm)[num_params_blr + num_params_var - 1]; /* mean value */
+          fline += trans2d[k*nv+i] * fcon * pow(fabs(fcon), model->Ag);
         }
       }
       fline *= dTransTau * A ;
@@ -395,11 +429,6 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
       vcloud_max = fmax(vx, vcloud_max);
       vcloud_min = fmin(vx, vcloud_min);
 
-      if(flag_save && thistask==roottask)
-      {
-        fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx, vy, vz);
-      }
-
       V = -vx;  //note the definition of the line-of-sight velocity. postive means a receding 
                 // velocity relative to the observer.
       //if(V<transv[0] || V>=transv[n_vel-1]+dV)
@@ -410,6 +439,11 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
         continue;
       //trans2d[idt*n_vel + idV] += pow(1.0/r, 2.0*(1 + gam)) * weight;
       trans2d[idt*n_vel + idV] += weight;
+
+      if(flag_save && thistask==roottask)
+      {
+        fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx, vy, vz);
+      }
     }
   }
 
@@ -434,6 +468,7 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
   }
   else
   {
+    printf(" Warning, zero transfer function.\n");
     for(i=0; i<parset.n_tau; i++)
     {
       for(j=0; j<n_vel; j++)

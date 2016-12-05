@@ -421,9 +421,12 @@ void reconstruct_line2d()
 void reconstruct_line2d_init()
 {
   int i;
-  double dT;
+  double dT, Tspan;
+
+  Tspan = Tcon_data[n_con_data -1] - Tcon_data[0];
+
   /* set time array for continuum */
-  Tcon_min = Tcon_data[0] - fmax(0.05*(Tcon_data[n_con_data -1] - Tcon_data[0]), parset.tau_max_set + (Tcon_data[0] - Tline_data[0]));
+  Tcon_min = Tcon_data[0] - fmax(0.05*Tspan, Tspan + (Tcon_data[0] - Tline_data[0]));
   Tcon_max = Tcon_data[n_con_data-1] + fmax(0.05*(Tcon_data[n_con_data -1] - Tcon_data[0]), 10.0);
   Tcon_max = fmax(Tcon_max, Tline_data[n_line_data -1]);  /* The time span shoud cover that of the emission line data */
   dT = (Tcon_max - Tcon_min)/(parset.n_con_recon -1);
@@ -447,7 +450,7 @@ void reconstruct_line2d_init()
 
   
   Tline_min = Tline_data[0] - fmin(0.1*(Tline_data[n_line_data - 1] - Tline_data[0]), 10);
-  Tline_min = fmax(Tline_min, Tcon_min + parset.tau_max_set);
+  Tline_min = fmax(Tline_min, Tcon_min + Tspan);
   Tline_max = Tline_data[n_line_data -1] + fmin(0.1*(Tline_data[n_line_data - 1] - Tline_data[0]), 10);
   Tline_max = fmin(Tline_max, Tcon_max);  /* The time span should be within that of the continuum */
 
