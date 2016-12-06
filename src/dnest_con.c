@@ -120,7 +120,7 @@ double perturb_con(void *model)
   which_parameter_update = which;
   
   /* level-dependent width */
-  which_level_update = which_level_update > (size_levels - 10)?(size_levels-10):which_level_update;
+  which_level_update = which_level_update > (size_levels - 30)?(size_levels-30):which_level_update;
   which_level_update = which_level_update <0?0:which_level_update;
   if( which_level_update != 0)
   {

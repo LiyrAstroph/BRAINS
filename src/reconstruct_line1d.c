@@ -257,7 +257,7 @@ void reconstruct_line1d()
     }
     fclose(fp);
 
-    transfun_1d_cloud_direct(best_model_line1d, 1);
+    transfun_1d_cloud_direct(best_model_line1d, parset.flag_save_clouds);
     calculate_line_from_blrmodel(best_model_line1d, Tline, Fline, parset.n_line_recon);
 
     // output reconstructed line light curve
@@ -303,7 +303,7 @@ void reconstruct_line1d_init()
 
   /* set time array for continuum */
   Tcon_min = Tcon_data[0] - fmax(0.05*Tspan, Tspan + (Tcon_data[0] - Tline_data[0]));
-  Tcon_max = Tcon_data[n_con_data-1] + fmax(0.05*(Tcon_data[n_con_data -1] - Tcon_data[0]), 10.0);
+  Tcon_max = Tcon_data[n_con_data-1] + fmax(0.05*Tspan, 10.0);
   Tcon_max = fmax(Tcon_max, Tline_data[n_line_data -1]);  /* The time span shoud cover that of the emission line data */
 
   dT = (Tcon_max - Tcon_min)/(parset.n_con_recon -1);
