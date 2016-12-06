@@ -234,6 +234,7 @@ void read_data()
   int i;
   char buf[200], fname[200];
 
+  // first need to determine the number of data points 
   if(thistask == roottask)
   {
     
@@ -312,6 +313,7 @@ void read_data()
     MPI_Bcast(&n_vel_data, 1, MPI_INT, roottask, MPI_COMM_WORLD);
   }
 
+  // now allocate memory for data
   allocate_memory_data();
 
   // now read data
@@ -362,6 +364,7 @@ void read_data()
     MPI_Bcast(Flerrs_data, n_line_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
   }
 
+  // read 2d line data
   if(parset.flag_dim == 2)
   {
     if(thistask == roottask)
@@ -471,9 +474,10 @@ void cal_emission_flux()
   int i, j;
   double dV;
   
+  // assume that velocity grid is equally spaced 
   dV = (Vline_data[n_vel_data-1]-Vline_data[0])/(n_vel_data-1);
-// using trapezoid formula.
 
+// using trapezoid formula.
   for(j=0; j<n_line_data; j++)
   { 
     Fline_data[j] = Fline2d_data[j*n_vel_data + 0]/2.0;
@@ -493,7 +497,7 @@ void cal_emission_flux()
 }
 
 /*!
- * get number of particles.
+ * get number of particles from the option file.
  */
 void get_num_particles(char *fname)
 {

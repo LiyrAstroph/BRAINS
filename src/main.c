@@ -53,17 +53,17 @@ int main(int argc, char **argv)
   if(thistask == roottask)
   {
     opterr = 0;
-    parset.flag_postprc = 0; /* default value */
+    parset.flag_postprc = 0; /* default value, 0 means postprocessing after runing MCMC sampling. */
     parset.temperature = 1.0; /* default value */
     while( (opt = getopt(argc, argv, "pt:")) != -1)
     {
       switch(opt)
       {
-        case 'p':  /* only do postprocess */
+        case 'p':  /* only do postprocessing */
           parset.flag_postprc = 1;
-          printf("# MCMC samples available, only do post-process.\n");
+          printf("# MCMC samples available, only do post-processing.\n");
           break;
-        case 't': /* temperature for postprocess */
+        case 't': /* temperature for postprocessing */
           parset.temperature = atof(optarg);
           printf("# Set a temperature %f.\n", parset.temperature);
           if(parset.temperature == 0.0)

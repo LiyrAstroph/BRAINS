@@ -31,10 +31,11 @@
 void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl)
 {
   int i, j;
-  double fline, fcon, tl, tc, tau, A;
+  double fline, fcon, tl, tc, tau, A, mean;
   BLRmodel *model = (BLRmodel *)pm;
 
   A=exp(model->A);
+  mean = ((double *)pm)[num_params_blr + num_params_var - 1];
   
   for(i=0;i<nl;i++)
   {
@@ -47,13 +48,12 @@ void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl
   	  if(tc>=Tcon_min && tc <=Tcon_max)
   	  {
   		  fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, tc, gsl_acc); /* interpolation */
-  			fline += Trans1D[j] * fcon * pow(fabs(fcon), model->Ag);     /*  line response */
   	  }
       else
       {
-        fcon = ((double *)pm)[num_params_blr + num_params_var - 1]; /* mean value */
-        fline += Trans1D[j] * fcon * pow(fabs(fcon), model->Ag);
+        fcon = mean; /*  beyond the range, set to be the mean value */
       }
+      fline += Trans1D[j] * fcon * pow(fabs(fcon), model->Ag);     /*  line response */
   	}
   	fline *= dTransTau * A;
   	Fl[i] = fline;
@@ -218,11 +218,11 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
                                               double *fl2d, int nl, int nv)
 {
   int i, j, k;
-  double fline, tau, tl, tc, fcon, A;
+  double fline, tau, tl, tc, fcon, A, mean;
   BLRmodel *model = (BLRmodel *)pm;
 
   A=exp(model->A);
-
+  mean = ((double *)pm)[num_params_blr + num_params_var - 1];
   for(j=0;j<nl; j++)
   {
     tl = Tl[j];
@@ -235,15 +235,14 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
         tc = tl - tau;
         if(tc>=Tcon_min && tc <=Tcon_max)
         {
-          fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, tc, gsl_acc);
-          fline += trans2d[k*nv+i] * fcon * pow(fabs(fcon), model->Ag);
-          //fline += trans2d[k*nv+i] * fcon;
+          fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, tc, gsl_acc);          
         }
         else
         {
-          fcon = ((double *)pm)[num_params_blr + num_params_var - 1]; /* mean value */
-          fline += trans2d[k*nv+i] * fcon * pow(fabs(fcon), model->Ag);
+          fcon = mean; /* mean value */
         }
+        fline += trans2d[k*nv+i] * fcon * pow(fabs(fcon), model->Ag);
+        //fline += trans2d[k*nv+i] * fcon;
       }
       fline *= dTransTau * A ;
       fl2d[j*nv + i] = fline;

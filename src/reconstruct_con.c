@@ -148,7 +148,8 @@ void postprocess_con()
 }
 
 /*! 
- *
+ * This function runs dnest sampling and postprocessing, reconstructs the continuum 
+*  using the best estimates of model parameters.
  */
 void reconstruct_con()
 {
@@ -161,6 +162,10 @@ void reconstruct_con()
 
   if(thistask == roottask)
   {
+    which_parameter_update = -1;
+    which_particle_update = 0;
+    Fcon = Fcon_particles[which_particle_update];
+
     calculate_con_from_model(best_model_con);
 
     FILE *fp;
@@ -182,7 +187,7 @@ void reconstruct_con()
   }
 
   reconstruct_con_end();
-
+  return;
 }
 
 /*!
@@ -211,6 +216,9 @@ void calculate_con_from_model(const void *model)
   return;
 }
 
+/*!
+ * This function calculate continuum ligth curves from varibility parameters.
+ */
 void reconstruct_con_from_varmodel(double sigma, double tau, double alpha)
 {
   double *Larr, *ybuf, *y;
@@ -316,7 +324,8 @@ double prob_con_variability_initial(const void *model)
 }
 
 /*!
- * this function sets the covariance matrix 
+ * this function sets the covariance matrix at time points for reconstruction.
+ * store into PSmat.
  */
 void set_covar_Pmat(double sigma, double tau, double alpha)
 {
@@ -337,7 +346,7 @@ void set_covar_Pmat(double sigma, double tau, double alpha)
 }
 
 /*!
- * this function sets the covariance matrix at data points 
+ * this function sets the covariance matrix at data time points 
  */
 void set_covar_Pmat_data(double sigma, double tau, double alpha)
 {
@@ -357,6 +366,9 @@ void set_covar_Pmat_data(double sigma, double tau, double alpha)
   return;
 }
 
+/*!
+ * this function sets the covariance matrix at time of data points and reconstruction points
+ */
 void set_covar_Umat(double sigma, double tau, double alpha)
 {
   double t1, t2;
@@ -374,14 +386,18 @@ void set_covar_Umat(double sigma, double tau, double alpha)
   return;
 }
 
+/*!
+ * this function initializes the continuum reconstruction.
+ */
 void reconstruct_con_init()
 {
   int i;
-  double dT;
+  double dT, Tspan;
 
+  Tspan = Tcon_data[n_con_data -1] - Tcon_data[0];
   /* set time array for continuum */
-  Tcon_min = Tcon_data[0] - fmax(0.05*(Tcon_data[n_con_data -1] - Tcon_data[0]), 10.0);
-  Tcon_max = Tcon_data[n_con_data-1] + fmax(0.05*(Tcon_data[n_con_data -1] - Tcon_data[0]), 10.0);
+  Tcon_min = Tcon_data[0] - fmax(0.05*Tspan, 10.0);
+  Tcon_max = Tcon_data[n_con_data-1] + fmax(0.05*Tspan, 10.0);
   dT = (Tcon_max - Tcon_min)/(parset.n_con_recon -1);
   
   for(i=0; i<parset.n_con_recon; i++)
@@ -418,6 +434,9 @@ void reconstruct_con_init()
   return;
 }
 
+/*!
+ * this function finalize the continuum reconstruction.
+ */
 void reconstruct_con_end()
 {
   int i;
@@ -429,6 +448,9 @@ void reconstruct_con_end()
   }
   free(Fcon_particles);
   free(Fcon_particles_perturb);
+  
+  free(prob_con_particles);
+  free(prob_con_particles_perturb);
 
   free(perturb_accept);
   free(which_parameter_update_prev);

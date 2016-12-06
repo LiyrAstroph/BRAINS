@@ -72,24 +72,32 @@ int dnest_line1d(int argc, char **argv)
   return 0;
 }
 
+/*!
+ * this function set the parameter range.
+ */
 void set_par_range_model1d()
 {
   int i;
 
+  // BLR parameters first
   for(i=0; i<num_params_blr-1; i++)
   {
     par_range_model[i][0] = blr_range_model[i][0];
     par_range_model[i][1] = blr_range_model[i][1];
   }
+  // note that the last BLR parameters is the systematic error (1d)
   i = num_params_blr -1;
   par_range_model[i][0] = blr_range_model[sizeof(BLRmodel)/sizeof(double)-1][0];
   par_range_model[i][1] = blr_range_model[sizeof(BLRmodel)/sizeof(double)-1][1];
 
+  // variability parameters
   for(i=num_params_blr; i<num_params_var + num_params_blr; i++)
   {
     par_range_model[i][0] = var_range_model[i-num_params_blr][0];
     par_range_model[i][1] = var_range_model[i-num_params_blr][1];
   }
+
+  // continuum light curve parameters
   for(i=num_params_blr+num_params_var; i<num_params; i++)
   {
     par_range_model[i][0] = var_range_model[num_params_var][0];
@@ -98,7 +106,7 @@ void set_par_range_model1d()
 }
 
 /*!
- * This function generate a sample from the prior.
+ * This function generates a sample from the prior.
  */
 void from_prior_line1d(void *model)
 {
@@ -110,11 +118,13 @@ void from_prior_line1d(void *model)
     pm[i] = par_range_model[i][0] + dnest_rand() * ( par_range_model[i][1] - par_range_model[i][0]  );
   }
 
+  // set an upper limit to the MCMC steps of systematic errors
   i=num_params_blr-1;
   pm[i] = par_range_model[i][1] - dnest_rand() * ( par_range_model[i][1] - par_range_model[i][0] )*0.01;
   i=num_params_blr;
   pm[i] = par_range_model[i][1] - dnest_rand() * ( par_range_model[i][1] - par_range_model[i][0] )*0.01;
 
+  // cope with fixed parameters.
   for(i=0; i<num_params_blr; i++)
   {
     if(par_fix[i] == 1)
@@ -148,6 +158,9 @@ double log_likelihoods_cal_initial_line1d(const void *model)
   return logL;
 }
 
+/*!
+ * this function perturbs the parameters.
+ */
 double perturb_line1d(void *model)
 {
   double *pm = (double *)model;
