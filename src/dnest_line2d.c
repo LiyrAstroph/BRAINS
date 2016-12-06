@@ -28,7 +28,9 @@
 #include "dnest_line2d.h"
 #include "proto.h"
 
-
+/*!
+ * this function does dnest samling.
+ */
 int dnest_line2d(int argc, char **argv)
 {
   int i;
@@ -73,28 +75,38 @@ int dnest_line2d(int argc, char **argv)
   return 0;
 }
 
+/*!
+ * this function setups parameter ranges.
+ */
 void set_par_range_model2d()
 {
   int i;
 
-  /* setup parameter range */
+  /* setup parameter range, BLR parameters first */
   for(i=0; i<num_params_blr; i++)
   {
     par_range_model[i][0] = blr_range_model[i][0];
     par_range_model[i][1] = blr_range_model[i][1];
   }
+  // variability parameters
   for(i=num_params_blr; i<num_params_var + num_params_blr; i++)
   {
     par_range_model[i][0] = var_range_model[i-num_params_blr][0];
     par_range_model[i][1] = var_range_model[i-num_params_blr][1];
   }
+  // continuum ligth curve values
   for(i=num_params_blr+num_params_var; i<num_params; i++)
   {
     par_range_model[i][0] = var_range_model[num_params_var][0];
     par_range_model[i][1] = var_range_model[num_params_var][1];
   }
+
+  return;
 }
 
+/*!
+ * this function generates a sample from prior.
+ */
 void from_prior_line2d(void *model)
 {
   int i;
@@ -110,6 +122,7 @@ void from_prior_line2d(void *model)
   i=num_params_blr;
   pm[i] = par_range_model[i][0] - dnest_rand() * ( par_range_model[i][1] - par_range_model[0][0] )*0.01;
 
+  // cope with fixed parameters
   for(i=0; i<num_params_blr; i++)
   {
     if(par_fix[i] == 1)
@@ -120,8 +133,13 @@ void from_prior_line2d(void *model)
     pm[i+num_params_var+num_params_blr] = dnest_randn();
   
   which_parameter_update = -1;
+
+  return;
 }
 
+/*!
+ * this function calculates likelihood.
+ */
 double log_likelihoods_cal_line2d(const void *model)
 {
   double logL;
@@ -129,6 +147,9 @@ double log_likelihoods_cal_line2d(const void *model)
   return logL;
 }
 
+/*!
+ * this function calculates likelihood at initial step.
+ */
 double log_likelihoods_cal_initial_line2d(const void *model)
 {
   double logL;
@@ -136,13 +157,19 @@ double log_likelihoods_cal_initial_line2d(const void *model)
   return logL;
 }
 
+/*!
+ * this function perturbs parameters.
+ */
 double perturb_line2d(void *model)
 {
   double *pm = (double *)model;
   double logH = 0.0, limit1, limit2, width, rnd;
   int which; 
 
-  /* fixed parameters need not to update */
+  /* 
+   * fixed parameters need not to update 
+   * perturb important parameters more frequently
+   */
   do
   {
     rnd = dnest_rand();
@@ -178,6 +205,7 @@ double perturb_line2d(void *model)
 
   if(which < num_params_blr + num_params_var)
   {
+    // set an upper limit to move steps of systematic error parameters.
     if(which == num_params_blr-1 || which == num_params_blr )
        width = fmin(width, (par_range_model[which][1] - par_range_model[which][0])*0.01 );
 
@@ -195,6 +223,9 @@ double perturb_line2d(void *model)
   return logH;
 }
 
+/*!
+ * this function prints out parameters.
+ */
 void print_particle_line2d(FILE *fp, const void *model)
 {
   int i;
@@ -205,18 +236,29 @@ void print_particle_line2d(FILE *fp, const void *model)
     fprintf(fp, "%f ", pm[i] );
   }
   fprintf(fp, "\n");
+  return;
 }
 
+/*!
+ * this function copy model from src to dest.
+ */
 void copy_model_line2d(void *dest, const void *src)
 {
   memcpy(dest, src, size_of_modeltype);
+  return;
 }
 
+/*!
+ * this function allocates a model memoery. 
+ */
 void *create_model_line2d()
 {
   return (void *)malloc(size_of_modeltype);
 }
 
+/*!
+ * this function returns number of parameters.
+ */
 int get_num_params_line2d()
 {
   return num_params;

@@ -252,6 +252,7 @@ void reconstruct_line1d()
     gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
     
     
+    // output continuum light curve
     sprintf(fname, "%s/%s", parset.file_dir, parset.pcon_out_file);
     fp = fopen(fname, "w");
     if(fp == NULL)
@@ -314,7 +315,7 @@ void reconstruct_line1d_init()
 
   Tspan = (Tcon_data[n_con_data-1] - Tcon_data[0]);
 
-  /* set time array for continuum */
+  /* set time grid for continuum */
   Tcon_min = Tcon_data[0] - fmax(0.05*Tspan, Tspan + (Tcon_data[0] - Tline_data[0]));
   Tcon_max = Tcon_data[n_con_data-1] + fmax(0.05*Tspan, 10.0);
   Tcon_max = fmax(Tcon_max, Tline_data[n_line_data -1]);  /* The time span shoud cover that of the emission line data */
@@ -330,6 +331,7 @@ void reconstruct_line1d_init()
   //Trans1D = malloc(parset.n_tau * sizeof(double));
   //Fline_at_data = malloc(n_line_data * sizeof(double));
 
+  // set time grid for line
   Tline = malloc(parset.n_line_recon * sizeof(double));
   Fline = malloc(parset.n_line_recon * sizeof(double));
   Flerrs = malloc(parset.n_line_recon * sizeof(double));
@@ -337,7 +339,7 @@ void reconstruct_line1d_init()
   Tline_min = Tline_data[0] - fmin(0.1*(Tline_data[n_line_data - 1] - Tline_data[0]), 10);
   Tline_min = fmax(Tline_min, Tcon_min + Tspan);
   Tline_max = Tline_data[n_line_data -1] + fmin(0.1*(Tline_data[n_line_data - 1] - Tline_data[0]), 10);
-  Tline_max = fmin(Tline_max, Tcon_max);  /* The time span should be within that of the continuum */
+  Tline_max = fmin(Tline_max, Tcon_max);  /* The time span should be smaller than that of the continuum */
   
   dT = (Tline_max - Tline_min)/(parset.n_line_recon - 1);
 
@@ -359,8 +361,7 @@ void reconstruct_line1d_init()
   }
   MPI_Bcast(&parset.num_particles, 1, MPI_INT, roottask, MPI_COMM_WORLD);
 
-  // only record gamma-distribution random number of clouds
-  
+  // Fcon perturbed and accepted for each particle
   Fcon_particles = malloc(parset.num_particles * sizeof(double *));
   Fcon_particles_perturb = malloc(parset.num_particles * sizeof(double *));
   for(i=0; i<parset.num_particles; i++)
@@ -369,6 +370,7 @@ void reconstruct_line1d_init()
     Fcon_particles_perturb[i] = malloc(parset.n_con_recon * sizeof(double));
   }
 
+  // acceptance and updated parameter of the previous MCMC move
   perturb_accept = malloc(parset.num_particles * sizeof(int));
   which_parameter_update_prev = malloc(parset.num_particles * sizeof(int));
   for(i=0; i<parset.num_particles; i++)
@@ -406,6 +408,7 @@ void reconstruct_line1d_init()
   prob_line_particles = malloc(parset.num_particles * sizeof(double));
   prob_line_particles_perturb = malloc(parset.num_particles * sizeof(double));
 
+  // scale factor of probabilities
   prob_scale_con = 1.0;
   prob_scale_line = 1.0;
 
@@ -475,7 +478,12 @@ void reconstruct_line1d_end()
   return;
 }
 
-
+/*!
+ * this function calculates probabilities.
+ *
+ * At each MCMC step, only one parameter is updated, which only changes some values; thus,
+ * optimization that reuses the unchanged values can improve computation efficiency.
+ */
 double prob_line1d(const void *model)
 {
   double prob = 0.0, prob_line=0.0, fcon, var2, dy;
@@ -485,16 +493,19 @@ double prob_line1d(const void *model)
   // if the previous perturb is accepted, store the previous perturb values, otherwise, no changes;
   if(perturb_accept[which_particle_update] == 1)
   { 
+    // the parameter previously updated
     param = which_parameter_update_prev[which_particle_update];
     /* continuum parameter is updated */
     if( param >= num_params_blr )
     {
-      /* probability is always changed. */
+      /* continuum probability is always changed. */
       prob_con_particles[which_particle_update] = prob_con_particles_perturb[which_particle_update];
 
       /* the num_params_blr-th parameter is systematic error of continuum, which 
        * only appear at the stage of calculating likelihood probability.
        * when this paramete is updated, Fcon is unchanged.  
+       *
+       * note that (response) Fline is also changed as long as Fcon is changed.
        */
       if( param > num_params_blr )
       {
@@ -507,11 +518,11 @@ double prob_line1d(const void *model)
     }
     else 
     {
-      /* BLR parameter is udated 
-     * Note a) that the (num_par_blr-1)-th parameter is systematic error of line.
-     * when this parameter is updated, Trans1D and Fline are unchanged.
-     *      b) Fline is always changed, except param = num_params_blr-1 or num_params_blr.
-     */
+      /* BLR parameter is updated 
+       * Note a) that the (num_par_blr-1)-th parameter is systematic error of line.
+       * when this parameter is updated, Trans1D and Fline are unchanged.
+       *      b) Fline is always changed, except param = num_params_blr-1 or num_params_blr.
+       */
       if( param < num_params_blr-1 )
       {
         memcpy(Trans1D_particles[which_particle_update], Trans1D_particles_perturb[which_particle_update], 
@@ -520,18 +531,19 @@ double prob_line1d(const void *model)
         memcpy(Fline_at_data_particles[which_particle_update], Fline_at_data_particles_perturb[which_particle_update], 
             n_line_data * sizeof(double));
 
+        // when beta is updated, store cloud distribution
         if(param == 1)
           memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
             parset.n_cloud_per_task * sizeof(double));
       }
     }      
 
+    // line probability is always changed, except when systematic error of continuum is updated.
     if( param != num_params_blr )
       prob_line_particles[which_particle_update] = prob_line_particles_perturb[which_particle_update];  
   }
 
-  /* only update continuum reconstruction when the corresponding parameters are updated
-   */
+  // only update continuum reconstruction when the corresponding parameters are updated
   if( which_parameter_update >= num_params_blr )
   {
     /* the num_params_blr-th parameter is systematic error of continuum, which 
@@ -567,7 +579,7 @@ double prob_line1d(const void *model)
   }
    
   /* only update transfer function when BLR model is changed
-   * or forced to update (force_update = -1)
+   * or forced to update (force_update = 1)
    * Trans1D is a pointer to the transfer function
    */
   if( (which_parameter_update < num_params_blr-1) || force_update == 1)
@@ -633,6 +645,9 @@ double prob_line1d(const void *model)
   return prob;
 }
 
+/*!
+ * this function calculate probability at initial step.
+ */
 double prob_initial_line1d(const void *model)
 {
   double prob = 0.0, prob_line=0.0, fcon, var2, dy;

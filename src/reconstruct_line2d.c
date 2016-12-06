@@ -26,6 +26,9 @@
 void *best_model_line2d;      /*!< best model */
 void *best_model_std_line2d;  /*!< standard deviation of the best model */
 
+/*!
+ * postprocessing.
+ */
 void postprocess2d()
 {
   char posterior_sample_file[BRAINS_MAX_STR_LENGTH];
@@ -45,7 +48,7 @@ void postprocess2d()
 
   if(thistask == roottask)
   {
-    // initialize smooth work space
+    // initialize smoothing workspace
     smooth_init(n_vel_data);
     char fname[200];
     FILE *fp, *fcon, *fline, *ftran, *fline1d;
@@ -142,10 +145,11 @@ void postprocess2d()
       gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
 
       transfun_2d_cloud_direct(post_model, Vline_data, Trans2D_at_veldata, 
-                                      n_vel_data, parset.flag_save_clouds);
+                                      n_vel_data, 0);
       calculate_line2d_from_blrmodel(post_model, Tline_data, Vline_data, Trans2D_at_veldata, 
                                       Fline2d_at_data, n_line_data, n_vel_data);
 
+      // calculate integrated line fluxes
       for(j = 0; j < n_line_data; j++)
       {
         Fline1d[j] = 0.0;
@@ -155,6 +159,7 @@ void postprocess2d()
         }
       }
 
+      // calculate mean time lag
       sum1 = 0.0;
       sum2 = 0.0;
       for(j=0; j<parset.n_tau; j++)
@@ -165,6 +170,7 @@ void postprocess2d()
           sum2 += Trans2D_at_veldata[j * n_vel_data + k];
         }
       }
+      // take care of zero transfer function
       if(sum2 > 0.0)
       {
         lag[i] = sum1/sum2;
@@ -178,12 +184,14 @@ void postprocess2d()
 
       //if( i % (num_ps/10+1) == 0)  
       {
+        // output continuum
         for(j=0; j<parset.n_con_recon; j++)
         {
           fprintf(fcon, "%f %f\n", Tcon[j], Fcon[j]/con_scale);
         }
         fprintf(fcon, "\n");
 
+        // output 2d line
         for(j=0; j<n_line_data; j++)
         {
           for(k=0; k<n_vel_data; k++)
@@ -194,6 +202,7 @@ void postprocess2d()
         }
         fprintf(fline, "\n");
 
+        // output transfer function
         for(j=0; j<parset.n_tau; j++)
         {
           for(k=0; k<n_vel_data; k++)
@@ -204,6 +213,7 @@ void postprocess2d()
         }
         fprintf(ftran, "\n");
 
+        // output 1d line 
         for(j = 0; j<n_line_data; j++)
         {
           fprintf(fline1d, "%f %f\n", Tline_data[j], Fline1d[j]);
@@ -275,6 +285,9 @@ void postprocess2d()
   return;
 }
 
+/*!
+ * this function run dnest sampleing, reconstruct light curves using the best estimates for parameters.
+ */
 void reconstruct_line2d()
 {
   char *argv[]={" "};
@@ -419,6 +432,9 @@ void reconstruct_line2d()
   return;
 }
 
+/*!
+ * this function initializes 2d reconstruction.
+ */
 void reconstruct_line2d_init()
 {
   int i;
@@ -453,7 +469,7 @@ void reconstruct_line2d_init()
   Tline_min = Tline_data[0] - fmin(0.1*(Tline_data[n_line_data - 1] - Tline_data[0]), 10);
   Tline_min = fmax(Tline_min, Tcon_min + Tspan);
   Tline_max = Tline_data[n_line_data -1] + fmin(0.1*(Tline_data[n_line_data - 1] - Tline_data[0]), 10);
-  Tline_max = fmin(Tline_max, Tcon_max);  /* The time span should be within that of the continuum */
+  Tline_max = fmin(Tline_max, Tcon_max);  /* The time span should be smaller than that of the continuum */
 
   dT = (Tline_max - Tline_min)/(parset.n_line_recon - 1);
 
@@ -542,6 +558,9 @@ void reconstruct_line2d_init()
   return;
 }
 
+/*!
+ * this function finalizes 2d reconstruction.
+ */
 void reconstruct_line2d_end()
 {
   free(Tline);
@@ -600,23 +619,35 @@ void reconstruct_line2d_end()
   return;
 }
 
+/*!
+ * this function calculate probability.
+ * 
+ * At each MCMC step, only one parameter is updated, which only changes some values; thus,
+ * optimization that reuses the unchanged values can improve computation efficiency.
+ */
 double prob_line2d(const void *model)
 {
   double prob = 0.0, prob_line = 0.0, fcon, var2, dy;
   int i, param;
   double *pm = (double *)model;
   
-  // if the previous perturb is accepted, store the previous Fcon at perturb stage;
-  // otherwise, Fcon has no changes;
-  // note that every time, only one parameter is updated, so that some 
-  // perturb values keep unchanged. It is hard to track the updated parameters at last time
+  // if the previous perturb is accepted, store the previous perturb values, otherwise, no changes;
   if(perturb_accept[which_particle_update] == 1)
   {
+    // the parameter previously updated
     param = which_parameter_update_prev[which_particle_update];
+    // continuum parameter is updated
     if(param >= num_params_blr)
     {
+      // continuum probability is always changed
       prob_con_particles[which_particle_update] = prob_con_particles_perturb[which_particle_update];
 
+      /* the num_params_blr-th parameter is systematic error of continuum, which 
+       * only appear at the stage of calculating likelihood probability.
+       * when this paramete is updated, Fcon is unchanged.  
+       *
+       * note that (response) Fline is also changed as long as Fcon is changed.
+       */
       if(param > num_params_blr)
       {
         memcpy(Fcon_particles[which_particle_update], Fcon_particles_perturb[which_particle_update], 
@@ -628,6 +659,11 @@ double prob_line2d(const void *model)
     }
     else
     {
+      /* BLR parameter is updated 
+       * Note a) that the (num_par_blr-1)-th parameter is systematic error of line.
+       * when this parameter is updated, Trans2D and Fline are unchanged.
+       *      b) Fline is always changed, except for param = num_params_blr-1 or num_params_blr.
+       */
       if(param < num_params_blr -1 )
       {
         memcpy(Trans2D_at_veldata_particles[which_particle_update], Trans2D_at_veldata_particles_perturb[which_particle_update], 
@@ -636,18 +672,25 @@ double prob_line2d(const void *model)
         memcpy(Fline_at_data_particles[which_particle_update], Fline_at_data_particles_perturb[which_particle_update],
             n_line_data * n_vel_data * sizeof(double));
 
+        // when beta is updated, store cloud distribution
         if(param == 1)
           memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
             parset.n_cloud_per_task * sizeof(double));
       }
     } 
     
+    // line probability is always changed, except when systematic error of continuum is updated.
     if( param != num_params_blr)
       prob_line_particles[which_particle_update] = prob_line_particles_perturb[which_particle_update];
   }
 
+  // only update continuum reconstruction when the corresponding parameters are updated
   if(which_parameter_update >= num_params_blr)
   {
+    /* the num_params_blr-th parameter is systematic error of continuum, which 
+     * only appears at the stage of calculating likelihood probability.
+     * when this paramete is updated, no need to re-calculate the contionuum.  
+     */
     if( which_parameter_update > num_params_blr )
     {
       Fcon = Fcon_particles_perturb[which_particle_update];
@@ -669,7 +712,7 @@ double prob_line2d(const void *model)
     prob *= prob_scale_con;
     prob_con_particles_perturb[which_particle_update] = prob;
   }
-  else
+  else /* continuum has no change, use the previous values */
   {
     Fcon = Fcon_particles[which_particle_update];
     gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
@@ -677,6 +720,7 @@ double prob_line2d(const void *model)
   }
   
    // only update transfer function when BLR model is changed.
+   // or when forced to updated
   if( (which_parameter_update < num_params_blr-1) || force_update == 1)
   {
     Trans2D_at_veldata = Trans2D_at_veldata_particles_perturb[which_particle_update];
@@ -687,6 +731,9 @@ double prob_line2d(const void *model)
     Trans2D_at_veldata = Trans2D_at_veldata_particles[which_particle_update];
   }
 
+  /* no need to calculate line when only systematic error parameters are updated.
+   * otherwise, always need to calculate line.
+   */
   if( which_parameter_update < num_params_blr-1 || which_parameter_update > num_params_blr || force_update == 1 )
   {
     Fline2d_at_data = Fline_at_data_particles_perturb[which_particle_update];
@@ -704,6 +751,7 @@ double prob_line2d(const void *model)
   }
   else
   {
+    // continuum systematic error is updated
     if( which_parameter_update == num_params_blr )
     {
       prob_line = prob_line_particles[which_particle_update];
@@ -731,6 +779,9 @@ double prob_line2d(const void *model)
   return prob;
 }
 
+/*!
+ * this function calculate probability at initial step.
+ */
 double prob_initial_line2d(const void *model)
 {
   double prob = 0.0, prob_line = 0.0, fcon, var2, dy;
@@ -757,7 +808,7 @@ double prob_initial_line2d(const void *model)
 
   for(i=0; i<n_line_data*n_vel_data; i++)
   {
-    dy = Fline2d_data[i] - Fline2d_at_data[i] ;
+    dy = Fline2d_data[i] - Fline2d_at_data[i];
     var2 = Flerrs2d_data[i]*Flerrs2d_data[i];
     var2 += exp(pm[num_params_blr-1])*exp(pm[num_params_blr-1]);
     prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
