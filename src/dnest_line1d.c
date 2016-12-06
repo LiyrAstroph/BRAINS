@@ -103,6 +103,7 @@ void set_par_range_model1d()
     par_range_model[i][0] = var_range_model[num_params_var][0];
     par_range_model[i][1] = var_range_model[num_params_var][1];
   }
+  return;
 }
 
 /*!
@@ -136,6 +137,7 @@ void from_prior_line1d(void *model)
 
   /* all parameters need to update at the initial step */
   which_parameter_update = -1;
+  return;
 }
 
 /*!
@@ -206,6 +208,7 @@ double perturb_line1d(void *model)
 
   if(which < num_params_blr + num_params_var)
   {
+    // set an upper limit to the MCMC steps of systematic errors
     if(which == num_params_blr-1 || which == num_params_blr )
        width = fmin(width, (par_range_model[which][1] - par_range_model[which][0])*0.01 );
 
@@ -223,7 +226,7 @@ double perturb_line1d(void *model)
 }
 
 /*!
- * This function print the particle into the file.
+ * This function print out the particle into the file.
  */
 void print_particle_line1d(FILE *fp, const void *model)
 {
@@ -235,6 +238,7 @@ void print_particle_line1d(FILE *fp, const void *model)
     fprintf(fp, "%f ", pm[i] );
   }
   fprintf(fp, "\n");
+  return;
 }
 
 /*!

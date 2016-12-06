@@ -28,6 +28,10 @@
 void *best_model_line1d;     /*!< best model */
 void *best_model_std_line1d; /*!< standard deviation of the best model */
 
+
+/*!
+ * this function does postprocessing.
+ */
 void postprocess1d()
 {
   char posterior_sample_file[BRAINS_MAX_STR_LENGTH];
@@ -122,6 +126,7 @@ void postprocess1d()
 
       sum1 = 0.0;
       sum2 = 0.0;
+      //take care of zero transfer function.
       for(j=0; j<parset.n_tau; j++)
       {
         sum1 += Trans1D[j] * TransTau[j];
@@ -218,12 +223,16 @@ void postprocess1d()
   return;
 }
 
+/*!
+ * this function run dnest sampling, reconstruct light curves using the best estimates of parameters.
+ */
 void reconstruct_line1d()
 {
   char *argv[]={""};
   reconstruct_line1d_init();
 // dnest run
   dnest_line1d(0, argv);
+
   postprocess1d();
 
   if(thistask == roottask)
@@ -292,8 +301,12 @@ void reconstruct_line1d()
   }
 
   reconstruct_line1d_end();
+  return;
 }
 
+/*! 
+ * this function initializes 1d line reconstruction.
+ */
 void reconstruct_line1d_init()
 {
   int i;
@@ -395,8 +408,13 @@ void reconstruct_line1d_init()
 
   prob_scale_con = 1.0;
   prob_scale_line = 1.0;
+
+  return;
 }
 
+/*!
+ * this function finalizes the 1d reconstruction.
+ */
 void reconstruct_line1d_end()
 {
   free(TransTau);
@@ -454,6 +472,7 @@ void reconstruct_line1d_end()
   {
     printf("Ends reconstruct_line1d.\n");
   }
+  return;
 }
 
 

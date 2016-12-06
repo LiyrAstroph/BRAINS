@@ -128,7 +128,8 @@ void multiply_vec2mat(double * x, double * a, int n)
  * This function calculates determinant of matrix A. \n
  * There are two versions in the internet, the main difference lies at dealing with the sign of det. \n
  * The version II is verifed to be \b INCORRECT. \n
- * Note that LAPACK is written in C, the indix diffes by 1 with that in C.
+ * Note that LAPACK is written in Fortran, the indix diffes by 1 with that in C.
+ * LAPACK version 3.5.0
  * ********************************
  * Version I:
  * \code{.sh}
@@ -240,7 +241,7 @@ void Chol_decomp_U(double *a, int n, int *info)
   }
 
   // only the upper triangle is referenced by dpotrf output, 
-  // so the strictly lower triangle are must set to zero
+  // so the strictly lower triangle must be set to zero
   for(i=0;i<n;i++)
     for(j=0;j<i;j++)
       a[i*n+j] = 0.0;
@@ -270,7 +271,7 @@ void Chol_decomp_L(double *a, int n, int *info)
   }
 
   // only the lower triangle is referenced by dpotrf output, 
-  // so the strictly upper triangle are must set to zero
+  // so the strictly upper triangle must be set to zero
   for(i=0;i<n;i++)
     for(j=i+1;j<n;j++)
       a[i*n+j] = 0.0;

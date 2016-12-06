@@ -15,7 +15,7 @@
 
 #include <stdbool.h>
 
-/* size of model type */
+/* size of model type, defined in dnest */
 extern int size_of_modeltype;
 
 /* functions */
