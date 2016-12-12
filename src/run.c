@@ -39,6 +39,11 @@ void begin_run()
   
   /* now run dnest and reconstruct the model. */
   MPI_Barrier(MPI_COMM_WORLD);
+  if(parset.flag_dim == -1)
+  {
+    sim();
+  }
+
   if(parset.flag_dim == 0) /* only continuum */
   {
     reconstruct_con();

@@ -5,22 +5,22 @@
 FileDir                     /home/liyropt/Projects/GIT/BRAINS
 %FileDir                     /ihepbatch/mbhd01/user/liyanrong/RM/Test/mrk493
 
-FlagDim                     2                           % 0, only continuum; 1, 1d line; 2, 2d line
+FlagDim                     -1                           % -1, simulation; 0, only continuum; 1, 1d line; 2, 2d line
 %===============================
 % data file
-ContinnumFile               data/mrk493_con.txt         % file for contnnum data
-LineFile                    data/mrk493_hb.txt          % file for line data
-Line2DFile                  data/mrk493_hb2d.txt        % file for line 2d data
+ContinnumFile               data/sim_con.txt         % file for contnnum data
+LineFile                    data/sim_hb.txt          % file for line data
+Line2DFile                  data/sim_hb2d.txt        % file for line 2d data
 %===============================
 % reconstruction
 NConRecon                   100                         % number of points for continuum reconstruction
 ConConstructFileOut         data/pcon.txt               % output filename 
 
-NLineRecon                  200                         % number of points for line reconstruction along time axis
+NLineRecon                  40                         % number of points for line reconstruction along time axis
 LineConstructFileOut        data/pline.txt              % output filename
 TranFileOut                 data/tran.txt               % output filename for 1d transfer function
 
-NVelRecon                   100                         % number of points for line reconstruction along velocity axis      
+NVelRecon                   25                         % number of points for line reconstruction along velocity axis      
 Line2DConstructFileOut      data/pline2d.txt            % output filename  
 Line2DDataConstructFileOut  data/pline2d_data.txt       % output filename for 2d transfer function at points same with data
 Tran2DFileOut               data/tran2d.txt             % output filename for 2d transfer function
@@ -31,12 +31,12 @@ NVPerCloud                  10                          % number of velocities p
 
 NTau                        200                         % number of time-lag points calculated in transfer function
 TauMinSet                   0.0                         % minimum time lag calculated
-TauMaxSet                   100.0                        % maximum time lag calculated
+TauMaxSet                   50.0                        % maximum time lag calculated
 
 FlagCloudsOut               0                           % 1, save clouds at the last run; 0, do not save
 CloudsFileOut               data/clouds.txt             % output filename for clouds 
 
-InstRes                     220                         % instrument resolution, in km/s
+InstRes                     400                         % instrument resolution, in km/s
 
 %===============================
 % narrow-line component

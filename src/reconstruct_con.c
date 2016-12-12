@@ -224,16 +224,16 @@ void reconstruct_con_from_varmodel(double sigma, double tau, double alpha)
   double *Larr, *ybuf, *y;
   double lambda, ave_con;
   int i, info;
-
+   
   Larr = malloc(n_con_data * sizeof(double));
   ybuf = malloc(n_con_data* sizeof(double));
   y = malloc(n_con_data* sizeof(double));
-
+  
   set_covar_Pmat_data(sigma, tau, alpha);
   set_covar_Umat(sigma, tau, alpha);
 
   inverse_mat(PSmat_data, n_con_data, &info);
-
+  
   for(i=0;i<n_con_data;i++)
     Larr[i]=1.0;
   multiply_matvec(PSmat_data, Larr, n_con_data, ybuf);

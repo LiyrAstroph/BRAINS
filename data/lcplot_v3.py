@@ -15,7 +15,7 @@ def set_cov_Pmat(sigma, tau, alpha, Tcon):
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif', size=15)
 
-obj = "arp151"
+obj = "sim"
 
 fp=open(obj + "_hb2d.txt", "r")
 line=fp.readline()

@@ -8,13 +8,13 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 from matplotlib.ticker import FuncFormatter
 
-redshift = 0.0165
-ccf = np.loadtxt("../data/1044_vr_lags.txt", skiprows=1)
-print(ccf)
-ccf[:, 0:3] = (ccf[:, 0:3]/(1.0+redshift) - 4861.0)/4861.0 * 3e5/1.0e3
+#redshift = 0.0165
+#ccf = np.loadtxt("../data/1044_vr_lags.txt", skiprows=1)
+#print(ccf)
+#ccf[:, 0:3] = (ccf[:, 0:3]/(1.0+redshift) - 4861.0)/4861.0 * 3e5/1.0e3
 
-nt = 100
-nv = 100
+nt = 200
+nv = 25
 
 fp=open("../data/tran2d.txt", "r")
 
@@ -22,7 +22,7 @@ grid_tau=np.zeros(nt)
 grid_vel=np.zeros(nv)
 tran = np.zeros((nt, nv))
 tran1d=np.zeros(nv)
-
+fp.readline()
 for j in range(0, nt):
   for i in range(0, nv):
     line=fp.readline()
@@ -33,8 +33,9 @@ for j in range(0, nt):
 grid_vel /= 1.0e3
 
 for i in range(0, nv):
-  tran1d[i] = np.sum(tran[:, i] * grid_tau)/np.sum(tran[:, i])
+  tran1d[i] = np.sum(tran[:, i] * grid_tau)/(np.sum(tran[:, i])+1.0e-10)
 
+print(tran1d)
 fig = plt.figure()
 ax = fig.add_axes((0.1, 0.1, 0.5, 0.8))
 plt.plot(grid_vel, tran1d, lw=2, color='w')

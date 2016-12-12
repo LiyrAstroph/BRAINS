@@ -71,6 +71,11 @@ void set_par_range_model2d();
 void smooth_init(int nv);
 void smooth_end();
 
+/* sim */
+void sim();
+void sim_init();
+void sim_end();
+
 /* time */
 double second();
 double timediff(double t0, double t1);

@@ -181,7 +181,7 @@ void scale_con_line()
   if(thistask == roottask)
     printf("task %d con scale: %e\t%e\n", thistask, con_scale, ave_con);
   
-  if(parset.flag_dim == 0)
+  if(parset.flag_dim <= 0)
   {
     return;
   }
