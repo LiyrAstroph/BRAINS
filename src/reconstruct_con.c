@@ -200,8 +200,8 @@ void calculate_con_from_model(const void *model)
   double sigma, tau, alpha, mu;
   int i, info;
   
-  sigma = exp(pm[1]);
   tau = exp(pm[2]);
+  sigma = exp(pm[1]) * sqrt(tau);
   alpha = 1.0;
   mu = pm[3];
   

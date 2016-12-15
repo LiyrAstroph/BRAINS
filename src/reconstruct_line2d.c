@@ -413,7 +413,7 @@ void reconstruct_line2d()
       fprintf(stderr, "# Error: Cannot open file %s\n", fname);
       exit(-1);
     }
-    fprintf(fp, "# %d %d\n", parset.n_tau, n_vel_data);
+    fprintf(fp, "# %d %d\n", parset.n_tau, parset.n_vel_recon);
     for(i=0; i<parset.n_tau; i++)
     {
       for(j=0; j<parset.n_vel_recon; j++)

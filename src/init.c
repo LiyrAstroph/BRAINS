@@ -54,8 +54,8 @@ void init()
   var_range_model[0][0] = log(1.0e-10);; // systematic error in continuum
   var_range_model[0][1] = log(1.0e6);;
 
-  var_range_model[1][0] = -3.0; // log(sigma)
-  var_range_model[1][1] = 1.0; 
+  var_range_model[1][0] = -6.0; // log(sigma)
+  var_range_model[1][1] = -1.0; 
 
   var_range_model[2][0] = 2.0; // log(tau)
   var_range_model[2][1] = 10.0; 
@@ -69,10 +69,10 @@ void init()
   i = 0;
   //mu
   blr_range_model[i][0] = log(0.1);
-  blr_range_model[i++][1] = log(Tcon_data[n_con_data-1] - Tcon_data[0]);
+  blr_range_model[i++][1] = log(rcloud_max_set);
   //beta
   blr_range_model[i][0] = 0.001;
-  blr_range_model[i++][1] = 3.0;
+  blr_range_model[i++][1] = 2.0;
   //F
   blr_range_model[i][0] = 0.001;
   blr_range_model[i++][1] = 0.999;
@@ -96,7 +96,7 @@ void init()
   blr_range_model[i++][1] = log(1000.0);
   //lambda
   blr_range_model[i][0] = 0.0;
-  blr_range_model[i++][1] = 3.0;
+  blr_range_model[i++][1] = 1.0;
   //q
   blr_range_model[i][0] = 0.0;
   blr_range_model[i++][1] = 1.0;
