@@ -5,7 +5,7 @@
 
 2	    # Number of particles
 1000	# new level interval
-1000	# save interval
+2000	# save interval
 200	  # threadSteps - how many steps each thread should do independently before communication
 300	  # maximum number of levels
 10	  # Backtracking scale length (lambda in the paper)

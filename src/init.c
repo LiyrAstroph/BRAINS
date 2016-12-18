@@ -72,7 +72,7 @@ void init()
   blr_range_model[i++][1] = log(rcloud_max_set);
   //beta
   blr_range_model[i][0] = 0.001;
-  blr_range_model[i++][1] = 2.0;
+  blr_range_model[i++][1] = 1.0;
   //F
   blr_range_model[i][0] = 0.001;
   blr_range_model[i++][1] = 0.999;

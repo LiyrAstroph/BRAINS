@@ -36,7 +36,7 @@ TauMaxSet                   200.0                        % maximum time lag calc
 FlagCloudsOut               1                           % 1, save clouds at the last run; 0, do not save
 CloudsFileOut               data/clouds.txt             % output filename for clouds 
 
-InstRes                     400                         % instrument resolution, in km/s
+InstRes                     220                         % instrument resolution, in km/s
 
 %===============================
 % narrow-line component
