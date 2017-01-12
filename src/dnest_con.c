@@ -66,7 +66,7 @@ void from_prior_con(void *model)
   pm[0] = var_range_model[0][1] - dnest_rand()*(var_range_model[0][1] - var_range_model[0][0]) * 0.01;
   pm[1] = var_range_model[1][0] + dnest_rand()*(var_range_model[1][1] - var_range_model[1][0]);
   pm[2] = var_range_model[2][0] + dnest_rand()*(var_range_model[2][1] - var_range_model[2][0]);
-  pm[3] = var_range_model[3][0] + dnest_rand()*(var_range_model[3][1] - var_range_model[3][0]);
+  pm[3] = dnest_randn(); //var_range_model[3][0] + dnest_rand()*(var_range_model[3][1] - var_range_model[3][0]);
 
   for(i=0; i<parset.n_con_recon; i++)
     pm[i+num_params_var] = dnest_randn();
@@ -163,8 +163,10 @@ double perturb_con(void *model)
       {
         width = var_range_model[3][1] - var_range_model[3][0];
       }
+      logH -= (-0.5*pow(pm[which], 2.0) );
       pm[which] += width*dnest_randh();
       wrap(&(pm[which]), var_range_model[3][0], var_range_model[3][1]);
+      logH += (-0.5*pow(pm[which], 2.0) );
       break;
 
     default: // light curve points

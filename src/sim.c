@@ -41,7 +41,7 @@ void sim()
   sim_init();
   
   double *pm = (double *)model;
-  pm[0] = log(10.0);
+  pm[0] = log(4.0);
   pm[1] = 0.5;
   pm[2] = 0.2;
   pm[3] = 20.0;
@@ -49,7 +49,7 @@ void sim()
   pm[5] = log(1.0);
   pm[6] = 0.0;
   pm[7] = 0.0;
-  pm[8] = log(10.0);
+  pm[8] = log(3.0);
   pm[9] = 0.1;
   pm[10] = 0.5;
 

@@ -196,22 +196,60 @@ void reconstruct_con()
  */
 void calculate_con_from_model(const void *model)
 {
+  double *Larr, *ybuf, *y, *yu;
+  double lambda, ave_con;
+
   double *pm = (double *)model;
   double sigma, tau, alpha, mu;
   int i, info;
   
+
   tau = exp(pm[2]);
   sigma = exp(pm[1]) * sqrt(tau);
   alpha = 1.0;
   mu = pm[3];
   
+  Larr = workspace; //malloc(n_con_data * sizeof(double));
+  ybuf = Larr + n_con_data; //malloc(n_con_data* sizeof(double));
+  y = ybuf + n_con_data;//malloc(n_con_data* sizeof(double));
+  yu = y + n_con_data; //malloc(parset.n_con_recon* sizeof(double));
+
+  set_covar_Pmat_data(sigma, tau, alpha);
+  set_covar_Umat(sigma, tau, alpha);
+
+  inverse_mat(PCmat_data, n_con_data, &info);
+
+  for(i=0;i<n_con_data;i++)
+    Larr[i]=1.0;
+
+  multiply_matvec(PCmat_data, Larr, n_con_data, ybuf);
+  lambda = cblas_ddot(n_con_data, Larr, 1, ybuf, 1);
+  multiply_matvec(PCmat_data, Fcon_data, n_con_data, ybuf);
+  ave_con = cblas_ddot(n_con_data, Larr, 1, ybuf, 1);
+  ave_con /= lambda;
+
+  ave_con += mu / sqrt(lambda);
+  
+  for(i=0; i<n_con_data; i++)
+    y[i] = Fcon_data[i] - ave_con;
+
+  multiply_matvec(PCmat_data, y, n_con_data, ybuf);
+  multiply_matvec_MN(USmat, parset.n_con_recon, n_con_data, ybuf, Fcon);
+
   set_covar_Pmat(sigma, tau, alpha);
+  //inverse_mat(PSmat, parset.n_con_recon, &info);
+  //for(i=0; i<parset.n_con_recon*parset.n_con_recon; i++)
+  //  PQmat[i] = PSmat[i];  
+  //for(i=0; i<parset.n_con_recon; i++)
+  //  PQmat[i*parset.n_con_recon+i] += 1.0/sigma/sigma;
+  
+  //inverse_mat(PQmat, parset.n_con_recon, &info);
   Chol_decomp_L(PSmat, parset.n_con_recon, &info);
-  multiply_matvec(PSmat, &pm[num_params_var], parset.n_con_recon, Fcon);
+  multiply_matvec(PSmat, &pm[num_params_var], parset.n_con_recon, yu);
 
   // add back the mean of continuum
   for(i=0; i<parset.n_con_recon; i++)
-    Fcon[i] += mu;
+    Fcon[i] += yu[i] + ave_con;
 
   return;
 }
@@ -354,14 +392,23 @@ void set_covar_Pmat_data(double sigma, double tau, double alpha)
   int i, j;
  
   for(i=0; i<n_con_data; i++)
-  {
+  { 
     t1 = Tcon_data[i];
-    for(j=0; j<=i; j++)
+
+    for(j=0; j<i; j++)
     {
       t2 = Tcon_data[j];
       PSmat_data[i*n_con_data+j] = sigma*sigma* exp (- pow (fabs(t1-t2) / tau, alpha));
       PSmat_data[j*n_con_data+i] = PSmat_data[i*n_con_data+j];
+
+      PNmat_data[i*n_con_data+j] = PNmat_data[j*n_con_data+i] = 0.0;
+
+      PCmat_data[i*n_con_data+j] = PCmat_data[j*n_con_data+i] = PSmat_data[i*n_con_data+j];
     }
+
+    PSmat_data[i*n_con_data+i] = sigma * sigma;
+    PNmat_data[i*n_con_data+i] = Fcerrs_data[i]*Fcerrs_data[i];
+    PCmat_data[i*n_con_data+i] = PSmat_data[i*n_con_data+i] + PNmat_data[i*n_con_data+i];
   }
   return;
 }

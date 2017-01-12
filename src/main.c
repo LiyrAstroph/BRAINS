@@ -131,7 +131,7 @@ BRAINS needs the following non-standard libraries for compilation:
 - \b MPI - the Message Passing Interface (version 1.0 or higher).\n
   The widely used MPI implementation MPICH is recommended, which can 
   be downloaded at http://www-unix.mcs.anl.gov/mpi/mpich/. \n Note that 
-  any vendor supplied versions exist.
+  many vendor supplied versions exist.
 
 - \b GSL - the GNU Scientific Library (version 2.2.1 or higher).\n
   This open-source package can be downloaded at http://www.gnu.org/software/gsl.\n

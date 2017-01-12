@@ -49,6 +49,9 @@ int *perturb_accept, *which_parameter_update_prev;
 double *Tcon, *Fcon, *Fcerrs;
 double Tcon_min, Tcon_max;
 double *PSmat, *USmat, *PSmat_data;
+double *PNmat_data;
+double *PCmat_data, *PQmat;
+double *workspace;
 
 /* line reconstruction */
 double *Fline_at_data;

@@ -120,6 +120,9 @@ extern double *limits;  // external from dnest
 extern double *Tcon, *Fcon, *Fcerrs;
 extern double Tcon_min, Tcon_max;
 extern double *PSmat, *USmat, *PSmat_data;
+extern double *PNmat_data;
+extern double *PCmat_data, *PQmat;
+extern double *workspace;
 
 /* line reconstruction */
 extern double *Fline_at_data;

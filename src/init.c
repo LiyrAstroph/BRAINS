@@ -57,11 +57,11 @@ void init()
   var_range_model[1][0] = -6.0; // log(sigma)
   var_range_model[1][1] = -1.0; 
 
-  var_range_model[2][0] = 2.0; // log(tau)
+  var_range_model[2][0] = 0.0; // log(tau)
   var_range_model[2][1] = 10.0; 
 
-  var_range_model[3][0] = 0.0; // mean value
-  var_range_model[3][1] = 2.0; 
+  var_range_model[3][0] = -10.0; // mean value
+  var_range_model[3][1] =  10.0; 
 
   var_range_model[4][0] = -10.0; // light curve values
   var_range_model[4][1] = 10.0; 
@@ -121,12 +121,17 @@ void allocate_memory()
   PSmat = malloc(parset.n_con_recon * parset.n_con_recon * sizeof(double));
   USmat = malloc(parset.n_con_recon * n_con_data * sizeof(double));
   PSmat_data = malloc(n_con_data * n_con_data * sizeof(double));
+  PNmat_data = malloc(n_con_data * n_con_data * sizeof(double));
+  PCmat_data = malloc(n_con_data * n_con_data * sizeof(double));
+  PQmat = malloc(parset.n_con_recon * parset.n_con_recon * sizeof(double));
 
   blr_range_model = malloc(sizeof(BLRmodel)/sizeof(double) * sizeof(double *));
   for(i=0; i<sizeof(BLRmodel)/sizeof(double); i++)
   {
     blr_range_model[i] = malloc(2*sizeof(double));
   }
+
+  workspace = malloc((3*n_con_data + parset.n_con_recon)*sizeof(double));
 }
 
 /*! 
@@ -142,12 +147,17 @@ void free_memory()
   free(PSmat);
   free(USmat);
   free(PSmat_data);
+  free(PNmat_data);
+  free(PCmat_data);
+  free(PQmat);
 
   for(i=0; i<sizeof(BLRmodel)/sizeof(double); i++)
   {
     free(blr_range_model[i]);
   }
   free(blr_range_model);
+
+  free(workspace);
   return;
 }
 
