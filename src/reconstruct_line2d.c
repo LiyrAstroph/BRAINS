@@ -633,9 +633,6 @@ double prob_line2d(const void *model)
     // continuum parameter is updated
     if(param >= num_params_blr)
     {
-      // continuum probability is always changed
-      prob_con_particles[which_particle_update] = prob_con_particles_perturb[which_particle_update];
-
       /* the num_params_blr-th parameter is systematic error of continuum, which 
        * only appear at the stage of calculating likelihood probability.
        * when this paramete is updated, Fcon is unchanged.  
@@ -695,16 +692,6 @@ double prob_line2d(const void *model)
       Fcon = Fcon_particles[which_particle_update];
     }
     gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
-
-    for(i=0; i<n_con_data; i++)
-    {
-      fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, Tcon_data[i], gsl_acc);
-      var2 = Fcerrs_data[i] * Fcerrs_data[i];
-      var2+= exp(pm[num_params_blr]) * exp(num_params_blr);
-      prob += (-0.5*pow(fcon - Fcon_data[i],2.0)/var2) - 0.5*log(2.0*PI*var2);
-    }
-    prob *= prob_scale_con;
-    prob_con_particles_perturb[which_particle_update] = prob;
   }
   else /* continuum has no change, use the previous values */
   {
@@ -769,7 +756,7 @@ double prob_line2d(const void *model)
 
   which_parameter_update_prev[which_particle_update] = which_parameter_update;
 
-  prob += prob_line;
+  prob = prob_line;
   return prob;
 }
 
@@ -786,15 +773,6 @@ double prob_initial_line2d(const void *model)
   calculate_con_from_model(model + num_params_blr*sizeof(double));
   gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
 
-  for(i=0; i<n_con_data; i++)
-  {
-    fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, Tcon_data[i], gsl_acc);
-    var2 = Fcerrs_data[i] * Fcerrs_data[i] + exp(pm[num_params_blr]) * exp(num_params_blr);
-    prob += (-0.5*pow(fcon - Fcon_data[i],2.0)/var2) - 0.5*log(2.0*PI*var2);
-  }
-  prob *= prob_scale_con;
-  prob_con_particles[which_particle_update] = prob;
-  
   Trans2D_at_veldata = Trans2D_at_veldata_particles[which_particle_update];
   Fline2d_at_data = Fline_at_data_particles[which_particle_update];
   transfun_2d_cloud_direct(model, Vline_data, Trans2D_at_veldata, n_vel_data, 0);
@@ -813,6 +791,6 @@ double prob_initial_line2d(const void *model)
   memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
             parset.n_cloud_per_task * sizeof(double));
 
-  prob += prob_line;
+  prob = prob_line;
   return prob;
 }

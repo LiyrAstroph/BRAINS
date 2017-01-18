@@ -54,14 +54,14 @@ void init()
   var_range_model[0][0] = log(1.0e-10);; // systematic error in continuum
   var_range_model[0][1] = log(1.0e6);;
 
-  var_range_model[1][0] = -6.0; // log(sigma)
-  var_range_model[1][1] = -1.0; 
+  var_range_model[1][0] = -4.0; // log(sigma)
+  var_range_model[1][1] = -3.0; 
 
-  var_range_model[2][0] = 0.0; // log(tau)
-  var_range_model[2][1] = 10.0; 
+  var_range_model[2][0] = 3.0; // log(tau)
+  var_range_model[2][1] = 4.0; 
 
-  var_range_model[3][0] = -10.0; // mean value
-  var_range_model[3][1] =  10.0; 
+  var_range_model[3][0] = -2.0; // mean value
+  var_range_model[3][1] =  2.0; 
 
   var_range_model[4][0] = -10.0; // light curve values
   var_range_model[4][1] = 10.0; 
@@ -119,11 +119,15 @@ void allocate_memory()
   Fcerrs = malloc(parset.n_con_recon * sizeof(double));
 
   PSmat = malloc(parset.n_con_recon * parset.n_con_recon * sizeof(double));
+  PNmat = malloc(parset.n_con_recon * parset.n_con_recon * sizeof(double));
   USmat = malloc(parset.n_con_recon * n_con_data * sizeof(double));
   PSmat_data = malloc(n_con_data * n_con_data * sizeof(double));
   PNmat_data = malloc(n_con_data * n_con_data * sizeof(double));
   PCmat_data = malloc(n_con_data * n_con_data * sizeof(double));
+  IPCmat_data = malloc(n_con_data * n_con_data * sizeof(double));
   PQmat = malloc(parset.n_con_recon * parset.n_con_recon * sizeof(double));
+  PEmat1 = malloc(parset.n_con_recon * n_con_data * sizeof(double));
+  PEmat2 = malloc(parset.n_con_recon * parset.n_con_recon * sizeof(double));
 
   blr_range_model = malloc(sizeof(BLRmodel)/sizeof(double) * sizeof(double *));
   for(i=0; i<sizeof(BLRmodel)/sizeof(double); i++)
@@ -145,11 +149,15 @@ void free_memory()
   free(Fcerrs);
 
   free(PSmat);
+  free(PNmat);
   free(USmat);
   free(PSmat_data);
   free(PNmat_data);
   free(PCmat_data);
+  free(IPCmat_data);
   free(PQmat);
+  free(PEmat1);
+  free(PEmat2);
 
   for(i=0; i<sizeof(BLRmodel)/sizeof(double); i++)
   {

@@ -73,6 +73,52 @@ void multiply_matvec_MN(double * a, int m, int n, double *x, double *y)
   cblas_dgemv(CblasRowMajor, CblasNoTrans, m, n, 1.0f, a, n, x, 1, 0.0f, y, 1);
 }
 
+/* C(m*n) = A(m*k) * B(k*n) */
+void multiply_mat_MN(double * a, double *b, double *c, int m, int n, int k)
+{
+  cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k, 1.0f
+                             , a, k, b, n, 0.0f, c, n);
+}
+
+/* C(m*n) = A^T(m*k) * B(k*n) */
+void multiply_mat_MN_transposeA(double * a, double *b, double *c, int m, int n, int k)
+{
+  cblas_dgemm(CblasRowMajor, CblasTrans, CblasNoTrans, m, n, k, 1.0f
+                             , a, m, b, n, 0.0f, c, n);
+}
+/* C(m*n) = A(m*k) * B^T(k*n) */
+void multiply_mat_MN_transposeB(double * a, double *b, double *c, int m, int n, int k)
+{
+  cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasTrans, m, n, k, 1.0f
+                             , a, k, b, k, 0.0f, c, n);
+}
+
+/* A(mxm)^-1 * B(mxn), store the output in B
+ * note that A will be changed on exit. */
+int multiply_mat_MN_inverseA(double * a, double *b, int m, int n)
+{
+  int * ipiv, info;
+  ipiv=malloc(m*sizeof(int));
+
+  info=LAPACKE_dgetrf(LAPACK_ROW_MAJOR, m, m, a, m, ipiv);
+  if(info!=0)
+  {
+    printf("multiply_mat_MN_inverseA 1.\n this usually caused by improper nc.\n increase the low limit of nc");
+    exit(0);
+    return info;
+  }
+  info = LAPACKE_dgetrs(LAPACK_ROW_MAJOR, 'N', m, n, a, m, ipiv, b, n);
+  if(info!=0)
+  {
+    printf("multiply_mat_MN_inverseA 2\n this usually caused by improper nc.\n increase the low limit of nc");
+    exit(0);
+    return info;
+  }
+
+  free(ipiv);
+  return info;
+}
+
 /*!
  * This functions calculate A^-1(nxn).
  */

@@ -99,7 +99,7 @@ void postprocess_con()
       {
         for(j=0; j<parset.n_con_recon; j++)
         {
-          fprintf(fcon, "%f %f\n", Tcon[j], Fcon[j]/con_scale);
+          fprintf(fcon, "%f %f %f\n", Tcon[j], Fcon[j]/con_scale, Fcerrs[j]/con_scale);
         }
         fprintf(fcon, "\n");
       }
@@ -181,7 +181,7 @@ void reconstruct_con()
 
     for(i=0; i<parset.n_con_recon; i++)
     {
-      fprintf(fp, "%f %f\n", Tcon[i], Fcon[i] / con_scale);
+      fprintf(fp, "%f %f %f\n", Tcon[i], Fcon[i] / con_scale, Fcerrs[i]/con_scale);
     }
     fclose(fp);
   }
@@ -197,13 +197,13 @@ void reconstruct_con()
 void calculate_con_from_model(const void *model)
 {
   double *Larr, *ybuf, *y, *yu;
-  double lambda, ave_con;
+  double lambda, ave_con, syserr;
 
   double *pm = (double *)model;
   double sigma, tau, alpha, mu;
   int i, info;
   
-
+  syserr = exp(pm[0]);
   tau = exp(pm[2]);
   sigma = exp(pm[1]) * sqrt(tau);
   alpha = 1.0;
@@ -214,7 +214,7 @@ void calculate_con_from_model(const void *model)
   y = ybuf + n_con_data;//malloc(n_con_data* sizeof(double));
   yu = y + n_con_data; //malloc(parset.n_con_recon* sizeof(double));
 
-  set_covar_Pmat_data(sigma, tau, alpha);
+  set_covar_Pmat_data(sigma, tau, alpha, syserr);
   set_covar_Umat(sigma, tau, alpha);
 
   inverse_mat(PCmat_data, n_con_data, &info);
@@ -236,20 +236,26 @@ void calculate_con_from_model(const void *model)
   multiply_matvec(PCmat_data, y, n_con_data, ybuf);
   multiply_matvec_MN(USmat, parset.n_con_recon, n_con_data, ybuf, Fcon);
 
+  multiply_mat_MN(USmat, PCmat_data, PEmat1, parset.n_con_recon, n_con_data, n_con_data);
+  multiply_mat_MN_transposeB(PEmat1, USmat, PEmat2, parset.n_con_recon, parset.n_con_recon, n_con_data);
+
   set_covar_Pmat(sigma, tau, alpha);
-  //inverse_mat(PSmat, parset.n_con_recon, &info);
-  //for(i=0; i<parset.n_con_recon*parset.n_con_recon; i++)
-  //  PQmat[i] = PSmat[i];  
-  //for(i=0; i<parset.n_con_recon; i++)
-  //  PQmat[i*parset.n_con_recon+i] += 1.0/sigma/sigma;
+  inverse_mat(PSmat, parset.n_con_recon, &info);
+
+  memcpy(PQmat, PSmat, parset.n_con_recon*parset.n_con_recon*sizeof(double));
+  for(i=0; i<parset.n_con_recon; i++)
+    PQmat[i*parset.n_con_recon+i] += 1.0/(sigma*sigma + syserr*syserr - PEmat2[i*parset.n_con_recon + i]);  
   
-  //inverse_mat(PQmat, parset.n_con_recon, &info);
-  Chol_decomp_L(PSmat, parset.n_con_recon, &info);
-  multiply_matvec(PSmat, &pm[num_params_var], parset.n_con_recon, yu);
+  inverse_mat(PQmat, parset.n_con_recon, &info);
+  Chol_decomp_L(PQmat, parset.n_con_recon, &info);
+  multiply_matvec(PQmat, &pm[num_params_var], parset.n_con_recon, yu);
 
   // add back the mean of continuum
   for(i=0; i<parset.n_con_recon; i++)
+  {
     Fcon[i] += yu[i] + ave_con;
+    Fcerrs[i] = sqrt(sigma*sigma + syserr*syserr - PEmat2[i*parset.n_con_recon + i]);
+  }
 
   return;
 }
@@ -257,7 +263,7 @@ void calculate_con_from_model(const void *model)
 /*!
  * This function calculate continuum ligth curves from varibility parameters.
  */
-void reconstruct_con_from_varmodel(double sigma, double tau, double alpha)
+void reconstruct_con_from_varmodel(double sigma, double tau, double alpha, double syserr)
 {
   double *Larr, *ybuf, *y;
   double lambda, ave_con;
@@ -267,7 +273,7 @@ void reconstruct_con_from_varmodel(double sigma, double tau, double alpha)
   ybuf = malloc(n_con_data* sizeof(double));
   y = malloc(n_con_data* sizeof(double));
   
-  set_covar_Pmat_data(sigma, tau, alpha);
+  set_covar_Pmat_data(sigma, tau, alpha, syserr);
   set_covar_Umat(sigma, tau, alpha);
 
   inverse_mat(PSmat_data, n_con_data, &info);
@@ -299,40 +305,48 @@ void reconstruct_con_from_varmodel(double sigma, double tau, double alpha)
 double prob_con_variability(const void *model)
 {
   double prob = 0.0, fcon, var2;
-  int i, param;
+  int i, param, info;
   double *pm = (double *)model;
+  double tau, sigma, alpha, lndet, lambda, ave_con, mu, syserr;
+  double *Larr, *ybuf, *y;
   
-  if(perturb_accept[which_particle_update] == 1 )
-  {
-    param = which_parameter_update_prev[which_particle_update];
-    /* when systematic error is updated, Fcon needs not to be updated 
-     * or when all the parameters are updated, needs to update Fcon
-     */
-    if( param > 0) 
-    {
-      memcpy(Fcon_particles[which_particle_update], Fcon_particles_perturb[which_particle_update], 
-        parset.n_con_recon*sizeof(double));
-    }
-  }
+  syserr = exp(pm[0]);
+  tau = exp(pm[2]);
+  sigma = exp(pm[1]) * sqrt(tau);
+  alpha = 1.0;
+  mu = pm[3];
+  
+  Larr = workspace;
+  ybuf = Larr + n_con_data;
+  y = ybuf + n_con_data;
 
-  if( which_parameter_update > 0)
-  {
-    Fcon = Fcon_particles_perturb[which_particle_update];
-    calculate_con_from_model(model);
-  }
-  else  /* only systematic error is updated */
-  {
-    Fcon = Fcon_particles[which_particle_update];
-  }
-  gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
-  
+  set_covar_Pmat_data(sigma, tau, alpha, syserr);
+  memcpy(IPCmat_data, PCmat_data, n_con_data*n_con_data*sizeof(double));
+
+  lndet = lndet_mat(PCmat_data, n_con_data, &info);
+
+  inverse_mat(IPCmat_data, n_con_data, &info);
+
+  for(i=0;i<n_con_data;i++)
+    Larr[i]=1.0;
+
+  multiply_matvec(IPCmat_data, Larr, n_con_data, ybuf);
+  lambda = cblas_ddot(n_con_data, Larr, 1, ybuf, 1);
+  multiply_matvec(IPCmat_data, Fcon_data, n_con_data, ybuf);
+  ave_con = cblas_ddot(n_con_data, Larr, 1, ybuf, 1);
+  ave_con /= lambda;
+
+  ave_con += mu / sqrt(lambda);
+
   for(i=0; i<n_con_data; i++)
-  {
-    fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, Tcon_data[i], gsl_acc);
-    var2 = Fcerrs_data[i] * Fcerrs_data[i] + exp(pm[0])*exp(pm[0]);
-    prob += (-0.5*pow(fcon - Fcon_data[i], 2.0)/var2) - 0.5*log(2.0*PI*var2);
-  }
+    y[i] = Fcon_data[i] - ave_con;
+  
+  multiply_matvec(IPCmat_data, y, n_con_data, ybuf);
+  prob = -0.5 * cblas_ddot(n_con_data, y, 1, ybuf, 1);
 
+  prob += -0.5*lndet;
+  
+  //printf("%f %f %f %f %f %f\n", prob, lndet, log(lambda), sigma, tau, ave_con);
   /* record the parameter being updated */
   which_parameter_update_prev[which_particle_update] = which_parameter_update;
   return prob;
@@ -344,20 +358,46 @@ double prob_con_variability(const void *model)
 double prob_con_variability_initial(const void *model)
 {
   double prob = 0.0, fcon, var2;
-  int i;
+  int i, param, info;
   double *pm = (double *)model;
-
-  Fcon = Fcon_particles[which_particle_update];
-  calculate_con_from_model(model);
-
-  gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
+  double tau, sigma, alpha, lndet, lambda, ave_con, mu, syserr;
+  double *Larr, *ybuf, *y;
   
+  syserr = exp(pm[0]);
+  tau = exp(pm[2]);
+  sigma = exp(pm[1]) * sqrt(tau);
+  alpha = 1.0;
+  mu = pm[3];
+  
+  Larr = workspace; 
+  ybuf = Larr + n_con_data; 
+  y = ybuf + n_con_data;
+
+  set_covar_Pmat_data(sigma, tau, alpha, syserr);
+  memcpy(IPCmat_data, PCmat_data, n_con_data*n_con_data*sizeof(double));
+
+  lndet = lndet_mat(PCmat_data, n_con_data, &info);
+
+  inverse_mat(IPCmat_data, n_con_data, &info);
+
+  for(i=0;i<n_con_data;i++)
+    Larr[i]=1.0;
+
+  multiply_matvec(IPCmat_data, Larr, n_con_data, ybuf);
+  lambda = cblas_ddot(n_con_data, Larr, 1, ybuf, 1);
+  multiply_matvec(IPCmat_data, Fcon_data, n_con_data, ybuf);
+  ave_con = cblas_ddot(n_con_data, Larr, 1, ybuf, 1);
+  ave_con /= lambda;
+
+  ave_con += mu / sqrt(lambda);
+
   for(i=0; i<n_con_data; i++)
-  {
-    fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, Tcon_data[i], gsl_acc);
-    var2 = Fcerrs_data[i] * Fcerrs_data[i] + exp(pm[0])*exp(pm[0]);
-    prob += (-0.5*pow(fcon - Fcon_data[i], 2.0)/var2) - 0.5*log(2.0*PI*var2);
-  }
+    y[i] = Fcon_data[i] - ave_con;
+  
+  multiply_matvec(IPCmat_data, y, n_con_data, ybuf);
+  prob = -0.5 * cblas_ddot(n_con_data, y, 1, ybuf, 1);
+
+  prob += -0.5*lndet;
   return prob;
 }
 
@@ -386,7 +426,7 @@ void set_covar_Pmat(double sigma, double tau, double alpha)
 /*!
  * this function sets the covariance matrix at data time points 
  */
-void set_covar_Pmat_data(double sigma, double tau, double alpha)
+void set_covar_Pmat_data(double sigma, double tau, double alpha, double syserr)
 {
   double t1, t2;
   int i, j;
@@ -407,7 +447,7 @@ void set_covar_Pmat_data(double sigma, double tau, double alpha)
     }
 
     PSmat_data[i*n_con_data+i] = sigma * sigma;
-    PNmat_data[i*n_con_data+i] = Fcerrs_data[i]*Fcerrs_data[i];
+    PNmat_data[i*n_con_data+i] = Fcerrs_data[i]*Fcerrs_data[i] + syserr*syserr;
     PCmat_data[i*n_con_data+i] = PSmat_data[i*n_con_data+i] + PNmat_data[i*n_con_data+i];
   }
   return;
@@ -452,8 +492,6 @@ void reconstruct_con_init()
     Tcon[i] = Tcon_min + i*dT;
   }
 
-  //Fcon = malloc(parset.n_con_recon * sizeof(double));
-
   sprintf(dnest_options_file, "%s/%s", parset.file_dir, "src/OPTIONSCON");
   if(thistask == roottask)
   {
@@ -487,7 +525,7 @@ void reconstruct_con_init()
 void reconstruct_con_end()
 {
   int i;
-  //free(Fcon);
+
   for(i=0; i<parset.num_particles; i++)
   {
     free(Fcon_particles[i]);

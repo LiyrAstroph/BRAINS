@@ -36,10 +36,10 @@ void reconstruct_con_end();
 double prob_con_variability(const void *model);
 double prob_con_variability_initial(const void *model);
 void set_covar_Pmat(double sigma, double tau, double alpha);
-void set_covar_Pmat_data(double sigma, double tau, double alpha);
+void set_covar_Pmat_data(double sigma, double tau, double alpha,double syserr);
 void set_covar_Umat(double sigma, double tau, double alpha);
 void calculate_con_from_model(const void *model);
-void reconstruct_con_from_varmodel(double sigma, double tau, double alpha);
+void reconstruct_con_from_varmodel(double sigma, double tau, double alpha, double syserr);
 void postprocess_con();
 
 /* 1d line reconstruction */
@@ -91,7 +91,10 @@ void multiply_mat_transposeA(double * a, double *b, double *c, int n);
 void multiply_mat_transposeB(double * a, double *b, double *c, int n);
 void multiply_matvec(double *a, double *x, int n, double *y);
 void multiply_matvec_transposeA(double *a, double *x, int n, double *y);
-void multiply_matvec_MN(double * a, int m, int n, double *x, double *y);
+void multiply_mat_MN(double * a, double *b, double *c, int m, int n, int k);
+void multiply_mat_MN_transposeA(double * a, double *b, double *c, int m, int n, int k);
+void multiply_mat_MN_transposeB(double * a, double *b, double *c, int m, int n, int k);
+int multiply_mat_MN_inverseA(double * a, double *b, int m, int n);
 void multiply_vec2mat(double * x, double * a, int n);
 void eigen_sym_mat(double *a, int n, double *val, int *info);
 void Chol_decomp_U(double *a, int n, int *info);

@@ -55,7 +55,7 @@ void sim()
 
   smooth_init(parset.n_vel_recon);
 
-  reconstruct_con_from_varmodel(0.1, 100.0, 1.0);
+  reconstruct_con_from_varmodel(0.1, 100.0, 1.0, 0.0);
   gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
 
   sprintf(fname, "%s/%s", parset.file_dir, "/data/sim_con_full.txt");

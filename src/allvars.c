@@ -48,9 +48,9 @@ int *perturb_accept, *which_parameter_update_prev;
 /* continuum reconstruction */
 double *Tcon, *Fcon, *Fcerrs;
 double Tcon_min, Tcon_max;
-double *PSmat, *USmat, *PSmat_data;
+double *PSmat, *PNmat, *USmat, *PSmat_data;
 double *PNmat_data;
-double *PCmat_data, *PQmat;
+double *PCmat_data, *IPCmat_data, *PQmat, *PEmat1, *PEmat2;
 double *workspace;
 
 /* line reconstruction */
