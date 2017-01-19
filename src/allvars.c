@@ -52,6 +52,7 @@ double *PSmat, *PNmat, *USmat, *PSmat_data;
 double *PNmat_data;
 double *PCmat_data, *IPCmat_data, *PQmat, *PEmat1, *PEmat2;
 double *workspace;
+double *var_param, *var_param_std;
 
 /* line reconstruction */
 double *Fline_at_data;
@@ -88,8 +89,6 @@ double **Fline_at_data_particles, **Fline_at_data_particles_perturb;
 double *prob_line_particles, *prob_line_particles_perturb;
 
 int postprc;
-
-double prob_scale_con, prob_scale_line;
 
 /* GSL */
 const gsl_rng_type * gsl_T;

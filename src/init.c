@@ -30,6 +30,8 @@ void init()
 {
   int i;
 
+  num_params_var = 4;
+
   allocate_memory();
 
   /* initialize GSL */
@@ -45,7 +47,7 @@ void init()
 
   gsl_acc = gsl_interp_accel_alloc();
   gsl_linear = gsl_interp_alloc(gsl_interp_linear, parset.n_con_recon);
-
+  
   /* set the range of cloud radial distribution */
   rcloud_min_set = parset.tau_min_set;
   rcloud_max_set = parset.tau_max_set*0.5;
@@ -54,14 +56,14 @@ void init()
   var_range_model[0][0] = log(1.0e-10);; // systematic error in continuum
   var_range_model[0][1] = log(1.0e6);;
 
-  var_range_model[1][0] = -4.0; // log(sigma)
-  var_range_model[1][1] = -3.0; 
+  var_range_model[1][0] = -6.0; // log(sigma)
+  var_range_model[1][1] = -1.0; 
 
-  var_range_model[2][0] = 3.0; // log(tau)
-  var_range_model[2][1] = 4.0; 
+  var_range_model[2][0] = log(1.0); // log(tau)
+  var_range_model[2][1] = log(1.0e4); 
 
-  var_range_model[3][0] = -2.0; // mean value
-  var_range_model[3][1] =  2.0; 
+  var_range_model[3][0] = -10.0; // mean value
+  var_range_model[3][1] =  10.0; 
 
   var_range_model[4][0] = -10.0; // light curve values
   var_range_model[4][1] = 10.0; 
@@ -136,6 +138,9 @@ void allocate_memory()
   }
 
   workspace = malloc((3*n_con_data + parset.n_con_recon)*sizeof(double));
+
+  var_param = malloc(num_params_var * sizeof(double));
+  var_param_std = malloc(num_params_var * sizeof(double));
 }
 
 /*! 
@@ -166,6 +171,10 @@ void free_memory()
   free(blr_range_model);
 
   free(workspace);
+
+  free(var_param);
+  free(var_param_std);
+  
   return;
 }
 

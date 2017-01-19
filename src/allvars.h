@@ -123,6 +123,7 @@ extern double *PSmat, *PNmat, *USmat, *PSmat_data;
 extern double *PNmat_data;
 extern double *PCmat_data, *IPCmat_data, *PQmat, *PEmat1, *PEmat2;
 extern double *workspace;
+extern double *var_param, *var_param_std;
 
 /* line reconstruction */
 extern double *Fline_at_data;
@@ -177,8 +178,6 @@ extern double **Fline_at_data_particles, **Fline_at_data_particles_perturb;
 extern double *prob_line_particles, *prob_line_particles_perturb;
 
 extern int postprc;
-
-extern double prob_scale_con, prob_scale_line;
 
 /* GSL */
 extern const gsl_rng_type * gsl_T;

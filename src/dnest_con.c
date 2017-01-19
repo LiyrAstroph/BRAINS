@@ -31,7 +31,6 @@
  */
 int dnest_con(int argc, char **argv)
 {
-  num_params_var = 4;
   num_params = parset.n_con_recon + num_params_var;
   size_of_modeltype = num_params * sizeof(double);
   

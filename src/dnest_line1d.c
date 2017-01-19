@@ -34,7 +34,6 @@ int dnest_line1d(int argc, char **argv)
 {
   int i;
   
-  num_params_var = 4;
   num_params_blr = 9;
   num_params = parset.n_con_recon + num_params_var + num_params_blr;
   size_of_modeltype = num_params * sizeof(double);
@@ -206,7 +205,7 @@ double perturb_line1d(void *model)
     width = ( par_range_model[which][1] - par_range_model[which][0] );
   }
 
-  if(which < num_params_blr + num_params_var)
+  if(which < num_params_blr)
   {
     // set an upper limit to the MCMC steps of systematic errors
     if(which == num_params_blr-1 || which == num_params_blr )
@@ -214,6 +213,13 @@ double perturb_line1d(void *model)
 
     pm[which] += dnest_randh() * width;
     wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
+  }
+  else if(which < num_params_blr + num_params_var)
+  {
+    logH -= (-0.5*pow((pm[which]-var_param[which - num_params_blr])/var_param_std[which - num_params_blr], 2.0) );
+    pm[which] += dnest_randh() * width;
+    wrap(&pm[which], par_range_model[which][0], par_range_model[which][1]);
+    logH += (-0.5*pow((pm[which]-var_param[which - num_params_blr])/var_param_std[which - num_params_blr], 2.0) );
   }
   else
   {

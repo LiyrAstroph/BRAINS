@@ -184,7 +184,13 @@ void reconstruct_con()
       fprintf(fp, "%f %f %f\n", Tcon[i], Fcon[i] / con_scale, Fcerrs[i]/con_scale);
     }
     fclose(fp);
+
+    memcpy(var_param, best_model_con, num_params_var*sizeof(double));
+    memcpy(var_param_std, best_model_std_con, num_params_var*sizeof(double));
   }
+
+  MPI_Bcast(var_param, num_params_var, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+  MPI_Bcast(var_param_std, num_params_var, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
 
   reconstruct_con_end();
   return;
@@ -209,10 +215,10 @@ void calculate_con_from_model(const void *model)
   alpha = 1.0;
   mu = pm[3];
   
-  Larr = workspace; //malloc(n_con_data * sizeof(double));
-  ybuf = Larr + n_con_data; //malloc(n_con_data* sizeof(double));
-  y = ybuf + n_con_data;//malloc(n_con_data* sizeof(double));
-  yu = y + n_con_data; //malloc(parset.n_con_recon* sizeof(double));
+  Larr = workspace; 
+  ybuf = Larr + n_con_data; 
+  y = ybuf + n_con_data;
+  yu = y + n_con_data; 
 
   set_covar_Pmat_data(sigma, tau, alpha, syserr);
   set_covar_Umat(sigma, tau, alpha);
@@ -310,43 +316,55 @@ double prob_con_variability(const void *model)
   double tau, sigma, alpha, lndet, lambda, ave_con, mu, syserr;
   double *Larr, *ybuf, *y;
   
-  syserr = exp(pm[0]);
-  tau = exp(pm[2]);
-  sigma = exp(pm[1]) * sqrt(tau);
-  alpha = 1.0;
-  mu = pm[3];
+  if(perturb_accept[which_particle_update] == 1)
+  {
+    param = which_parameter_update_prev[which_particle_update];
+    prob_con_particles[which_particle_update] = prob_con_particles_perturb[which_particle_update];
+  }
+
+  if( which_parameter_update < num_params_var)
+  {
+    syserr = exp(pm[0]);
+    tau = exp(pm[2]);
+    sigma = exp(pm[1]) * sqrt(tau);
+    alpha = 1.0;
+    mu = pm[3];
   
-  Larr = workspace;
-  ybuf = Larr + n_con_data;
-  y = ybuf + n_con_data;
+    Larr = workspace;
+    ybuf = Larr + n_con_data;
+    y = ybuf + n_con_data;
 
-  set_covar_Pmat_data(sigma, tau, alpha, syserr);
-  memcpy(IPCmat_data, PCmat_data, n_con_data*n_con_data*sizeof(double));
+    set_covar_Pmat_data(sigma, tau, alpha, syserr);
+    memcpy(IPCmat_data, PCmat_data, n_con_data*n_con_data*sizeof(double));
 
-  lndet = lndet_mat(PCmat_data, n_con_data, &info);
+    lndet = lndet_mat(PCmat_data, n_con_data, &info);
 
-  inverse_mat(IPCmat_data, n_con_data, &info);
+    inverse_mat(IPCmat_data, n_con_data, &info);
 
-  for(i=0;i<n_con_data;i++)
-    Larr[i]=1.0;
+    for(i=0;i<n_con_data;i++)
+      Larr[i]=1.0;
 
-  multiply_matvec(IPCmat_data, Larr, n_con_data, ybuf);
-  lambda = cblas_ddot(n_con_data, Larr, 1, ybuf, 1);
-  multiply_matvec(IPCmat_data, Fcon_data, n_con_data, ybuf);
-  ave_con = cblas_ddot(n_con_data, Larr, 1, ybuf, 1);
-  ave_con /= lambda;
+    multiply_matvec(IPCmat_data, Larr, n_con_data, ybuf);
+    lambda = cblas_ddot(n_con_data, Larr, 1, ybuf, 1);
+    multiply_matvec(IPCmat_data, Fcon_data, n_con_data, ybuf);
+    ave_con = cblas_ddot(n_con_data, Larr, 1, ybuf, 1);
+    ave_con /= lambda;
 
-  ave_con += mu / sqrt(lambda);
+    ave_con += mu / sqrt(lambda);
 
-  for(i=0; i<n_con_data; i++)
-    y[i] = Fcon_data[i] - ave_con;
+    for(i=0; i<n_con_data; i++)
+      y[i] = Fcon_data[i] - ave_con;
   
-  multiply_matvec(IPCmat_data, y, n_con_data, ybuf);
-  prob = -0.5 * cblas_ddot(n_con_data, y, 1, ybuf, 1);
+    multiply_matvec(IPCmat_data, y, n_con_data, ybuf);
+    prob = -0.5 * cblas_ddot(n_con_data, y, 1, ybuf, 1);
+    prob += -0.5*lndet;
 
-  prob += -0.5*lndet;
-  
-  //printf("%f %f %f %f %f %f\n", prob, lndet, log(lambda), sigma, tau, ave_con);
+    prob_con_particles_perturb[which_particle_update] = prob;
+  }
+  else
+  {
+    prob = prob_con_particles[which_particle_update];
+  }
   /* record the parameter being updated */
   which_parameter_update_prev[which_particle_update] = which_parameter_update;
   return prob;
@@ -396,8 +414,9 @@ double prob_con_variability_initial(const void *model)
   
   multiply_matvec(IPCmat_data, y, n_con_data, ybuf);
   prob = -0.5 * cblas_ddot(n_con_data, y, 1, ybuf, 1);
-
   prob += -0.5*lndet;
+
+  prob_con_particles[which_particle_update] = prob;
   return prob;
 }
 
