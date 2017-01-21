@@ -205,7 +205,7 @@ double perturb_line2d(void *model)
   if(which < num_params_blr)
   {
     // set an upper limit to move steps of systematic error parameters.
-    if(which == num_params_blr-1 || which == num_params_blr )
+    if(which == num_params_blr-1)
        width = fmin(width, (par_range_model[which][1] - par_range_model[which][0])*0.01 );
 
     pm[which] += dnest_randh() * width;

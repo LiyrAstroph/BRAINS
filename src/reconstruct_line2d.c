@@ -516,9 +516,6 @@ void reconstruct_line2d_init()
     which_parameter_update_prev[i] = -1;
   }
 
-  prob_con_particles = malloc(parset.num_particles * sizeof(double));
-  prob_con_particles_perturb = malloc(parset.num_particles * sizeof(double));
-
   clouds_particles = malloc(parset.num_particles * sizeof(double *));
   clouds_particles_perturb = malloc(parset.num_particles * sizeof(double *));
   for(i=0; i<parset.num_particles; i++)
@@ -572,8 +569,6 @@ void reconstruct_line2d_end()
   
   free(perturb_accept);
   free(which_parameter_update_prev);
-  free(prob_con_particles);
-  free(prob_con_particles_perturb);
 
   free(Fline_at_data);
 
