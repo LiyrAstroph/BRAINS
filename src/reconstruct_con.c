@@ -209,7 +209,7 @@ void calculate_con_from_model(const void *model)
   double sigma, tau, alpha, mu;
   int i, info;
   
-  syserr = exp(pm[0]);
+  syserr = 0.0;//exp(pm[0]);
   tau = exp(pm[2]);
   sigma = exp(pm[1]) * sqrt(tau);
   alpha = 1.0;
@@ -466,7 +466,7 @@ void set_covar_Pmat_data(double sigma, double tau, double alpha, double syserr)
     }
 
     PSmat_data[i*n_con_data+i] = sigma * sigma;
-    PNmat_data[i*n_con_data+i] = Fcerrs_data[i]*Fcerrs_data[i] + syserr*syserr;
+    PNmat_data[i*n_con_data+i] = Fcerrs_data[i]*Fcerrs_data[i];// + syserr*syserr;
     PCmat_data[i*n_con_data+i] = PSmat_data[i*n_con_data+i] + PNmat_data[i*n_con_data+i];
   }
   return;
