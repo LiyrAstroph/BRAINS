@@ -155,6 +155,9 @@ void transfun_1d_cloud_direct(const void *pm, int flag_save)
     yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
     zb = sin(Lthe) * x + cos(Lthe) * z;
 
+    if(zb < 0.0)
+      zb = -zb;
+
 // conter-rotate around y, LOS is x-axis 
     x = xb * cos(PI/2.0-inc) + zb * sin(PI/2.0-inc);
     y = yb;
@@ -365,6 +368,9 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
     yb = -cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
     zb =  sin(Lthe) * x + cos(Lthe) * z;
 
+    if(zb < 0.0)
+      zb = -zb;
+
 // conter-rotate around y
     x = xb * cos(PI/2.0-inc) + zb * sin(PI/2.0-inc);
     y = yb;
@@ -420,6 +426,9 @@ void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, i
       vxb = cos(Lthe)*cos(Lphi) * vx + sin(Lphi) * vy - sin(Lthe)*cos(Lphi) * vz;
       vyb =-cos(Lthe)*sin(Lphi) * vx + cos(Lphi) * vy + sin(Lthe)*sin(Lphi) * vz;
       vzb = sin(Lthe) * vx + cos(Lthe) * vz;
+
+      if(zb < 0.0)
+        vzb = -vzb;
     
       vx = vxb * cos(PI/2.0-inc) + vzb * sin(PI/2.0-inc);
       vy = vyb;

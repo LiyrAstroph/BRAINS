@@ -209,7 +209,7 @@ void calculate_con_from_model(const void *model)
   double sigma, tau, alpha, mu;
   int i, info;
   
-  syserr = 0.0;//exp(pm[0]);
+  syserr = 0.0;//exp(pm[0]);  turn off systermatic error for continuum
   tau = exp(pm[2]);
   sigma = exp(pm[1]) * sqrt(tau);
   alpha = 1.0;

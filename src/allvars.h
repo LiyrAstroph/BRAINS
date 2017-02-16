@@ -77,6 +77,8 @@ typedef struct
 
   int flag_dim;
 
+  int flag_trend;
+  
   int n_con_recon, n_line_recon, n_vel_recon;
 
   int n_tau;

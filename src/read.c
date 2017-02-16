@@ -62,6 +62,10 @@ void read_parset()
     addr[nt] = &parset.n_con_recon;
     id[nt++] = INT;
 
+    strcpy(tag[nt], "FlagTrend");
+    addr[nt] = &parset.flag_trend;
+    id[nt++] = INT;
+
     strcpy(tag[nt], "ConConstructFileOut");
     addr[nt] = &parset.pcon_out_file;
     id[nt++] = STRING;
@@ -209,6 +213,12 @@ void read_parset()
     if(parset.flag_dim > 2 || parset.flag_dim < -1)
     {
       fprintf(stderr, "# Error in flag_dim: value %d is not allowed.\n", parset.flag_dim);
+      exit(0);
+    }
+
+    if(parset.flag_trend > 2 || parset.flag_trend < 0)
+    {
+      fprintf(stderr, "# Error in flag_trend: value %d is not allowed.\n", parset.flag_trend);
       exit(0);
     }
 
