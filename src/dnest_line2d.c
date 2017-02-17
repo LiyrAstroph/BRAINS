@@ -88,16 +88,22 @@ void set_par_range_model2d()
     par_range_model[i][1] = blr_range_model[i][1];
   }
   // variability parameters
-  for(i=num_params_blr; i<num_params_var + num_params_blr; i++)
+  for(i=num_params_blr; i<3 + num_params_blr; i++)
   {
     par_range_model[i][0] = var_range_model[i-num_params_blr][0];
     par_range_model[i][1] = var_range_model[i-num_params_blr][1];
   }
+  for(i=3 + num_params_blr; i< num_params_var + num_params_blr; i++)
+  {
+    par_range_model[i][0] = var_range_model[3][0];
+    par_range_model[i][1] = var_range_model[3][1];
+  }
+
   // continuum ligth curve values
   for(i=num_params_blr+num_params_var; i<num_params; i++)
   {
-    par_range_model[i][0] = var_range_model[num_params_var][0];
-    par_range_model[i][1] = var_range_model[num_params_var][1];
+    par_range_model[i][0] = var_range_model[4][0];
+    par_range_model[i][1] = var_range_model[4][1];
   }
 
   return;
@@ -111,21 +117,32 @@ void from_prior_line2d(void *model)
   int i;
   double *pm = (double *)model;
 
-  for(i=0; i<num_params_blr + num_params_var; i++)
+  for(i=0; i<num_params_blr ; i++)
   {
     pm[i] = par_range_model[i][0] + dnest_rand() * ( par_range_model[i][1] - par_range_model[i][0]  );
   }
 
   i=num_params_blr-1;
   pm[i] = par_range_model[i][0] - dnest_rand() * ( par_range_model[i][1] - par_range_model[0][0] )*0.01;
-  i=num_params_blr;
-  pm[i] = par_range_model[i][0] - dnest_rand() * ( par_range_model[i][1] - par_range_model[0][0] )*0.01;
+  //i=num_params_blr;
+  //pm[i] = par_range_model[i][0] - dnest_rand() * ( par_range_model[i][1] - par_range_model[0][0] )*0.01;
 
   // cope with fixed parameters
   for(i=0; i<num_params_blr; i++)
   {
     if(par_fix[i] == 1)
       pm[i] = par_fix_val[i];
+  }
+
+  // variability parameters
+  for(i=num_params_blr; i<num_params_blr+3; i++)
+  {
+    pm[i] = dnest_randn()*var_param_std[i-num_params_blr] + var_param[i-num_params_blr];
+    wrap(&pm[i], par_range_model[i][0], par_range_model[i][1]);
+  }
+  for(i=num_params_blr+3; i<num_params_blr+num_params_var; i++)
+  {
+    pm[i] = dnest_randn();
   }
   
   for(i=0; i<parset.n_con_recon; i++)

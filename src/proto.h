@@ -41,6 +41,7 @@ void set_covar_Umat(double sigma, double tau, double alpha);
 void calculate_con_from_model(const void *model);
 void reconstruct_con_from_varmodel(double sigma, double tau, double alpha, double syserr);
 void postprocess_con();
+void set_par_range_con();
 
 /* 1d line reconstruction */
 int dnest_line1d(int argc, char **argv);
@@ -91,6 +92,7 @@ void multiply_mat_transposeA(double * a, double *b, double *c, int n);
 void multiply_mat_transposeB(double * a, double *b, double *c, int n);
 void multiply_matvec(double *a, double *x, int n, double *y);
 void multiply_matvec_transposeA(double *a, double *x, int n, double *y);
+void multiply_matvec_MN(double * a, int m, int n, double *x, double *y);
 void multiply_mat_MN(double * a, double *b, double *c, int m, int n, int k);
 void multiply_mat_MN_transposeA(double * a, double *b, double *c, int m, int n, int k);
 void multiply_mat_MN_transposeB(double * a, double *b, double *c, int m, int n, int k);

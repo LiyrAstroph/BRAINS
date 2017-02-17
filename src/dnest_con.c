@@ -31,8 +31,14 @@
  */
 int dnest_con(int argc, char **argv)
 {
+  int i;
+
   num_params = parset.n_con_recon + num_params_var;
   size_of_modeltype = num_params * sizeof(double);
+
+  par_range_model = malloc( num_params * sizeof(double *));
+  for(i=0; i<num_params; i++)
+    par_range_model[i] = malloc(2*sizeof(double));
   
   /* setup functions used for dnest*/
   from_prior = from_prior_con;
@@ -44,6 +50,7 @@ int dnest_con(int argc, char **argv)
   create_model = create_model_con;
   get_num_params = get_num_params_con;
   
+  set_par_range_con();
   strcpy(options_file, dnest_options_file);
   
   if(parset.flag_postprc == 0)
@@ -55,6 +62,36 @@ int dnest_con(int argc, char **argv)
 }
 
 /*!
+ * this function set the parameter range.
+ */
+void set_par_range_con()
+{
+  int i;
+
+  // variability parameters
+
+  for(i=0; i<3; i++)
+  {
+    par_range_model[i][0] = var_range_model[i][0];
+    par_range_model[i][1] = var_range_model[i][1];
+  }
+
+  for(i=3; i<num_params_var; i++) // parameters for long-term trend
+  {
+    par_range_model[i][0] = var_range_model[3][0];
+    par_range_model[i][1] = var_range_model[3][1];
+  }
+
+  // continuum light curve parameters
+  for(i=num_params_var; i<num_params; i++)
+  {
+    par_range_model[i][0] = var_range_model[4][0];
+    par_range_model[i][1] = var_range_model[4][1];
+  }
+  return;
+}
+
+/*!
  * This function generate a sample from the prior.
  */
 void from_prior_con(void *model)
@@ -63,9 +100,14 @@ void from_prior_con(void *model)
   double *pm = (double *)model;
   
   pm[0] = var_range_model[0][1] - dnest_rand()*(var_range_model[0][1] - var_range_model[0][0]) * 0.01;
-  pm[1] = var_range_model[1][0] + dnest_rand()*(var_range_model[1][1] - var_range_model[1][0]);
-  pm[2] = var_range_model[2][0] + dnest_rand()*(var_range_model[2][1] - var_range_model[2][0]);
-  pm[3] = dnest_randn(); //var_range_model[3][0] + dnest_rand()*(var_range_model[3][1] - var_range_model[3][0]);
+  for(i=1; i<3; i++)
+  {
+    pm[i] = var_range_model[i][0] + dnest_rand()*(var_range_model[i][1] - var_range_model[i][0]);
+  }
+  for(i=3; i<num_params_var; i++)
+  {
+    pm[i] = dnest_randn(); //var_range_model[3][0] + dnest_rand()*(var_range_model[3][1] - var_range_model[3][0]);
+  }
 
   for(i=0; i<parset.n_con_recon; i++)
     pm[i+num_params_var] = dnest_randn();
@@ -127,57 +169,33 @@ double perturb_con(void *model)
     limit2 = limits[(which_level_update-1) * num_params *2 + which *2 + 1];
     width = limit2 - limit1;
   }
-
-  switch(which)
+  else
   {
-    case 0: // systematic error of continuum; constrain the minimum step size 
-      if(which_level_update == 0)
-      {
-        width = var_range_model[0][1] - var_range_model[0][0];
-      }
-      pm[which] += fmin(width, (var_range_model[0][1] - var_range_model[0][0]) * 0.1) * dnest_randh();
-      wrap(&(pm[which]), var_range_model[0][0], var_range_model[0][1]);
-      break;
-    
-    case 1: // sigma
-      if(which_level_update == 0)
-      {
-        width = var_range_model[1][1] - var_range_model[1][0];
-      }
-      pm[which] += width*dnest_randh();
-      wrap(&(pm[which]), var_range_model[1][0] , var_range_model[1][1] );
-      break;
+    width = ( par_range_model[which][1] - par_range_model[which][0] );
+  }
 
-    case 2: // tau
-      if(which_level_update == 0)
-      {
-        width = var_range_model[2][1] - var_range_model[2][0];
-      }
-      pm[which] += width*dnest_randh();
-      wrap(&(pm[which]), var_range_model[2][0], var_range_model[2][1]);
-      break;
+  if(which < 3)
+  {
+    // set an upper limit to the MCMC steps of systematic errors
+    if(which == 0)
+       width = fmin(width, (par_range_model[which][1] - par_range_model[which][0])*0.01 );
 
-    case 3: // mean value
-      if(which_level_update == 0)
-      {
-        width = var_range_model[3][1] - var_range_model[3][0];
-      }
-      logH -= (-0.5*pow(pm[which], 2.0) );
-      pm[which] += width*dnest_randh();
-      wrap(&(pm[which]), var_range_model[3][0], var_range_model[3][1]);
-      logH += (-0.5*pow(pm[which], 2.0) );
-      break;
-
-    default: // light curve points
-      if(which_level_update == 0)
-      {
-        width = var_range_model[4][1] - var_range_model[4][0];
-      }
-      logH -= (-0.5*pow(pm[which], 2.0) );
-      pm[which] += width*dnest_randh();
-      wrap(&pm[which], var_range_model[4][0], var_range_model[4][1]);
-      logH += (-0.5*pow(pm[which], 2.0) );
-      break;
+    pm[which] += dnest_randh() * width;
+    wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
+  }
+  else if(which < num_params_var)
+  {
+    logH -= (-0.5*pow(pm[which], 2.0) );
+    pm[which] += dnest_randh() * width;
+    wrap(&pm[which], par_range_model[which][0], par_range_model[which][1]);
+    logH += (-0.5*pow(pm[which], 2.0) );
+  }
+  else
+  {
+    logH -= (-0.5*pow(pm[which], 2.0) );
+    pm[which] += dnest_randh() * width;
+    wrap(&pm[which], par_range_model[which][0], par_range_model[which][1]);
+    logH += (-0.5*pow(pm[which], 2.0) );
   }
   return logH;
 }

@@ -212,13 +212,13 @@ void read_parset()
 
     if(parset.flag_dim > 2 || parset.flag_dim < -1)
     {
-      fprintf(stderr, "# Error in flag_dim: value %d is not allowed.\n", parset.flag_dim);
+      fprintf(stderr, "# Error in flag_dim: value %d is not allowed.\nPlease specify a value in [-1-2].\n", parset.flag_dim);
       exit(0);
     }
 
     if(parset.flag_trend > 2 || parset.flag_trend < 0)
     {
-      fprintf(stderr, "# Error in flag_trend: value %d is not allowed.\n", parset.flag_trend);
+      fprintf(stderr, "# Error in flag_trend: value %d is not allowed.\nPlease specify a value in [0-1].\n", parset.flag_trend);
       exit(0);
     }
 
