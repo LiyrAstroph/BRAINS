@@ -158,6 +158,10 @@ void read_parset()
     addr[nt] = &parset.str_par_fix_val;
     id[nt++] = STRING;
 
+    /* default values */
+    parset.flag_dim = 0;
+    parset.flag_trend = 0;
+    parset.flag_narrowline = 0;
     
     char fname[200];
     sprintf(fname, "%s", parset.param_file);
