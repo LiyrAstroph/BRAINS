@@ -40,26 +40,28 @@ void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl
   
   for(i=0;i<nl;i++)
   {
-  	tl = Tl[i];
-  	fline = 0.0;
-  	for(j=0; j<parset.n_tau; j++)
-  	{
-  	  tau = TransTau[j];
-  	  tc = tl - tau;
-  	  if(tc>=Tcon_min && tc <=Tcon_max)
-  	  {
-  		  fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, tc, gsl_acc); /* interpolation */
-  	  }
+    tl = Tl[i];
+    fline = 0.0;
+    for(j=0; j<parset.n_tau; j++)
+    {
+      tau = TransTau[j];
+      tc = tl - tau;
+      if(tc>=Tcon_min && tc <=Tcon_max)
+      {
+        fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, tc, gsl_acc); /* interpolation */
+      }
       else
       {
         fcon = mean; /*  beyond the range, set to be the mean value */
       }
-      if(fcon < 0.0)
-        fcon = 0.0;
-      fline += Trans1D[j] * fcon * pow(fabs(fcon), model->Ag);     /*  line response */
-  	}
-  	fline *= dTransTau * A;
-  	Fl[i] = fline;
+     
+      if(fcon > 0.0)
+      {
+        fline += Trans1D[j] * fcon * pow(fabs(fcon), model->Ag);     /*  line response */
+      }	
+    }
+    fline *= dTransTau * A;
+    Fl[i] = fline;
   }
   return;
 }
@@ -249,10 +251,11 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
         {
           fcon = mean; /* mean value */
         }
-        if(fcon < 0.0)
-          fcon = 0.0;
-        fline += trans2d[k*nv+i] * fcon * pow(fabs(fcon), model->Ag);
-        //fline += trans2d[k*nv+i] * fcon;
+        if(fcon > 0.0)
+        {
+           fline += trans2d[k*nv+i] * fcon * pow(fabs(fcon), model->Ag);
+           //fline += trans2d[k*nv+i] * fcon;
+        }
       }
       fline *= dTransTau * A ;
       fl2d[j*nv + i] = fline;
