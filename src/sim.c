@@ -55,7 +55,7 @@ void sim()
 
   smooth_init(parset.n_vel_recon);
 
-  reconstruct_con_from_varmodel(0.1, 100.0, 1.0, 0.0);
+  reconstruct_con_from_varmodel(0.26, 74.0, 1.0, 0.0);
   gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
 
   sprintf(fname, "%s/%s", parset.file_dir, "/data/sim_con_full.txt");
@@ -106,7 +106,7 @@ void sim()
     fprintf(stderr, "# Error: Cannot open file %s\n", fname);
     exit(-1);
   }
-  fprintf(fp, "# %d %d\n", parset.n_tau, n_vel_data);
+  fprintf(fp, "# %d %d\n", parset.n_tau, parset.n_vel_recon);
   for(i=0; i<parset.n_tau; i++)
   {
     for(j=0; j<parset.n_vel_recon; j++)
@@ -133,7 +133,7 @@ void sim_init()
   which_parameter_update = -1;
   
   num_params_blr = 12;
-  num_params_var = 4;
+  num_params_var = 4 + parset.flag_trend;
   num_params = num_params_blr + num_params_var + parset.n_con_recon;
   size_of_modeltype = num_params * sizeof(double);
 
@@ -177,7 +177,7 @@ void sim_init()
   }
 
   double vel_max_set, vel_min_set;
-  vel_max_set = 3500.0/VelUnit;
+  vel_max_set = 3000.0/VelUnit;
   vel_min_set = - vel_max_set;
   double dVel = (vel_max_set- vel_min_set)/(parset.n_vel_recon -1.0);
 
