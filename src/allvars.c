@@ -46,6 +46,7 @@ unsigned long long int which_mcmc_steps;//mcmc steps
 int *perturb_accept, *which_parameter_update_prev;
 
 /* continuum reconstruction */
+int nq;
 double *Tcon, *Fcon, *Fcerrs;
 double Tcon_min, Tcon_max;
 double *PSmat, *PNmat, *USmat, *PSmat_data;
@@ -53,6 +54,8 @@ double *PNmat_data;
 double *PCmat_data, *IPCmat_data, *PQmat, *PEmat1, *PEmat2;
 double *workspace;
 double *var_param, *var_param_std;
+double *con_q;
+
 
 /* line reconstruction */
 double *Fline_at_data;
@@ -80,6 +83,7 @@ double rcloud_min_set, rcloud_max_set;
 
 double **Fcon_particles, **Fcon_particles_perturb;
 double *prob_con_particles, *prob_con_particles_perturb;
+double **con_q_particles, **con_q_particles_perturb;
 
 int force_update;
 double **clouds_particles_perturb, **clouds_particles;

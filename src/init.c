@@ -30,6 +30,7 @@ void init()
 {
   int i;
 
+  nq = 1 + parset.flag_trend;
   num_params_var = 4 + parset.flag_trend;
 
   allocate_memory();
@@ -141,6 +142,8 @@ void allocate_memory()
 
   var_param = malloc(num_params_var * sizeof(double));
   var_param_std = malloc(num_params_var * sizeof(double));
+
+  return;
 }
 
 /*! 

@@ -5,7 +5,7 @@
 FileDir                     /home/liyropt/Projects/GIT/BRAINS
 %FileDir                     /ihepbatch/mbhd01/user/liyanrong/RM/Test/mrk493
 
-FlagDim                     1                         % -1, simulation; 0, only continuum; 1, 1d line; 2, 2d line
+FlagDim                     2                         % -1, simulation; 0, only continuum; 1, 1d line; 2, 2d line
 %===============================
 % data file
 ContinnumFile               data/mrk493_con.txt         % file for contnnum data

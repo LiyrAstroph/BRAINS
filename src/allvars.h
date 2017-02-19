@@ -119,6 +119,7 @@ extern int *perturb_accept, *which_parameter_update_prev;
 extern double *limits;  // external from dnest
 
 /* continuum reconstruction */
+extern int nq;
 extern double *Tcon, *Fcon, *Fcerrs;
 extern double Tcon_min, Tcon_max;
 extern double *PSmat, *PNmat, *USmat, *PSmat_data;
@@ -126,6 +127,7 @@ extern double *PNmat_data;
 extern double *PCmat_data, *IPCmat_data, *PQmat, *PEmat1, *PEmat2;
 extern double *workspace;
 extern double *var_param, *var_param_std;
+extern double *con_q;
 
 /* line reconstruction */
 extern double *Fline_at_data;
@@ -171,6 +173,7 @@ extern double rcloud_min_set, rcloud_max_set;
 
 extern double **Fcon_particles, **Fcon_particles_perturb;
 extern double *prob_con_particles, *prob_con_particles_perturb;
+extern double **con_q_particles, **con_q_particles_perturb;
 
 extern int force_update;
 extern double **clouds_particles_perturb, **clouds_particles;

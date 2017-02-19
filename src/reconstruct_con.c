@@ -207,9 +207,7 @@ void calculate_con_from_model(const void *model)
 
   double *pm = (double *)model;
   double sigma, tau, alpha;
-  int i, j, nL, info;
-  
-  nL = parset.flag_trend + 1;
+  int i, j, info;
 
   syserr = 0.0;//exp(pm[0]);  turn off systematic error 
   tau = exp(pm[2]);
@@ -217,11 +215,11 @@ void calculate_con_from_model(const void *model)
   alpha = 1.0;
   
   Larr = workspace; 
-  ybuf = Larr + n_con_data*nL; 
-  y = ybuf + n_con_data*nL;
+  ybuf = Larr + n_con_data*nq; 
+  y = ybuf + n_con_data*nq;
   Cq = y + n_con_data;
-  yq = Cq + nL*nL;
-  yu = yq + nL; 
+  yq = Cq + nq*nq;
+  yu = yq + nq; 
   yuq = yu + parset.n_con_recon;
   Larr_rec = yuq + parset.n_con_recon;
 
@@ -232,26 +230,28 @@ void calculate_con_from_model(const void *model)
 
   for(i=0;i<n_con_data;i++)
   {
-    Larr[i*nL + 0]=1.0;
-    for(j=1; j<nL; j++)
-      Larr[i*nL + j] = pow(Tcon_data[i], j);
+    Larr[i*nq + 0]=1.0;
+    for(j=1; j<nq; j++)
+      Larr[i*nq + j] = pow(Tcon_data[i], j);
   }
  
-  multiply_mat_MN(PCmat_data, Larr, ybuf, n_con_data, nL, n_con_data);
-  multiply_mat_MN_transposeA(Larr, ybuf, Cq, nL, nL, n_con_data);
+  multiply_mat_MN(PCmat_data, Larr, ybuf, n_con_data, nq, n_con_data);
+  multiply_mat_MN_transposeA(Larr, ybuf, Cq, nq, nq, n_con_data);
 
   multiply_matvec(PCmat_data, Fcon_data, n_con_data, ybuf);
-  multiply_mat_MN_transposeA(Larr, ybuf, yq, nL, 1, n_con_data);
+  multiply_mat_MN_transposeA(Larr, ybuf, yq, nq, 1, n_con_data);
 
-  inverse_mat(Cq, nL, &info);
-  multiply_mat_MN(Cq, yq, ybuf, nL, 1, nL);
+  inverse_mat(Cq, nq, &info);
+  multiply_mat_MN(Cq, yq, ybuf, nq, 1, nq);
 
-  Chol_decomp_L(Cq, nL, &info);
-  multiply_matvec(Cq, &pm[3], nL, yq);
-  for(i=0; i<nL; i++)
+  Chol_decomp_L(Cq, nq, &info);
+  multiply_matvec(Cq, &pm[3], nq, yq);
+  for(i=0; i<nq; i++)
     yq[i] += ybuf[i];
-  
-  multiply_matvec_MN(Larr, n_con_data, nL, yq, ybuf);
+
+  memcpy(con_q, yq, nq*sizeof(double)); //back up long-term trend
+   
+  multiply_matvec_MN(Larr, n_con_data, nq, yq, ybuf);
   for(i=0; i<n_con_data; i++)
   {
     y[i] = Fcon_data[i] - ybuf[i];
@@ -277,11 +277,11 @@ void calculate_con_from_model(const void *model)
   // add back long-term trend of continuum
   for(i=0;i<parset.n_con_recon;i++)
   {
-    Larr_rec[i*nL + 0]=1.0;
-    for(j=1; j<nL; j++)
-      Larr_rec[i*nL + j] = pow(Tcon[i], j);
+    Larr_rec[i*nq + 0]=1.0;
+    for(j=1; j<nq; j++)
+      Larr_rec[i*nq + j] = pow(Tcon[i], j);
   }
-  multiply_matvec_MN(Larr_rec, parset.n_con_recon, nL, yq, yuq);
+  multiply_matvec_MN(Larr_rec, parset.n_con_recon, nq, yq, yuq);
 
   for(i=0; i<parset.n_con_recon; i++)
   {
@@ -298,16 +298,14 @@ void calculate_con_from_model(const void *model)
 void reconstruct_con_from_varmodel(double sigma, double tau, double alpha, double syserr)
 {
   double *Larr, *ybuf, *y, *Larr_rec, *yq, *yuq, *Cq;
-  int i, j, nL, info;
-  
-  nL = parset.flag_trend + 1;
+  int i, j, info;
 
   Larr = workspace;
-  ybuf = Larr + n_con_data * nL;
+  ybuf = Larr + n_con_data * nq;
   y = ybuf + n_con_data;
   Cq = y + n_con_data;
-  yq = Cq + nL*nL;
-  yuq = yq + nL; 
+  yq = Cq + nq*nq;
+  yuq = yq + nq; 
   Larr_rec = yuq + parset.n_con_recon;
 
   set_covar_Pmat_data(sigma, tau, alpha, syserr);
@@ -317,23 +315,24 @@ void reconstruct_con_from_varmodel(double sigma, double tau, double alpha, doubl
   
   for(i=0;i<n_con_data;i++)
   {
-    Larr[i*nL + 0]=1.0;
-    for(j=1; j<nL; j++)
-      Larr[i*nL + j] = pow(Tcon_data[i], j);
+    Larr[i*nq + 0]=1.0;
+    for(j=1; j<nq; j++)
+      Larr[i*nq + j] = pow(Tcon_data[i], j);
   }
 
-  multiply_mat_MN(PSmat_data, Larr, ybuf, n_con_data, nL, n_con_data);
-  multiply_mat_MN_transposeA(Larr, ybuf, Cq, nL, nL, n_con_data);
+  multiply_mat_MN(PSmat_data, Larr, ybuf, n_con_data, nq, n_con_data);
+  multiply_mat_MN_transposeA(Larr, ybuf, Cq, nq, nq, n_con_data);
 
   multiply_matvec(PSmat_data, Fcon_data, n_con_data, ybuf);
-  multiply_mat_MN_transposeA(Larr, ybuf, yq, nL, 1, n_con_data);
+  multiply_mat_MN_transposeA(Larr, ybuf, yq, nq, 1, n_con_data);
 
-  inverse_mat(Cq, nL, &info);
-  multiply_mat_MN(Cq, yq, ybuf, nL, 1, nL);
+  inverse_mat(Cq, nq, &info);
+  multiply_mat_MN(Cq, yq, ybuf, nq, 1, nq);
 
-  memcpy(yq, ybuf, nL*sizeof(double));
+  memcpy(yq, ybuf, nq*sizeof(double));
+  memcpy(con_q, ybuf, nq*sizeof(double)); // back up long-term trend
   
-  multiply_matvec_MN(Larr, n_con_data, nL, yq, ybuf);
+  multiply_matvec_MN(Larr, n_con_data, nq, yq, ybuf);
   for(i=0; i<n_con_data; i++)
   {
     y[i] = Fcon_data[i] - ybuf[i];
@@ -344,11 +343,11 @@ void reconstruct_con_from_varmodel(double sigma, double tau, double alpha, doubl
 
   for(i=0;i<parset.n_con_recon;i++)
   {
-    Larr_rec[i*nL + 0]=1.0;
-    for(j=1; j<nL; j++)
-      Larr_rec[i*nL + j] = pow(Tcon[i], j);
+    Larr_rec[i*nq + 0]=1.0;
+    for(j=1; j<nq; j++)
+      Larr_rec[i*nq + j] = pow(Tcon[i], j);
   }
-  multiply_matvec_MN(Larr_rec, parset.n_con_recon, nL, yq, yuq);
+  multiply_matvec_MN(Larr_rec, parset.n_con_recon, nq, yq, yuq);
 
   for(i=0; i<parset.n_con_recon; i++)
     Fcon[i] += yuq[i];
@@ -361,7 +360,7 @@ void reconstruct_con_from_varmodel(double sigma, double tau, double alpha, doubl
 double prob_con_variability(const void *model)
 {
   double prob = 0.0;
-  int i, j, nL, param, info;
+  int i, j, param, info;
   double *pm = (double *)model;
   double tau, sigma, alpha, lndet, syserr;
   double *Larr, *ybuf, *y, *yq, *Cq;
@@ -374,7 +373,6 @@ double prob_con_variability(const void *model)
 
   if( which_parameter_update < num_params_var)
   {
-    nL = parset.flag_trend + 1;
 
     syserr = exp(pm[0]);
     tau = exp(pm[2]);
@@ -385,7 +383,7 @@ double prob_con_variability(const void *model)
     ybuf = Larr + n_con_data;
     y = ybuf + n_con_data;
     yq = y + n_con_data;
-    Cq = yq + nL;
+    Cq = yq + nq;
 
     set_covar_Pmat_data(sigma, tau, alpha, syserr);
     memcpy(IPCmat_data, PCmat_data, n_con_data*n_con_data*sizeof(double));
@@ -396,29 +394,29 @@ double prob_con_variability(const void *model)
 
     for(i=0;i<n_con_data;i++)
     {
-      Larr[i*nL + 0]=1.0;
-      for(j=1; j<nL; j++)
-        Larr[i*nL + j] = pow(Tcon_data[i], j);
+      Larr[i*nq + 0]=1.0;
+      for(j=1; j<nq; j++)
+        Larr[i*nq + j] = pow(Tcon_data[i], j);
     }
  
     /* calculate L^T*C^-1*L */
-    multiply_mat_MN(IPCmat_data, Larr, ybuf, n_con_data, nL, n_con_data);
-    multiply_mat_MN_transposeA(Larr, ybuf, Cq, nL, nL, n_con_data);
+    multiply_mat_MN(IPCmat_data, Larr, ybuf, n_con_data, nq, n_con_data);
+    multiply_mat_MN_transposeA(Larr, ybuf, Cq, nq, nq, n_con_data);
 
     /* calculate L^T*C^-1*y */
     multiply_matvec(IPCmat_data, Fcon_data, n_con_data, ybuf);
-    multiply_mat_MN_transposeA(Larr, ybuf, yq, nL, 1, n_con_data);
+    multiply_mat_MN_transposeA(Larr, ybuf, yq, nq, 1, n_con_data);
 
     /* calculate (L^T*C^-1*L)^-1 * L^T*C^-1*y */
-    inverse_mat(Cq, nL, &info);
-    multiply_mat_MN(Cq, yq, ybuf, nL, 1, nL);
+    inverse_mat(Cq, nq, &info);
+    multiply_mat_MN(Cq, yq, ybuf, nq, 1, nq);
 
-    Chol_decomp_L(Cq, nL, &info);
-    multiply_matvec(Cq, &pm[3], nL, yq);
-    for(i=0; i<nL; i++)
+    Chol_decomp_L(Cq, nq, &info);
+    multiply_matvec(Cq, &pm[3], nq, yq);
+    for(i=0; i<nq; i++)
       yq[i] += ybuf[i];
   
-    multiply_matvec_MN(Larr, n_con_data, nL, yq, ybuf);
+    multiply_matvec_MN(Larr, n_con_data, nq, yq, ybuf);
     for(i=0; i<n_con_data; i++)
     {
       y[i] = Fcon_data[i] - ybuf[i];
@@ -445,12 +443,10 @@ double prob_con_variability(const void *model)
 double prob_con_variability_initial(const void *model)
 {
   double prob = 0.0;
-  int i, j, nL, info;
+  int i, j, info;
   double *pm = (double *)model;
   double tau, sigma, alpha, lndet, syserr;
   double *Larr, *ybuf, *y, *yq, *Cq;
-  
-  nL = parset.flag_trend + 1;
 
   syserr = exp(pm[0]);
   tau = exp(pm[2]);
@@ -461,7 +457,7 @@ double prob_con_variability_initial(const void *model)
   ybuf = Larr + n_con_data;
   y = ybuf + n_con_data;
   yq = y + n_con_data;
-  Cq = yq + nL;
+  Cq = yq + nq;
 
   set_covar_Pmat_data(sigma, tau, alpha, syserr);
   memcpy(IPCmat_data, PCmat_data, n_con_data*n_con_data*sizeof(double));
@@ -472,26 +468,26 @@ double prob_con_variability_initial(const void *model)
 
   for(i=0;i<n_con_data;i++)
   {
-    Larr[i*nL + 0]=1.0;
-    for(j=1; j<nL; j++)
-      Larr[i*nL + j] = pow(Tcon_data[i], j);
+    Larr[i*nq + 0]=1.0;
+    for(j=1; j<nq; j++)
+      Larr[i*nq + j] = pow(Tcon_data[i], j);
   }
  
-  multiply_mat_MN(IPCmat_data, Larr, ybuf, n_con_data, nL, n_con_data);
-  multiply_mat_MN_transposeA(Larr, ybuf, Cq, nL, nL, n_con_data);
+  multiply_mat_MN(IPCmat_data, Larr, ybuf, n_con_data, nq, n_con_data);
+  multiply_mat_MN_transposeA(Larr, ybuf, Cq, nq, nq, n_con_data);
 
   multiply_matvec(IPCmat_data, Fcon_data, n_con_data, ybuf);
-  multiply_mat_MN_transposeA(Larr, ybuf, yq, nL, 1, n_con_data);
+  multiply_mat_MN_transposeA(Larr, ybuf, yq, nq, 1, n_con_data);
 
-  inverse_mat(Cq, nL, &info);
-  multiply_mat_MN(Cq, yq, ybuf, nL, 1, nL);
+  inverse_mat(Cq, nq, &info);
+  multiply_mat_MN(Cq, yq, ybuf, nq, 1, nq);
 
-  Chol_decomp_L(Cq, nL, &info);
-  multiply_matvec(Cq, &pm[3], nL, yq);
-  for(i=0; i<nL; i++)
+  Chol_decomp_L(Cq, nq, &info);
+  multiply_matvec(Cq, &pm[3], nq, yq);
+  for(i=0; i<nq; i++)
     yq[i] += ybuf[i];
   
-  multiply_matvec_MN(Larr, n_con_data, nL, yq, ybuf);
+  multiply_matvec_MN(Larr, n_con_data, nq, yq, ybuf);
   for(i=0; i<n_con_data; i++)
   {
     y[i] = Fcon_data[i] - ybuf[i];
@@ -620,6 +616,8 @@ void reconstruct_con_init()
   }
   prob_con_particles = malloc(parset.num_particles * sizeof(double));
   prob_con_particles_perturb = malloc(parset.num_particles * sizeof(double));
+
+  con_q = malloc(nq * sizeof(double));
   return;
 }
 
@@ -645,5 +643,7 @@ void reconstruct_con_end()
   free(which_parameter_update_prev);
   free(best_model_con);
   free(best_model_std_con);
+
+  free(con_q);
   return;
 }

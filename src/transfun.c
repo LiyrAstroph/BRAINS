@@ -30,13 +30,12 @@
  */
 void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl)
 {
-  int i, j;
+  int i, j, k;
   double fline, fcon, tl, tc, tau, A, mean;
   BLRmodel *model = (BLRmodel *)pm;
 
   A=exp(model->A);
   //mean = ((double *)pm)[num_params_blr + num_params_var - 1];
-  mean = 0.0;
   
   for(i=0;i<nl;i++)
   {
@@ -52,9 +51,14 @@ void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl
       }
       else
       {
-        fcon = mean; /*  beyond the range, set to be the mean value */
+        //fcon = mean; 
+        fcon = con_q[0];
+        for(k=1; k < nq; k++)/*  beyond the range, set to be the long-term trend */
+        {
+          fcon += con_q[k] * pow(tc, k);
+        }
       }
-     
+
       if(fcon > 0.0)
       {
         fline += Trans1D[j] * fcon * pow(fabs(fcon), model->Ag);     /*  line response */
@@ -225,7 +229,7 @@ void transfun_1d_cloud_direct(const void *pm, int flag_save)
 void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const double *transv, const double *trans2d, 
                                               double *fl2d, int nl, int nv)
 {
-  int i, j, k;
+  int i, j, k, m;
   double fline, tau, tl, tc, fcon, A, mean;
   BLRmodel *model = (BLRmodel *)pm;
 
@@ -249,8 +253,14 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
         }
         else
         {
-          fcon = mean; /* mean value */
+          //fcon = mean; 
+          fcon = con_q[0];
+          for(m=1; m < nq; m++)/*  beyond the range, set to be the long-term trend */
+          {
+            fcon += con_q[m] * pow(tc, m);
+          }
         }
+
         if(fcon > 0.0)
         {
            fline += trans2d[k*nv+i] * fcon * pow(fabs(fcon), model->Ag);
@@ -285,7 +295,7 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
 void transfun_2d_cloud_direct(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
   int i, j, idV, idt, nc;
-  double vrange, r, phi, dis, Lopn_cos, u;
+  double r, phi, dis, Lopn_cos, u;
   double x, y, z, xb, yb, zb, vx, vy, vz, vxb, vyb, vzb;
   double inc, F, beta, mu, k, gam, a, s;
   double Lphi, Lthe, L, E, vcloud_max, vcloud_min;

@@ -193,6 +193,8 @@ void sim_init()
     clouds_particles[i] = malloc(parset.n_cloud_per_task * sizeof(double));
     clouds_particles_perturb[i] = malloc(parset.n_cloud_per_task * sizeof(double));
   }
+
+  con_q = malloc(nq * sizeof(double));
   return;
 }
 
@@ -213,4 +215,6 @@ void sim_end()
   }
   free(clouds_particles);
   free(clouds_particles_perturb);
+
+  free(con_q);
 }

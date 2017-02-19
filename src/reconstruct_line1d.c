@@ -101,6 +101,7 @@ void postprocess1d()
     force_update = 1;
     which_parameter_update = -1; 
     which_particle_update = 0;
+    con_q = con_q_particles[which_particle_update];
     Fcon = Fcon_particles[which_particle_update];
     Trans1D = Trans1D_particles[which_particle_update];
 
@@ -245,6 +246,7 @@ void reconstruct_line1d()
     which_parameter_update = -1; // force to update the transfer function
     which_particle_update = 0;
 
+    con_q = con_q_particles[which_particle_update];
     Fcon = Fcon_particles[which_particle_update];
     Trans1D = Trans1D_particles[which_particle_update];
 
@@ -405,6 +407,14 @@ void reconstruct_line1d_init()
   prob_line_particles = malloc(parset.num_particles * sizeof(double));
   prob_line_particles_perturb = malloc(parset.num_particles * sizeof(double));
 
+  con_q_particles = malloc(parset.num_particles * sizeof(double *));
+  con_q_particles_perturb = malloc(parset.num_particles * sizeof(double *));
+  for(i=0; i<parset.num_particles; i++)
+  {
+    con_q_particles[i] = malloc(nq * sizeof(double));
+    con_q_particles_perturb[i] = malloc(nq* sizeof(double));
+  }
+
   return;
 }
 
@@ -446,6 +456,9 @@ void reconstruct_line1d_end()
     free(Trans1D_particles_perturb[i]);
     free(Fline_at_data_particles[i]);
     free(Fline_at_data_particles_perturb[i]);
+
+    free(con_q_particles[i]);
+    free(con_q_particles_perturb[i]);
   }
   free(clouds_particles);
   free(clouds_particles_perturb);
@@ -455,6 +468,9 @@ void reconstruct_line1d_end()
   free(Fline_at_data_particles_perturb);
   free(prob_line_particles);
   free(prob_line_particles_perturb);
+
+  free(con_q_particles);
+  free(con_q_particles_perturb);
 
   for(i=0; i<num_params; i++)
   {
@@ -500,6 +516,9 @@ double prob_line1d(const void *model)
 
       memcpy(Fline_at_data_particles[which_particle_update], Fline_at_data_particles_perturb[which_particle_update], 
         n_line_data * sizeof(double));
+
+      memcpy(con_q_particles[which_particle_update], con_q_particles_perturb[which_particle_update],
+        nq*sizeof(double));
     }
     else 
     {
@@ -534,6 +553,7 @@ double prob_line1d(const void *model)
      * only appears at the stage of calculating likelihood probability.
      * when this paramete is updated, no need to re-calculate the contionuum.  
      */
+    con_q = con_q_particles_perturb[which_particle_update];
     Fcon = Fcon_particles_perturb[which_particle_update];
     calculate_con_from_model(model + num_params_blr*sizeof(double));
 
@@ -541,6 +561,7 @@ double prob_line1d(const void *model)
   }
   else /* continuum has no change, use the previous values */
   {
+    con_q = con_q_particles[which_particle_update];
     Fcon = Fcon_particles[which_particle_update];
     gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
   }
@@ -608,6 +629,8 @@ double prob_initial_line1d(const void *model)
   int i;
   double *pm = (double *)model;
   
+  con_q = con_q_particles[which_particle_update];
+
   Fcon = Fcon_particles[which_particle_update];
   calculate_con_from_model(model + num_params_blr*sizeof(double));
   gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
