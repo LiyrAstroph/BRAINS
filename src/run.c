@@ -51,13 +51,19 @@ void begin_run()
 
   if(parset.flag_dim == 1) /* 1d line */
   {
-    reconstruct_con();
+    if(parset.flag_postprc == 0)
+    {
+      reconstruct_con();
+    }
   	reconstruct_line1d();
   }
 
   if(parset.flag_dim == 2) /* 2d line */
   {
-    reconstruct_con();
+    if(parset.flag_postprc == 0)
+    {
+      reconstruct_con();
+    }
     reconstruct_line2d();
   }
 
