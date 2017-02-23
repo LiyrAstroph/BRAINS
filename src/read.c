@@ -371,6 +371,14 @@ void read_data()
         fscanf(fp, "%lf %lf %lf \n", &Tline_data[i], &Fline_data[i], &Flerrs_data[i]);
       }
       fclose(fp);
+
+      if(Tline_data[0] - Tcon_data[0] > 0.0)
+      {
+        fprintf(stderr, "# Error: No time overlap between ontinuum and line time series.\n");
+        fprintf(stderr, "# Error: continuum, %f-%f; line, %f-%f.\n", Tcon_data[0], Tcon_data[n_con_data-1], 
+          Tline_data[0], Tline_data[n_line_data-1]);
+        exit(-1);
+      }
     }
 
     MPI_Bcast(Tline_data, n_line_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
@@ -408,6 +416,14 @@ void read_data()
         fscanf(fp, "\n");
       }
       fclose(fp);
+
+      if(Tline_data[0] - Tcon_data[0] > 0.0)
+      {
+        fprintf(stderr, "# Error: No time overlap between ontinuum and line time series.\n");
+        fprintf(stderr, "# Error: continuum, %f-%f; line, %f-%f.\n", Tcon_data[0], Tcon_data[n_con_data-1], 
+          Tline_data[0], Tline_data[n_line_data-1]);
+        exit(-1);
+      }
       
     }
 
