@@ -153,10 +153,19 @@ void postprocess_con()
  */
 void reconstruct_con()
 {
-  char *argv[]={""};
+  int argc=1;
+  char *argv[2];
+
+  //setup argc and argv
+  argv[0]="dnest";
+  if(parset.flag_restart)
+  {
+    argc++;
+    argv[1]="-r";
+  }
 
   reconstruct_con_init();
-  dnest_con(0, argv);
+  dnest_con(argc, argv);
 
   postprocess_con();
 

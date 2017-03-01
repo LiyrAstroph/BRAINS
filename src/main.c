@@ -53,9 +53,12 @@ int main(int argc, char **argv)
   if(thistask == roottask)
   {
     opterr = 0;
+    optind = 0; // reset getopt. 
     parset.flag_postprc = 0; /* default value, 0 means postprocessing after runing MCMC sampling. */
     parset.temperature = 1.0; /* default value */
-    while( (opt = getopt(argc, argv, "pt:")) != -1)
+    parset.flag_restart = 0;
+
+    while( (opt = getopt(argc, argv, "pt:r")) != -1)
     {
       switch(opt)
       {
@@ -77,6 +80,10 @@ int main(int argc, char **argv)
             exit(0);
           }
           break;
+        case 'r':
+          parset.flag_restart = 1;
+          printf("# Restart run.\n");
+          break;
         case '?':
           printf("# Incorrect option -%c %s.\n", optopt, optarg);
           exit(0);
@@ -85,6 +92,10 @@ int main(int argc, char **argv)
           break;
       }
     }
+    
+    if(parset.flag_postprc == 1)
+      parset.flag_restart = 0;
+
     strcpy(parset.param_file, argv[optind]); /* copy input parameter file */
   }
 

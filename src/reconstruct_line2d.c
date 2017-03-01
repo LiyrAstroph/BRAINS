@@ -291,12 +291,21 @@ void postprocess2d()
  */
 void reconstruct_line2d()
 {
-  char *argv[]={" "};
+  int argc = 1;
+  char *argv[2];
+
+  //setup argc and argv
+  argv[0]="dnest";
+  if(parset.flag_restart)
+  {
+    argc++;
+    argv[1]="-r";
+  }
 
   reconstruct_line2d_init();
   
   smooth_init(n_vel_data);
-  dnest_line2d(0, argv);
+  dnest_line2d(argc, argv);
   smooth_end();
 
   postprocess2d();

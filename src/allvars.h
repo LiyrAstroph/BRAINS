@@ -98,6 +98,8 @@ typedef struct
   double flux_narrowline, width_narrowline, shift_narrowline;
 
   int flag_postprc;
+  int flag_restart;
+  
   double temperature;
 }PARSET;
 extern PARSET parset;

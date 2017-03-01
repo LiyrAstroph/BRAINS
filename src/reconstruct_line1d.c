@@ -229,10 +229,20 @@ void postprocess1d()
  */
 void reconstruct_line1d()
 {
-  char *argv[]={""};
+  int argc = 1;
+  char *argv[2];
+
+  //setup argc and argv
+  argv[0]="dnest";
+  if(parset.flag_restart)
+  {
+    argc++;
+    argv[1]="-r";
+  }
+
   reconstruct_line1d_init();
 // dnest run
-  dnest_line1d(0, argv);
+  dnest_line1d(argc, argv);
 
   postprocess1d();
 
