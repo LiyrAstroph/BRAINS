@@ -229,15 +229,28 @@ void postprocess1d()
  */
 void reconstruct_line1d()
 {
-  int argc = 1;
-  char *argv[2];
+  int i, argc=1;
+  char **argv;
 
-  //setup argc and argv
-  argv[0]="dnest";
-  if(parset.flag_restart)
+  argv = malloc(5*sizeof(char *));
+  for(i=0; i<5; i++)
   {
-    argc++;
-    argv[1]="-r";
+    argv[i] = malloc(BRAINS_MAX_STR_LENGTH*sizeof(char));
+  }
+  //setup argc and argv
+  strcpy(argv[0], "dnest");
+  argc += 2;
+  strcpy(argv[1], "-s");
+  strcpy(argv[2], parset.file_dir);
+  strcat(argv[2], "/data/restart1d_denst.txt");
+
+  if(parset.flag_restart == 1 && parset.flag_dim == 1)
+  {
+    argc += 2;
+    strcpy(argv[3], "-r");
+    strcpy(argv[4], parset.file_dir);
+    strcat(argv[4], "/");
+    strcat(argv[4], "data/restart1d_dnest.txt");
   }
 
   reconstruct_line1d_init();
@@ -314,6 +327,12 @@ void reconstruct_line1d()
   }
 
   reconstruct_line1d_end();
+
+  for(i=0; i<5; i++)
+  {
+    free(argv[i]);
+  }
+  free(argv);
   return;
 }
 
@@ -662,6 +681,5 @@ double prob_initial_line1d(const void *model)
 
   memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
             parset.n_cloud_per_task * sizeof(double));
-
   return prob_line;
 }

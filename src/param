@@ -8,7 +8,7 @@ FileDir                     /home/liyropt/Projects/GIT/BRAINS
 FlagDim                     0                         % -1, simulation; 0, only continuum; 1, 1d line; 2, 2d line
 %===============================
 % data file
-ContinnumFile               data/arp151_con.txt         % file for contnnum data
+ContinnumFile               data/mrk493_con.txt         % file for contnnum data
 LineFile                    data/mrk493_hb.txt          % file for line data
 Line2DFile                  data/mrk493_hb2d.txt        % file for line 2d data
 %===============================
@@ -27,12 +27,12 @@ Line2DDataConstructFileOut  data/pline2d_data.txt       % output filename for 2d
 Tran2DFileOut               data/tran2d.txt             % output filename for 2d transfer function
 Tran2DDataFileOut           data/tran2d_data.txt             % output filename for 2d transfer function
 
-NCloudPerCore               10000                        % number of clouds per task
+NCloudPerCore               1000                        % number of clouds per task
 NVPerCloud                  5                          % number of velocities per cloud
 
 NTau                        200                         % number of time-lag points calculated in transfer function
 TauMinSet                   0.0                         % minimum time lag calculated
-TauMaxSet                   20.0                        % maximum time lag calculated
+TauMaxSet                   100.0                        % maximum time lag calculated
 
 FlagCloudsOut               1                           % 1, save clouds at the last run; 0, do not save
 CloudsFileOut               data/clouds.txt             % output filename for clouds 
