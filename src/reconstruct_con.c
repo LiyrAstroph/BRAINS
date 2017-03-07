@@ -149,13 +149,14 @@ void postprocess_con()
 
 /*! 
  * This function runs dnest sampling and postprocessing, reconstructs the continuum 
-*  using the best estimates of model parameters.
+ *  using the best estimates of model parameters.
  */
 void reconstruct_con()
 {
   int i, argc=1;
   char **argv;
 
+  // configure restart of dnest 
   argv = malloc(5*sizeof(char *));
   for(i=0; i<5; i++)
   {
@@ -168,7 +169,7 @@ void reconstruct_con()
   strcpy(argv[2], parset.file_dir);
   strcat(argv[2], "/data/restart_dnest.txt");
 
-  if(parset.flag_restart == 1 && parset.flag_dim == 0)
+  if(parset.flag_restart == 1)
   {
     argc += 2;
     strcpy(argv[3], "-r");
@@ -216,6 +217,7 @@ void reconstruct_con()
 
   reconstruct_con_end();
 
+  //clear up argv 
   for(i=0; i<5; i++)
   {
     free(argv[i]);

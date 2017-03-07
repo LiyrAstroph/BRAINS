@@ -57,8 +57,18 @@ int dnest_line1d(int argc, char **argv)
   
   set_par_range_model1d();
   set_par_fix(num_params_blr);
+
   for(i=num_params_blr; i<num_params; i++)
     par_fix[i] = 0;
+
+  // fix continuum variation parameter sigma and tau
+  if(parset.flag_fixvar == 1)
+  {
+    par_fix[num_params_blr + 1] = 1;
+    par_fix_val[num_params_blr + 1] = var_param[1];
+    par_fix[num_params_blr + 2] = 1;
+    par_fix_val[num_params_blr + 2] = var_param[2];
+  }
 
   strcpy(options_file, dnest_options_file);
   
@@ -128,13 +138,6 @@ void from_prior_line1d(void *model)
   pm[i] = par_range_model[i][1] - dnest_rand() * ( par_range_model[i][1] - par_range_model[i][0] )*0.01;
   //i=num_params_blr;
   //pm[i] = par_range_model[i][1] - dnest_rand() * ( par_range_model[i][1] - par_range_model[i][0] )*0.01;
-
-  // cope with fixed parameters.
-  for(i=0; i<num_params_blr; i++)
-  {
-    if(par_fix[i] == 1)
-      pm[i] = par_fix_val[i];
-  }
   
   // variability parameters
   for(i=num_params_blr; i<num_params_blr+3; i++)
@@ -145,6 +148,13 @@ void from_prior_line1d(void *model)
   for(i=num_params_blr+3; i<num_params_blr+num_params_var; i++)
   {
     pm[i] = dnest_randn();
+  }
+
+  // cope with fixed parameters.
+  for(i=0; i<num_params_blr + num_params_var; i++)
+  {
+    if(par_fix[i] == 1)
+      pm[i] = par_fix_val[i];
   }
 
   for(i=0; i<parset.n_con_recon; i++)

@@ -99,6 +99,8 @@ typedef struct
 
   int flag_postprc;
   int flag_restart;
+
+  int flag_fixvar;
   
   double temperature;
 }PARSET;

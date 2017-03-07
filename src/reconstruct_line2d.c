@@ -294,6 +294,7 @@ void reconstruct_line2d()
   int i, argc=1;
   char **argv;
 
+  //configure restart of dnest
   argv = malloc(5*sizeof(char *));
   for(i=0; i<5; i++)
   {
@@ -306,7 +307,7 @@ void reconstruct_line2d()
   strcpy(argv[2], parset.file_dir);
   strcat(argv[2], "/data/restart2d_dnest.txt");
 
-  if(parset.flag_restart == 1 && parset.flag_dim == 2)
+  if(parset.flag_restart == 1 )
   {
     argc += 2;
     strcpy(argv[3], "-r");
@@ -453,6 +454,7 @@ void reconstruct_line2d()
 
   reconstruct_line2d_end();
 
+  //clear up argv
   for(i=0; i<5; i++)
   {
     free(argv[i]);

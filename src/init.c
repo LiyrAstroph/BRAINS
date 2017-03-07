@@ -99,7 +99,7 @@ void init()
   blr_range_model[i++][1] = log(1000.0);
   //lambda
   blr_range_model[i][0] = 0.0;
-  blr_range_model[i++][1] = 1.0;
+  blr_range_model[i++][1] = 1.5;
   //q
   blr_range_model[i][0] = 0.0;
   blr_range_model[i++][1] = 1.0;

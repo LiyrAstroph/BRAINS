@@ -232,6 +232,7 @@ void reconstruct_line1d()
   int i, argc=1;
   char **argv;
 
+  // configure restart of dnest
   argv = malloc(5*sizeof(char *));
   for(i=0; i<5; i++)
   {
@@ -242,9 +243,9 @@ void reconstruct_line1d()
   argc += 2;
   strcpy(argv[1], "-s");
   strcpy(argv[2], parset.file_dir);
-  strcat(argv[2], "/data/restart1d_denst.txt");
+  strcat(argv[2], "/data/restart1d_dnest.txt");
 
-  if(parset.flag_restart == 1 && parset.flag_dim == 1)
+  if(parset.flag_restart == 1 )
   {
     argc += 2;
     strcpy(argv[3], "-r");
