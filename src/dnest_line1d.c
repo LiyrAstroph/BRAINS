@@ -34,7 +34,45 @@ int dnest_line1d(int argc, char **argv)
 {
   int i;
   
-  num_params_blr = 9;
+  switch(parset.flag_blrmodel)
+  {
+    case 1:
+      num_params_blr = 9;
+      calculate_line_from_blrmodel = calculate_line_from_blrmodel1;
+      transfun_1d_cloud_direct = transfun_1d_cloud_direct_model1;
+      perturb = perturb_line1d_model1;
+      log_likelihoods_cal = log_likelihoods_cal_line1d_model1;
+      break;
+    case 2:
+      num_params_blr = 9;
+      calculate_line_from_blrmodel = calculate_line_from_blrmodel1;
+      transfun_1d_cloud_direct = transfun_1d_cloud_direct_model1;
+      perturb = perturb_line1d_model1;
+      log_likelihoods_cal = log_likelihoods_cal_line1d_model1;
+      break;
+    case 3:
+      num_params_blr = 9;
+      calculate_line_from_blrmodel = calculate_line_from_blrmodel3;
+      transfun_1d_cloud_direct = transfun_1d_cloud_direct_model3;
+      perturb = perturb_line1d_model3;
+      log_likelihoods_cal = log_likelihoods_cal_line1d_model3;
+      break;
+    case 4:
+      num_params_blr = 9;
+      calculate_line_from_blrmodel = calculate_line_from_blrmodel3;
+      transfun_1d_cloud_direct = transfun_1d_cloud_direct_model3;
+      perturb = perturb_line1d_model3;
+      log_likelihoods_cal = log_likelihoods_cal_line1d_model3;
+      break;
+    default:
+      num_params_blr = 9;
+      calculate_line_from_blrmodel = calculate_line_from_blrmodel1;
+      transfun_1d_cloud_direct = transfun_1d_cloud_direct_model1;
+      perturb = perturb_line1d_model1;
+      log_likelihoods_cal = log_likelihoods_cal_line1d_model1;
+      break;
+  }
+  
   num_params = parset.n_con_recon + num_params_var + num_params_blr;
   size_of_modeltype = num_params * sizeof(double);
 
@@ -47,9 +85,7 @@ int dnest_line1d(int argc, char **argv)
 
   /* setup functions used for dnest*/
   from_prior = from_prior_line1d;
-  log_likelihoods_cal = log_likelihoods_cal_line1d;
   log_likelihoods_cal_initial = log_likelihoods_cal_initial_line1d;
-  perturb = perturb_line1d;
   print_particle = print_particle_line1d;
   copy_model = copy_model_line1d;
   create_model = create_model_line1d;
@@ -96,8 +132,8 @@ void set_par_range_model1d()
   }
   // note that the last BLR parameters is the systematic error (1d)
   i = num_params_blr -1;
-  par_range_model[i][0] = blr_range_model[sizeof(BLRmodel)/sizeof(double)-1][0];
-  par_range_model[i][1] = blr_range_model[sizeof(BLRmodel)/sizeof(double)-1][1];
+  par_range_model[i][0] = blr_range_model[BLRmodel_size/sizeof(double)-1][0];
+  par_range_model[i][1] = blr_range_model[BLRmodel_size/sizeof(double)-1][1];
 
   // variability parameters
   for(i=num_params_blr; i<3 + num_params_blr; i++)
@@ -132,6 +168,12 @@ void from_prior_line1d(void *model)
   {
     pm[i] = par_range_model[i][0] + dnest_rand() * ( par_range_model[i][1] - par_range_model[i][0]  );
   }
+  
+  if(parset.flag_blrmodel == 3 || parset.flag_blrmodel == 4)
+  {
+    if( pm[1] + pm[2] > log(rcloud_max_set))
+      wrap(&pm[2], par_range_model[2][0], log(rcloud_max_set) - pm[1]);
+  }
 
   // set an upper limit to the MCMC steps of systematic errors
   i=num_params_blr-1;
@@ -160,19 +202,10 @@ void from_prior_line1d(void *model)
   for(i=0; i<parset.n_con_recon; i++)
     pm[i+num_params_var+num_params_blr] = dnest_randn();
 
+  
   /* all parameters need to update at the initial step */
   which_parameter_update = -1;
   return;
-}
-
-/*!
- * This function calculate log likelihood probability.
- */
-double log_likelihoods_cal_line1d(const void *model)
-{
-  double logL;
-  logL = prob_line1d(model);
-  return logL;
 }
 
 /*!
@@ -186,9 +219,62 @@ double log_likelihoods_cal_initial_line1d(const void *model)
 }
 
 /*!
+ * This function print out the particle into the file.
+ */
+void print_particle_line1d(FILE *fp, const void *model)
+{
+  int i;
+  double *pm = (double *)model;
+
+  for(i=0; i<num_params; i++)
+  {
+    fprintf(fp, "%f ", pm[i] );
+  }
+  fprintf(fp, "\n");
+  return;
+}
+
+/*!
+ * This function copy the model from src to dest.
+ */
+void copy_model_line1d(void *dest, const void *src)
+{
+  memcpy(dest, src, size_of_modeltype);
+}
+
+/*!
+ * This function create a model.
+ */
+void *create_model_line1d()
+{
+  return (void *)malloc( size_of_modeltype );
+}
+
+/*!
+ * This function return the number of parameters.
+ */
+int get_num_params_line1d()
+{
+  return num_params;
+}
+
+/*=======================================================================
+ * model 1 
+ *=======================================================================
+ */
+/*!
+ * This function calculate log likelihood probability for model 1.
+ */
+double log_likelihoods_cal_line1d_model1(const void *model)
+{
+  double logL;
+  logL = prob_line1d_model1(model);
+  return logL;
+}
+/*!
  * this function perturbs the parameters.
  */
-double perturb_line1d(void *model)
+double perturb_line1d_model1(void *model)
 {
   double *pm = (double *)model;
   double logH = 0.0, limit1, limit2, width, rnd;
@@ -257,42 +343,96 @@ double perturb_line1d(void *model)
   return logH;
 }
 
-/*!
- * This function print out the particle into the file.
+/*=======================================================================
+ * model 3 
+ *=======================================================================
  */
-void print_particle_line1d(FILE *fp, const void *model)
+/*!
+ * this function perturbs the parameters.
+ */
+double perturb_line1d_model3(void *model)
 {
-  int i;
   double *pm = (double *)model;
+  double logH = 0.0, limit1, limit2, width, rnd;
+  int which;
 
-  for(i=0; i<num_params; i++)
+  /*
+   * sample BLR and variability parameters more frequently; 
+   * fixed parameter needs not to update.
+   */
+  do
   {
-    fprintf(fp, "%f ", pm[i] );
+    rnd = dnest_rand();
+    if(rnd < 0.5)
+      which = dnest_rand_int(num_params_blr + num_params_var);
+    else
+      which = dnest_rand_int(parset.n_con_recon) + num_params_blr + num_params_var;
+
+  }while(par_fix[which]==1);
+
+  if(which >= num_params || which < 0)
+  {
+    printf("# Error: Incorrect which.\n");
+    exit(0);
   }
-  fprintf(fp, "\n");
-  return;
+  
+  which_parameter_update = which;
+
+  /* level-dependent width */
+  which_level_update = which_level_update > (size_levels - 30)?(size_levels -30):which_level_update;
+  which_level_update = which_level_update <0?0:which_level_update;
+
+  if( which_level_update != 0)
+  {
+    limit1 = limits[(which_level_update-1) * num_params *2 + which *2];
+    limit2 = limits[(which_level_update-1) * num_params *2 + which *2 + 1];
+    width = limit2 - limit1;
+  }
+  else
+  {
+    width = ( par_range_model[which][1] - par_range_model[which][0] );
+  }
+
+  if(which < num_params_blr)
+  {
+    // set an upper limit to the MCMC steps of systematic errors
+    if(which == num_params_blr-1)
+       width = fmin(width, (par_range_model[which][1] - par_range_model[which][0])*0.01 );
+
+    pm[which] += dnest_randh() * width;
+    wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
+
+    if(pm[1] + pm[2] > log(rcloud_max_set))
+    {
+      if(which == 1)
+        wrap(&pm[which], par_range_model[which][0], log(rcloud_max_set) - pm[2]);
+      if(which == 2)
+        wrap(&pm[which], par_range_model[which][0], log(rcloud_max_set) - pm[1]);
+    }
+  }
+  else if(which < num_params_blr + num_params_var)
+  {
+    logH -= (-0.5*pow((pm[which]-var_param[which - num_params_blr])/var_param_std[which - num_params_blr], 2.0) );
+    pm[which] += dnest_randh() * width;
+    wrap(&pm[which], par_range_model[which][0], par_range_model[which][1]);
+    logH += (-0.5*pow((pm[which]-var_param[which - num_params_blr])/var_param_std[which - num_params_blr], 2.0) );
+  }
+  else
+  {
+    logH -= (-0.5*pow(pm[which], 2.0) );
+    pm[which] += dnest_randh() * width;
+    wrap(&pm[which], par_range_model[which][0], par_range_model[which][1]);
+    logH += (-0.5*pow(pm[which], 2.0) );
+  }
+  return logH;
 }
 
 /*!
- * This function copy the model from src to dest.
+ * This function calculate log likelihood probability.
  */
-void copy_model_line1d(void *dest, const void *src)
+double log_likelihoods_cal_line1d_model3(const void *model)
 {
-  memcpy(dest, src, size_of_modeltype);
-}
-
-/*!
- * This function create a model.
- */
-void *create_model_line1d()
-{
-  return (void *)malloc( size_of_modeltype );
-}
-
-/*!
- * This function return the number of parameters.
- */
-int get_num_params_line1d()
-{
-  return num_params;
+  double logL;
+  logL = prob_line1d_model3(model);
+  return logL;
 }

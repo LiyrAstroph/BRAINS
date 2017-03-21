@@ -67,6 +67,7 @@ double *Fline2d_at_data;
 double *Fline2d, *Flerrs2d;
 
 // BLR
+int BLRmodel_size;
 int *par_fix, npar_fix;
 double *par_fix_val;
 double **blr_range_model, **par_range_model;

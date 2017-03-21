@@ -22,12 +22,17 @@ extern int size_of_modeltype;
 /* functions */
 void from_prior_line1d(void *model);
 void print_particle_line1d(FILE *fp, const void *model);
-double log_likelihoods_cal_line1d(const void *model);
+//double log_likelihoods_cal_line1d(const void *model);
 double log_likelihoods_cal_initial_line1d(const void *model);
-double perturb_line1d(void *model);
+//double perturb_line1d(void *model);
 void copy_model_line1d(void *dest, const void *src);
 void* create_model_line1d();
 int get_num_params_line1d();
+
+double perturb_line1d_model1(void *model);
+double log_likelihoods_cal_line1d_model1(const void *model);
+double perturb_line1d_model3(void *model);
+double log_likelihoods_cal_line1d_model3(const void *model);
 
 void (*print_particle)(FILE *fp, const void *model);
 void (*from_prior)(void *model);

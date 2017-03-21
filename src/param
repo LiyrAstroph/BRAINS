@@ -6,18 +6,19 @@ FileDir                     /home/liyropt/Projects/GIT/BRAINS
 %FileDir                     /ihepbatch/mbhd01/user/liyanrong/RM/Test/mrk493
 
 FlagDim                     2                         % -1, simulation; 0, only continuum; 1, 1d line; 2, 2d line
+FlagBLRModel                2                         % 1, 2, 3, 4, BLR model type
 %===============================
 % data file
-ContinnumFile               data/irasf_con.txt         % file for contnnum data
-LineFile                    data/irasf_hb.txt          % file for line data
-Line2DFile                  data/irasf_hb2d.txt        % file for line 2d data
+ContinnumFile               data/mrk493_con.txt         % file for contnnum data
+LineFile                    data/mrk493_hb.txt          % file for line data
+Line2DFile                  data/mrk493_hb2d.txt        % file for line 2d data
 %===============================
 % reconstruction
 NConRecon                   200                         % number of points for continuum reconstruction
 FlagTrend                   0                           % 0, mean; 1, first-order trend
 ConConstructFileOut         data/pcon.txt               % output filename 
 
-FlagFixVar                  1                           % 0, not fixed; 1, fix the parameters of variation from continuum data.
+FlagFixVar                  0                           % 0, not fixed; 1, fix the parameters of variation from continuum data.
 NLineRecon                  43                          % number of points for line reconstruction along time axis
 LineConstructFileOut        data/pline.txt              % output filename
 TranFileOut                 data/tran.txt               % output filename for 1d transfer function

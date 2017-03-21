@@ -84,6 +84,8 @@ typedef struct
   int n_tau;
   double tau_min_set, tau_max_set;
 
+  int flag_blrmodel;
+
   int n_cloud_per_task, n_vel_per_cloud;
 
   int flag_save_clouds;
@@ -160,8 +162,41 @@ typedef struct
 	double lambda;   /*!< \brief orbit parameter */
 	double q;        /*!< \brief inflow/outflow */
 	double logse;    /*!< \brief systematic errors in continuum and emission line */
-}BLRmodel;
+}BLRmodel1;
 
+typedef struct
+{
+  double mu;       /*!< \brief mean BLR radius, in light day */
+  double beta;     /*!< \brief shape parameter */ 
+  double F;        /*!< \brief inner edge */
+  double inc;      /*!< \brief inclination, in degree, 0-90 */
+  double opn;      /*!< \brief openning angle, in degere, 0-90 */
+  double A;        /*!< \brief response coefficient */
+  double Ag;       /*!< \brief nonlinear response */
+  double k;        /*!< \brief anisotropic emission */
+  double mbh;      /*!< \brief black hole mass,  in 10e6 solar mass */
+  double sigr;     /*!< \brief orbit parameter */
+  double sigtheta; /*!< \brief inflow/outflow */
+  double logse;    /*!< \brief systematic errors in continuum and emission line */
+}BLRmodel2;
+
+typedef struct
+{
+  double alpha;     /*!< \brief shape parameter */ 
+  double Rin;       /*!< \brief mean BLR radius, in light day */
+  double F;        /*!< \brief inner edge */
+  double inc;      /*!< \brief inclination, in degree, 0-90 */
+  double opn;      /*!< \brief openning angle, in degere, 0-90 */
+  double A;        /*!< \brief response coefficient */
+  double Ag;       /*!< \brief nonlinear response */
+  double k;        /*!< \brief anisotropic emission */
+  double mbh;      /*!< \brief black hole mass,  in 10e6 solar mass */
+  double xi;       /*!< \brief orbit parameter */
+  double q;        /*!< \brief inflow/outflow */
+  double logse;    /*!< \brief systematic errors in continuum and emission line */
+}BLRmodel3;
+
+extern int BLRmodel_size;
 extern int *par_fix, npar_fix;
 extern double *par_fix_val;
 

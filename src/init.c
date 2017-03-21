@@ -28,10 +28,33 @@
  */
 void init()
 {
-  int i;
 
   nq = 1 + parset.flag_trend;
   num_params_var = 4 + parset.flag_trend;
+
+  switch(parset.flag_blrmodel)
+  {
+    case 1:
+      BLRmodel_size = sizeof(BLRmodel1);
+      set_blr_range_model = set_blr_range_model1;
+      break;
+    case 2:
+      BLRmodel_size = sizeof(BLRmodel2);
+      set_blr_range_model = set_blr_range_model2;
+      break;
+    case 3:
+      BLRmodel_size = sizeof(BLRmodel3);
+      set_blr_range_model = set_blr_range_model3;
+      break;
+    case 4:
+      BLRmodel_size = sizeof(BLRmodel3);
+      set_blr_range_model = set_blr_range_model4;
+      break;
+    default:
+      BLRmodel_size = sizeof(BLRmodel1);
+      set_blr_range_model = set_blr_range_model1;
+      break;
+  }
 
   allocate_memory();
 
@@ -69,46 +92,7 @@ void init()
   var_range_model[4][0] = -10.0; // light curve values
   var_range_model[4][1] = 10.0; 
 
-  i = 0;
-  //mu
-  blr_range_model[i][0] = log(0.1);
-  blr_range_model[i++][1] = log(rcloud_max_set);
-  //beta
-  blr_range_model[i][0] = 0.001;
-  blr_range_model[i++][1] = 1.0;
-  //F
-  blr_range_model[i][0] = 0.001;
-  blr_range_model[i++][1] = 0.999;
-  //inc
-  blr_range_model[i][0] = 0.0;
-  blr_range_model[i++][1] = 90.0;
-  //opn
-  blr_range_model[i][0] = 0.0;
-  blr_range_model[i++][1] = 90.0;
-  //A
-  blr_range_model[i][0] = log(0.01);
-  blr_range_model[i++][1] = log(10.0);
-  //Ag
-  blr_range_model[i][0] = -1.0;
-  blr_range_model[i++][1] = 3.0;
-  //k
-  blr_range_model[i][0] = -0.5;
-  blr_range_model[i++][1] = 0.5;
-  //mbh
-  blr_range_model[i][0] = log(0.1);
-  blr_range_model[i++][1] = log(1000.0);
-  //lambda
-  blr_range_model[i][0] = 0.0;
-  blr_range_model[i++][1] = 1.5;
-  //q
-  blr_range_model[i][0] = 0.0;
-  blr_range_model[i++][1] = 1.0;
-  //logse
-  blr_range_model[i][0] = log(1.0e-10);
-  blr_range_model[i++][1] = log(1.0e6);
-
-  /* setup extra limits to the range of mu */
-  blr_range_model[0][1] = fmin(blr_range_model[0][1], log(rcloud_max_set));
+  set_blr_range_model();
 }
 
 /*!
@@ -132,8 +116,8 @@ void allocate_memory()
   PEmat1 = malloc(parset.n_con_recon * n_con_data * sizeof(double));
   PEmat2 = malloc(parset.n_con_recon * parset.n_con_recon * sizeof(double));
 
-  blr_range_model = malloc(sizeof(BLRmodel)/sizeof(double) * sizeof(double *));
-  for(i=0; i<sizeof(BLRmodel)/sizeof(double); i++)
+  blr_range_model = malloc(BLRmodel_size/sizeof(double) * sizeof(double *));
+  for(i=0; i<BLRmodel_size/sizeof(double); i++)
   {
     blr_range_model[i] = malloc(2*sizeof(double));
   }
@@ -167,7 +151,7 @@ void free_memory()
   free(PEmat1);
   free(PEmat2);
 
-  for(i=0; i<sizeof(BLRmodel)/sizeof(double); i++)
+  for(i=0; i<BLRmodel_size/sizeof(double); i++)
   {
     free(blr_range_model[i]);
   }
@@ -294,4 +278,196 @@ void set_par_fix(int num_params_blr)
   MPI_Bcast(par_fix, num_params_blr, MPI_INT, roottask, MPI_COMM_WORLD);
   MPI_Bcast(par_fix_val, num_params_blr, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
   return;
+}
+
+/*
+ * setup BLR model parameter range. 
+ */
+
+// model 1
+void set_blr_range_model1()
+{
+  int i;
+
+  i = 0;
+  //mu
+  blr_range_model[i][0] = log(0.1);
+  blr_range_model[i++][1] = log(rcloud_max_set);
+  //beta
+  blr_range_model[i][0] = 0.001;
+  blr_range_model[i++][1] = 1.0;
+  //F
+  blr_range_model[i][0] = 0.001;
+  blr_range_model[i++][1] = 0.999;
+  //inc
+  blr_range_model[i][0] = 0.0;
+  blr_range_model[i++][1] = 90.0;
+  //opn
+  blr_range_model[i][0] = 0.0;
+  blr_range_model[i++][1] = 90.0;
+  //A
+  blr_range_model[i][0] = log(0.01);
+  blr_range_model[i++][1] = log(10.0);
+  //Ag
+  blr_range_model[i][0] = -1.0;
+  blr_range_model[i++][1] = 3.0;
+  //k
+  blr_range_model[i][0] = -0.5;
+  blr_range_model[i++][1] = 0.5;
+  //mbh
+  blr_range_model[i][0] = log(0.1);
+  blr_range_model[i++][1] = log(1000.0);
+  //lambda
+  blr_range_model[i][0] = 0.0;
+  blr_range_model[i++][1] = 1.5;
+  //q
+  blr_range_model[i][0] = 0.0;
+  blr_range_model[i++][1] = 1.0;
+  //logse
+  blr_range_model[i][0] = log(1.0e-10);
+  blr_range_model[i++][1] = log(1.0e6);
+
+  /* setup extra limits to the range of mu */
+  blr_range_model[0][1] = fmin(blr_range_model[0][1], log(rcloud_max_set));
+}
+
+// model 2
+void set_blr_range_model2()
+{
+  int i;
+
+  i = 0;
+  //mu
+  blr_range_model[i][0] = log(0.1);
+  blr_range_model[i++][1] = log(rcloud_max_set);
+  //beta
+  blr_range_model[i][0] = 0.001;
+  blr_range_model[i++][1] = 1.0;
+  //F
+  blr_range_model[i][0] = 0.001;
+  blr_range_model[i++][1] = 0.999;
+  //inc
+  blr_range_model[i][0] = 0.0;
+  blr_range_model[i++][1] = 90.0;
+  //opn
+  blr_range_model[i][0] = 0.0;
+  blr_range_model[i++][1] = 90.0;
+  //A
+  blr_range_model[i][0] = log(0.01);
+  blr_range_model[i++][1] = log(10.0);
+  //Ag
+  blr_range_model[i][0] = -1.0;
+  blr_range_model[i++][1] = 3.0;
+  //k
+  blr_range_model[i][0] = -0.5;
+  blr_range_model[i++][1] = 0.5;
+  //mbh
+  blr_range_model[i][0] = log(0.1);
+  blr_range_model[i++][1] = log(1000.0);
+  //sigr
+  blr_range_model[i][0] = 0.0;
+  blr_range_model[i++][1] = 1.0;
+  //sigtheta
+  blr_range_model[i][0] = 0.0;
+  blr_range_model[i++][1] = 1.0;
+  //logse
+  blr_range_model[i][0] = log(1.0e-10);
+  blr_range_model[i++][1] = log(1.0e6);
+
+  /* setup extra limits to the range of mu */
+  blr_range_model[0][1] = fmin(blr_range_model[0][1], log(rcloud_max_set));
+}
+
+// model 3
+void set_blr_range_model3()
+{
+  int i;
+  
+  i = 0;
+  //alpha
+  blr_range_model[i][0] = -3.0;
+  blr_range_model[i++][1] = 3.0;
+  //Rin
+  blr_range_model[i][0] = log(0.1);
+  blr_range_model[i++][1] = log(rcloud_max_set);
+  //F
+  blr_range_model[i][0] = log(1.0);
+  blr_range_model[i++][1] = log(1.0e3);
+  //inc
+  blr_range_model[i][0] = 0.0;
+  blr_range_model[i++][1] = 90.0;
+  //opn
+  blr_range_model[i][0] = 0.0;
+  blr_range_model[i++][1] = 90.0;
+  //A
+  blr_range_model[i][0] = log(0.01);
+  blr_range_model[i++][1] = log(10.0);
+  //Ag
+  blr_range_model[i][0] = -1.0;
+  blr_range_model[i++][1] = 3.0;
+  //k
+  blr_range_model[i][0] = -0.5;
+  blr_range_model[i++][1] = 0.5;
+  //mbh
+  blr_range_model[i][0] = log(0.1);
+  blr_range_model[i++][1] = log(1000.0);
+  //xi
+  blr_range_model[i][0] = 0.0;
+  blr_range_model[i++][1] = 1.0;
+  //q
+  blr_range_model[i][0] = 0.0;
+  blr_range_model[i++][1] = 1.0;
+  //logse
+  blr_range_model[i][0] = log(1.0e-10);
+  blr_range_model[i++][1] = log(1.0e6);
+
+  /* setup extra limits to the range of mu */
+  blr_range_model[1][1] = fmin(blr_range_model[1][1], log(rcloud_max_set));
+}
+
+// model 3
+void set_blr_range_model4()
+{
+  int i;
+  
+  i = 0;
+  //alpha
+  blr_range_model[i][0] = -3.0;
+  blr_range_model[i++][1] = 3.0;
+  //Rin
+  blr_range_model[i][0] = log(0.1);
+  blr_range_model[i++][1] = log(rcloud_max_set);
+  //F
+  blr_range_model[i][0] = log(1.0);
+  blr_range_model[i++][1] = log(1.0e3);
+  //inc
+  blr_range_model[i][0] = 0.0;
+  blr_range_model[i++][1] = 90.0;
+  //opn
+  blr_range_model[i][0] = 0.0;
+  blr_range_model[i++][1] = 90.0;
+  //A
+  blr_range_model[i][0] = log(0.01);
+  blr_range_model[i++][1] = log(10.0);
+  //Ag
+  blr_range_model[i][0] = -1.0;
+  blr_range_model[i++][1] = 3.0;
+  //k
+  blr_range_model[i][0] = -0.5;
+  blr_range_model[i++][1] = 0.5;
+  //mbh
+  blr_range_model[i][0] = log(0.1);
+  blr_range_model[i++][1] = log(1000.0);
+  //xi
+  blr_range_model[i][0] = 0.0;
+  blr_range_model[i++][1] = sqrt(2.0)/2.0;
+  //q
+  blr_range_model[i][0] = 0.0;
+  blr_range_model[i++][1] = 1.0;
+  //logse
+  blr_range_model[i][0] = log(1.0e-10);
+  blr_range_model[i++][1] = log(1.0e6);
+
+  /* setup extra limits to the range of mu */
+  blr_range_model[1][1] = fmin(blr_range_model[1][1], log(rcloud_max_set));
 }

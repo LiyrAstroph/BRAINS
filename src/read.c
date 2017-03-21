@@ -162,12 +162,17 @@ void read_parset()
     addr[nt] = &parset.flag_fixvar;
     id[nt++] = INT;
 
+    strcpy(tag[nt], "FlagBLRModel");
+    addr[nt] = &parset.flag_blrmodel;
+    id[nt++] = INT;
+
 
     /* default values */
     parset.flag_dim = 0;
     parset.flag_trend = 0;
     parset.flag_narrowline = 0;
     parset.flag_fixvar = 0;
+    parset.flag_blrmodel = 1;
     
     char fname[200];
     sprintf(fname, "%s", parset.param_file);
@@ -238,6 +243,11 @@ void read_parset()
         parset.width_narrowline, parset.shift_narrowline);
       parset.width_narrowline /= VelUnit;
       parset.shift_narrowline /= VelUnit;
+    }
+
+    if(parset.flag_blrmodel == 3 || parset.flag_blrmodel == 4)
+    {
+      parset.n_vel_per_cloud = 1;
     }
   }
   
