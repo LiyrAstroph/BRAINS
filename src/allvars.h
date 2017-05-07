@@ -77,7 +77,7 @@ typedef struct
 
   int flag_dim;
 
-  int flag_trend;
+  int flag_trend, flag_trend_diff;
   
   int n_con_recon, n_line_recon, n_vel_recon;
 
@@ -200,10 +200,10 @@ extern int BLRmodel_size;
 extern int *par_fix, npar_fix;
 extern double *par_fix_val;
 
-extern int num_params, num_params_blr, num_params_var;
+extern int num_params, num_params_blr, num_params_var, num_params_trend;
 
 extern double **blr_range_model, **par_range_model;
-extern double var_range_model[5][2];
+extern double var_range_model[7][2];
 
 /* transfer function / velocity-delay map */
 extern double *TransTau, *TransV, *Trans1D, *Trans2D_at_veldata, *Trans2D;

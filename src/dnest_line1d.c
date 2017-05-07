@@ -141,17 +141,22 @@ void set_par_range_model1d()
     par_range_model[i][0] = var_range_model[i-num_params_blr][0];
     par_range_model[i][1] = var_range_model[i-num_params_blr][1];
   }
-  for(i=3 + num_params_blr; i< num_params_var + num_params_blr; i++)
+  for(i=3 + num_params_blr; i< 4 + parset.flag_trend + num_params_blr; i++)
   {
     par_range_model[i][0] = var_range_model[3][0];
     par_range_model[i][1] = var_range_model[3][1];
+  }
+  for(i=4 + parset.flag_trend + num_params_blr; i< num_params_var + num_params_blr; i++)
+  {
+    par_range_model[i][0] = var_range_model[4 + i - (4 + parset.flag_trend + num_params_blr)][0];
+    par_range_model[i][1] = var_range_model[4 + i - (4 + parset.flag_trend + num_params_blr)][1];
   }
 
   // continuum light curve parameters
   for(i=num_params_blr+num_params_var; i<num_params; i++)
   {
-    par_range_model[i][0] = var_range_model[4][0];
-    par_range_model[i][1] = var_range_model[4][1];
+    par_range_model[i][0] = var_range_model[5][0];
+    par_range_model[i][1] = var_range_model[5][1];
   }
   return;
 }
@@ -187,9 +192,13 @@ void from_prior_line1d(void *model)
     pm[i] = dnest_randn()*var_param_std[i-num_params_blr] + var_param[i-num_params_blr];
     wrap(&pm[i], par_range_model[i][0], par_range_model[i][1]);
   }
-  for(i=num_params_blr+3; i<num_params_blr+num_params_var; i++)
+  for(i=num_params_blr+3; i<num_params_blr+ 4 + parset.flag_trend; i++)
   {
     pm[i] = dnest_randn();
+  }
+  for( i = num_params_blr+ 4 + parset.flag_trend; i< num_params_blr + num_params_var; i++)
+  {
+    pm[i] = par_range_model[i][0] + dnest_rand() * ( par_range_model[i][1] - par_range_model[i][0]  );
   }
 
   // cope with fixed parameters.
@@ -326,12 +335,17 @@ double perturb_line1d_model1(void *model)
     pm[which] += dnest_randh() * width;
     wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
   }
-  else if(which < num_params_blr + num_params_var)
+  else if(which < num_params_blr + 4 + parset.flag_trend)
   {
     logH -= (-0.5*pow((pm[which]-var_param[which - num_params_blr])/var_param_std[which - num_params_blr], 2.0) );
     pm[which] += dnest_randh() * width;
     wrap(&pm[which], par_range_model[which][0], par_range_model[which][1]);
     logH += (-0.5*pow((pm[which]-var_param[which - num_params_blr])/var_param_std[which - num_params_blr], 2.0) );
+  }
+  else if(which < num_params_blr + num_params_var)
+  {
+    pm[which] += dnest_randh() * width;
+    wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
   }
   else
   {
@@ -410,12 +424,17 @@ double perturb_line1d_model3(void *model)
         wrap(&pm[which], par_range_model[which][0], log(rcloud_max_set) - pm[1]);
     }
   }
-  else if(which < num_params_blr + num_params_var)
+  else if(which < num_params_blr + 4 + parset.flag_trend)
   {
     logH -= (-0.5*pow((pm[which]-var_param[which - num_params_blr])/var_param_std[which - num_params_blr], 2.0) );
     pm[which] += dnest_randh() * width;
     wrap(&pm[which], par_range_model[which][0], par_range_model[which][1]);
     logH += (-0.5*pow((pm[which]-var_param[which - num_params_blr])/var_param_std[which - num_params_blr], 2.0) );
+  }
+  else if(which < num_params_blr + num_params_var)
+  {
+    pm[which] += dnest_randh() * width;
+    wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
   }
   else
   {

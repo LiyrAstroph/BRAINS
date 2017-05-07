@@ -166,6 +166,10 @@ void read_parset()
     addr[nt] = &parset.flag_blrmodel;
     id[nt++] = INT;
 
+    strcpy(tag[nt], "FlagTrendDiff");
+    addr[nt] = &parset.flag_trend_diff;
+    id[nt++] = INT;
+
 
     /* default values */
     parset.flag_dim = 0;
@@ -173,6 +177,7 @@ void read_parset()
     parset.flag_narrowline = 0;
     parset.flag_fixvar = 0;
     parset.flag_blrmodel = 1;
+    parset.flag_trend_diff = 0;
     
     char fname[200];
     sprintf(fname, "%s", parset.param_file);
@@ -248,6 +253,11 @@ void read_parset()
     if(parset.flag_blrmodel == 3 || parset.flag_blrmodel == 4)
     {
       parset.n_vel_per_cloud = 1;
+    }
+
+    if(parset.flag_dim < 1)
+    {
+      parset.flag_trend_diff = 0;
     }
   }
   

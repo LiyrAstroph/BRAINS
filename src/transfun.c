@@ -35,7 +35,8 @@
 void calculate_line_from_blrmodel1(const void *pm, double *Tl, double *Fl, int nl)
 {
   int i, j, k;
-  double fline, fcon, tl, tc, tau, A, mean;
+  double fline, fcon, tl, tc, tau, A, mean, ftrend;
+  double *pmodel = (double *)pm;
   BLRmodel1 *model = (BLRmodel1 *)pm;
 
   A=exp(model->A);
@@ -62,6 +63,9 @@ void calculate_line_from_blrmodel1(const void *pm, double *Tl, double *Fl, int n
           fcon += con_q[k] * pow(tc, k);
         }
       }
+
+      ftrend = pmodel[num_params_blr + 4 + parset.flag_trend] * (tc - 0.5*(Tcon_data[0] + Tcon_data[n_con_data-1]));
+      fcon += ftrend;
 
       if(fcon > 0.0)
       {
@@ -234,7 +238,8 @@ void calculate_line2d_from_blrmodel1(const void *pm, const double *Tl, const dou
                                               double *fl2d, int nl, int nv)
 {
   int i, j, k, m;
-  double fline, tau, tl, tc, fcon, A, mean;
+  double fline, tau, tl, tc, fcon, A, mean, ftrend;
+  double *pmodel = (double *)pm;
   BLRmodel1 *model = (BLRmodel1 *)pm;
 
   A=exp(model->A);
@@ -264,6 +269,9 @@ void calculate_line2d_from_blrmodel1(const void *pm, const double *Tl, const dou
             fcon += con_q[m] * pow(tc, m);
           }
         }
+
+        ftrend = pmodel[num_params_blr + 4 + parset.flag_trend] * (tc - 0.5*(Tcon_data[0] + Tcon_data[n_con_data-1]));
+        fcon += ftrend;
 
         if(fcon > 0.0)
         {
@@ -742,7 +750,8 @@ void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *tra
 void calculate_line_from_blrmodel3(const void *pm, double *Tl, double *Fl, int nl)
 {
   int i, j, k;
-  double fline, fcon, tl, tc, tau, A, mean;
+  double fline, fcon, tl, tc, tau, A, mean, ftrend;
+  double *pmodel = (double *)pm;
   BLRmodel3 *model = (BLRmodel3 *)pm;
 
   A=exp(model->A);
@@ -769,6 +778,9 @@ void calculate_line_from_blrmodel3(const void *pm, double *Tl, double *Fl, int n
           fcon += con_q[k] * pow(tc, k);
         }
       }
+
+      ftrend = pmodel[num_params_blr + 4 + parset.flag_trend] * (tc - 0.5*(Tcon_data[0] + Tcon_data[n_con_data-1]));
+      fcon += ftrend;
 
       if(fcon > 0.0)
       {
@@ -940,7 +952,8 @@ void calculate_line2d_from_blrmodel3(const void *pm, const double *Tl, const dou
                                               double *fl2d, int nl, int nv)
 {
   int i, j, k, m;
-  double fline, tau, tl, tc, fcon, A, mean;
+  double fline, tau, tl, tc, fcon, A, mean, ftrend;
+  double *pmodel = (double *)pm;
   BLRmodel3 *model = (BLRmodel3 *)pm;
 
   A=exp(model->A);
@@ -970,6 +983,9 @@ void calculate_line2d_from_blrmodel3(const void *pm, const double *Tl, const dou
             fcon += con_q[m] * pow(tc, m);
           }
         }
+
+        ftrend = pmodel[num_params_blr + 4 + parset.flag_trend] * (tc - 0.5*(Tcon_data[0] + Tcon_data[n_con_data-1]));
+        fcon += ftrend;
 
         if(fcon > 0.0)
         {

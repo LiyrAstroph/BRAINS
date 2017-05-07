@@ -15,7 +15,7 @@ def set_cov_Pmat(sigma, tau, alpha, Tcon):
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif', size=15)
 
-obj = "mrk493"
+obj = "irasf"
 
 fp=open(obj + "_hb2d.txt", "r")
 line=fp.readline()
@@ -92,6 +92,7 @@ mbh2=hd_sort[len(hd_sort)*(1.0-0.1585)]
 print(mbh1, mbh2)
 
 syserr_con = np.exp(np.mean(phd[:, 12]))/con_scale
+syserr_con = 0.0
 syserr = np.exp(np.mean(phd[:, 11]))/line_scale
 
 print("scale:", con_scale, line_scale)

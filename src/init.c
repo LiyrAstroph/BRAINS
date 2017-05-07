@@ -30,7 +30,17 @@ void init()
 {
 
   nq = 1 + parset.flag_trend;
-  num_params_var = 4 + parset.flag_trend;
+  
+  if(parset.flag_trend_diff)
+  {
+    num_params_trend = 1; // differences of the trends between continuum and line
+  }
+  else
+  {
+    num_params_trend = 0;
+  }
+  
+  num_params_var = 4 + parset.flag_trend + num_params_trend;
 
   switch(parset.flag_blrmodel)
   {
@@ -89,8 +99,11 @@ void init()
   var_range_model[3][0] = -10.0; // mean value
   var_range_model[3][1] =  10.0; 
 
-  var_range_model[4][0] = -10.0; // light curve values
-  var_range_model[4][1] = 10.0; 
+  var_range_model[4][0] = -0.1; // slope of the trend in the differences between contiuum and line
+  var_range_model[4][1] =  0.1; 
+
+  var_range_model[5][0] = -10.0; // light curve values
+  var_range_model[5][1] = 10.0; 
 
   set_blr_range_model();
 }
