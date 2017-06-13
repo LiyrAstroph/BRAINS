@@ -145,7 +145,7 @@ extern double *Fline2d_at_data;
 extern double *Fline2d, *Flerrs2d;
 
 /*!
- *  \struct BLRmodel
+ *  \struct BLRmodel1
  *  \brief broad-line region model. 
  */
 typedef struct

@@ -85,10 +85,12 @@ int dnest_line2d(int argc, char **argv)
   /* setup functions used for dnest*/
   from_prior = from_prior_line2d;
   log_likelihoods_cal_initial = log_likelihoods_cal_initial_line2d;
+  log_likelihoods_cal_restart = log_likelihoods_cal_restart_line2d;
   print_particle = print_particle_line2d;
   copy_model = copy_model_line2d;
   create_model = create_model_line2d;
   get_num_params = get_num_params_line2d;
+  restart_clouds = restart_clouds_2d;
   
   set_par_range_model2d();
   /* setup the fixed parameters */
@@ -221,6 +223,16 @@ double log_likelihoods_cal_initial_line2d(const void *model)
 {
   double logL;
   logL = prob_initial_line2d(model);
+  return logL;
+}
+
+/*!
+ * this function calculates likelihood at initial step.
+ */
+double log_likelihoods_cal_restart_line2d(const void *model)
+{
+  double logL;
+  logL = prob_restart_line2d(model);
   return logL;
 }
 

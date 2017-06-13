@@ -665,6 +665,7 @@ double prob_initial_line2d(const void *model)
 
   Trans2D_at_veldata = Trans2D_at_veldata_particles[which_particle_update];
   Fline2d_at_data = Fline_at_data_particles[which_particle_update];
+  which_parameter_update = -1;
   transfun_2d_cloud_direct(model, Vline_data, Trans2D_at_veldata, n_vel_data, 0);
   calculate_line2d_from_blrmodel(model, Tline_data, Vline_data, Trans2D_at_veldata, Fline2d_at_data, n_line_data, n_vel_data);
 
@@ -683,6 +684,37 @@ double prob_initial_line2d(const void *model)
   return prob_line;
 }
 
+/*!
+ * this function calculate probability at restart step.
+ */
+double prob_restart_line2d(const void *model)
+{
+  double prob_line = 0.0, var2, dy;
+  int i;
+  double *pm = (double *)model;
+  
+  con_q = con_q_particles[which_particle_update];
+  Fcon = Fcon_particles[which_particle_update];
+  calculate_con_from_model(model + num_params_blr*sizeof(double));
+  gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
+
+  Trans2D_at_veldata = Trans2D_at_veldata_particles[which_particle_update];
+  Fline2d_at_data = Fline_at_data_particles[which_particle_update];
+  which_parameter_update = num_params + 1;
+  transfun_2d_cloud_direct(model, Vline_data, Trans2D_at_veldata, n_vel_data, 0);
+  calculate_line2d_from_blrmodel(model, Tline_data, Vline_data, Trans2D_at_veldata, Fline2d_at_data, n_line_data, n_vel_data);
+
+  for(i=0; i<n_line_data*n_vel_data; i++)
+  {
+    dy = Fline2d_data[i] - Fline2d_at_data[i];
+    var2 = Flerrs2d_data[i]*Flerrs2d_data[i];
+    var2 += exp(pm[num_params_blr-1])*exp(pm[num_params_blr-1]);
+    prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
+  }
+  prob_line_particles[which_particle_update] = prob_line;
+
+  return prob_line;
+}
 /*================================================================================
  * model 1
  *================================================================================

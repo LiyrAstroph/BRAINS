@@ -47,11 +47,13 @@ int dnest_con(int argc, char **argv)
   from_prior = from_prior_con;
   log_likelihoods_cal = log_likelihoods_cal_con;
   log_likelihoods_cal_initial = log_likelihoods_cal_initial_con;
+  log_likelihoods_cal_restart = log_likelihoods_cal_restart_con;
   perturb = perturb_con;
   print_particle = print_particle_con;
   copy_model = copy_model_con;
   create_model = create_model_con;
   get_num_params = get_num_params_con;
+  restart_clouds = restart_clouds_con;
   
   set_par_range_con();
   
@@ -165,6 +167,15 @@ double log_likelihoods_cal_initial_con(const void *model)
 }
 
 /*!
+ * This function calculate log likelihood probability at the initial step.
+ */
+double log_likelihoods_cal_restart_con(const void *model)
+{
+  double logL;
+  logL = prob_con_variability_initial(model);
+  return logL;
+}
+/*!
  * This function generate a new move of parameters.
  */
 double perturb_con(void *model)
@@ -273,4 +284,9 @@ void *create_model_con()
 int get_num_params_con()
 {
   return num_params;
+}
+
+void restart_clouds_con(int iflag)
+{
+  return;
 }

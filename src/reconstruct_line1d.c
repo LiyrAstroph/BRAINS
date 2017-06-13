@@ -535,6 +535,7 @@ double prob_initial_line1d(const void *model)
   
   Trans1D = Trans1D_particles[which_particle_update];
   Fline_at_data = Fline_at_data_particles[which_particle_update];
+  which_parameter_update = -1;
   transfun_1d_cloud_direct(model, 0);
   calculate_line_from_blrmodel(model, Tline_data, Fline_at_data, n_line_data);
 
@@ -549,6 +550,41 @@ double prob_initial_line1d(const void *model)
 
   memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
             parset.n_cloud_per_task * sizeof(double));
+  return prob_line;
+}
+
+/*!
+ * this function calculate probability at restart step.
+ * all models have the same function.
+ */
+double prob_restart_line1d(const void *model)
+{
+  double prob_line=0.0, var2, dy;
+  int i;
+  double *pm = (double *)model;
+  
+  con_q = con_q_particles[which_particle_update];
+
+  Fcon = Fcon_particles[which_particle_update];
+  calculate_con_from_model(model + num_params_blr*sizeof(double));
+  gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
+
+  
+  Trans1D = Trans1D_particles[which_particle_update];
+  Fline_at_data = Fline_at_data_particles[which_particle_update];
+  which_parameter_update = num_params + 1; // so as not to update clouds.
+  transfun_1d_cloud_direct(model, 0);
+  calculate_line_from_blrmodel(model, Tline_data, Fline_at_data, n_line_data);
+
+  for(i=0; i<n_line_data; i++)
+  {
+    dy = Fline_data[i] - Fline_at_data[i] ;
+    var2 = Flerrs_data[i]*Flerrs_data[i];
+    var2 += exp(pm[num_params_blr-1]) * exp(pm[num_params_blr-1]);
+    prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
+  }
+  prob_line_particles[which_particle_update] = prob_line;
+
   return prob_line;
 }
 

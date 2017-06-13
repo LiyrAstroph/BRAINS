@@ -266,37 +266,45 @@ void calculate_con_from_model(const void *model)
       Larr[i*nq + j] = pow(Tcon_data[i], j);
   }
  
+  // Cq^-1 = L^TxC^-1xL
   multiply_mat_MN(PCmat_data, Larr, ybuf, n_con_data, nq, n_con_data);
   multiply_mat_MN_transposeA(Larr, ybuf, Cq, nq, nq, n_con_data);
 
+  // L^TxC^-1xy
   multiply_matvec(PCmat_data, Fcon_data, n_con_data, ybuf);
   multiply_mat_MN_transposeA(Larr, ybuf, yq, nq, 1, n_con_data);
 
+  // (hat q) = Cqx(L^TxC^-1xy)
   inverse_mat(Cq, nq, &info);
   multiply_mat_MN(Cq, yq, ybuf, nq, 1, nq);
 
+  // q = uq + (hat q)
   Chol_decomp_L(Cq, nq, &info);
   multiply_matvec(Cq, &pm[3], nq, yq);
   for(i=0; i<nq; i++)
     yq[i] += ybuf[i];
 
   memcpy(con_q, yq, nq*sizeof(double)); //back up long-term trend
-   
+  
+  // y = yc - Lxq
   multiply_matvec_MN(Larr, n_con_data, nq, yq, ybuf);
   for(i=0; i<n_con_data; i++)
   {
     y[i] = Fcon_data[i] - ybuf[i];
   }
 
+  // (hat s) = SxC^-1xy
   multiply_matvec(PCmat_data, y, n_con_data, ybuf);
   multiply_matvec_MN(USmat, parset.n_con_recon, n_con_data, ybuf, Fcon);
 
+  // SxC^-1xS^T
   multiply_mat_MN(USmat, PCmat_data, PEmat1, parset.n_con_recon, n_con_data, n_con_data);
   multiply_mat_MN_transposeB(PEmat1, USmat, PEmat2, parset.n_con_recon, parset.n_con_recon, n_con_data);
 
   set_covar_Pmat(sigma, tau, alpha);
   inverse_mat(PSmat, parset.n_con_recon, &info);
 
+  // Q = [S^-1 + N^-1]^-1
   memcpy(PQmat, PSmat, parset.n_con_recon*parset.n_con_recon*sizeof(double));
   for(i=0; i<parset.n_con_recon; i++)
     PQmat[i*parset.n_con_recon+i] += 1.0/(sigma*sigma + syserr*syserr - PEmat2[i*parset.n_con_recon + i]);  

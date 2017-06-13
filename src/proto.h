@@ -56,6 +56,7 @@ void reconstruct_line1d_init();
 void reconstruct_line1d_end();
 //double prob_line1d(const void *model);
 double prob_initial_line1d(const void *model);
+double prob_restart_line1d(const void *model);
 void (*calculate_line_from_blrmodel)(const void *pm, double *Tl, double *Fl, int nl);
 void calculate_line_from_blrmodel1(const void *pm, double *Tl, double *Fl, int nl);
 //void calculate_line_from_blrmodel2(const void *pm, double *Tl, double *Fl, int nl);
@@ -72,10 +73,13 @@ void set_par_range_model1d();
 double prob_line1d_model1(const void *model);
 double prob_line1d_model3(const void *model);
 
+void restart_clouds_1d(int iflag);
+
 /* 2d line reconstruction */
 int dnest_line2d(int argc, char **argv);
 //double prob_line2d(const void *model);
 double prob_initial_line2d(const void *model);
+double prob_restart_line2d(const void *model);
 void reconstruct_line2d();
 void reconstruct_line2d_init();
 void reconstruct_line2d_end();
@@ -101,6 +105,8 @@ void transfun_2d_cloud_direct_model4(const void *pm, double *transv, double *tra
 
 void smooth_init(int nv);
 void smooth_end();
+
+void restart_clouds_2d(int iflag);
 
 /* sim */
 void sim();

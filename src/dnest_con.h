@@ -22,18 +22,21 @@ void from_prior_con(void *model);
 void print_particle_con(FILE *fp, const void *model);
 double log_likelihoods_cal_con(const void *model);
 double log_likelihoods_cal_initial_con(const void *model);
+double log_likelihoods_cal_restart_con(const void *model);
 double perturb_con(void *model);
 void copy_model_con(void *dest, const void *src);
 void* create_model_con();
 int get_num_params_con();
+void restart_clouds_con(int iflag);
 
 void (*print_particle)(FILE *fp, const void *model);
 void (*from_prior)(void *model);
 double (*log_likelihoods_cal)(const void *model);
 double (*log_likelihoods_cal_initial)(const void *model);
+double (*log_likelihoods_cal_restart)(const void *model);
 double (*perturb)(void *model);
 void (*copy_model)(void *dest, const void *src);
 void* (*create_model)();
 int (*get_num_params)();
-
+void (*restart_clouds)(int iflag);
 #endif

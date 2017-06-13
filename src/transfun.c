@@ -1437,3 +1437,38 @@ void transfun_2d_cloud_direct_model4(const void *pm, double *transv, double *tra
 
   return;
 }
+
+
+void restart_clouds_1d(int iflag)
+{
+  FILE *fp;
+  char str[200];
+  int i;
+
+  sprintf(str, "%s/data/clouds_%04d.txt", parset.file_dir, thistask);
+  fp = fopen(str, "wb");
+  if(fp == NULL)
+  {
+    printf("# Cannot open file %s.\n", str);
+  }
+
+  if(iflag == 0)
+  {
+    printf("# Writing clouds at task %d.\n", thistask);
+    for(i=0; i<parset.num_particles; i++)
+      fwrite(clouds_particles[i], sizeof(double), parset.n_cloud_per_task, fp);
+  }
+  else
+  {
+    printf("# Reading clouds at task %d.\n", thistask);
+    for(i=0; i<parset.num_particles; i++)
+      fread(clouds_particles[i], sizeof(double), parset.n_cloud_per_task, fp);
+  }
+  fclose(fp);
+}
+
+void restart_clouds_2d(int iflag)
+{
+  restart_clouds_1d(iflag);
+}
+
