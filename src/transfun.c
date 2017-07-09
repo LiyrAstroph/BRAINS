@@ -1446,7 +1446,12 @@ void restart_clouds_1d(int iflag)
   int i;
 
   sprintf(str, "%s/data/clouds_%04d.txt", parset.file_dir, thistask);
-  fp = fopen(str, "wb");
+
+  if(iflag = 0)  // write
+    fp = fopen(str, "wb");
+  else           // read
+    fp = fopen(str, "rb");
+
   if(fp == NULL)
   {
     printf("# Cannot open file %s.\n", str);
