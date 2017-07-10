@@ -216,7 +216,7 @@ void transfun_1d_cloud_direct_model1(const void *pm, int flag_save)
   }
   else
   {
-    printf(" Warning, zero transfer function.\n");
+    printf(" Warning, zero transfer function at task %d.\n", thistask);
     for(i=0; i<parset.n_tau; i++)
     {
       Trans1D[i] = 0.0;
@@ -508,7 +508,7 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
   }
   else
   {
-    printf(" Warning, zero transfer function.\n");
+    printf(" Warning, zero transfer function at task %d.\n", thistask);
     for(i=0; i<parset.n_tau; i++)
     {
       for(j=0; j<n_vel; j++)
@@ -721,7 +721,7 @@ void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *tra
   }
   else
   {
-    printf(" Warning, zero transfer function.\n");
+    printf(" Warning, zero transfer function at task %d.\n", thistask);
     for(i=0; i<parset.n_tau; i++)
     {
       for(j=0; j<n_vel; j++)
@@ -930,7 +930,7 @@ void transfun_1d_cloud_direct_model3(const void *pm, int flag_save)
   }
   else
   {
-    printf(" Warning, zero transfer function.\n");
+    printf(" Warning, zero transfer function at task %d.\n", thistask);
     for(i=0; i<parset.n_tau; i++)
     {
       Trans1D[i] = 0.0;
@@ -1210,7 +1210,7 @@ void transfun_2d_cloud_direct_model3(const void *pm, double *transv, double *tra
   }
   else
   {
-    printf(" Warning, zero transfer function.\n");
+    printf(" Warning, zero transfer function at task %d.\n", thistask);
     for(i=0; i<parset.n_tau; i++)
     {
       for(j=0; j<n_vel; j++)
@@ -1422,7 +1422,7 @@ void transfun_2d_cloud_direct_model4(const void *pm, double *transv, double *tra
   }
   else
   {
-    printf(" Warning, zero transfer function.\n");
+    printf(" Warning, zero transfer function at task %d.\n", thistask);
     for(i=0; i<parset.n_tau; i++)
     {
       for(j=0; j<n_vel; j++)
@@ -1443,7 +1443,7 @@ void restart_clouds_1d(int iflag)
 {
   FILE *fp;
   char str[200];
-  int i;
+  int i, count;
 
   sprintf(str, "%s/data/clouds_%04d.txt", parset.file_dir, thistask);
 
@@ -1461,13 +1461,26 @@ void restart_clouds_1d(int iflag)
   {
     printf("# Writing clouds at task %d.\n", thistask);
     for(i=0; i<parset.num_particles; i++)
-      fwrite(clouds_particles[i], sizeof(double), parset.n_cloud_per_task, fp);
+    {
+      count = fwrite(clouds_particles[i], sizeof(double), parset.n_cloud_per_task, fp);
+      if(count < parset.n_cloud_per_task)
+      {
+        printf("# Error in writing clouds at task %d.\n", thistask);
+      }
+    }
   }
   else
   {
     printf("# Reading clouds at task %d.\n", thistask);
     for(i=0; i<parset.num_particles; i++)
-      fread(clouds_particles[i], sizeof(double), parset.n_cloud_per_task, fp);
+    {
+      count = fread(clouds_particles[i], sizeof(double), parset.n_cloud_per_task, fp);
+      if(count < parset.n_cloud_per_task)
+      {
+        printf("# Error in reading clouds at task %d.\n", thistask);
+      }
+    }
+
   }
   fclose(fp);
 }
