@@ -1447,7 +1447,7 @@ void restart_clouds_1d(int iflag)
 
   sprintf(str, "%s/data/clouds_%04d.txt", parset.file_dir, thistask);
 
-  if(iflag = 0)  // write
+  if(iflag == 0)  // write
     fp = fopen(str, "wb");
   else           // read
     fp = fopen(str, "rb");
