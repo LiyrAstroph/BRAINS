@@ -53,7 +53,7 @@ void sim()
   pm[9] = 0.1;
   pm[10] = 0.5;
 
-  smooth_init(parset.n_vel_recon);
+  smooth_init(parset.n_vel_recon, TransV);
 
   reconstruct_con_from_varmodel(0.26, 74.0, 1.0, 0.0);
   gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);

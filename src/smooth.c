@@ -39,7 +39,7 @@ gsl_fft_complex_workspace * work_cmp;
 /*!
  * This function initates workspace for FFT.
  */
-void smooth_init(int nv)
+void smooth_init(int nv, const double *transv)
 {
   //nd_fft = parset.n_vel_recon>=n_vel_data? parset.n_vel_recon : n_vel_data;
   nd_fft = nv;
@@ -58,6 +58,36 @@ void smooth_init(int nv)
   resp_cmp = malloc(nd_fft * 2 * sizeof(double));
   data_fft_cmp = malloc(nd_fft *2 * sizeof(double));
   data_fft_inverse = malloc(nd_fft *2 * sizeof(double));
+
+  // initialize response and its fft.
+  int i;
+  double sigV, dV, tot;
+
+  sigV = parset.InstRes / VelUnit;
+  dV = transv[1] - transv[0];
+
+  /* setup response, whose negective-time part is wrapped around and stored at the right hand*/
+  tot = 0.0;
+  for (i = 0; i<nd_fft/2; i++)
+  {
+    resp[i] = 1.0/sqrt(2.0*M_PI)/sigV * exp(-0.5*(i*dV)*(i*dV)/sigV/sigV);
+    tot += resp[i];
+  }
+  for (i = nd_fft-1; i>= nd_fft/2; i--)
+  {
+    resp[i] = 1.0/sqrt(2.0*M_PI)/sigV * exp(-0.5*((i-nd_fft)*dV)*((i-nd_fft)*dV)/sigV/sigV);
+    tot += resp[i];
+  }  
+  
+  /* normalize response */
+  for(i=0; i<nd_fft; i++)
+  {
+    resp[i] /= (tot * dV);
+  }
+
+  /* FFT of response */
+  gsl_fft_real_transform(resp, 1, nd_fft, real_resp, work_resp);
+  gsl_fft_halfcomplex_unpack(resp, resp_cmp, 1, nd_fft);
 }
 
 /*!
@@ -89,33 +119,9 @@ void smooth_end()
 void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int nv)
 {
   int i, j;
-  double sigV, dV, tot;
+  double dV;
 
-  sigV = parset.InstRes / VelUnit;
   dV = transv[1] - transv[0];
-
-  /* setup response, whose negective-time part is wrapped around and stored at the right hand*/
-  tot = 0.0;
-  for (i = 0; i<nd_fft/2; i++)
-  {
-    resp[i] = 1.0/sqrt(2.0*M_PI)/sigV * exp(-0.5*(i*dV)*(i*dV)/sigV/sigV);
-    tot += resp[i];
-  }
-  for (i = nd_fft-1; i>= nd_fft/2; i--)
-  {
-    resp[i] = 1.0/sqrt(2.0*M_PI)/sigV * exp(-0.5*((i-nd_fft)*dV)*((i-nd_fft)*dV)/sigV/sigV);
-    tot += resp[i];
-  }  
-  
-  /* normalize response */
-  for(i=0; i<nd_fft; i++)
-  {
-    resp[i] /= (tot * dV);
-  }
-
-  /* FFT of response */
-  gsl_fft_real_transform(resp, 1, nd_fft, real_resp, work_resp);
-  gsl_fft_halfcomplex_unpack(resp, resp_cmp, 1, nd_fft);
 
   for(j=0; j<nl; j++)
   {

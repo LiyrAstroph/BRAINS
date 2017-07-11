@@ -103,7 +103,7 @@ void calculate_line2d_from_blrmodel3(const void *pm, const double *Tl, const dou
 
 void transfun_2d_cloud_direct_model4(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save);
 
-void smooth_init(int nv);
+void smooth_init(int nv, const double *transv);
 void smooth_end();
 
 void restart_clouds_2d(int iflag);

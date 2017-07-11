@@ -49,7 +49,7 @@ void postprocess2d()
   if(thistask == roottask)
   {
     // initialize smoothing workspace
-    smooth_init(n_vel_data);
+    smooth_init(n_vel_data, Vline_data);
     char fname[200];
     FILE *fp, *fcon, *fline, *ftran, *fline1d;
     double *Fline1d, dV;
@@ -318,7 +318,7 @@ void reconstruct_line2d()
 
   reconstruct_line2d_init();
   
-  smooth_init(n_vel_data);
+  smooth_init(n_vel_data, Vline_data);
   dnest_line2d(argc, argv);
   smooth_end();
 
@@ -356,7 +356,7 @@ void reconstruct_line2d()
     }
     fclose(fp);
 
-    smooth_init(n_vel_data);
+    smooth_init(n_vel_data, Vline_data);
     // recovered line2d at data points
     transfun_2d_cloud_direct(best_model_line2d, Vline_data, Trans2D_at_veldata, 
                                               n_vel_data, parset.flag_save_clouds);
@@ -403,7 +403,7 @@ void reconstruct_line2d()
     smooth_end();
     
     // recovered line2d at specified points
-    smooth_init(parset.n_vel_recon);
+    smooth_init(parset.n_vel_recon, TransV);
 
     which_parameter_update = -1;
     which_particle_update = 0;
