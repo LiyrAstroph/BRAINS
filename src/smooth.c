@@ -82,7 +82,8 @@ void smooth_init(int nv, const double *transv)
   /* normalize response */
   for(i=0; i<nd_fft; i++)
   {
-    resp[i] /= (tot * dV);
+    //resp[i] /= (tot * dV);
+    resp[i] /= (tot);
   }
 
   /* FFT of response */
@@ -142,7 +143,8 @@ void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int
     for(i=0; i<nv; i++)
     {
       /* take into account the velocity grid width */
-      fl2d[j*nv + i] = data_fft_inverse[i*2] * dV;
+      //fl2d[j*nv + i] = data_fft_inverse[i*2] * dV;
+      fl2d[j*nv + i] = data_fft_inverse[i*2];
     }
   }
   return;

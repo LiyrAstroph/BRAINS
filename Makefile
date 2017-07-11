@@ -24,6 +24,8 @@ LAPACK_INCL = -I/usr/include/lapacke
 LAPACK_LIBS = -L/usr/lib64 -llapacke -llapack -lblas
 DNEST_INCL  = -I /home/liyropt/Projects/GIT/DNest/
 DNEST_LIBS  = -L /home/liyropt/Projects/GIT/DNest -ldnest
+FFTW_INCL   = $(shell pkg-config --cflags fftw3) 
+FFTW_LIBS   = $(shell pkg-config --libs fftw3) 
 
 MPICHINCL     = $(shell pkg-config --cflags mpich) 
 MPICHLIB    = $(shell pkg-config --libs mpich) 
@@ -47,15 +49,15 @@ OBJS     = $(SRC)/main.o $(SRC)/allvars.o $(SRC)/read.o $(SRC)/run.o     \
            $(SRC)/dnest_con.o $(SRC)/reconstruct_con.o $(SRC)/init.o     \
            $(SRC)/mathfun.o $(SRC)/dnest_line1d.o $(SRC)/dnest_line2d.o  \
            $(SRC)/reconstruct_line1d.o  $(SRC)/reconstruct_line2d.o      \
-           $(SRC)/transfun.o $(SRC)/smooth.o $(SRC)/nrutil.o             \
+           $(SRC)/transfun.o $(SRC)/smooth_fftw.o $(SRC)/nrutil.o             \
            $(SRC)/system.o  $(SRC)/sim.o
  
 INCL     = Makefile $(SRC)/allvars.h $(SRC)/proto.h $(SRC)/dnest_con.h   \
            $(SRC)/dnest_line1d.h  $(SRC)/dnest_line2d.h $(SRC)/nrutil.h          
 
 OPTIONS  = $(OPTIMIZE)
-CFLAGS   = $(OPTIONS) $(GSL_INCL) $(LAPACK_INCL) $(MPICHINCL) $(DNEST_INCL)
-LIBS     = $(GSL_LIBS) $(LAPACK_LIBS) $(MPICHLIB) $(DNEST_LIBS)
+CFLAGS   = $(OPTIONS) $(GSL_INCL) $(LAPACK_INCL) $(MPICHINCL) $(DNEST_INCL) $(FFTW_INCL)
+LIBS     = $(GSL_LIBS) $(LAPACK_LIBS) $(MPICHLIB) $(DNEST_LIBS) $(FFTW_LIBS)
 
 $(EXEC):$(OBJS)
 	cd $(SRC)
