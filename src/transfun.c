@@ -63,9 +63,13 @@ void calculate_line_from_blrmodel1(const void *pm, double *Tl, double *Fl, int n
           fcon += con_q[k] * pow(tc, k);
         }
       }
-
-      ftrend = pmodel[num_params_blr + 4 + parset.flag_trend] * (tc - 0.5*(Tcon_data[0] + Tcon_data[n_con_data-1]));
-      fcon += ftrend;
+      
+      // add different trend in continuum and emission
+      if(parset.flag_trend_diff)
+      {
+        ftrend = pmodel[num_params_blr + 4 + parset.flag_trend] * (tc - 0.5*(Tcon_data[0] + Tcon_data[n_con_data-1]));
+        fcon += ftrend;
+      }
 
       if(fcon > 0.0)
       {
@@ -270,8 +274,12 @@ void calculate_line2d_from_blrmodel1(const void *pm, const double *Tl, const dou
           }
         }
 
-        ftrend = pmodel[num_params_blr + 4 + parset.flag_trend] * (tc - 0.5*(Tcon_data[0] + Tcon_data[n_con_data-1]));
-        fcon += ftrend;
+        // add different trend in continuum and emission line
+        if(parset.flag_trend_diff)
+        {
+          ftrend = pmodel[num_params_blr + 4 + parset.flag_trend] * (tc - 0.5*(Tcon_data[0] + Tcon_data[n_con_data-1]));
+          fcon += ftrend;
+        }
 
         if(fcon > 0.0)
         {
@@ -779,8 +787,11 @@ void calculate_line_from_blrmodel3(const void *pm, double *Tl, double *Fl, int n
         }
       }
 
-      ftrend = pmodel[num_params_blr + 4 + parset.flag_trend] * (tc - 0.5*(Tcon_data[0] + Tcon_data[n_con_data-1]));
-      fcon += ftrend;
+      if(parset.flag_trend_diff)
+      {
+        ftrend = pmodel[num_params_blr + 4 + parset.flag_trend] * (tc - 0.5*(Tcon_data[0] + Tcon_data[n_con_data-1]));
+        fcon += ftrend;
+      }
 
       if(fcon > 0.0)
       {
@@ -983,9 +994,12 @@ void calculate_line2d_from_blrmodel3(const void *pm, const double *Tl, const dou
             fcon += con_q[m] * pow(tc, m);
           }
         }
-
-        ftrend = pmodel[num_params_blr + 4 + parset.flag_trend] * (tc - 0.5*(Tcon_data[0] + Tcon_data[n_con_data-1]));
-        fcon += ftrend;
+        
+        if(parset.flag_trend_diff)
+        {
+          ftrend = pmodel[num_params_blr + 4 + parset.flag_trend] * (tc - 0.5*(Tcon_data[0] + Tcon_data[n_con_data-1]));
+          fcon += ftrend;
+        }
 
         if(fcon > 0.0)
         {
