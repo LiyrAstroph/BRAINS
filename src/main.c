@@ -80,7 +80,7 @@ int main(int argc, char **argv)
           break;
 
         case 'c':
-          printf("# Recalculate posterior sample info.\n");
+          printf("# Recalculate the sample info.\n");
           parset.flag_sample_info = 1;
           break;
 
