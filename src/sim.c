@@ -42,10 +42,10 @@ void sim()
   
   double *pm = (double *)model;
   pm[0] = log(4.0);
-  pm[1] = 0.5;
+  pm[1] = 0.9;
   pm[2] = 0.2;
   pm[3] = 20.0;
-  pm[4] = 40.0;
+  pm[4] = 80.0;
   pm[5] = log(1.0);
   pm[6] = 0.0;
   pm[7] = 0.0;
@@ -54,10 +54,10 @@ void sim()
   pm[10] = 0.5;
 
   smooth_init(parset.n_vel_recon, TransV);
-
+  
   reconstruct_con_from_varmodel(0.26, 74.0, 1.0, 0.0);
   gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
-
+  
   sprintf(fname, "%s/%s", parset.file_dir, "/data/sim_con_full.txt");
   fp = fopen(fname, "w");
   if(fp == NULL)
@@ -65,7 +65,7 @@ void sim()
     fprintf(stderr, "# Error: Cannot open file %s\n", fname);
     exit(-1);
   }
-
+  
   for(i=0; i<parset.n_con_recon; i++)
   {
     fprintf(fp, "%f %f\n", Tcon[i], Fcon[i] / con_scale);
@@ -84,7 +84,7 @@ void sim()
     fprintf(stderr, "# Error: Cannot open file %s\n", fname);
     exit(-1);
   }
-
+  
   fprintf(fp, "# %d %d\n", parset.n_line_recon, parset.n_vel_recon);
   for(i=0; i<parset.n_line_recon; i++)
   {
@@ -97,7 +97,7 @@ void sim()
     fprintf(fp, "\n");
   }
   fclose(fp);
-
+  
   // output 2d transfer function
   sprintf(fname, "%s/%s", parset.file_dir, parset.tran2d_out_file);
   fp = fopen(fname, "w");
@@ -126,6 +126,35 @@ void sim_init()
 {
   int i;
   double dT, Tspan;
+
+  switch(parset.flag_blrmodel)
+  {
+    case 1:
+      num_params_blr = 12;
+      calculate_line2d_from_blrmodel = calculate_line2d_from_blrmodel1;
+      transfun_2d_cloud_direct = transfun_2d_cloud_direct_model1;
+      break;
+    case 2:
+      num_params_blr = 12;
+      calculate_line2d_from_blrmodel = calculate_line2d_from_blrmodel1;
+      transfun_2d_cloud_direct = transfun_2d_cloud_direct_model2;
+      break;
+    case 3:
+      num_params_blr = 12;
+      calculate_line2d_from_blrmodel = calculate_line2d_from_blrmodel3;
+      transfun_2d_cloud_direct = transfun_2d_cloud_direct_model3;
+      break;
+    case 4:
+      num_params_blr = 12;
+      calculate_line2d_from_blrmodel = calculate_line2d_from_blrmodel3;
+      transfun_2d_cloud_direct = transfun_2d_cloud_direct_model4;
+      break;
+    default:
+      num_params_blr = 12;
+      calculate_line2d_from_blrmodel = calculate_line2d_from_blrmodel1;
+      transfun_2d_cloud_direct = transfun_2d_cloud_direct_model1;
+      break;
+  }
 
   parset.num_particles = 1;
   which_particle_update = 0;
