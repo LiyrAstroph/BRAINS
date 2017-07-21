@@ -31,16 +31,12 @@ void *best_model_std_con;  /*!< standard deviation of the best model */
 void postprocess_con()
 {
   char posterior_sample_file[BRAINS_MAX_STR_LENGTH];
-  double temperature = 1.0;
   double *pm, *pmstd;
   int num_ps, i, j;
   void *posterior_sample, *post_model;
   
   best_model_con = malloc(size_of_modeltype);
   best_model_std_con = malloc(size_of_modeltype);
-
-  temperature = parset.temperature;
-  dnest_postprocess(temperature);
   
   if(thistask == roottask)
   {
@@ -153,29 +149,39 @@ void postprocess_con()
  */
 void reconstruct_con()
 {
-  int i, argc=1;
+  int i, argc=0;
   char **argv;
 
   // configure restart of dnest 
-  argv = malloc(5*sizeof(char *));
-  for(i=0; i<5; i++)
+  argv = malloc(8*sizeof(char *));
+  for(i=0; i<8; i++)
   {
     argv[i] = malloc(BRAINS_MAX_STR_LENGTH*sizeof(char));
   }
   //setup argc and argv
-  strcpy(argv[0], "dnest");
-  argc += 2;
-  strcpy(argv[1], "-s");
-  strcpy(argv[2], parset.file_dir);
-  strcat(argv[2], "/data/restart_dnest.txt");
+  strcpy(argv[argc++], "dnest");
+  strcpy(argv[argc++], "-s");
+  strcpy(argv[argc], parset.file_dir);
+  strcat(argv[argc++], "/data/restart_dnest.txt");
 
   if(parset.flag_restart == 1)
   {
-    argc += 2;
-    strcpy(argv[3], "-r");
-    strcpy(argv[4], parset.file_dir);
-    strcat(argv[4], "/");
-    strcat(argv[4], "data/restart_dnest.txt");
+    strcpy(argv[argc++], "-r");
+    strcpy(argv[argc], parset.file_dir);
+    strcat(argv[argc], "/");
+    strcat(argv[argc++], "data/restart_dnest.txt");
+  }
+  if(parset.flag_postprc == 1)
+  {
+    strcpy(argv[argc++], "-p");
+  }
+  if(parset.flag_temp == 1)
+  {
+    sprintf(argv[argc++], "-t%f", parset.temperature);
+  }
+  if(parset.flag_sample_info == 1)
+  {
+    strcpy(argv[argc++], "-c");
   }
 
   reconstruct_con_init();

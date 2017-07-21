@@ -34,17 +34,12 @@ void postprocess2d()
   char posterior_sample_file[BRAINS_MAX_STR_LENGTH];
   int num_ps, i, j, k, nc;
   double *pm, *pmstd;
-  double temperature=1.0;
   double *lag;
   void *posterior_sample, *post_model;
   double mean_lag, mean_lag_std, sum1, sum2;
 
   best_model_line2d = malloc(size_of_modeltype);
   best_model_std_line2d = malloc(size_of_modeltype);
-
-// generate posterior sample
-  temperature = parset.temperature;
-  dnest_postprocess(temperature);
 
   if(thistask == roottask)
   {
@@ -291,29 +286,39 @@ void postprocess2d()
  */
 void reconstruct_line2d()
 {
-  int i, argc=1;
+  int i, argc=0;
   char **argv;
 
   //configure restart of dnest
-  argv = malloc(5*sizeof(char *));
-  for(i=0; i<5; i++)
+  argv = malloc(8*sizeof(char *));
+  for(i=0; i<8; i++)
   {
     argv[i] = malloc(BRAINS_MAX_STR_LENGTH*sizeof(char));
   }
   //setup argc and argv
-  strcpy(argv[0], "dnest");
-  argc += 2;
-  strcpy(argv[1], "-s");
-  strcpy(argv[2], parset.file_dir);
-  strcat(argv[2], "/data/restart2d_dnest.txt");
+  strcpy(argv[argc++], "dnest");
+  strcpy(argv[argc++], "-s");
+  strcpy(argv[argc], parset.file_dir);
+  strcat(argv[argc++], "/data/restart2d_dnest.txt");
 
-  if(parset.flag_restart == 1 )
+  if(parset.flag_restart == 1)
   {
-    argc += 2;
-    strcpy(argv[3], "-r");
-    strcpy(argv[4], parset.file_dir);
-    strcat(argv[4], "/");
-    strcat(argv[4], "data/restart2d_dnest.txt");
+    strcpy(argv[argc++], "-r");
+    strcpy(argv[argc], parset.file_dir);
+    strcat(argv[argc], "/");
+    strcat(argv[argc++], "data/restart2d_dnest.txt");
+  }
+  if(parset.flag_postprc == 1)
+  {
+    strcpy(argv[argc++], "-p");
+  }
+  if(parset.flag_temp == 1)
+  {
+    sprintf(argv[argc++], "-t%f", parset.temperature);
+  }
+  if(parset.flag_sample_info == 1)
+  {
+    strcpy(argv[argc++], "-c");
   }
 
   reconstruct_line2d_init();

@@ -112,11 +112,8 @@ int dnest_line2d(int argc, char **argv)
 
   strcpy(options_file, dnest_options_file);
 
-  if(parset.flag_postprc == 0)
-  {
-    force_update = 0;
-    dnest(argc, argv);
-  }
+  force_update = 0;
+  dnest(argc, argv);
   
   return 0;
 }

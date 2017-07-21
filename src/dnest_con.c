@@ -67,11 +67,7 @@ int dnest_con(int argc, char **argv)
   }
 
   strcpy(options_file, dnest_options_file);
-  
-  if(parset.flag_postprc == 0)
-  {
-    dnest(argc, argv);
-  }
+  dnest(argc, argv);
   
   return 0;
 }

@@ -46,6 +46,8 @@ int main(int argc, char **argv)
     parset.flag_postprc = 0; /* default value, 0 means postprocessing after runing MCMC sampling. */
     parset.temperature = 1.0; /* default value */
     parset.flag_restart = 0;
+    parset.flag_sample_info = 0;
+    parset.flag_temp = 0;
 
     while( (opt = getopt(argc, argv, "pt:rch")) != -1)
     {
@@ -53,9 +55,11 @@ int main(int argc, char **argv)
       {
         case 'p':  /* only do postprocessing */
           parset.flag_postprc = 1;
+          parset.temperature = 1.0;
           printf("# MCMC samples available, only do post-processing.\n");
           break;
         case 't': /* temperature for postprocessing */
+          parset.flag_temp = 1;
           parset.temperature = atof(optarg);
           printf("# Set a temperature %f.\n", parset.temperature);
           if(parset.temperature == 0.0)
@@ -77,7 +81,7 @@ int main(int argc, char **argv)
 
         case 'c':
           printf("# Recalculate posterior sample info.\n");
-          parset.flag_postprc = 1;
+          parset.flag_sample_info = 1;
           break;
 
         case 'h':
@@ -95,7 +99,7 @@ int main(int argc, char **argv)
       }
     }
     
-    if(parset.flag_postprc == 1)
+    if(parset.flag_postprc == 1 || parset.flag_sample_info == 1)
       parset.flag_restart = 0;
     
     if(flag_help == 0) // not only print help.

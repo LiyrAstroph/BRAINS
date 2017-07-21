@@ -101,6 +101,8 @@ typedef struct
 
   int flag_postprc;
   int flag_restart;
+  int flag_sample_info;
+  int flag_temp;
 
   int flag_fixvar;
   

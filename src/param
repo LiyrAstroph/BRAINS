@@ -5,7 +5,7 @@
 FileDir                     /home/liyropt/Projects/GIT/BRAINS
 %FileDir                     /ihepbatch/mbhd01/user/liyanrong/RM/Test/mrk493
 
-FlagDim                     1                           % -1, simulation; 0, only continuum; 1, 1d line; 2, 2d line
+FlagDim                     0                           % -1, simulation; 0, only continuum; 1, 1d line; 2, 2d line
 FlagBLRModel                1                           % 1, 2, 3, 4, BLR model type
 %===============================
 % data file
