@@ -23,7 +23,7 @@
 int main(int argc, char **argv)
 {
   double t0, t1, dt;
-  int opt;
+  int opt, flag_help=0, flag_end=0;
   /* initialize MPI */
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &thistask);
@@ -38,17 +38,6 @@ int main(int argc, char **argv)
     printf("%d cores used.\n", totaltask);
   }
 
-  if(argc<2)
-  {
-    if(thistask == roottask)
-    {
-      fprintf(stderr, "# Error: No parameter file specified!\n");
-      fprintf(stdout, "Ends incorrectly.\n");
-    }
-    MPI_Finalize();
-    return 0;
-  }
-
   /* cope with command options. */
   if(thistask == roottask)
   {
@@ -58,7 +47,7 @@ int main(int argc, char **argv)
     parset.temperature = 1.0; /* default value */
     parset.flag_restart = 0;
 
-    while( (opt = getopt(argc, argv, "pt:r")) != -1)
+    while( (opt = getopt(argc, argv, "pt:rch")) != -1)
     {
       switch(opt)
       {
@@ -80,14 +69,27 @@ int main(int argc, char **argv)
             exit(0);
           }
           break;
+
         case 'r':
           parset.flag_restart = 1;
           printf("# Restart run.\n");
           break;
+
+        case 'c':
+          printf("# Recalculate posterior sample info.\n");
+          parset.flag_postprc = 1;
+          break;
+
+        case 'h':
+          flag_help = 1;
+          print_help();
+          break;
+
         case '?':
           printf("# Incorrect option -%c %s.\n", optopt, optarg);
           exit(0);
           break;
+
         default:
           break;
       }
@@ -95,13 +97,40 @@ int main(int argc, char **argv)
     
     if(parset.flag_postprc == 1)
       parset.flag_restart = 0;
+    
+    if(flag_help == 0) // not only print help.
+    {
+      if(argv[optind] != NULL) // parameter file is specified 
+        strcpy(parset.param_file, argv[optind]); /* copy input parameter file */
+      else
+      {
+        flag_end = 1;
+        fprintf(stderr, "# Error: No parameter file specified!\n");
+      }
+    }
+    
+  }
+  
+  MPI_Bcast(&flag_help, 1, MPI_INT, roottask, MPI_COMM_WORLD);
+  MPI_Bcast(&flag_end, 1, MPI_INT, roottask, MPI_COMM_WORLD);
+  
+  if(flag_end == 1 && flag_help ==0 )
+  {
+    if(thistask == roottask)
+    {
+      fprintf(stdout, "Ends incorrectly.\n");
+    }
 
-    strcpy(parset.param_file, argv[optind]); /* copy input parameter file */
+    MPI_Finalize();
+    return 0;
   }
 
-  begin_run();    /* implementation run */
+  if(flag_help == 0)
+  {
+    begin_run();    /* implementation run */
 
-  end_run();      /* end run */
+    end_run();      /* end run */
+  }
   
   MPI_Finalize();   /* clean up and finalize MPI */
   if(thistask == roottask)

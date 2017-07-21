@@ -28,6 +28,8 @@ void get_num_particles(char *fname);
 void get_posterior_sample_file(char *fname, char *samplefile);
 void set_par_fix(int num_params_blr);
 
+void print_help();
+
 void (*set_blr_range_model)();
 void set_blr_range_model1();
 void set_blr_range_model2();
