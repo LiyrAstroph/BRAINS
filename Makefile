@@ -13,8 +13,9 @@ OPTIMIZE = -O2 -Wall
 
 #------------target system---------
 #SYSTEM="Darwin"
-#SYSTEM="Linux"
-SYSTEM="Cluster"
+SYSTEM="Linux"
+#SYSTEM="Cluster"
+#SYSTEM="TianheII"
 
 ifeq ($(SYSTEM), "Linux")
 NCORE      :=$(grep -c ^processor /proc/cpuinfo)
@@ -44,6 +45,21 @@ FFTW_LIBS = -L/mbh/mbhd01/user/liyanrong/soft/fftw/lib -lfftw3
 DNEST_INCL  = -I /mbh/mbhd01/user/liyanrong/GIT/DNest/
 DNEST_LIBS  = -L /mbh/mbhd01/user/liyanrong/GIT/DNest -ldnest
 endif
+
+ifeq ($(SYSTEM), "TianheII")
+GSL_INCL =
+GSL_LIBS = -lgsl -lgslcblas -lm
+MPICHLIB = -lmpich
+MPIINCL  =
+LAPACK_INCL = -I/HOME/ihep_yrli_1/BIGDATA/soft/lapack/include
+LAPACK_LIBS = -L/HOME/ihep_yrli_1/BIGDATA/soft/lapack/lib -llapacke -llapack -lblas -lgfortran
+FFTW_INCL =
+FFTW_LIBS = -lfftw3
+
+DNEST_INCL  = -I /HOME/ihep_yrli_1/BIGDATA/soft/DNest/
+DNEST_LIBS  = -L /HOME/ihep_yrli_1/BIGDATA/soft/DNest -ldnest
+endif
+
 
 EXEC     = brains
 SRC      = ./src
