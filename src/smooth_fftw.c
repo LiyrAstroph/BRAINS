@@ -120,8 +120,11 @@ void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int
     /* FFT of line */
     fftw_execute(pdata);
     
-    /* complex multiply and inverse FFT */
-    for(i=0; i<nd_fft; i++)
+    /* complex multiply and inverse FFT 
+     * note that for FFT of real data, FFTW outputs n/2+1 complex numbers.
+     * similarly, for complex to real transform, FFTW needs input of n/2+1 complex numbers.
+     */
+    for(i=0; i<nd_fft/2 + 1; i++)
     {
       conv_fft[i][0] = data_fft[i][0]*resp_fft[i][0] - data_fft[i][1]*resp_fft[i][1];
       conv_fft[i][1] = data_fft[i][0]*resp_fft[i][1] + data_fft[i][1]*resp_fft[i][0];
