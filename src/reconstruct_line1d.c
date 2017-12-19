@@ -653,7 +653,7 @@ double prob_line1d_model1(const void *model)
             n_line_data * sizeof(double));
 
         // when beta is updated, store cloud distribution
-        if(param == 1)
+        if(param == 3)
           memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
             parset.n_cloud_per_task * sizeof(double));
       }
@@ -791,7 +791,7 @@ double prob_line1d_model3(const void *model)
             n_line_data * sizeof(double));
 
         // when beta is updated, store cloud distribution
-        if(param == 0 || param == 2)
+        if(param == 2 || param == 4)
           memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
             parset.n_cloud_per_task * sizeof(double));
       }

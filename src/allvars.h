@@ -152,13 +152,13 @@ extern double *Fline2d, *Flerrs2d;
  */
 typedef struct
 {
+  double A;        /*!< \brief response coefficient */
+  double Ag;       /*!< \brief nonlinear response */
 	double mu;       /*!< \brief mean BLR radius, in light day */
 	double beta;     /*!< \brief shape parameter */ 
 	double F;        /*!< \brief inner edge */
 	double inc;      /*!< \brief inclination, in degree, 0-90 */
 	double opn;	     /*!< \brief openning angle, in degere, 0-90 */
-	double A;        /*!< \brief response coefficient */
-	double Ag;       /*!< \brief nonlinear response */
 	double k;        /*!< \brief anisotropic emission */
 	double mbh;      /*!< \brief black hole mass,  in 10e6 solar mass */
 	double lambda;   /*!< \brief orbit parameter */
@@ -168,13 +168,13 @@ typedef struct
 
 typedef struct
 {
+  double A;        /*!< \brief response coefficient */
+  double Ag;       /*!< \brief nonlinear response */
   double mu;       /*!< \brief mean BLR radius, in light day */
   double beta;     /*!< \brief shape parameter */ 
   double F;        /*!< \brief inner edge */
   double inc;      /*!< \brief inclination, in degree, 0-90 */
   double opn;      /*!< \brief openning angle, in degere, 0-90 */
-  double A;        /*!< \brief response coefficient */
-  double Ag;       /*!< \brief nonlinear response */
   double k;        /*!< \brief anisotropic emission */
   double mbh;      /*!< \brief black hole mass,  in 10e6 solar mass */
   double sigr;     /*!< \brief orbit parameter */
@@ -184,13 +184,13 @@ typedef struct
 
 typedef struct
 {
+  double A;        /*!< \brief response coefficient */
+  double Ag;       /*!< \brief nonlinear response */
   double alpha;     /*!< \brief shape parameter */ 
   double Rin;       /*!< \brief mean BLR radius, in light day */
   double F;        /*!< \brief inner edge */
   double inc;      /*!< \brief inclination, in degree, 0-90 */
   double opn;      /*!< \brief openning angle, in degere, 0-90 */
-  double A;        /*!< \brief response coefficient */
-  double Ag;       /*!< \brief nonlinear response */
   double k;        /*!< \brief anisotropic emission */
   double mbh;      /*!< \brief black hole mass,  in 10e6 solar mass */
   double xi;       /*!< \brief orbit parameter */

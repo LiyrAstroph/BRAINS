@@ -303,6 +303,12 @@ void set_blr_range_model1()
   int i;
 
   i = 0;
+  //A
+  blr_range_model[i][0] = log(0.01);
+  blr_range_model[i++][1] = log(10.0);
+  //Ag
+  blr_range_model[i][0] = -1.0;
+  blr_range_model[i++][1] = 3.0;
   //mu
   blr_range_model[i][0] = log(0.1);
   blr_range_model[i++][1] = log(rcloud_max_set);
@@ -318,12 +324,6 @@ void set_blr_range_model1()
   //opn
   blr_range_model[i][0] = 0.0;
   blr_range_model[i++][1] = 90.0;
-  //A
-  blr_range_model[i][0] = log(0.01);
-  blr_range_model[i++][1] = log(10.0);
-  //Ag
-  blr_range_model[i][0] = -1.0;
-  blr_range_model[i++][1] = 3.0;
   //k
   blr_range_model[i][0] = -0.5;
   blr_range_model[i++][1] = 0.5;
@@ -350,6 +350,12 @@ void set_blr_range_model2()
   int i;
 
   i = 0;
+  //A
+  blr_range_model[i][0] = log(0.01);
+  blr_range_model[i++][1] = log(10.0);
+  //Ag
+  blr_range_model[i][0] = -1.0;
+  blr_range_model[i++][1] = 3.0;
   //mu
   blr_range_model[i][0] = log(0.1);
   blr_range_model[i++][1] = log(rcloud_max_set);
@@ -365,12 +371,6 @@ void set_blr_range_model2()
   //opn
   blr_range_model[i][0] = 0.0;
   blr_range_model[i++][1] = 90.0;
-  //A
-  blr_range_model[i][0] = log(0.01);
-  blr_range_model[i++][1] = log(10.0);
-  //Ag
-  blr_range_model[i][0] = -1.0;
-  blr_range_model[i++][1] = 3.0;
   //k
   blr_range_model[i][0] = -0.5;
   blr_range_model[i++][1] = 0.5;
@@ -397,6 +397,12 @@ void set_blr_range_model3()
   int i;
   
   i = 0;
+  //A
+  blr_range_model[i][0] = log(0.01);
+  blr_range_model[i++][1] = log(10.0);
+  //Ag
+  blr_range_model[i][0] = -1.0;
+  blr_range_model[i++][1] = 3.0;
   //alpha
   blr_range_model[i][0] = -3.0;
   blr_range_model[i++][1] = 3.0;
@@ -412,12 +418,6 @@ void set_blr_range_model3()
   //opn
   blr_range_model[i][0] = 0.0;
   blr_range_model[i++][1] = 90.0;
-  //A
-  blr_range_model[i][0] = log(0.01);
-  blr_range_model[i++][1] = log(10.0);
-  //Ag
-  blr_range_model[i][0] = -1.0;
-  blr_range_model[i++][1] = 3.0;
   //k
   blr_range_model[i][0] = -0.5;
   blr_range_model[i++][1] = 0.5;
@@ -444,6 +444,12 @@ void set_blr_range_model4()
   int i;
   
   i = 0;
+  //A
+  blr_range_model[i][0] = log(0.01);
+  blr_range_model[i++][1] = log(10.0);
+  //Ag
+  blr_range_model[i][0] = -1.0;
+  blr_range_model[i++][1] = 3.0;
   //alpha
   blr_range_model[i][0] = -3.0;
   blr_range_model[i++][1] = 3.0;
@@ -459,12 +465,6 @@ void set_blr_range_model4()
   //opn
   blr_range_model[i][0] = 0.0;
   blr_range_model[i++][1] = 90.0;
-  //A
-  blr_range_model[i][0] = log(0.01);
-  blr_range_model[i++][1] = log(10.0);
-  //Ag
-  blr_range_model[i][0] = -1.0;
-  blr_range_model[i++][1] = 3.0;
   //k
   blr_range_model[i][0] = -0.5;
   blr_range_model[i++][1] = 0.5;

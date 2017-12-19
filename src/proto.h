@@ -61,9 +61,6 @@ double prob_initial_line1d(const void *model);
 double prob_restart_line1d(const void *model);
 void (*calculate_line_from_blrmodel)(const void *pm, double *Tl, double *Fl, int nl);
 void calculate_line_from_blrmodel1(const void *pm, double *Tl, double *Fl, int nl);
-//void calculate_line_from_blrmodel2(const void *pm, double *Tl, double *Fl, int nl);
-void calculate_line_from_blrmodel3(const void *pm, double *Tl, double *Fl, int nl);
-//void calculate_line_from_blrmodel4(const void *pm, double *Tl, double *Fl, int nl);
 void (*transfun_1d_cloud_direct)(const void *pm, int flag_save);
 void transfun_1d_cloud_direct_model1(const void *pm, int flag_save);
 //void transfun_1d_cloud_direct_model2(const void *pm, int flag_save);
@@ -98,11 +95,7 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
 void calculate_line2d_from_blrmodel1(const void *pm, const double *Tl, const double *transv, const double *trans2d, 
                                               double *fl2d, int nl, int nv);
 void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save);
-
 void transfun_2d_cloud_direct_model3(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save);
-void calculate_line2d_from_blrmodel3(const void *pm, const double *Tl, const double *transv, const double *trans2d, 
-                                              double *fl2d, int nl, int nv);
-
 void transfun_2d_cloud_direct_model4(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save);
 
 void smooth_init(int nv, const double *transv);

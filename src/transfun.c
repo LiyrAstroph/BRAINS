@@ -38,8 +38,8 @@ void calculate_line_from_blrmodel1(const void *pm, double *Tl, double *Fl, int n
   double fline, fcon, tl, tc, tau, A, Ag, ftrend;
   double *pmodel = (double *)pm;
 
-  A=exp(pmodel[5]);
-  Ag=pmodel[6];
+  A=exp(pmodel[0]);
+  Ag=pmodel[1];
 
   for(i=0;i<nl;i++)
   {
@@ -72,7 +72,7 @@ void calculate_line_from_blrmodel1(const void *pm, double *Tl, double *Fl, int n
 
       if(fcon > 0.0)
       {
-        fline += Trans1D[j] * fcon * pow(fabs(fcon), Ag);     /*  line response */
+        fline += Trans1D[j] * fcon * pow(fcon, Ag);     /*  line response */
       }	
     }
     fline *= dTransTau * A;
@@ -87,7 +87,7 @@ void calculate_line_from_blrmodel1(const void *pm, double *Tl, double *Fl, int n
 void transfun_1d_cloud_direct_model1(const void *pm, int flag_save)
 {
   FILE *fcloud_out;
-  int i, idt, nc;
+  int i, idt, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb;
   double inc, F, beta, mu, k, gam, a, s;
@@ -118,6 +118,9 @@ void transfun_1d_cloud_direct_model1(const void *pm, int flag_save)
     }
   }
 
+  if(which_parameter_update == 3 || force_update == 1 || which_parameter_update == -1 )
+    flag_update = 1;
+
   /* reset transfer function */
   for(i=0; i<parset.n_tau; i++)
   {
@@ -128,16 +131,11 @@ void transfun_1d_cloud_direct_model1(const void *pm, int flag_save)
   {
 // generate a direction of the angular momentum of the orbit   
     Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    if(Lopn_cos<1.0)
-    {
-      Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
-    }
-    else
-      Lthe = 0.0;
-    
+    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
+
     // "which_parameter_update = -1" means that all parameters are updated, usually occurs at the 
     // initial step.
-    if(which_parameter_update == 1 || force_update == 1 || which_parameter_update == -1 ) //
+    if( flag_update == 1 ) //
     {
       nc = 0;
       r = rcloud_max_set+1.0;
@@ -171,9 +169,13 @@ void transfun_1d_cloud_direct_model1(const void *pm, int flag_save)
  * first rotate around y axis by an angle of Lthe, then roate around z axis 
  * by an angle of Lphi
  */
-    xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
+  /*xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
     yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
-    zb = sin(Lthe) * x + cos(Lthe) * z;
+    zb = sin(Lthe) * x + cos(Lthe) * z; */
+    
+    xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y;
+    yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y;
+    zb = sin(Lthe) * x;
 
     if(zb < 0.0)
       zb = -zb;
@@ -244,8 +246,8 @@ void calculate_line2d_from_blrmodel1(const void *pm, const double *Tl, const dou
   double fline, tau, tl, tc, fcon, A, Ag, ftrend;
   double *pmodel = (double *)pm;
 
-  A=exp(pmodel[5]);
-  Ag=pmodel[6];
+  A=exp(pmodel[0]);
+  Ag=pmodel[1];
 
   for(j=0;j<nl; j++)
   {
@@ -280,7 +282,7 @@ void calculate_line2d_from_blrmodel1(const void *pm, const double *Tl, const dou
 
         if(fcon > 0.0)
         {
-           fline += trans2d[k*nv+i] * fcon * pow(fabs(fcon), Ag);
+           fline += trans2d[k*nv+i] * fcon * pow(fcon, Ag);
            //fline += trans2d[k*nv+i] * fcon;
         }
       }
@@ -311,7 +313,7 @@ void calculate_line2d_from_blrmodel1(const void *pm, const double *Tl, const dou
  */
 void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
-  int i, j, idV, idt, nc;
+  int i, j, idV, idt, nc, flag_update=0;
   double r, phi, dis, Lopn_cos, u;
   double x, y, z, xb, yb, zb, vx, vy, vz, vxb, vyb, vzb;
   double inc, F, beta, mu, k, gam, a, s;
@@ -359,19 +361,17 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
     }
   }
 
+  if(which_parameter_update == 3 || force_update == 1 || which_parameter_update == -1 )
+    flag_update = 1;
+
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
 // generate a direction of the angular momentum     
     Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    if(Lopn_cos<1.0)
-    {
-      Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
-    }
-    else
-      Lthe = 0.0;
+    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
 
     // which_parameter_update == 1 ==> beta is being updated.
-    if(which_parameter_update == 1 || force_update == 1 || which_parameter_update == -1 )
+    if( flag_update == 1 )
     {
       nc = 0;
       r = rcloud_max_set+1.0;
@@ -400,10 +400,13 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
     y = r * sin(phi);
     z = 0.0;
 
-
-    xb =  cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
+  /*xb =  cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
     yb = -cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
-    zb =  sin(Lthe) * x + cos(Lthe) * z;
+    zb =  sin(Lthe) * x + cos(Lthe) * z;*/
+
+    xb =  cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y;
+    yb = -cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y;
+    zb =  sin(Lthe) * x;
 
     if(zb < 0.0)
       zb = -zb;
@@ -460,9 +463,13 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
       vy = Vr * sin(phi) + Vph * cos(phi);
       vz = 0.0;     
 
-      vxb = cos(Lthe)*cos(Lphi) * vx + sin(Lphi) * vy - sin(Lthe)*cos(Lphi) * vz;
+    /*vxb = cos(Lthe)*cos(Lphi) * vx + sin(Lphi) * vy - sin(Lthe)*cos(Lphi) * vz;
       vyb =-cos(Lthe)*sin(Lphi) * vx + cos(Lphi) * vy + sin(Lthe)*sin(Lphi) * vz;
-      vzb = sin(Lthe) * vx + cos(Lthe) * vz;
+      vzb = sin(Lthe) * vx + cos(Lthe) * vz;*/
+
+      vxb = cos(Lthe)*cos(Lphi) * vx + sin(Lphi) * vy;
+      vyb =-cos(Lthe)*sin(Lphi) * vx + cos(Lphi) * vy;
+      vzb = sin(Lthe) * vx;
 
       if(zb < 0.0)
         vzb = -vzb;
@@ -540,7 +547,7 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
  */
 void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
-  int i, j, idV, idt, nc;
+  int i, j, idV, idt, nc, flag_update=0;
   double r, phi, dis, Lopn_cos, u;
   double x, y, z, xb, yb, zb, vx, vy, vz, vxb, vyb, vzb;
   double inc, F, beta, mu, k, gam, a, s;
@@ -587,19 +594,17 @@ void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *tra
     }
   }
 
+  if(which_parameter_update == 3 || force_update == 1 || which_parameter_update == -1 )
+    flag_update = 1;
+
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
 // generate a direction of the angular momentum     
     Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    if(Lopn_cos<1.0)
-    {
-      Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
-    }
-    else
-      Lthe = 0.0;
+    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
 
     // which_parameter_update == 1 ==> beta is being updated.
-    if(which_parameter_update == 1 || force_update == 1 || which_parameter_update == -1 )
+    if( flag_update == 1 )
     {
       nc = 0;
       r = rcloud_max_set+1.0;
@@ -629,9 +634,13 @@ void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *tra
     z = 0.0;
 
 
-    xb =  cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
+  /*xb =  cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
     yb = -cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
-    zb =  sin(Lthe) * x + cos(Lthe) * z;
+    zb =  sin(Lthe) * x + cos(Lthe) * z;*/
+
+    xb =  cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y;
+    yb = -cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y;
+    zb =  sin(Lthe) * x;
 
     if(zb < 0.0)
       zb = -zb;
@@ -673,9 +682,13 @@ void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *tra
       vy = Vr * sin(phi) + Vph * cos(phi);
       vz = 0.0;     
 
-      vxb = cos(Lthe)*cos(Lphi) * vx + sin(Lphi) * vy - sin(Lthe)*cos(Lphi) * vz;
+    /*vxb = cos(Lthe)*cos(Lphi) * vx + sin(Lphi) * vy - sin(Lthe)*cos(Lphi) * vz;
       vyb =-cos(Lthe)*sin(Lphi) * vx + cos(Lphi) * vy + sin(Lthe)*sin(Lphi) * vz;
-      vzb = sin(Lthe) * vx + cos(Lthe) * vz;
+      vzb = sin(Lthe) * vx + cos(Lthe) * vz;*/
+
+      vxb = cos(Lthe)*cos(Lphi) * vx + sin(Lphi) * vy;
+      vyb =-cos(Lthe)*sin(Lphi) * vx + cos(Lphi) * vy;
+      vzb = sin(Lthe) * vx;
 
       if(zb < 0.0)
         vzb = -vzb;
@@ -747,59 +760,6 @@ void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *tra
  * model 3
  *====================================================================
  */
-/*!
- * This function calculate 1d line from a given BLR model.
- *
- * Note that the light curves has been obtained in advance 
- */
-void calculate_line_from_blrmodel3(const void *pm, double *Tl, double *Fl, int nl)
-{
-  int i, j, k;
-  double fline, fcon, tl, tc, tau, A, mean, ftrend;
-  double *pmodel = (double *)pm;
-  BLRmodel3 *model = (BLRmodel3 *)pm;
-
-  A=exp(model->A);
-  //mean = ((double *)pm)[num_params_blr + num_params_var - 1];
-  
-  for(i=0;i<nl;i++)
-  {
-    tl = Tl[i];
-    fline = 0.0;
-    for(j=0; j<parset.n_tau; j++)
-    {
-      tau = TransTau[j];
-      tc = tl - tau;
-      if(tc>=Tcon_min && tc <=Tcon_max)
-      {
-        fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, tc, gsl_acc); /* interpolation */
-      }
-      else
-      {
-        //fcon = mean; 
-        fcon = con_q[0];
-        for(k=1; k < nq; k++)/*  beyond the range, set to be the long-term trend */
-        {
-          fcon += con_q[k] * pow(tc, k);
-        }
-      }
-
-      if(parset.flag_trend_diff)
-      {
-        ftrend = pmodel[num_params_blr + 4 + parset.flag_trend] * (tc - 0.5*(Tcon_data[0] + Tcon_data[n_con_data-1]));
-        fcon += ftrend;
-      }
-
-      if(fcon > 0.0)
-      {
-        fline += Trans1D[j] * fcon * pow(fabs(fcon), model->Ag);     /*  line response */
-      } 
-    }
-    fline *= dTransTau * A;
-    Fl[i] = fline;
-  }
-  return;
-}
 
 /* 
  * This function caclulate 1d transfer function.
@@ -807,7 +767,7 @@ void calculate_line_from_blrmodel3(const void *pm, double *Tl, double *Fl, int n
 void transfun_1d_cloud_direct_model3(const void *pm, int flag_save)
 {
   FILE *fcloud_out;
-  int i, idt, nc;
+  int i, idt, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb;
   double inc, F, alpha, Rin, k, gam;
@@ -835,6 +795,9 @@ void transfun_1d_cloud_direct_model3(const void *pm, int flag_save)
     }
   }
 
+  if(which_parameter_update == 2 || which_parameter_update==4 || force_update == 1 || which_parameter_update == -1 ) //
+    flag_update = 1;
+
   /* reset transfer function */
   for(i=0; i<parset.n_tau; i++)
   {
@@ -845,16 +808,11 @@ void transfun_1d_cloud_direct_model3(const void *pm, int flag_save)
   {
 // generate a direction of the angular momentum of the orbit   
     Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    if(Lopn_cos<1.0)
-    {
-      Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
-    }
-    else
-      Lthe = 0.0;
+    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
     
     // "which_parameter_update = -1" means that all parameters are updated, usually occurs at the 
     // initial step.
-    if(which_parameter_update == 0 || which_parameter_update==2 || force_update == 1 || which_parameter_update == -1 ) //
+    if( flag_update == 1 ) //
     {
       nc = 0;
       r = rcloud_max_set+1.0;
@@ -890,9 +848,13 @@ void transfun_1d_cloud_direct_model3(const void *pm, int flag_save)
  * first rotate around y axis by an angle of Lthe, then roate around z axis 
  * by an angle of Lphi
  */
-    xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
+  /*xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
     yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
-    zb = sin(Lthe) * x + cos(Lthe) * z;
+    zb = sin(Lthe) * x + cos(Lthe) * z;*/
+
+    xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y;
+    yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y;
+    zb = sin(Lthe) * x;
 
     if(zb < 0.0)
       zb = -zb;
@@ -953,85 +915,13 @@ void transfun_1d_cloud_direct_model3(const void *pm, int flag_save)
   return;
 }
 
-/*!
- * This function caclulate 2d line from obtained transfer function.
- */
-void calculate_line2d_from_blrmodel3(const void *pm, const double *Tl, const double *transv, const double *trans2d, 
-                                              double *fl2d, int nl, int nv)
-{
-  int i, j, k, m;
-  double fline, tau, tl, tc, fcon, A, mean, ftrend;
-  double *pmodel = (double *)pm;
-  BLRmodel3 *model = (BLRmodel3 *)pm;
-
-  A=exp(model->A);
-  //mean = ((double *)pm)[num_params_blr + num_params_var - 1];
-  mean = 0.0;
-
-  for(j=0;j<nl; j++)
-  {
-    tl = Tl[j];
-    for(i=0; i<nv; i++)
-    {
-      fline = 0.0;
-      for(k=0; k<parset.n_tau; k++)
-      {
-        tau = TransTau[k];
-        tc = tl - tau;
-        if(tc>=Tcon_min && tc <=Tcon_max)
-        {
-          fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, tc, gsl_acc);          
-        }
-        else
-        {
-          //fcon = mean; 
-          fcon = con_q[0];
-          for(m=1; m < nq; m++)/*  beyond the range, set to be the long-term trend */
-          {
-            fcon += con_q[m] * pow(tc, m);
-          }
-        }
-        
-        if(parset.flag_trend_diff)
-        {
-          ftrend = pmodel[num_params_blr + 4 + parset.flag_trend] * (tc - 0.5*(Tcon_data[0] + Tcon_data[n_con_data-1]));
-          fcon += ftrend;
-        }
-
-        if(fcon > 0.0)
-        {
-           fline += trans2d[k*nv+i] * fcon * pow(fabs(fcon), model->Ag);
-           //fline += trans2d[k*nv+i] * fcon;
-        }
-      }
-      fline *= dTransTau * A ;
-      fl2d[j*nv + i] = fline;
-    }
-  }
-
-// smooth the line profile
-  line_gaussian_smooth_2D_FFT(transv, fl2d, nl, nv);
-// add narrow line
-  if(parset.flag_narrowline == 1)
-  {
-    for(j = 0; j<nl; j++)
-    {
-      for(i=0; i<nv; i++)
-      {
-        fl2d[j*nv + i] += parset.flux_narrowline  
-               * exp( -0.5 * pow( (transv[i] - parset.shift_narrowline)/(parset.width_narrowline), 2.0) ) * line_scale;
-      }
-    } 
-  }
-}
-
 /*! 
  * This function calculate 2d transfer function at velocity grid "transv" and time grid "TransTau" . 
  * Note that time-lag grid is already set by parset.n_tau.
  */
 void transfun_2d_cloud_direct_model3(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
-  int i, j, idV, idt, nc;
+  int i, j, idV, idt, nc, flag_update=0;
   double r, phi, dis, Lopn_cos, u;
   double x, y, z, xb, yb, zb, vx, vy, vz, vxb, vyb, vzb;
   double inc, F, alpha, Rin, mu, k, gam;
@@ -1076,19 +966,17 @@ void transfun_2d_cloud_direct_model3(const void *pm, double *transv, double *tra
     }
   }
 
+  if(which_parameter_update == 2 || which_parameter_update==4 || force_update == 1 || which_parameter_update == -1 ) //
+    flag_update = 1; 
+
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
 // generate a direction of the angular momentum     
     Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    if(Lopn_cos<1.0)
-    {
-      Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
-    }
-    else
-      Lthe = 0.0;
+    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
 
     // which_parameter_update == 1 ==> beta is being updated.
-    if(which_parameter_update == 0 || which_parameter_update==2 || force_update == 1 || which_parameter_update == -1 ) //
+    if( flag_update == 1 ) //
     {
       nc = 0;
       r = rcloud_max_set+1.0;
@@ -1120,9 +1008,13 @@ void transfun_2d_cloud_direct_model3(const void *pm, double *transv, double *tra
     z = 0.0;
 
 
-    xb =  cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
+  /*xb =  cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
     yb = -cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
-    zb =  sin(Lthe) * x + cos(Lthe) * z;
+    zb =  sin(Lthe) * x + cos(Lthe) * z;*/
+
+    xb =  cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y;
+    yb = -cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y;
+    zb =  sin(Lthe) * x;
 
     if(zb < 0.0)
       zb = -zb;
@@ -1168,9 +1060,13 @@ void transfun_2d_cloud_direct_model3(const void *pm, double *transv, double *tra
       vy = Vr * sin(phi) + Vph * cos(phi);
       vz = 0.0;     
 
-      vxb = cos(Lthe)*cos(Lphi) * vx + sin(Lphi) * vy - sin(Lthe)*cos(Lphi) * vz;
+    /*vxb = cos(Lthe)*cos(Lphi) * vx + sin(Lphi) * vy - sin(Lthe)*cos(Lphi) * vz;
       vyb =-cos(Lthe)*sin(Lphi) * vx + cos(Lphi) * vy + sin(Lthe)*sin(Lphi) * vz;
-      vzb = sin(Lthe) * vx + cos(Lthe) * vz;
+      vzb = sin(Lthe) * vx + cos(Lthe) * vz;*/
+
+      vxb = cos(Lthe)*cos(Lphi) * vx + sin(Lphi) * vy;
+      vyb =-cos(Lthe)*sin(Lphi) * vx + cos(Lphi) * vy;
+      vzb = sin(Lthe) * vx;
 
       if(zb < 0.0)
         vzb = -vzb;
@@ -1243,7 +1139,7 @@ void transfun_2d_cloud_direct_model3(const void *pm, double *transv, double *tra
  */
 void transfun_2d_cloud_direct_model4(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
-  int i, j, idV, idt, nc;
+  int i, j, idV, idt, nc, flag_update=0;
   double r, phi, dis, Lopn_cos, u;
   double x, y, z, xb, yb, zb, vx, vy, vz, vxb, vyb, vzb;
   double inc, F, alpha, Rin, mu, k, gam;
@@ -1287,20 +1183,18 @@ void transfun_2d_cloud_direct_model4(const void *pm, double *transv, double *tra
       exit(-1);
     }
   }
+  
+  if(which_parameter_update == 2 || which_parameter_update==4 || force_update == 1 || which_parameter_update == -1 ) //
+    flag_update = 1;
 
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
 // generate a direction of the angular momentum     
     Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    if(Lopn_cos<1.0)
-    {
-      Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
-    }
-    else
-      Lthe = 0.0;
+    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
 
     // which_parameter_update == 1 ==> beta is being updated.
-    if(which_parameter_update == 0 || which_parameter_update==2 || force_update == 1 || which_parameter_update == -1 ) //
+    if( flag_update == 1 ) //
     {
       nc = 0;
       r = rcloud_max_set+1.0;
@@ -1332,9 +1226,14 @@ void transfun_2d_cloud_direct_model4(const void *pm, double *transv, double *tra
     z = 0.0;
 
 
-    xb =  cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
+  /*xb =  cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
     yb = -cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
-    zb =  sin(Lthe) * x + cos(Lthe) * z;
+    zb =  sin(Lthe) * x + cos(Lthe) * z; */
+    
+    xb =  cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y;
+    yb = -cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y;
+    zb =  sin(Lthe) * x;
+
 
     if(zb < 0.0)
       zb = -zb;
@@ -1380,9 +1279,13 @@ void transfun_2d_cloud_direct_model4(const void *pm, double *transv, double *tra
       vy = Vr * sin(phi) + Vph * cos(phi);
       vz = 0.0;     
 
-      vxb = cos(Lthe)*cos(Lphi) * vx + sin(Lphi) * vy - sin(Lthe)*cos(Lphi) * vz;
+    /*vxb = cos(Lthe)*cos(Lphi) * vx + sin(Lphi) * vy - sin(Lthe)*cos(Lphi) * vz;
       vyb =-cos(Lthe)*sin(Lphi) * vx + cos(Lphi) * vy + sin(Lthe)*sin(Lphi) * vz;
-      vzb = sin(Lthe) * vx + cos(Lthe) * vz;
+      vzb = sin(Lthe) * vx + cos(Lthe) * vz;*/
+
+      vxb = cos(Lthe)*cos(Lphi) * vx + sin(Lphi) * vy;
+      vyb =-cos(Lthe)*sin(Lphi) * vx + cos(Lphi) * vy;
+      vzb = sin(Lthe) * vx;
 
       if(zb < 0.0)
         vzb = -vzb;

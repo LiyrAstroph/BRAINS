@@ -141,12 +141,12 @@ void sim_init()
       break;
     case 3:
       num_params_blr = 12;
-      calculate_line2d_from_blrmodel = calculate_line2d_from_blrmodel3;
+      calculate_line2d_from_blrmodel = calculate_line2d_from_blrmodel1;
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model3;
       break;
     case 4:
       num_params_blr = 12;
-      calculate_line2d_from_blrmodel = calculate_line2d_from_blrmodel3;
+      calculate_line2d_from_blrmodel = calculate_line2d_from_blrmodel1;
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model4;
       break;
     default:
