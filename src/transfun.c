@@ -35,13 +35,12 @@
 void calculate_line_from_blrmodel1(const void *pm, double *Tl, double *Fl, int nl)
 {
   int i, j, k;
-  double fline, fcon, tl, tc, tau, A, mean, ftrend;
+  double fline, fcon, tl, tc, tau, A, Ag, ftrend;
   double *pmodel = (double *)pm;
-  BLRmodel1 *model = (BLRmodel1 *)pm;
 
-  A=exp(model->A);
-  //mean = ((double *)pm)[num_params_blr + num_params_var - 1];
-  
+  A=exp(pmodel[5]);
+  Ag=pmodel[6];
+
   for(i=0;i<nl;i++)
   {
     tl = Tl[i];
@@ -73,7 +72,7 @@ void calculate_line_from_blrmodel1(const void *pm, double *Tl, double *Fl, int n
 
       if(fcon > 0.0)
       {
-        fline += Trans1D[j] * fcon * pow(fabs(fcon), model->Ag);     /*  line response */
+        fline += Trans1D[j] * fcon * pow(fabs(fcon), Ag);     /*  line response */
       }	
     }
     fline *= dTransTau * A;
@@ -242,13 +241,11 @@ void calculate_line2d_from_blrmodel1(const void *pm, const double *Tl, const dou
                                               double *fl2d, int nl, int nv)
 {
   int i, j, k, m;
-  double fline, tau, tl, tc, fcon, A, mean, ftrend;
+  double fline, tau, tl, tc, fcon, A, Ag, ftrend;
   double *pmodel = (double *)pm;
-  BLRmodel1 *model = (BLRmodel1 *)pm;
 
-  A=exp(model->A);
-  //mean = ((double *)pm)[num_params_blr + num_params_var - 1];
-  mean = 0.0;
+  A=exp(pmodel[5]);
+  Ag=pmodel[6];
 
   for(j=0;j<nl; j++)
   {
@@ -283,7 +280,7 @@ void calculate_line2d_from_blrmodel1(const void *pm, const double *Tl, const dou
 
         if(fcon > 0.0)
         {
-           fline += trans2d[k*nv+i] * fcon * pow(fabs(fcon), model->Ag);
+           fline += trans2d[k*nv+i] * fcon * pow(fabs(fcon), Ag);
            //fline += trans2d[k*nv+i] * fcon;
         }
       }
