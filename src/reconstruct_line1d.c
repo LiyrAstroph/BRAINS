@@ -228,8 +228,8 @@ void reconstruct_line1d()
   char **argv;
 
   // configure restart of dnest
-  argv = malloc(8*sizeof(char *));
-  for(i=0; i<8; i++)
+  argv = malloc(9*sizeof(char *));
+  for(i=0; i<9; i++)
   {
     argv[i] = malloc(BRAINS_MAX_STR_LENGTH*sizeof(char));
   }
@@ -257,6 +257,11 @@ void reconstruct_line1d()
   if(parset.flag_sample_info == 1)
   {
     strcpy(argv[argc++], "-c");
+  }
+  
+  //level-dependent sampling
+  {
+    strcpy(argv[argc++], "-l");
   }
 
   reconstruct_line1d_init();

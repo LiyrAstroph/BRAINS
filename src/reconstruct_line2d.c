@@ -290,8 +290,8 @@ void reconstruct_line2d()
   char **argv;
 
   //configure restart of dnest
-  argv = malloc(8*sizeof(char *));
-  for(i=0; i<8; i++)
+  argv = malloc(9*sizeof(char *));
+  for(i=0; i<9; i++)
   {
     argv[i] = malloc(BRAINS_MAX_STR_LENGTH*sizeof(char));
   }
@@ -320,7 +320,12 @@ void reconstruct_line2d()
   {
     strcpy(argv[argc++], "-c");
   }
-
+  
+  //level-dependent sampling
+  {
+    strcpy(argv[argc++], "-l");
+  }
+  
   reconstruct_line2d_init();
   
   smooth_init(n_vel_data, Vline_data);
