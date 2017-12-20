@@ -23,16 +23,13 @@
 #include "allvars.h"
 #include "proto.h"
 
-/*================================================================
- * model 1
- *================================================================
- */
+
 /*!
  * This function calculate 1d line from a given BLR model.
  *
  * Note that the light curves has been obtained in advance 
  */
-void calculate_line_from_blrmodel1(const void *pm, double *Tl, double *Fl, int nl)
+void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl)
 {
   int i, j, k;
   double fline, fcon, tl, tc, tau, A, Ag, ftrend;
@@ -81,6 +78,81 @@ void calculate_line_from_blrmodel1(const void *pm, double *Tl, double *Fl, int n
   return;
 }
 
+/*!
+ * This function caclulate 2d line from obtained transfer function.
+ */
+void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const double *transv, const double *trans2d, 
+                                              double *fl2d, int nl, int nv)
+{
+  int i, j, k, m;
+  double fline, tau, tl, tc, fcon, A, Ag, ftrend;
+  double *pmodel = (double *)pm;
+
+  A=exp(pmodel[0]);
+  Ag=pmodel[1];
+
+  for(j=0;j<nl; j++)
+  {
+    tl = Tl[j];
+    for(i=0; i<nv; i++)
+    {
+      fline = 0.0;
+      for(k=0; k<parset.n_tau; k++)
+      {
+        tau = TransTau[k];
+        tc = tl - tau;
+        if(tc>=Tcon_min && tc <=Tcon_max)
+        {
+          fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, tc, gsl_acc);          
+        }
+        else
+        {
+          //fcon = mean; 
+          fcon = con_q[0];
+          for(m=1; m < nq; m++)/*  beyond the range, set to be the long-term trend */
+          {
+            fcon += con_q[m] * pow(tc, m);
+          }
+        }
+
+        // add different trend in continuum and emission line
+        if(parset.flag_trend_diff)
+        {
+          ftrend = pmodel[num_params_blr + 4 + parset.flag_trend] * (tc - 0.5*(Tcon_data[0] + Tcon_data[n_con_data-1]));
+          fcon += ftrend;
+        }
+
+        if(fcon > 0.0)
+        {
+           fline += trans2d[k*nv+i] * fcon * pow(fcon, Ag);
+           //fline += trans2d[k*nv+i] * fcon;
+        }
+      }
+      fline *= dTransTau * A ;
+      fl2d[j*nv + i] = fline;
+    }
+  }
+
+// smooth the line profile
+  line_gaussian_smooth_2D_FFT(transv, fl2d, nl, nv);
+// add narrow line
+  if(parset.flag_narrowline == 1)
+  {
+    for(j = 0; j<nl; j++)
+    {
+      for(i=0; i<nv; i++)
+      {
+        fl2d[j*nv + i] += parset.flux_narrowline  
+               * exp( -0.5 * pow( (transv[i] - parset.shift_narrowline)/(parset.width_narrowline), 2.0) ) * line_scale;
+      }
+    } 
+  }
+}
+
+/*================================================================
+ * model 1
+ *================================================================
+ */
 /* 
  * This function caclulate 1d transfer function.
  */
@@ -236,76 +308,6 @@ void transfun_1d_cloud_direct_model1(const void *pm, int flag_save)
   return;
 }
 
-/*!
- * This function caclulate 2d line from obtained transfer function.
- */
-void calculate_line2d_from_blrmodel1(const void *pm, const double *Tl, const double *transv, const double *trans2d, 
-                                              double *fl2d, int nl, int nv)
-{
-  int i, j, k, m;
-  double fline, tau, tl, tc, fcon, A, Ag, ftrend;
-  double *pmodel = (double *)pm;
-
-  A=exp(pmodel[0]);
-  Ag=pmodel[1];
-
-  for(j=0;j<nl; j++)
-  {
-    tl = Tl[j];
-    for(i=0; i<nv; i++)
-    {
-      fline = 0.0;
-      for(k=0; k<parset.n_tau; k++)
-      {
-        tau = TransTau[k];
-        tc = tl - tau;
-        if(tc>=Tcon_min && tc <=Tcon_max)
-        {
-          fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, tc, gsl_acc);          
-        }
-        else
-        {
-          //fcon = mean; 
-          fcon = con_q[0];
-          for(m=1; m < nq; m++)/*  beyond the range, set to be the long-term trend */
-          {
-            fcon += con_q[m] * pow(tc, m);
-          }
-        }
-
-        // add different trend in continuum and emission line
-        if(parset.flag_trend_diff)
-        {
-          ftrend = pmodel[num_params_blr + 4 + parset.flag_trend] * (tc - 0.5*(Tcon_data[0] + Tcon_data[n_con_data-1]));
-          fcon += ftrend;
-        }
-
-        if(fcon > 0.0)
-        {
-           fline += trans2d[k*nv+i] * fcon * pow(fcon, Ag);
-           //fline += trans2d[k*nv+i] * fcon;
-        }
-      }
-      fline *= dTransTau * A ;
-      fl2d[j*nv + i] = fline;
-    }
-  }
-
-// smooth the line profile
-  line_gaussian_smooth_2D_FFT(transv, fl2d, nl, nv);
-// add narrow line
-  if(parset.flag_narrowline == 1)
-  {
-    for(j = 0; j<nl; j++)
-    {
-      for(i=0; i<nv; i++)
-      {
-        fl2d[j*nv + i] += parset.flux_narrowline  
-               * exp( -0.5 * pow( (transv[i] - parset.shift_narrowline)/(parset.width_narrowline), 2.0) ) * line_scale;
-      }
-    } 
-  }
-}
 
 /*! 
  * This function calculate 2d transfer function at velocity grid "transv" and time grid "TransTau" . 

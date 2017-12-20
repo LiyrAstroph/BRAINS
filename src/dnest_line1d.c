@@ -38,35 +38,30 @@ int dnest_line1d(int argc, char **argv)
   {
     case 1:
       num_params_blr = 9;
-      calculate_line_from_blrmodel = calculate_line_from_blrmodel1;
       transfun_1d_cloud_direct = transfun_1d_cloud_direct_model1;
       perturb = perturb_line1d_model1;
       log_likelihoods_cal = log_likelihoods_cal_line1d_model1;
       break;
     case 2:
       num_params_blr = 9;
-      calculate_line_from_blrmodel = calculate_line_from_blrmodel1;
       transfun_1d_cloud_direct = transfun_1d_cloud_direct_model1;
       perturb = perturb_line1d_model1;
       log_likelihoods_cal = log_likelihoods_cal_line1d_model1;
       break;
     case 3:
       num_params_blr = 9;
-      calculate_line_from_blrmodel = calculate_line_from_blrmodel1;
       transfun_1d_cloud_direct = transfun_1d_cloud_direct_model3;
       perturb = perturb_line1d_model3;
       log_likelihoods_cal = log_likelihoods_cal_line1d_model3;
       break;
     case 4:
       num_params_blr = 9;
-      calculate_line_from_blrmodel = calculate_line_from_blrmodel1;
       transfun_1d_cloud_direct = transfun_1d_cloud_direct_model3;
       perturb = perturb_line1d_model3;
       log_likelihoods_cal = log_likelihoods_cal_line1d_model3;
       break;
     default:
       num_params_blr = 9;
-      calculate_line_from_blrmodel = calculate_line_from_blrmodel1;
       transfun_1d_cloud_direct = transfun_1d_cloud_direct_model1;
       perturb = perturb_line1d_model1;
       log_likelihoods_cal = log_likelihoods_cal_line1d_model1;

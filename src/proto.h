@@ -59,13 +59,13 @@ void reconstruct_line1d_end();
 //double prob_line1d(const void *model);
 double prob_initial_line1d(const void *model);
 double prob_restart_line1d(const void *model);
-void (*calculate_line_from_blrmodel)(const void *pm, double *Tl, double *Fl, int nl);
-void calculate_line_from_blrmodel1(const void *pm, double *Tl, double *Fl, int nl);
+
+void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl);
 void (*transfun_1d_cloud_direct)(const void *pm, int flag_save);
+
 void transfun_1d_cloud_direct_model1(const void *pm, int flag_save);
-//void transfun_1d_cloud_direct_model2(const void *pm, int flag_save);
 void transfun_1d_cloud_direct_model3(const void *pm, int flag_save);
-//void transfun_1d_cloud_direct_model4(const void *pm, int flag_save);
+
 void postprocess1d();
 void set_par_range_model1d();
 
@@ -84,7 +84,7 @@ void reconstruct_line2d_init();
 void reconstruct_line2d_end();
 void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int nv);
 void (*transfun_2d_cloud_direct)(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save);
-void (*calculate_line2d_from_blrmodel)(const void *pm, const double *Tl, const double *transv, const double *trans2d, 
+void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const double *transv, const double *trans2d, 
                                               double *fl2d, int nl, int nv);
 void postprocess2d();
 void set_par_range_model2d();
@@ -92,8 +92,6 @@ void set_par_range_model2d();
 double prob_line2d_model1(const void *model);
 double prob_line2d_model3(const void *model);
 void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save);
-void calculate_line2d_from_blrmodel1(const void *pm, const double *Tl, const double *transv, const double *trans2d, 
-                                              double *fl2d, int nl, int nv);
 void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save);
 void transfun_2d_cloud_direct_model3(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save);
 void transfun_2d_cloud_direct_model4(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save);

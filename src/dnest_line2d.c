@@ -39,35 +39,30 @@ int dnest_line2d(int argc, char **argv)
   {
     case 1:
       num_params_blr = 12;
-      calculate_line2d_from_blrmodel = calculate_line2d_from_blrmodel1;
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model1;
       perturb = perturb_line2d_model1;
       log_likelihoods_cal = log_likelihoods_cal_line2d_model1;
       break;
     case 2:
       num_params_blr = 12;
-      calculate_line2d_from_blrmodel = calculate_line2d_from_blrmodel1;
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model2;
       perturb = perturb_line2d_model1;
       log_likelihoods_cal = log_likelihoods_cal_line2d_model1;
       break;
     case 3:
       num_params_blr = 12;
-      calculate_line2d_from_blrmodel = calculate_line2d_from_blrmodel1;
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model3;
       perturb = perturb_line2d_model3;
       log_likelihoods_cal = log_likelihoods_cal_line2d_model3;
       break;
     case 4:
       num_params_blr = 12;
-      calculate_line2d_from_blrmodel = calculate_line2d_from_blrmodel1;
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model4;
       perturb = perturb_line2d_model3;
       log_likelihoods_cal = log_likelihoods_cal_line2d_model3;
       break;
     default:
       num_params_blr = 12;
-      calculate_line2d_from_blrmodel = calculate_line2d_from_blrmodel1;
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model1;
       perturb = perturb_line2d_model1;
       log_likelihoods_cal = log_likelihoods_cal_line2d_model1;

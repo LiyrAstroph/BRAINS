@@ -41,13 +41,13 @@ void sim()
   sim_init();
   
   double *pm = (double *)model;
-  pm[0] = log(4.0);
-  pm[1] = 0.9;
-  pm[2] = 0.2;
-  pm[3] = 20.0;
-  pm[4] = 80.0;
-  pm[5] = log(1.0);
-  pm[6] = 0.0;
+  pm[0] = log(1.0);
+  pm[1] = 0.0;
+  pm[2] = log(4.0);
+  pm[3] = 0.9;
+  pm[4] = 0.2;
+  pm[5] = 20.0;
+  pm[6] = 80.0;
   pm[7] = 0.0;
   pm[8] = log(3.0);
   pm[9] = 0.1;
@@ -131,27 +131,22 @@ void sim_init()
   {
     case 1:
       num_params_blr = 12;
-      calculate_line2d_from_blrmodel = calculate_line2d_from_blrmodel1;
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model1;
       break;
     case 2:
       num_params_blr = 12;
-      calculate_line2d_from_blrmodel = calculate_line2d_from_blrmodel1;
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model2;
       break;
     case 3:
       num_params_blr = 12;
-      calculate_line2d_from_blrmodel = calculate_line2d_from_blrmodel1;
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model3;
       break;
     case 4:
       num_params_blr = 12;
-      calculate_line2d_from_blrmodel = calculate_line2d_from_blrmodel1;
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model4;
       break;
     default:
       num_params_blr = 12;
-      calculate_line2d_from_blrmodel = calculate_line2d_from_blrmodel1;
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model1;
       break;
   }
