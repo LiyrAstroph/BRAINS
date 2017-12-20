@@ -656,6 +656,9 @@ void reconstruct_line2d_end()
     free(par_range_model[i]);
   }
   free(par_range_model);
+
+  free(params_radial_samp);
+  
   return;
 }
 
@@ -725,20 +728,16 @@ double prob_restart_line2d(const void *model)
 
   return prob_line;
 }
-/*================================================================================
- * model 1
- *================================================================================
- */
 /*!
  * this function calculate probability.
  * 
  * At each MCMC step, only one parameter is updated, which only changes some values; thus,
  * optimization that reuses the unchanged values can improve computation efficiency.
  */
-double prob_line2d_model1(const void *model)
+double prob_line2d(const void *model)
 {
   double prob_line = 0.0, var2, dy;
-  int i, param;
+  int i, param, flag_cpy=0;
   double *pm = (double *)model, *ptemp;
   
   // if the previous perturb is accepted, store the previous perturb values, otherwise, no changes;
@@ -799,165 +798,15 @@ double prob_line2d_model1(const void *model)
         Fline_at_data_particles_perturb[which_particle_update] = ptemp;
 
         // when beta is updated, store cloud distribution
-        if(param == 3)
+        for(i=0; i<num_params_radial_samp; i++)
         {
-          /*memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
-            parset.n_cloud_per_task * sizeof(double));*/
-
-          ptemp = clouds_particles[which_particle_update];
-          clouds_particles[which_particle_update] = clouds_particles_perturb[which_particle_update];
-          clouds_particles_perturb[which_particle_update] = ptemp;
+          if(param == params_radial_samp[i])
+          {
+            flag_cpy = 1;
+            break;
+          }
         }
-      }
-    } 
-    
-    // line probability is always changed.
-    prob_line_particles[which_particle_update] = prob_line_particles_perturb[which_particle_update];
-  }
-
-  // only update continuum reconstruction when the corresponding parameters are updated
-  if(which_parameter_update >= num_params_blr)
-  {
-    /* the num_params_blr-th parameter is systematic error of continuum, which 
-     * only appears at the stage of calculating likelihood probability.
-     * when this paramete is updated, no need to re-calculate the contionuum.  
-     */
-    con_q = con_q_particles_perturb[which_particle_update];
-    Fcon = Fcon_particles_perturb[which_particle_update];
-    calculate_con_from_model(model + num_params_blr*sizeof(double));
-    gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
-  }
-  else /* continuum has no change, use the previous values */
-  {
-    con_q = con_q_particles[which_particle_update];
-    Fcon = Fcon_particles[which_particle_update];
-    gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
-  }
-  
-   // only update transfer function when BLR model is changed.
-   // or when forced to updated
-  if( (which_parameter_update < num_params_blr-1) || force_update == 1)
-  {
-    Trans2D_at_veldata = Trans2D_at_veldata_particles_perturb[which_particle_update];
-    transfun_2d_cloud_direct(model, Vline_data, Trans2D_at_veldata, n_vel_data, 0);
-  }
-  else
-  {
-    Trans2D_at_veldata = Trans2D_at_veldata_particles[which_particle_update];
-  }
-
-  /* no need to calculate line when only systematic error parameters are updated.
-   * otherwise, always need to calculate line.
-   */
-  if( which_parameter_update != num_params_blr-1 || force_update == 1 )
-  {
-    Fline2d_at_data = Fline_at_data_particles_perturb[which_particle_update];
-    calculate_line2d_from_blrmodel(model, Tline_data, Vline_data, Trans2D_at_veldata, Fline2d_at_data, n_line_data, n_vel_data);
-
-    for(i=0; i<n_line_data*n_vel_data; i++)
-    {
-      dy = Fline2d_data[i] - Fline2d_at_data[i];
-      var2 = Flerrs2d_data[i]*Flerrs2d_data[i];
-      var2 += exp(pm[num_params_blr-1])*exp(pm[num_params_blr-1]);
-      prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
-    }
-    prob_line_particles_perturb[which_particle_update] = prob_line;
-  }
-  else
-  {
-    /* re-point */
-    Fline2d_at_data = Fline_at_data_particles[which_particle_update];
-    for(i=0; i<n_line_data * n_vel_data; i++)
-    {
-      dy = Fline2d_data[i] - Fline2d_at_data[i] ;
-      var2 = Flerrs2d_data[i]*Flerrs2d_data[i];
-      var2 += exp(pm[num_params_blr-1])*exp(pm[num_params_blr-1]);
-      prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
-    }
-      /* backup prob_line */
-    prob_line_particles_perturb[which_particle_update] = prob_line;
-  }
-
-  which_parameter_update_prev[which_particle_update] = which_parameter_update;
-
-  return prob_line;
-}
-
-/*================================================================================
- * model 3
- *================================================================================
- */
-/*!
- * this function calculate probability.
- * 
- * At each MCMC step, only one parameter is updated, which only changes some values; thus,
- * optimization that reuses the unchanged values can improve computation efficiency.
- */
-double prob_line2d_model3(const void *model)
-{
-  double prob_line = 0.0, var2, dy;
-  int i, param;
-  double *pm = (double *)model, *ptemp;
-  
-  // if the previous perturb is accepted, store the previous perturb values, otherwise, no changes;
-  if(perturb_accept[which_particle_update] == 1)
-  {
-    // the parameter previously updated
-    param = which_parameter_update_prev[which_particle_update];
-    // continuum parameter is updated
-    if(param >= num_params_blr)
-    {
-      /* the num_params_blr-th parameter is systematic error of continuum, which 
-       * only appear at the stage of calculating likelihood probability.
-       * when this paramete is updated, Fcon is unchanged.  
-       * note that (response) Fline is also changed as long as Fcon is changed.
-       */
-      /*memcpy(Fcon_particles[which_particle_update], Fcon_particles_perturb[which_particle_update], 
-        parset.n_con_recon*sizeof(double));
-
-      memcpy(Fline_at_data_particles[which_particle_update], Fline_at_data_particles_perturb[which_particle_update],
-        n_line_data * n_vel_data * sizeof(double));
-
-      memcpy(con_q_particles[which_particle_update], con_q_particles_perturb[which_particle_update],
-        nq*sizeof(double));*/
-
-      ptemp = Fcon_particles[which_particle_update];
-      Fcon_particles[which_particle_update] = Fcon_particles_perturb[which_particle_update];
-      Fcon_particles_perturb[which_particle_update] = ptemp;
-
-      ptemp = Fline_at_data_particles[which_particle_update];
-      Fline_at_data_particles[which_particle_update] = Fline_at_data_particles_perturb[which_particle_update];
-      Fline_at_data_particles_perturb[which_particle_update] = ptemp;
-
-      ptemp = con_q_particles[which_particle_update];
-      con_q_particles[which_particle_update] = con_q_particles_perturb[which_particle_update];
-      con_q_particles_perturb[which_particle_update] = ptemp;
-    }
-    else
-    {
-      /* BLR parameter is updated 
-       * Note a) that the (num_par_blr-1)-th parameter is systematic error of line.
-       * when this parameter is updated, Trans2D and Fline are unchanged.
-       *      b) Fline is always changed, except for param = num_params_blr-1 or num_params_blr.
-       */
-      if(param < num_params_blr -1 )
-      {
-        /*memcpy(Trans2D_at_veldata_particles[which_particle_update], Trans2D_at_veldata_particles_perturb[which_particle_update], 
-            parset.n_tau * n_vel_data * sizeof(double));
-
-        memcpy(Fline_at_data_particles[which_particle_update], Fline_at_data_particles_perturb[which_particle_update],
-            n_line_data * n_vel_data * sizeof(double));*/
-
-        ptemp = Trans2D_at_veldata_particles[which_particle_update];
-        Trans2D_at_veldata_particles[which_particle_update] = Trans2D_at_veldata_particles_perturb[which_particle_update];
-        Trans2D_at_veldata_particles_perturb[which_particle_update] = ptemp;
-
-        ptemp = Fline_at_data_particles[which_particle_update];
-        Fline_at_data_particles[which_particle_update] = Fline_at_data_particles_perturb[which_particle_update];
-        Fline_at_data_particles_perturb[which_particle_update] = ptemp;
-
-        // when beta is updated, store cloud distribution
-        if(param == 2 || param == 4)
+        if(flag_cpy == 1)
         {
           /*memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
             parset.n_cloud_per_task * sizeof(double));*/

@@ -146,6 +146,9 @@ extern double Tline_min, Tline_max;
 extern double *Fline2d_at_data;
 extern double *Fline2d, *Flerrs2d;
 
+extern int num_params_radial_samp;
+extern int *params_radial_samp;
+
 /*!
  *  \struct BLRmodel1
  *  \brief broad-line region model. 

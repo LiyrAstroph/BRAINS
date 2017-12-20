@@ -56,7 +56,7 @@ int dnest_line1d(int argc, char **argv);
 void reconstruct_line1d();
 void reconstruct_line1d_init();
 void reconstruct_line1d_end();
-//double prob_line1d(const void *model);
+double prob_line1d(const void *model);
 double prob_initial_line1d(const void *model);
 double prob_restart_line1d(const void *model);
 
@@ -69,14 +69,11 @@ void transfun_1d_cloud_direct_model3(const void *pm, int flag_save);
 void postprocess1d();
 void set_par_range_model1d();
 
-double prob_line1d_model1(const void *model);
-double prob_line1d_model3(const void *model);
-
 void restart_clouds_1d(int iflag);
 
 /* 2d line reconstruction */
 int dnest_line2d(int argc, char **argv);
-//double prob_line2d(const void *model);
+double prob_line2d(const void *model);
 double prob_initial_line2d(const void *model);
 double prob_restart_line2d(const void *model);
 void reconstruct_line2d();
@@ -89,8 +86,6 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
 void postprocess2d();
 void set_par_range_model2d();
 
-double prob_line2d_model1(const void *model);
-double prob_line2d_model3(const void *model);
 void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save);
 void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save);
 void transfun_2d_cloud_direct_model3(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save);

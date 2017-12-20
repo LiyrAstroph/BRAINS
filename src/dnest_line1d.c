@@ -40,31 +40,52 @@ int dnest_line1d(int argc, char **argv)
       num_params_blr = 9;
       transfun_1d_cloud_direct = transfun_1d_cloud_direct_model1;
       perturb = perturb_line1d_model1;
-      log_likelihoods_cal = log_likelihoods_cal_line1d_model1;
+
+      num_params_radial_samp=1;
+      params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
+      params_radial_samp[0] = 3;
+
       break;
     case 2:
       num_params_blr = 9;
       transfun_1d_cloud_direct = transfun_1d_cloud_direct_model1;
       perturb = perturb_line1d_model1;
-      log_likelihoods_cal = log_likelihoods_cal_line1d_model1;
+
+      num_params_radial_samp=1;
+      params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
+      params_radial_samp[0] = 3;
+
       break;
     case 3:
       num_params_blr = 9;
       transfun_1d_cloud_direct = transfun_1d_cloud_direct_model3;
       perturb = perturb_line1d_model3;
-      log_likelihoods_cal = log_likelihoods_cal_line1d_model3;
+
+      num_params_radial_samp=2;
+      params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
+      params_radial_samp[0] = 2;
+      params_radial_samp[1] = 4;
+
       break;
     case 4:
       num_params_blr = 9;
       transfun_1d_cloud_direct = transfun_1d_cloud_direct_model3;
       perturb = perturb_line1d_model3;
-      log_likelihoods_cal = log_likelihoods_cal_line1d_model3;
+
+      num_params_radial_samp=2;
+      params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
+      params_radial_samp[0] = 2;
+      params_radial_samp[1] = 4;
+
       break;
     default:
       num_params_blr = 9;
       transfun_1d_cloud_direct = transfun_1d_cloud_direct_model1;
       perturb = perturb_line1d_model1;
-      log_likelihoods_cal = log_likelihoods_cal_line1d_model1;
+
+      num_params_radial_samp=1;
+      params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
+      params_radial_samp[0] = 3;
       break;
   }
   
@@ -82,6 +103,7 @@ int dnest_line1d(int argc, char **argv)
   from_prior = from_prior_line1d;
   log_likelihoods_cal_initial = log_likelihoods_cal_initial_line1d;
   log_likelihoods_cal_restart = log_likelihoods_cal_restart_line1d;
+  log_likelihoods_cal = log_likelihoods_cal_line1d;
   print_particle = print_particle_line1d;
   copy_model = copy_model_line1d;
   create_model = create_model_line1d;
@@ -232,6 +254,16 @@ double log_likelihoods_cal_restart_line1d(const void *model)
 }
 
 /*!
+ * This function calculate log likelihood probability.
+ */
+double log_likelihoods_cal_line1d(const void *model)
+{
+  double logL;
+  logL = prob_line1d(model);
+  return logL;
+}
+
+/*!
  * This function print out the particle into the file.
  */
 void print_particle_line1d(FILE *fp, const void *model)
@@ -275,15 +307,6 @@ int get_num_params_line1d()
  * model 1 
  *=======================================================================
  */
-/*!
- * This function calculate log likelihood probability for model 1.
- */
-double log_likelihoods_cal_line1d_model1(const void *model)
-{
-  double logL;
-  logL = prob_line1d_model1(model);
-  return logL;
-}
 /*!
  * this function perturbs the parameters.
  */
@@ -448,14 +471,4 @@ double perturb_line1d_model3(void *model)
     logH += (-0.5*pow(pm[which], 2.0) );
   }
   return logH;
-}
-
-/*!
- * This function calculate log likelihood probability.
- */
-double log_likelihoods_cal_line1d_model3(const void *model)
-{
-  double logL;
-  logL = prob_line1d_model3(model);
-  return logL;
 }

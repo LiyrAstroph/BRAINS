@@ -66,6 +66,9 @@ double Tline_min, Tline_max;
 double *Fline2d_at_data;
 double *Fline2d, *Flerrs2d;
 
+int num_params_radial_samp;
+int *params_radial_samp;
+
 // BLR
 int BLRmodel_size;
 int *par_fix, npar_fix;

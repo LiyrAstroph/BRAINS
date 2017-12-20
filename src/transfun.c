@@ -190,8 +190,18 @@ void transfun_1d_cloud_direct_model1(const void *pm, int flag_save)
     }
   }
 
-  if(which_parameter_update == 3 || force_update == 1 || which_parameter_update == -1 )
+  for(i=0; i<num_params_radial_samp;i++)
+  {
+    if(which_parameter_update == params_radial_samp[i])
+    {
+      flag_update = 1;
+      break;
+    }
+  }
+  if(force_update == 1 || which_parameter_update == -1 )
+  {
     flag_update = 1;
+  }
 
   /* reset transfer function */
   for(i=0; i<parset.n_tau; i++)
@@ -363,8 +373,18 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
     }
   }
 
-  if(which_parameter_update == 3 || force_update == 1 || which_parameter_update == -1 )
+  for(i=0; i<num_params_radial_samp;i++)
+  {
+    if(which_parameter_update == params_radial_samp[i])
+    {
+      flag_update = 1;
+      break;
+    }
+  }
+  if(force_update == 1 || which_parameter_update == -1 )
+  {
     flag_update = 1;
+  }
 
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
@@ -596,8 +616,18 @@ void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *tra
     }
   }
 
-  if(which_parameter_update == 3 || force_update == 1 || which_parameter_update == -1 )
+  for(i=0; i<num_params_radial_samp;i++)
+  {
+    if(which_parameter_update == params_radial_samp[i])
+    {
+      flag_update = 1;
+      break;
+    }
+  }
+  if(force_update == 1 || which_parameter_update == -1 )
+  {
     flag_update = 1;
+  }
 
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
@@ -797,8 +827,18 @@ void transfun_1d_cloud_direct_model3(const void *pm, int flag_save)
     }
   }
 
-  if(which_parameter_update == 2 || which_parameter_update==4 || force_update == 1 || which_parameter_update == -1 ) //
+  for(i=0; i<num_params_radial_samp;i++)
+  {
+    if(which_parameter_update == params_radial_samp[i])
+    {
+      flag_update = 1;
+      break;
+    }
+  }
+  if(force_update == 1 || which_parameter_update == -1 )
+  {
     flag_update = 1;
+  }
 
   /* reset transfer function */
   for(i=0; i<parset.n_tau; i++)
@@ -968,8 +1008,18 @@ void transfun_2d_cloud_direct_model3(const void *pm, double *transv, double *tra
     }
   }
 
-  if(which_parameter_update == 2 || which_parameter_update==4 || force_update == 1 || which_parameter_update == -1 ) //
-    flag_update = 1; 
+  for(i=0; i<num_params_radial_samp;i++)
+  {
+    if(which_parameter_update == params_radial_samp[i])
+    {
+      flag_update = 1;
+      break;
+    }
+  }
+  if(force_update == 1 || which_parameter_update == -1 )
+  {
+    flag_update = 1;
+  }
 
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
@@ -1186,8 +1236,18 @@ void transfun_2d_cloud_direct_model4(const void *pm, double *transv, double *tra
     }
   }
   
-  if(which_parameter_update == 2 || which_parameter_update==4 || force_update == 1 || which_parameter_update == -1 ) //
+  for(i=0; i<num_params_radial_samp;i++)
+  {
+    if(which_parameter_update == params_radial_samp[i])
+    {
+      flag_update = 1;
+      break;
+    }
+  }
+  if(force_update == 1 || which_parameter_update == -1 )
+  {
     flag_update = 1;
+  }
 
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
