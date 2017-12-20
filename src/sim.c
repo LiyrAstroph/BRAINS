@@ -38,6 +38,8 @@ void sim()
   char fname[200];
   int i, j;
 
+  printf("%f\n", line_scale);
+
   sim_init();
   
   double *pm = (double *)model;
@@ -47,7 +49,7 @@ void sim()
   pm[3] = 0.9;
   pm[4] = 0.2;
   pm[5] = 20.0;
-  pm[6] = 80.0;
+  pm[6] = 40.0;
   pm[7] = 0.0;
   pm[8] = log(3.0);
   pm[9] = 0.1;
@@ -68,10 +70,26 @@ void sim()
   
   for(i=0; i<parset.n_con_recon; i++)
   {
-    fprintf(fp, "%f %f\n", Tcon[i], Fcon[i] / con_scale);
+    fprintf(fp, "%f %f\n", Tcon[i], Fcon[i]/con_scale);
   }
   fclose(fp);
   
+  transfun_1d_cloud_direct(model, 0);
+  calculate_line_from_blrmodel(model, Tline, Fline, parset.n_line_recon);
+
+  sprintf(fname, "%s/%s", parset.file_dir, "/data/sim_hb.txt");
+  fp = fopen(fname, "w");
+  if(fp == NULL)
+  {
+    fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+    exit(-1);
+  }
+
+  for(i=0; i<parset.n_line_recon; i++)
+  {
+    fprintf(fp, "%f %f %f\n", Tline[i], Fline[i] + + gsl_ran_gaussian(gsl_r, 0.01), 0.01);
+  }
+
   transfun_2d_cloud_direct(model, TransV, Trans2D, parset.n_vel_recon, 0);
   calculate_line2d_from_blrmodel(model, Tline, TransV, 
           Trans2D, Fline2d, parset.n_line_recon, parset.n_vel_recon);
@@ -91,7 +109,7 @@ void sim()
     for(j=0; j<parset.n_vel_recon; j++)
     {
       fprintf(fp, "%f %f %f %f\n", TransV[j]*VelUnit, Tline[i],  
-        (Fline2d[i*parset.n_vel_recon + j] + gsl_ran_gaussian(gsl_r, 0.01)) / line_scale, 0.01/line_scale);
+        (Fline2d[i*parset.n_vel_recon + j] + gsl_ran_gaussian(gsl_r, 0.01)), 0.01);
     }
 
     fprintf(fp, "\n");
@@ -131,22 +149,27 @@ void sim_init()
   {
     case 1:
       num_params_blr = 12;
+      transfun_1d_cloud_direct = transfun_1d_cloud_direct_model1;
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model1;
       break;
     case 2:
       num_params_blr = 12;
+      transfun_1d_cloud_direct = transfun_1d_cloud_direct_model1;
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model2;
       break;
     case 3:
       num_params_blr = 12;
+      transfun_1d_cloud_direct = transfun_1d_cloud_direct_model3;
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model3;
       break;
     case 4:
       num_params_blr = 12;
+      transfun_1d_cloud_direct = transfun_1d_cloud_direct_model3;
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model4;
       break;
     default:
       num_params_blr = 12;
+      transfun_1d_cloud_direct = transfun_1d_cloud_direct_model1;
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model1;
       break;
   }
@@ -180,8 +203,10 @@ void sim_init()
 
   TransTau = malloc(parset.n_tau * sizeof(double));
   TransV = malloc(parset.n_vel_recon * sizeof(double));
+  Trans1D = malloc(parset.n_tau * sizeof(double));
   Trans2D = malloc(parset.n_tau * parset.n_vel_recon * sizeof(double));
   Tline = malloc(parset.n_line_recon * sizeof(double));
+  Fline = malloc(parset.n_line_recon * sizeof(double));
   Fline2d = malloc(parset.n_line_recon * parset.n_vel_recon * sizeof(double));
 
   Tline_min = Tcon_min + fmin(Tspan, parset.tau_max_set) + 20.0;
@@ -231,7 +256,10 @@ void sim_end()
   free(TransTau);
   free(TransV);
   free(Tline);
+  free(Fline);
   free(Fline2d);
+  free(Trans2D);
+  free(Trans1D);
   for(i=0; i<parset.num_particles; i++)
   {
     free(clouds_particles[i]);
