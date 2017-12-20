@@ -612,7 +612,7 @@ double prob_line1d_model1(const void *model)
 {
   double prob_line=0.0, var2, dy;
   int i, param;
-  double *pm = (double *)model;
+  double *pm = (double *)model, *ptemp;
   
   // if the previous perturb is accepted, store the previous perturb values, otherwise, no changes;
   if(perturb_accept[which_particle_update] == 1)
@@ -628,14 +628,26 @@ double prob_line1d_model1(const void *model)
        *
        * note that (response) Fline is also changed as long as Fcon is changed.
        */
-      memcpy(Fcon_particles[which_particle_update], Fcon_particles_perturb[which_particle_update], 
+      /*memcpy(Fcon_particles[which_particle_update], Fcon_particles_perturb[which_particle_update], 
         parset.n_con_recon*sizeof(double));
 
       memcpy(Fline_at_data_particles[which_particle_update], Fline_at_data_particles_perturb[which_particle_update], 
         n_line_data * sizeof(double));
 
       memcpy(con_q_particles[which_particle_update], con_q_particles_perturb[which_particle_update],
-        nq*sizeof(double));
+        nq*sizeof(double));*/
+
+      ptemp = Fcon_particles[which_particle_update];
+      Fcon_particles[which_particle_update] = Fcon_particles_perturb[which_particle_update];
+      Fcon_particles_perturb[which_particle_update] = ptemp;
+
+      ptemp = Fline_at_data_particles[which_particle_update];
+      Fline_at_data_particles[which_particle_update] = Fline_at_data_particles_perturb[which_particle_update];
+      Fline_at_data_particles_perturb[which_particle_update] = ptemp;
+
+      ptemp = con_q_particles[which_particle_update];
+      con_q_particles[which_particle_update] = con_q_particles_perturb[which_particle_update];
+      con_q_particles_perturb[which_particle_update] = ptemp;
     }
     else 
     {
@@ -646,16 +658,30 @@ double prob_line1d_model1(const void *model)
        */
       if( param < num_params_blr-1 )
       {
-        memcpy(Trans1D_particles[which_particle_update], Trans1D_particles_perturb[which_particle_update], 
+        /*memcpy(Trans1D_particles[which_particle_update], Trans1D_particles_perturb[which_particle_update], 
             parset.n_tau * sizeof(double));
 
         memcpy(Fline_at_data_particles[which_particle_update], Fline_at_data_particles_perturb[which_particle_update], 
-            n_line_data * sizeof(double));
+            n_line_data * sizeof(double));*/
+
+        ptemp = Trans1D_particles[which_particle_update];
+        Trans1D_particles[which_particle_update] = Trans1D_particles_perturb[which_particle_update];
+        Trans1D_particles_perturb[which_particle_update] = ptemp;
+
+        ptemp = Fline_at_data_particles[which_particle_update];
+        Fline_at_data_particles[which_particle_update] = Fline_at_data_particles_perturb[which_particle_update];
+        Fline_at_data_particles_perturb[which_particle_update] = ptemp;
 
         // when beta is updated, store cloud distribution
         if(param == 3)
-          memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
-            parset.n_cloud_per_task * sizeof(double));
+        {
+          /*memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
+            parset.n_cloud_per_task * sizeof(double));*/
+
+          ptemp = clouds_particles[which_particle_update];
+          clouds_particles[which_particle_update] = clouds_particles_perturb[which_particle_update];
+          clouds_particles_perturb[which_particle_update] = ptemp;
+        }
       }
     }      
     // line probability is always changed
@@ -750,7 +776,7 @@ double prob_line1d_model3(const void *model)
 {
   double prob_line=0.0, var2, dy;
   int i, param;
-  double *pm = (double *)model;
+  double *pm = (double *)model, *ptemp;
   
   // if the previous perturb is accepted, store the previous perturb values, otherwise, no changes;
   if(perturb_accept[which_particle_update] == 1)
@@ -766,14 +792,26 @@ double prob_line1d_model3(const void *model)
        *
        * note that (response) Fline is also changed as long as Fcon is changed.
        */
-      memcpy(Fcon_particles[which_particle_update], Fcon_particles_perturb[which_particle_update], 
+      /*memcpy(Fcon_particles[which_particle_update], Fcon_particles_perturb[which_particle_update], 
         parset.n_con_recon*sizeof(double));
 
       memcpy(Fline_at_data_particles[which_particle_update], Fline_at_data_particles_perturb[which_particle_update], 
         n_line_data * sizeof(double));
 
       memcpy(con_q_particles[which_particle_update], con_q_particles_perturb[which_particle_update],
-        nq*sizeof(double));
+        nq*sizeof(double));*/
+
+      ptemp = Fcon_particles[which_particle_update];
+      Fcon_particles[which_particle_update] = Fcon_particles_perturb[which_particle_update];
+      Fcon_particles_perturb[which_particle_update] = ptemp;
+
+      ptemp = Fline_at_data_particles[which_particle_update];
+      Fline_at_data_particles[which_particle_update] = Fline_at_data_particles_perturb[which_particle_update];
+      Fline_at_data_particles_perturb[which_particle_update] = ptemp;
+
+      ptemp = con_q_particles[which_particle_update];
+      con_q_particles[which_particle_update] = con_q_particles_perturb[which_particle_update];
+      con_q_particles_perturb[which_particle_update] = ptemp;
     }
     else 
     {
@@ -784,16 +822,30 @@ double prob_line1d_model3(const void *model)
        */
       if( param < num_params_blr-1 )
       {
-        memcpy(Trans1D_particles[which_particle_update], Trans1D_particles_perturb[which_particle_update], 
+        /*memcpy(Trans1D_particles[which_particle_update], Trans1D_particles_perturb[which_particle_update], 
             parset.n_tau * sizeof(double));
 
         memcpy(Fline_at_data_particles[which_particle_update], Fline_at_data_particles_perturb[which_particle_update], 
-            n_line_data * sizeof(double));
+            n_line_data * sizeof(double));*/
+
+        ptemp = Trans1D_particles[which_particle_update];
+        Trans1D_particles[which_particle_update] = Trans1D_particles_perturb[which_particle_update];
+        Trans1D_particles_perturb[which_particle_update] = ptemp;
+
+        ptemp = Fline_at_data_particles[which_particle_update];
+        Fline_at_data_particles[which_particle_update] = Fline_at_data_particles_perturb[which_particle_update];
+        Fline_at_data_particles_perturb[which_particle_update] = ptemp;
 
         // when beta is updated, store cloud distribution
         if(param == 2 || param == 4)
-          memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
-            parset.n_cloud_per_task * sizeof(double));
+        {
+          /*memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
+            parset.n_cloud_per_task * sizeof(double));*/
+
+          ptemp = clouds_particles[which_particle_update];
+          clouds_particles[which_particle_update] = clouds_particles_perturb[which_particle_update];
+          clouds_particles_perturb[which_particle_update] = ptemp;
+        }
       }
     }      
 
