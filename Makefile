@@ -8,7 +8,7 @@
 SHELL=/bin/bash
 
 CC       = mpicc
-OPTIMIZE = -O2 -Wall
+OPTIMIZE = -O2 -Wall -finline-functions
 #OPTIMIZE += -DDebug
 
 #------------target system---------
