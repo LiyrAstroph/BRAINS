@@ -162,7 +162,7 @@ void transfun_1d_cloud_direct_model1(const void *pm, int flag_save)
   int i, idt, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb;
-  double inc, F, beta, mu, k, gam, a, s;
+  double inc, F, beta, mu, k, gam, a, s, rin, sig;
   double Lphi, Lthe;
   double Anorm, weight, rnd;
   BLRmodel1 *model = (BLRmodel1 *)pm;
@@ -177,6 +177,8 @@ void transfun_1d_cloud_direct_model1(const void *pm, int flag_save)
 
   a = 1.0/beta/beta;
   s = mu/a;
+  rin=mu*F;
+  sig=(1.0-F)*s;
   
   if(flag_save && thistask == roottask)
   {
@@ -230,7 +232,7 @@ void transfun_1d_cloud_direct_model1(const void *pm, int flag_save)
         }
         rnd = gsl_ran_gamma(gsl_r, a, 1.0);
 //      r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
-        r = mu * F + (1.0-F) * s * rnd;
+        r = rin + sig * rnd;
         nc++;
       }
       clouds_particles_perturb[which_particle_update][i] = rnd;
@@ -238,7 +240,7 @@ void transfun_1d_cloud_direct_model1(const void *pm, int flag_save)
     else
     {
       rnd = clouds_particles[which_particle_update][i];
-      r = mu * F + (1.0-F) * s * rnd;
+      r = rin + sig * rnd;
     }
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
@@ -328,7 +330,7 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
   int i, j, idV, idt, nc, flag_update=0;
   double r, phi, dis, Lopn_cos, u;
   double x, y, z, xb, yb, zb, vx, vy, vz, vxb, vyb, vzb;
-  double inc, F, beta, mu, k, gam, a, s;
+  double inc, F, beta, mu, k, gam, a, s, rin, sig;
   double Lphi, Lthe, L, E, vcloud_max, vcloud_min;
   double dV, V, Anorm, weight, rnd;
   BLRmodel1 *model = (BLRmodel1 *)pm;
@@ -346,6 +348,8 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
 
   a = 1.0/beta/beta;
   s = mu/a;
+  rin = mu*F;
+  sig = (1.0-F)*s;
 
   mbh = exp(model->mbh);
   lambda = model->lambda;
@@ -406,7 +410,7 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
         }
         rnd = gsl_ran_gamma(gsl_r, a, 1.0);
 //      r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
-        r = mu * F + (1.0-F) * s * rnd;
+        r = rin + sig * rnd;
         nc++;
       }
       clouds_particles_perturb[which_particle_update][i] = rnd;
@@ -414,7 +418,7 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
     else
     {
       rnd = clouds_particles[which_particle_update][i];
-      r = mu * F + (1.0-F) * s * rnd;
+      r = rin + sig * rnd;
     }
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
@@ -571,7 +575,7 @@ void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *tra
   int i, j, idV, idt, nc, flag_update=0;
   double r, phi, dis, Lopn_cos, u;
   double x, y, z, xb, yb, zb, vx, vy, vz, vxb, vyb, vzb;
-  double inc, F, beta, mu, k, gam, a, s;
+  double inc, F, beta, mu, k, gam, a, s, rin, sig;
   double Lphi, Lthe, L, E, vcloud_max, vcloud_min;
   double dV, V, Anorm, weight, rnd;
   BLRmodel2 *model = (BLRmodel2 *)pm;
@@ -589,6 +593,8 @@ void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *tra
 
   a = 1.0/beta/beta;
   s = mu/a;
+  rin=mu*F;
+  sig=(1.0-F)*s;
 
   mbh = exp(model->mbh);
   sigr = model->sigr;
@@ -648,7 +654,7 @@ void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *tra
         }
         rnd = gsl_ran_gamma(gsl_r, a, 1.0);
 //      r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
-        r = mu * F + (1.0-F) * s * rnd;
+        r = rin + sig * rnd;
         nc++;
       }
       clouds_particles_perturb[which_particle_update][i] = rnd;
@@ -656,7 +662,7 @@ void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *tra
     else
     {
       rnd = clouds_particles[which_particle_update][i];
-      r = mu * F + (1.0-F) * s * rnd;
+      r = rin + sig * rnd;
     }
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
