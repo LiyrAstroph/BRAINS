@@ -478,8 +478,7 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
       {
         Vr = 0.0;
       }
-      u = gsl_rng_uniform(gsl_r);
-      Vph = L/r * (u<0.5?-1.0:1.0);
+      Vph = L/r; //RM cannot distiguish the orientation of the rotation.
 
       vx = Vr * cos(phi) - Vph * sin(phi);
       vy = Vr * sin(phi) + Vph * cos(phi);
@@ -707,8 +706,7 @@ void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *tra
       rhotheta = gsl_ran_gaussian(gsl_r, 1.0) * sigtheta + 0.5*PI;
 
       Vr = rhor * cos(rhotheta) * Vcirc;
-      u = gsl_rng_uniform(gsl_r);
-      Vph = rhor * sin(rhotheta) * Vcirc * (u<0.5?-1.0:1.0);
+      Vph = rhor * sin(rhotheta) * Vcirc; //RM cannot distiguish the orientation of the rotation.
 
       vx = Vr * cos(phi) - Vph * sin(phi);
       vy = Vr * sin(phi) + Vph * cos(phi);
@@ -1104,9 +1102,7 @@ void transfun_2d_cloud_direct_model3(const void *pm, double *transv, double *tra
       Vr = xi * sqrt(2.0*mbh/r);
       u = gsl_rng_uniform(gsl_r);
       Vr = Vr * (u<q?-1.0:1.0);
-      
-      u = gsl_rng_uniform(gsl_r);
-      Vph = L/r * (u<0.5?-1.0:1.0);
+      Vph = L/r; //RM cannot distiguish the orientation of the rotation.
 
       vx = Vr * cos(phi) - Vph * sin(phi);
       vy = Vr * sin(phi) + Vph * cos(phi);
@@ -1333,9 +1329,7 @@ void transfun_2d_cloud_direct_model4(const void *pm, double *transv, double *tra
       Vr = xi * sqrt(2.0*mbh/r);
       u = gsl_rng_uniform(gsl_r);
       Vr = Vr * (u<q?-1.0:1.0);
-      
-      u = gsl_rng_uniform(gsl_r);
-      Vph = sqrt(1.0-2.0*xi*xi) * L/r * (u<0.5?-1.0:1.0);
+      Vph = sqrt(1.0-2.0*xi*xi) * L/r; //RM cannot distiguish the orientation of the rotation.
 
       vx = Vr * cos(phi) - Vph * sin(phi);
       vy = Vr * sin(phi) + Vph * cos(phi);
