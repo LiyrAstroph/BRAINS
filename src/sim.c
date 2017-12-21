@@ -39,7 +39,8 @@ void sim()
   sim_init();
   
   double *pm = (double *)model;
-  pm[0] = log(1.0);
+  //model1
+  /*pm[0] = log(1.0);
   pm[1] = 0.0;
   pm[2] = log(4.0);
   pm[3] = 0.9;
@@ -49,7 +50,30 @@ void sim()
   pm[7] = 0.0;
   pm[8] = log(3.0);
   pm[9] = 0.1;
-  pm[10] = 0.5;
+  pm[10] = 0.5;*/
+
+  //model5
+  pm[0] = log(1.0);
+  pm[1] = 0.0;
+  pm[2] = log(4.0);
+  pm[3] = 0.5;
+  pm[4] = 2.0;
+  pm[5] = 1.5;
+  pm[6] = 20.0;
+  pm[7] = 40.0;
+  pm[8] = 0.0;
+  pm[9] = 1.0;
+  pm[10] = 1.0;
+  pm[11] = log(2.0);
+  pm[12] = 0.5;
+  pm[13] = 0.5;
+  pm[14] = 0.01;
+  pm[15] = 0.1;
+  pm[16] = 0.01;
+  pm[17] = 0.1;
+  pm[18] = 0.0;
+  pm[19] = log(1.0e-10);
+
 
   smooth_init(parset.n_vel_recon, TransV);
   
@@ -162,6 +186,11 @@ void sim_init()
       num_params_blr = 12;
       transfun_1d_cloud_direct = transfun_1d_cloud_direct_model3;
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model4;
+      break;
+    case 5:
+      num_params_blr = 20;
+      transfun_1d_cloud_direct = transfun_1d_cloud_direct_model5;
+      transfun_2d_cloud_direct = transfun_2d_cloud_direct_model5;
       break;
     default:
       num_params_blr = 12;

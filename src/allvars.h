@@ -155,51 +155,78 @@ extern int *params_radial_samp;
  */
 typedef struct
 {
-  double A;        /*!< \brief response coefficient */
-  double Ag;       /*!< \brief nonlinear response */
-	double mu;       /*!< \brief mean BLR radius, in light day */
-	double beta;     /*!< \brief shape parameter */ 
-	double F;        /*!< \brief inner edge */
-	double inc;      /*!< \brief inclination, in degree, 0-90 */
-	double opn;	     /*!< \brief openning angle, in degere, 0-90 */
-	double k;        /*!< \brief anisotropic emission */
-	double mbh;      /*!< \brief black hole mass,  in 10e6 solar mass */
-	double lambda;   /*!< \brief orbit parameter */
-	double q;        /*!< \brief inflow/outflow */
-	double logse;    /*!< \brief systematic errors in continuum and emission line */
+  double A;        /*!< \brief 1.  response coefficient */
+  double Ag;       /*!< \brief 2.  nonlinear response */
+	double mu;       /*!< \brief 3.  mean BLR radius, in light day */
+	double beta;     /*!< \brief 4.  shape parameter */ 
+	double F;        /*!< \brief 5.  inner edge */
+	double inc;      /*!< \brief 6.  inclination, in degree, 0-90 */
+	double opn;	     /*!< \brief 7.  openning angle, in degere, 0-90 */
+	double k;        /*!< \brief 8.  anisotropic emission */
+	double mbh;      /*!< \brief 9.  black hole mass,  in 10e6 solar mass */
+	double lambda;   /*!< \brief 10. orbit parameter */
+	double q;        /*!< \brief 11. inflow/outflow */
+	double logse;    /*!< \brief 12. systematic errors in continuum and emission line */
 }BLRmodel1;
 
 typedef struct
 {
-  double A;        /*!< \brief response coefficient */
-  double Ag;       /*!< \brief nonlinear response */
-  double mu;       /*!< \brief mean BLR radius, in light day */
-  double beta;     /*!< \brief shape parameter */ 
-  double F;        /*!< \brief inner edge */
-  double inc;      /*!< \brief inclination, in degree, 0-90 */
-  double opn;      /*!< \brief openning angle, in degere, 0-90 */
-  double k;        /*!< \brief anisotropic emission */
-  double mbh;      /*!< \brief black hole mass,  in 10e6 solar mass */
-  double sigr;     /*!< \brief orbit parameter */
-  double sigtheta; /*!< \brief inflow/outflow */
-  double logse;    /*!< \brief systematic errors in continuum and emission line */
+  double A;        /*!< \brief 1.  response coefficient */
+  double Ag;       /*!< \brief 2.  nonlinear response */
+  double mu;       /*!< \brief 3.  mean BLR radius, in light day */
+  double beta;     /*!< \brief 4.  shape parameter */ 
+  double F;        /*!< \brief 5.  inner edge */
+  double inc;      /*!< \brief 6.  inclination, in degree, 0-90 */
+  double opn;      /*!< \brief 7.  openning angle, in degere, 0-90 */
+  double k;        /*!< \brief 8.  anisotropic emission */
+  double mbh;      /*!< \brief 9.  black hole mass,  in 10e6 solar mass */
+  double sigr;     /*!< \brief 10. orbit parameter */
+  double sigtheta; /*!< \brief 11. inflow/outflow */
+  double logse;    /*!< \brief 12. systematic errors in continuum and emission line */
 }BLRmodel2;
 
 typedef struct
 {
-  double A;        /*!< \brief response coefficient */
-  double Ag;       /*!< \brief nonlinear response */
-  double alpha;     /*!< \brief shape parameter */ 
-  double Rin;       /*!< \brief mean BLR radius, in light day */
-  double F;        /*!< \brief inner edge */
-  double inc;      /*!< \brief inclination, in degree, 0-90 */
-  double opn;      /*!< \brief openning angle, in degere, 0-90 */
-  double k;        /*!< \brief anisotropic emission */
-  double mbh;      /*!< \brief black hole mass,  in 10e6 solar mass */
-  double xi;       /*!< \brief orbit parameter */
-  double q;        /*!< \brief inflow/outflow */
-  double logse;    /*!< \brief systematic errors in continuum and emission line */
+  double A;        /*!< \brief 1.  response coefficient */
+  double Ag;       /*!< \brief 2.  nonlinear response */
+  double alpha;    /*!< \brief 3.  shape parameter */ 
+  double Rin;      /*!< \brief 4.  mean BLR radius, in light day */
+  double F;        /*!< \brief 5.  inner edge */
+  double inc;      /*!< \brief 6.  inclination, in degree, 0-90 */
+  double opn;      /*!< \brief 7.  openning angle, in degere, 0-90 */
+  double k;        /*!< \brief 8.  anisotropic emission */
+  double mbh;      /*!< \brief 9.  black hole mass,  in 10e6 solar mass */
+  double xi;       /*!< \brief 10. orbit parameter */
+  double q;        /*!< \brief 11. inflow/outflow */
+  double logse;    /*!< \brief 12. systematic errors in continuum and emission line */
 }BLRmodel3;
+
+
+typedef BLRmodel3 BLRmodel4;
+
+typedef struct 
+{
+  double A;             /*!< \brief 1. line response*/    
+  double Ag;            /*!< \brief 2. no-linearity */
+  double mu;            /*!< \brief 3. peak radius*/
+  double Fin;           /*!< \brief 4. fraction of inner radius*/
+  double Fout;          /*!< \brief 5. fraction of outer radius*/
+  double alpha;         /*!< \brief 6. slope*/
+  double inc;           /*!< \brief 7. inclination */
+  double opn;           /*!< \brief 8. opening angle */
+  double k;             /*!< \brief 9. kappa */
+  double beta;          /*!< \brief 10.beta */
+  double xi;            /*!< \brief 11.obscuration */
+  double mbh;           /*!< \brief 12.black hole mass */
+  double fellip;        /*!< \brief 13.ellipitic orbits */
+  double fflow;         /*!< \brief 14.inflow/outflow */
+  double sigr_circ;     /*!< \brief 15. */
+  double sigthe_circ;   /*!< \brief 16. */
+  double sigr_rad;      /*!< \brief 17. */
+  double sigthe_rad;    /*!< \brief 18. */
+  double theta_rot;     /*!< \brief 19. */
+  double logse;         /*!< \brief 20. */
+}BLRmodel5;
 
 extern int BLRmodel_size;
 extern int *par_fix, npar_fix;

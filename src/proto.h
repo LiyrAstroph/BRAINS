@@ -35,6 +35,7 @@ void set_blr_range_model1();
 void set_blr_range_model2();
 void set_blr_range_model3();
 void set_blr_range_model4();
+void set_blr_range_model5();
 
 /* continuum reconstruction */
 int dnest_con(int argc, char **argv);
@@ -65,6 +66,7 @@ void (*transfun_1d_cloud_direct)(const void *pm, int flag_save);
 
 void transfun_1d_cloud_direct_model1(const void *pm, int flag_save);
 void transfun_1d_cloud_direct_model3(const void *pm, int flag_save);
+void transfun_1d_cloud_direct_model5(const void *pm, int flag_save);
 
 void postprocess1d();
 void set_par_range_model1d();
@@ -90,6 +92,7 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
 void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save);
 void transfun_2d_cloud_direct_model3(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save);
 void transfun_2d_cloud_direct_model4(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save);
+void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save);
 
 void smooth_init(int nv, const double *transv);
 void smooth_end();

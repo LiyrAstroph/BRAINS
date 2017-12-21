@@ -79,6 +79,18 @@ int dnest_line2d(int argc, char **argv)
       params_radial_samp[1] = 4;
       
       break;
+    case 5:
+      num_params_blr = 20;
+      transfun_2d_cloud_direct = transfun_2d_cloud_direct_model5;
+      perturb = perturb_line2d_model5;
+
+      num_params_radial_samp=3;
+      params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
+      params_radial_samp[0] = 3;
+      params_radial_samp[1] = 4;
+      params_radial_samp[2] = 5;
+      break;
+
     default:
       num_params_blr = 12;
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model1;
@@ -193,6 +205,12 @@ void from_prior_line2d(void *model)
   {
     if( pm[3] + pm[4] > log(rcloud_max_set))
       wrap(&pm[4], par_range_model[4][0], log(rcloud_max_set) - pm[3]);
+  }
+
+  if(parset.flag_blrmodel == 5)
+  {
+    if( pm[2] + log(pm[4]) > log(rcloud_max_set) )
+      wrap( &pm[4], par_range_model[4][0], rcloud_max_set/exp(pm[2]) );
   }
 
   i=num_params_blr-1;
@@ -472,5 +490,94 @@ double perturb_line2d_model3(void *model)
     logH += (-0.5*pow(pm[which], 2.0) );
   }
 
+  return logH;
+}
+
+/*=======================================================================
+ * model 5
+ *=======================================================================
+ */
+/*!
+ * this function perturbs the parameters.
+ */
+double perturb_line2d_model5(void *model)
+{
+  double *pm = (double *)model;
+  double logH = 0.0, limit1, limit2, width, rnd;
+  int which;
+
+  /*
+   * sample BLR and variability parameters more frequently; 
+   * fixed parameter needs not to update.
+   */
+  do
+  {
+    rnd = dnest_rand();
+    if(rnd < 0.5)
+      which = dnest_rand_int(num_params_blr + num_params_var);
+    else
+      which = dnest_rand_int(parset.n_con_recon) + num_params_blr + num_params_var;
+
+  }while(par_fix[which]==1);
+
+  if(which >= num_params || which < 0)
+  {
+    printf("# Error: Incorrect which.\n");
+    exit(0);
+  }
+  
+  which_parameter_update = which;
+
+  /* level-dependent width */
+  which_level_update = which_level_update > (size_levels - 30)?(size_levels -30):which_level_update;
+  which_level_update = which_level_update <0?0:which_level_update;
+
+  if( which_level_update != 0)
+  {
+    limit1 = limits[(which_level_update-1) * num_params *2 + which *2];
+    limit2 = limits[(which_level_update-1) * num_params *2 + which *2 + 1];
+    width = limit2 - limit1;
+  }
+  else
+  {
+    width = ( par_range_model[which][1] - par_range_model[which][0] );
+  }
+
+  if(which < num_params_blr)
+  {
+    // set an upper limit to the MCMC steps of systematic errors
+    if(which == num_params_blr-1)
+       width = fmin(width, (par_range_model[which][1] - par_range_model[which][0])*0.01 );
+
+    pm[which] += dnest_randh() * width;
+    wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
+
+    if(pm[2] + log(pm[4]) > log(rcloud_max_set))
+    {
+      if(which == 2)
+        wrap(&pm[which], par_range_model[which][0], log(rcloud_max_set/pm[4]));
+      if(which == 4)
+        wrap(&pm[which], par_range_model[which][0], rcloud_max_set/exp(pm[2]));
+    }
+  }
+  else if(which < num_params_blr + 4 + parset.flag_trend)
+  {
+    logH -= (-0.5*pow((pm[which]-var_param[which - num_params_blr])/var_param_std[which - num_params_blr], 2.0) );
+    pm[which] += dnest_randh() * width;
+    wrap(&pm[which], par_range_model[which][0], par_range_model[which][1]);
+    logH += (-0.5*pow((pm[which]-var_param[which - num_params_blr])/var_param_std[which - num_params_blr], 2.0) );
+  }
+  else if(which < num_params_blr + num_params_var)
+  {
+    pm[which] += dnest_randh() * width;
+    wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
+  }
+  else
+  {
+    logH -= (-0.5*pow(pm[which], 2.0) );
+    pm[which] += dnest_randh() * width;
+    wrap(&pm[which], par_range_model[which][0], par_range_model[which][1]);
+    logH += (-0.5*pow(pm[which], 2.0) );
+  }
   return logH;
 }

@@ -32,6 +32,7 @@ int get_num_params_line1d();
 
 double perturb_line1d_model1(void *model);
 double perturb_line1d_model3(void *model);
+double perturb_line1d_model5(void *model);
 
 void (*print_particle)(FILE *fp, const void *model);
 void (*from_prior)(void *model);
