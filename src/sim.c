@@ -110,6 +110,21 @@ void sim()
     fprintf(fp, "%f %f %f\n", Tline[i], Fline[i] + + gsl_ran_gaussian(gsl_r, 0.01), 0.01);
   }
 
+  // output transfer function.
+  sprintf(fname, "%s/%s", parset.file_dir, parset.tran_out_file);
+  fp = fopen(fname, "w");
+  if(fp == NULL)
+  {
+    fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+    exit(-1);
+  }
+
+  for(i=0; i<parset.n_tau; i++)
+  {
+    fprintf(fp, "%f %f\n", TransTau[i], Trans1D[i]);
+  }
+  fclose(fp);
+
   transfun_2d_cloud_direct(model, TransV, Trans2D, parset.n_vel_recon, 0);
   calculate_line2d_from_blrmodel(model, Tline, TransV, 
           Trans2D, Fline2d, parset.n_line_recon, parset.n_vel_recon);
