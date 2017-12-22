@@ -748,11 +748,12 @@ double prob_line2d(const void *model)
     // continuum parameter is updated
     if(param >= num_params_blr)
     {
-      /* the num_params_blr-th parameter is systematic error of continuum, which 
-       * only appear at the stage of calculating likelihood probability.
-       * when this paramete is updated, Fcon is unchanged.  
-       * note that (response) Fline is also changed as long as Fcon is changed.
+      /* 
+       *note that (response) Fline is also changed as long as Fcon is changed.
+       *num_params_blr-the parameter is the systematic error of continuum.
+       *the change of this parameter also changes continuum reconstruction.
        */
+
       /*memcpy(Fcon_particles[which_particle_update], Fcon_particles_perturb[which_particle_update], 
         parset.n_con_recon*sizeof(double));
 
@@ -825,10 +826,6 @@ double prob_line2d(const void *model)
   // only update continuum reconstruction when the corresponding parameters are updated
   if(which_parameter_update >= num_params_blr)
   {
-    /* the num_params_blr-th parameter is systematic error of continuum, which 
-     * only appears at the stage of calculating likelihood probability.
-     * when this paramete is updated, no need to re-calculate the contionuum.  
-     */
     con_q = con_q_particles_perturb[which_particle_update];
     Fcon = Fcon_particles_perturb[which_particle_update];
     calculate_con_from_model(model + num_params_blr*sizeof(double));
@@ -853,7 +850,7 @@ double prob_line2d(const void *model)
     Trans2D_at_veldata = Trans2D_at_veldata_particles[which_particle_update];
   }
 
-  /* no need to calculate line when only systematic error parameters are updated.
+  /* no need to calculate line when only systematic error parameter of line are updated.
    * otherwise, always need to calculate line.
    */
   if( which_parameter_update != num_params_blr-1 || force_update == 1 )
