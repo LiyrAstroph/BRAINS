@@ -1437,7 +1437,7 @@ void transfun_1d_cloud_direct_model5(const void *pm, int flag_save)
   inc = model->inc * PI/180.0;         /* inclination angle in rad */
   alpha = model->alpha;         
   Fin = model->Fin;
-  Fout = model->Fout;                 
+  Fout = exp(model->Fout);                 
   mu = exp(model->mu);            /* mean radius */
   k = model->k;  
   beta = model->beta;
@@ -1619,7 +1619,7 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
   inc = model->inc * PI/180.0;         /* inclination angle in rad */
   alpha = model->alpha;         
   Fin = model->Fin;
-  Fout = model->Fout;                 
+  Fout = exp(model->Fout);                 
   mu = exp(model->mu);            /* mean radius */
   k = model->k;  
   beta = model->beta;

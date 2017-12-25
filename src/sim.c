@@ -57,7 +57,7 @@ void sim()
   pm[1] = 0.0;
   pm[2] = log(4.0);
   pm[3] = 0.5;
-  pm[4] = 2.0;
+  pm[4] = log(2.0);
   pm[5] = 1.5;
   pm[6] = 20.0;
   pm[7] = 40.0;
@@ -77,7 +77,7 @@ void sim()
 
   smooth_init(parset.n_vel_recon, TransV);
   
-  reconstruct_con_from_varmodel(0.26, 74.0, 1.0, 0.0);
+  reconstruct_con_from_varmodel(0.03, 66.0, 1.0, 0.0);
   gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
   
   sprintf(fname, "%s/%s", parset.file_dir, "/data/sim_con_full.txt");

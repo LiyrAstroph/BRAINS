@@ -209,8 +209,8 @@ void from_prior_line2d(void *model)
 
   if(parset.flag_blrmodel == 5)
   {
-    if( pm[2] + log(pm[4]) > log(rcloud_max_set) )
-      wrap( &pm[4], par_range_model[4][0], rcloud_max_set/exp(pm[2]) );
+    if( pm[2] + pm[4] > log(rcloud_max_set) )
+      wrap( &pm[4], par_range_model[4][0], log(rcloud_max_set)-pm[2] );
   }
 
   i=num_params_blr-1;
@@ -552,12 +552,12 @@ double perturb_line2d_model5(void *model)
     pm[which] += dnest_randh() * width;
     wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
 
-    if(pm[2] + log(pm[4]) > log(rcloud_max_set))
+    if((which == 2 || which == 4) && (pm[2] + pm[4] > log(rcloud_max_set)))
     {
       if(which == 2)
-        wrap(&pm[which], par_range_model[which][0], log(rcloud_max_set/pm[4]));
+        wrap(&pm[which], par_range_model[which][0], log(rcloud_max_set) - pm[4]);
       if(which == 4)
-        wrap(&pm[which], par_range_model[which][0], rcloud_max_set/exp(pm[2]));
+        wrap(&pm[which], par_range_model[which][0], log(rcloud_max_set) - pm[2]);
     }
   }
   else if(which < num_params_blr + 4 + parset.flag_trend)
