@@ -26,8 +26,6 @@ double log_likelihoods_cal_line1d(const void *model);
 double log_likelihoods_cal_initial_line1d(const void *model);
 double log_likelihoods_cal_restart_line1d(const void *model);
 //double perturb_line1d(void *model);
-void copy_model_line1d(void *dest, const void *src);
-void* create_model_line1d();
 int get_num_params_line1d();
 
 double perturb_line1d_model1(void *model);
@@ -40,8 +38,6 @@ double (*log_likelihoods_cal)(const void *model);
 double (*log_likelihoods_cal_initial)(const void *model);
 double (*log_likelihoods_cal_restart)(const void *model);
 double (*perturb)(void *model);
-void (*copy_model)(void *dest, const void *src);
-void* (*create_model)();
 int (*get_num_params)();
 void (*restart_clouds)(int iflag);
 #endif

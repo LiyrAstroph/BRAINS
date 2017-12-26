@@ -50,8 +50,6 @@ int dnest_con(int argc, char **argv)
   log_likelihoods_cal_restart = log_likelihoods_cal_restart_con;
   perturb = perturb_con;
   print_particle = print_particle_con;
-  copy_model = copy_model_con;
-  create_model = create_model_con;
   get_num_params = get_num_params_con;
   restart_clouds = restart_clouds_con;
   
@@ -256,22 +254,6 @@ void print_particle_con(FILE *fp, const void *model)
     fprintf(fp, "%f ", pm[i] );
   }
   fprintf(fp, "\n");
-}
-
-/*!
- * This function copy the model from src to dest.
- */
-void copy_model_con(void *dest, const void *src)
-{
-  memcpy(dest, src, size_of_modeltype);
-}
-
-/*!
- * This function create a model.
- */
-void *create_model_con()
-{
-  return (void *)malloc( size_of_modeltype );
 }
 
 /*!

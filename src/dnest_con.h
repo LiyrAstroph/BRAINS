@@ -24,8 +24,6 @@ double log_likelihoods_cal_con(const void *model);
 double log_likelihoods_cal_initial_con(const void *model);
 double log_likelihoods_cal_restart_con(const void *model);
 double perturb_con(void *model);
-void copy_model_con(void *dest, const void *src);
-void* create_model_con();
 int get_num_params_con();
 void restart_clouds_con(int iflag);
 
@@ -35,8 +33,6 @@ double (*log_likelihoods_cal)(const void *model);
 double (*log_likelihoods_cal_initial)(const void *model);
 double (*log_likelihoods_cal_restart)(const void *model);
 double (*perturb)(void *model);
-void (*copy_model)(void *dest, const void *src);
-void* (*create_model)();
 int (*get_num_params)();
 void (*restart_clouds)(int iflag);
 #endif

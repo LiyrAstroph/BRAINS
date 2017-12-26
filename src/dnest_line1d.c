@@ -118,8 +118,6 @@ int dnest_line1d(int argc, char **argv)
   log_likelihoods_cal_restart = log_likelihoods_cal_restart_line1d;
   log_likelihoods_cal = log_likelihoods_cal_line1d;
   print_particle = print_particle_line1d;
-  copy_model = copy_model_line1d;
-  create_model = create_model_line1d;
   get_num_params = get_num_params_line1d;
   restart_clouds = restart_clouds_1d;
   
@@ -296,22 +294,6 @@ void print_particle_line1d(FILE *fp, const void *model)
   }
   fprintf(fp, "\n");
   return;
-}
-
-/*!
- * This function copy the model from src to dest.
- */
-void copy_model_line1d(void *dest, const void *src)
-{
-  memcpy(dest, src, size_of_modeltype);
-}
-
-/*!
- * This function create a model.
- */
-void *create_model_line1d()
-{
-  return (void *)malloc( size_of_modeltype );
 }
 
 /*!

@@ -188,9 +188,13 @@ BRAINS needs the following non-standard libraries for compilation:
   Note that to LAPACKE is contained in LAPACK source. One needs to switch on
   LAPACKE when compiling LAPACK.
 
+- \b FFTW - a fast Fourier transform library (version 3.0 or higher).\n
+  This open-source package can be download at http://www.fftw.org/.\n
+  
+
 Note that in Linux system, there are package managers that can install the above 
 libraries convienently. If so, use them. In this case, the libraries usually are 
-installed in standard environment path. Otherwise, any of the above libraries is 
+installed in standard environment path. Otherwise, if any of the above libraries is 
 not installed in standard locations on your system, the \ref BRAINS-Makefile 
 "Makefile" provided with the code may need slight adjustments.
 

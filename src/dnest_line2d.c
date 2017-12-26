@@ -117,8 +117,6 @@ int dnest_line2d(int argc, char **argv)
   log_likelihoods_cal_restart = log_likelihoods_cal_restart_line2d;
   log_likelihoods_cal = log_likelihoods_cal_line2d;
   print_particle = print_particle_line2d;
-  copy_model = copy_model_line2d;
-  create_model = create_model_line2d;
   get_num_params = get_num_params_line2d;
   restart_clouds = restart_clouds_2d;
   
@@ -293,23 +291,6 @@ void print_particle_line2d(FILE *fp, const void *model)
   }
   fprintf(fp, "\n");
   return;
-}
-
-/*!
- * this function copy model from src to dest.
- */
-void copy_model_line2d(void *dest, const void *src)
-{
-  memcpy(dest, src, size_of_modeltype);
-  return;
-}
-
-/*!
- * this function allocates a model memoery. 
- */
-void *create_model_line2d()
-{
-  return (void *)malloc(size_of_modeltype);
 }
 
 /*!
