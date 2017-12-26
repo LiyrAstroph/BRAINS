@@ -190,11 +190,11 @@ double perturb_con(void *model)
       which = dnest_rand_int(parset.n_con_recon) + num_params_var;
   }while(par_fix[which] == 1);
 
-  if(which >= num_params || which < 0)
+  /*if(which >= num_params || which < 0)
   {
     printf("# Error: Incorrect which.\n");
     exit(0);
-  }
+  }*/
   
   which_parameter_update = which;
   

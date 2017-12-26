@@ -349,11 +349,11 @@ double perturb_line1d_model1(void *model)
 
   }while(par_fix[which]==1);
 
-  if(which >= num_params || which < 0)
+  /*if(which >= num_params || which < 0)
   {
     printf("# Error: Incorrect which.\n");
     exit(0);
-  }
+  }*/
   
   which_parameter_update = which;
 
@@ -430,11 +430,11 @@ double perturb_line1d_model3(void *model)
 
   }while(par_fix[which]==1);
 
-  if(which >= num_params || which < 0)
+  /*if(which >= num_params || which < 0)
   {
     printf("# Error: Incorrect which.\n");
     exit(0);
-  }
+  }*/
   
   which_parameter_update = which;
 
@@ -519,11 +519,11 @@ double perturb_line1d_model5(void *model)
 
   }while(par_fix[which]==1);
 
-  if(which >= num_params || which < 0)
+  /*if(which >= num_params || which < 0)
   {
     printf("# Error: Incorrect which.\n");
     exit(0);
-  }
+  }*/
   
   which_parameter_update = which;
 
