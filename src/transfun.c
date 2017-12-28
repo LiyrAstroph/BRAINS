@@ -1769,13 +1769,13 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
       {
         if(rnd_flow < fflow)
         {
-          rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_circ  + 1.0) * Vkep;
-          theV =  gsl_ran_ugaussian(gsl_r) * sigthe_circ + theta_rot;
+          rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_rad  + 1.0) * Vkep;
+          theV =  gsl_ran_ugaussian(gsl_r) * sigthe_rad + theta_rot;
         }
         else
         {
-          rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_circ  + 1.0) * Vkep;
-          theV =  gsl_ran_ugaussian(gsl_r) * sigthe_circ + PI + theta_rot;
+          rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_rad  + 1.0) * Vkep;
+          theV =  gsl_ran_ugaussian(gsl_r) * sigthe_rad + PI + theta_rot;
         }
       }
       
