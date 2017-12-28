@@ -107,7 +107,7 @@ void sim()
 
   for(i=0; i<parset.n_line_recon; i++)
   {
-    fprintf(fp, "%f %f %f\n", Tline[i], Fline[i] + + gsl_ran_gaussian(gsl_r, 0.01), 0.01);
+    fprintf(fp, "%f %f %f\n", Tline[i], Fline[i] + gsl_ran_ugaussian(gsl_r)*0.01, 0.01);
   }
 
   // output transfer function.
@@ -144,7 +144,7 @@ void sim()
     for(j=0; j<parset.n_vel_recon; j++)
     {
       fprintf(fp, "%f %f %f %f\n", TransV[j]*VelUnit, Tline[i],  
-        (Fline2d[i*parset.n_vel_recon + j] + gsl_ran_gaussian(gsl_r, 0.01)), 0.01);
+        (Fline2d[i*parset.n_vel_recon + j] + gsl_ran_ugaussian(gsl_r)*0.01), 0.01);
     }
 
     fprintf(fp, "\n");

@@ -462,7 +462,7 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
       
     for(j=0; j<parset.n_vel_per_cloud; j++)
     {
-      chi = lambda * gsl_ran_gaussian(gsl_r, 1.0);
+      chi = lambda * gsl_ran_ugaussian(gsl_r);
       E = Emin / (1.0 + exp(-chi));
 
       Lmax = sqrt(2.0 * r*r * (E + mbh/r));      
@@ -708,8 +708,8 @@ void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *tra
       
     for(j=0; j<parset.n_vel_per_cloud; j++)
     {    
-      rhor = gsl_ran_gaussian(gsl_r, 1.0) * sigr + 1.0;
-      rhotheta = gsl_ran_gaussian(gsl_r, 1.0) * sigtheta + 0.5*PI;
+      rhor = gsl_ran_ugaussian(gsl_r) * sigr + 1.0;
+      rhotheta = gsl_ran_ugaussian(gsl_r) * sigtheta + 0.5*PI;
 
       Vr = rhor * cos(rhotheta) * Vcirc;
       Vph = rhor * sin(rhotheta) * Vcirc; //RM cannot distiguish the orientation of the rotation.
@@ -1762,20 +1762,20 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
 
       if(rnd < fellip)
       {
-        rhoV = (gsl_rng_uniform(gsl_r)*sigr_circ  + 1.0) * Vkep;
-        theV = gsl_rng_uniform(gsl_r) * sigthe_circ + PI/2.0;
+        rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_circ  + 1.0) * Vkep;
+        theV =  gsl_ran_ugaussian(gsl_r) * sigthe_circ + PI/2.0;
       }
       else
       {
         if(rnd_flow < fflow)
         {
-          rhoV = (gsl_rng_uniform(gsl_r)*sigr_circ  + 1.0) * Vkep;
-          theV = gsl_rng_uniform(gsl_r) * sigthe_circ + theta_rot;
+          rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_circ  + 1.0) * Vkep;
+          theV =  gsl_ran_ugaussian(gsl_r) * sigthe_circ + theta_rot;
         }
         else
         {
-          rhoV = (gsl_rng_uniform(gsl_r)*sigr_circ  + 1.0) * Vkep;
-          theV = gsl_rng_uniform(gsl_r) * sigthe_circ + PI + theta_rot;
+          rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_circ  + 1.0) * Vkep;
+          theV =  gsl_ran_ugaussian(gsl_r) * sigthe_circ + PI + theta_rot;
         }
       }
       

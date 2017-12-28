@@ -509,7 +509,7 @@ void set_blr_range_model5()
   blr_range_model[i++][1] = 1.0;
   //Fout
   blr_range_model[i][0] = log(1.0);
-  blr_range_model[i++][1] = log(20.0);
+  blr_range_model[i++][1] = log(1000.0);
   //alpha
   blr_range_model[i][0] = 1.0;
   blr_range_model[i++][1] = 3.0;
