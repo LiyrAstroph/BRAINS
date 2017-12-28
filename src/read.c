@@ -405,11 +405,21 @@ void read_data()
           Tline_data[0], Tline_data[n_line_data-1]);
         exit(-1);
       }
+
+    // cal mean line error
+      line_error_mean = 0.0;
+      for(i=0; i<n_line_data;i++)
+      {
+        line_error_mean += Flerrs_data[i];
+      }
+      line_error_mean /= n_line_data;
     }
 
     MPI_Bcast(Tline_data, n_line_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
     MPI_Bcast(Fline_data, n_line_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
     MPI_Bcast(Flerrs_data, n_line_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+
+    MPI_Bcast(&line_error_mean, 1, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
   }
 
   // read 2d line data
@@ -451,6 +461,15 @@ void read_data()
         exit(-1);
       }
       
+      // cal mean line error
+      line_error_mean = 0.0;
+      for(i=0; i<n_line_data;i++)
+        for(j=0; j<n_vel_data; j++)
+        {
+          line_error_mean += Flerrs_data[i];
+        }
+
+      line_error_mean /= (n_line_data*n_vel_data);
     }
 
     // broadcast 2d data
@@ -459,6 +478,7 @@ void read_data()
     MPI_Bcast(Fline2d_data, n_line_data*n_vel_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
     MPI_Bcast(Flerrs2d_data, n_line_data*n_vel_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
 
+    MPI_Bcast(&line_error_mean, 1, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
     // each task calculates line fluxes
     cal_emission_flux();
   }

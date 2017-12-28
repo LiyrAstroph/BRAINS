@@ -72,7 +72,7 @@ void sim()
   pm[16] = log(0.01);
   pm[17] = log(0.1);
   pm[18] = 0.0;
-  pm[19] = log(1.0e-10);
+  pm[19] = log(1.0);
 
 
   smooth_init(parset.n_vel_recon, TransV);

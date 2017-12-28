@@ -118,6 +118,8 @@ extern double *Tline_data, *Fline_data, *Flerrs_data;
 extern double *Vline_data, *Fline2d_data, *Flerrs2d_data;
 extern double con_scale, line_scale;
 
+extern double line_error_mean;
+
 extern char dnest_options_file[BRAINS_MAX_STR_LENGTH];
 
 extern int which_parameter_update, which_particle_update;  // which parameter and particle to be updated

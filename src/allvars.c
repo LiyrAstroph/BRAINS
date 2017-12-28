@@ -37,6 +37,8 @@ double *Tline_data, *Fline_data, *Flerrs_data;
 double *Vline_data, *Fline2d_data, *Flerrs2d_data;
 double con_scale, line_scale;
 
+double line_error_mean;
+
 char dnest_options_file[BRAINS_MAX_STR_LENGTH];
 
 int which_parameter_update;  /*!< which parameter being updated */
