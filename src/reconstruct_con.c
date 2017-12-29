@@ -345,10 +345,13 @@ void calculate_con_from_model(const void *model)
 /*!
  * This function calculate continuum ligth curves from varibility parameters.
  */
-void reconstruct_con_from_varmodel(double sigma, double tau, double alpha, double syserr)
+void reconstruct_con_from_varmodel(double sigma_hat, double tau, double alpha, double syserr)
 {
-  double *Larr, *ybuf, *y, *Larr_rec, *yq, *yuq, *Cq;
+  double *Larr, *ybuf, *y, *Larr_rec, *yq, *yuq, *Cq, sigma;
   int i, j, info;
+  double *PEmat3, *PEmat4;
+
+  sigma = sigma_hat * sqrt(tau);
 
   Larr = workspace;
   ybuf = Larr + n_con_data * nq;
@@ -358,10 +361,13 @@ void reconstruct_con_from_varmodel(double sigma, double tau, double alpha, doubl
   yuq = yq + nq; 
   Larr_rec = yuq + parset.n_con_recon;
 
+  PEmat3 = malloc(parset.n_con_recon * nq * sizeof(double));
+  PEmat4 = malloc(parset.n_con_recon * parset.n_con_recon * sizeof(double));
+
   set_covar_Pmat_data(sigma, tau, alpha, syserr);
   set_covar_Umat(sigma, tau, alpha);
 
-  inverse_mat(PSmat_data, n_con_data, &info);
+  inverse_mat(PCmat_data, n_con_data, &info);
   
   for(i=0;i<n_con_data;i++)
   {
@@ -370,10 +376,10 @@ void reconstruct_con_from_varmodel(double sigma, double tau, double alpha, doubl
       Larr[i*nq + j] = pow(Tcon_data[i], j);
   }
 
-  multiply_mat_MN(PSmat_data, Larr, ybuf, n_con_data, nq, n_con_data);
+  multiply_mat_MN(PCmat_data, Larr, ybuf, n_con_data, nq, n_con_data);
   multiply_mat_MN_transposeA(Larr, ybuf, Cq, nq, nq, n_con_data);
 
-  multiply_matvec(PSmat_data, Fcon_data, n_con_data, ybuf);
+  multiply_matvec(PCmat_data, Fcon_data, n_con_data, ybuf);
   multiply_mat_MN_transposeA(Larr, ybuf, yq, nq, 1, n_con_data);
 
   inverse_mat(Cq, nq, &info);
@@ -388,7 +394,7 @@ void reconstruct_con_from_varmodel(double sigma, double tau, double alpha, doubl
     y[i] = Fcon_data[i] - ybuf[i];
   }
 
-  multiply_matvec(PSmat_data, y, n_con_data, ybuf);
+  multiply_matvec(PCmat_data, y, n_con_data, ybuf);
   multiply_matvec_MN(USmat, parset.n_con_recon, n_con_data, ybuf, Fcon);
 
   for(i=0;i<parset.n_con_recon;i++)
@@ -402,6 +408,22 @@ void reconstruct_con_from_varmodel(double sigma, double tau, double alpha, doubl
   for(i=0; i<parset.n_con_recon; i++)
     Fcon[i] += yuq[i];
   
+  // SxC^-1xS^T
+  multiply_mat_MN(USmat, PCmat_data, PEmat1, parset.n_con_recon, n_con_data, n_con_data);
+  multiply_mat_MN_transposeB(PEmat1, USmat, PEmat2, parset.n_con_recon, parset.n_con_recon, n_con_data);
+
+  multiply_mat_MN(PEmat1, Larr, PEmat3, parset.n_con_recon, nq, n_con_data);
+  for(i=0; i<parset.n_con_recon*nq; i++)PEmat3[i] -= Larr_rec[i];
+  multiply_mat_MN(PEmat3, Cq, PEmat1, parset.n_con_recon, nq, nq);
+  multiply_mat_MN_transposeB(PEmat1, PEmat3, PEmat4, parset.n_con_recon, parset.n_con_recon, nq);
+
+  for(i=0; i<parset.n_con_recon; i++)
+  {
+    Fcerrs[i] = sqrt(sigma*sigma - PEmat2[i*parset.n_con_recon+i] + PEmat4[i*parset.n_con_recon + i]);
+  }
+
+  free(PEmat3);
+  free(PEmat4);
   return;
 }
 /*!

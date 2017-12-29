@@ -77,7 +77,8 @@ void sim()
 
   smooth_init(parset.n_vel_recon, TransV);
   
-  reconstruct_con_from_varmodel(0.03, 66.0, 1.0, 0.0);
+  //note that here use sigma_hat = sigma/sqrt(tau).
+  reconstruct_con_from_varmodel(0.03, 45.0, 1.0, 0.0); 
   gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
   
   sprintf(fname, "%s/%s", parset.file_dir, "/data/sim_con_full.txt");
@@ -90,7 +91,24 @@ void sim()
   
   for(i=0; i<parset.n_con_recon; i++)
   {
-    fprintf(fp, "%f %f\n", Tcon[i], Fcon[i]/con_scale);
+    fprintf(fp, "%f %f %f\n", Tcon[i], Fcon[i]/con_scale, Fcerrs[i]/con_scale);
+  }
+  fclose(fp);
+
+  sprintf(fname, "%s/%s", parset.file_dir, "/data/sim_con.txt");
+  fp = fopen(fname, "w");
+  if(fp == NULL)
+  {
+    fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+    exit(-1);
+  }
+  
+  for(i=0; i<parset.n_con_recon; i++)
+  {
+    if( (Tcon[i] > Tcon_data[0]) && (Tcon[i] <=Tcon_data[n_con_data-1]) )
+    {
+      fprintf(fp, "%f %f %f\n", Tcon[i], Fcon[i]/con_scale, Fcerrs[i]/con_scale);
+    }
   }
   fclose(fp);
   
@@ -246,8 +264,8 @@ void sim_init()
   Fline = malloc(parset.n_line_recon * sizeof(double));
   Fline2d = malloc(parset.n_line_recon * parset.n_vel_recon * sizeof(double));
 
-  Tline_min = Tcon_min + fmax(0.05*Tspan, parset.tau_max_set);
-  Tline_max = Tcon_max;
+  Tline_min = Tcon_data[0] + 10.0;
+  Tline_max = Tcon_data[n_con_data-1];
 
   dT = (Tline_max - Tline_min)/(parset.n_line_recon - 1);
 

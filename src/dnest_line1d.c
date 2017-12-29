@@ -357,8 +357,8 @@ double perturb_line1d_model1(void *model)
   if(which < num_params_blr)
   {
     // set an upper limit to the MCMC steps of systematic errors
-    //if(which == num_params_blr-1)
-    //   width = fmin(width, (par_range_model[which][1] - par_range_model[which][0])*0.01 );
+    if(which == num_params_blr-1)
+       width = fmin(width, (par_range_model[which][1] - par_range_model[which][0])*0.01 );
 
     pm[which] += dnest_randh() * width;
     wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
@@ -438,8 +438,8 @@ double perturb_line1d_model3(void *model)
   if(which < num_params_blr)
   {
     // set an upper limit to the MCMC steps of systematic errors
-    //if(which == num_params_blr-1)
-    //   width = fmin(width, (par_range_model[which][1] - par_range_model[which][0])*0.01 );
+    if(which == num_params_blr-1)
+       width = fmin(width, (par_range_model[which][1] - par_range_model[which][0])*0.01 );
 
     pm[which] += dnest_randh() * width;
     wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
@@ -527,8 +527,8 @@ double perturb_line1d_model5(void *model)
   if(which < num_params_blr)
   {
     // set an upper limit to the MCMC steps of systematic errors
-    //if(which == num_params_blr-1)
-    //   width = fmin(width, (par_range_model[which][1] - par_range_model[which][0])*0.01 );
+    if(which == num_params_blr-1)
+       width = fmin(width, (par_range_model[which][1] - par_range_model[which][0])*0.01 );
 
     pm[which] += dnest_randh() * width;
     wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);

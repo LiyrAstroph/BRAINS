@@ -132,7 +132,7 @@ void allocate_memory()
   PQmat = malloc(parset.n_con_recon * parset.n_con_recon * sizeof(double));
   PEmat1 = malloc(parset.n_con_recon * n_con_data * sizeof(double));
   PEmat2 = malloc(parset.n_con_recon * parset.n_con_recon * sizeof(double));
-
+  
   blr_range_model = malloc(BLRmodel_size/sizeof(double) * sizeof(double *));
   for(i=0; i<BLRmodel_size/sizeof(double); i++)
   {
