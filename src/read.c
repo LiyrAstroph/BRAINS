@@ -466,7 +466,7 @@ void read_data()
       for(i=0; i<n_line_data;i++)
         for(j=0; j<n_vel_data; j++)
         {
-          line_error_mean += Flerrs_data[i];
+          line_error_mean += Flerrs2d_data[i];
         }
 
       line_error_mean /= (n_line_data*n_vel_data);

@@ -686,7 +686,7 @@ double prob_initial_line2d(const void *model)
   for(i=0; i<n_line_data*n_vel_data; i++)
   {
     dy = Fline2d_data[i] - Fline2d_at_data[i];
-    var2 = Flerrs2d_data[i]*Flerrs2d_data[i];
+    var2 = Flerrs2d_data[i]*Flerrs2d_data[i] + var2_se;
     prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
   }
   prob_line_particles[which_particle_update] = prob_line;
