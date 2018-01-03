@@ -239,9 +239,8 @@ void scale_con_line()
         Fline2d_data[i*n_vel_data + j] *= line_scale;
         Flerrs2d_data[i*n_vel_data + j] *= line_scale;
       } 
-
-    line_error_mean *= line_scale;
   }
+  line_error_mean *= line_scale;
 }
 
 /*!
