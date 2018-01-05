@@ -208,8 +208,8 @@ double perturb_con(void *model)
   if(which < 3)
   {
     // set an upper limit to the MCMC steps of systematic errors
-    if(which == 0)
-       width = fmin(width, (par_range_model[which][1] - par_range_model[which][0])*0.01 );
+    //if(which == 0)
+    //   width = fmin(width, (par_range_model[which][1] - par_range_model[which][0])*0.01 );
 
     pm[which] += dnest_randh() * width;
     wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
