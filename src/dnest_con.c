@@ -58,11 +58,6 @@ int dnest_con(int argc, char **argv)
   //setup fixed parameters
   for(i=0; i<num_params; i++)
     par_fix[i] = 0;
-  if(parset.flag_trend_diff)
-  {
-    par_fix[4+parset.flag_trend] = 1;
-    par_fix_val[4+parset.flag_trend] = 0.0;
-  }
 
   strcpy(options_file, dnest_options_file);
   dnest(argc, argv);
@@ -91,7 +86,7 @@ void set_par_range_con()
     par_range_model[i][1] = var_range_model[3][1];
   }
   
-  for(i= 4 + parset.flag_trend; i<num_params_var; i++)
+  for(i= 4 + parset.flag_trend; i<num_params_var; i++) // parameter for trend difference
   {
     par_range_model[i][0] = var_range_model[4 + i - (4 + parset.flag_trend)][0];
     par_range_model[i][1] = var_range_model[4 + i - (4 + parset.flag_trend)][1];
@@ -161,7 +156,7 @@ double log_likelihoods_cal_initial_con(const void *model)
 }
 
 /*!
- * This function calculate log likelihood probability at the initial step.
+ * This function calculate log likelihood probability at the restart step.
  */
 double log_likelihoods_cal_restart_con(const void *model)
 {

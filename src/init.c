@@ -100,7 +100,7 @@ void init()
   var_range_model[2][0] = log(1.0); // log(tau)
   var_range_model[2][1] = log(1.0e4); 
 
-  var_range_model[3][0] = -10.0; // mean value
+  var_range_model[3][0] = -10.0; // mean value or trend parameter values
   var_range_model[3][1] =  10.0; 
 
   var_range_model[4][0] = -0.1; // slope of the trend in the differences between contiuum and line

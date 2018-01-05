@@ -713,7 +713,7 @@ double prob_restart_line2d(const void *model)
 
   Trans2D_at_veldata = Trans2D_at_veldata_particles[which_particle_update];
   Fline2d_at_data = Fline_at_data_particles[which_particle_update];
-  which_parameter_update = num_params + 1;
+  which_parameter_update = num_params + 1; // so as not to update clouds.
   transfun_2d_cloud_direct(model, Vline_data, Trans2D_at_veldata, n_vel_data, 0);
   calculate_line2d_from_blrmodel(model, Tline_data, Vline_data, Trans2D_at_veldata, Fline2d_at_data, n_line_data, n_vel_data);
 
