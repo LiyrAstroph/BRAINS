@@ -214,8 +214,8 @@ void from_prior_line1d(void *model)
   }
 
   // set an upper limit to the MCMC steps of systematic errors
-  i=num_params_blr-1;
-  pm[i] = par_range_model[i][1] - dnest_rand() * ( par_range_model[i][1] - par_range_model[i][0] )*0.01;
+  //i=num_params_blr-1;
+  //pm[i] = par_range_model[i][1] - dnest_rand() * ( par_range_model[i][1] - par_range_model[i][0] )*0.01;
   //i=num_params_blr;
   //pm[i] = par_range_model[i][1] - dnest_rand() * ( par_range_model[i][1] - par_range_model[i][0] )*0.01;
   

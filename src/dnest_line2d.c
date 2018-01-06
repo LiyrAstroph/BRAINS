@@ -211,8 +211,8 @@ void from_prior_line2d(void *model)
       wrap( &pm[4], par_range_model[4][0], log(rcloud_max_set)-pm[2] );
   }
 
-  i=num_params_blr-1;
-  pm[i] = par_range_model[i][0] - dnest_rand() * ( par_range_model[i][1] - par_range_model[0][0] )*0.01;
+  //i=num_params_blr-1;
+  //pm[i] = par_range_model[i][1] - dnest_rand() * ( par_range_model[i][1] - par_range_model[0][0] )*0.01;
   //i=num_params_blr;
   //pm[i] = par_range_model[i][0] - dnest_rand() * ( par_range_model[i][1] - par_range_model[0][0] )*0.01;
 

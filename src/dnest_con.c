@@ -109,8 +109,8 @@ void from_prior_con(void *model)
   int i;
   double *pm = (double *)model;
   
-  pm[0] = var_range_model[0][1] - dnest_rand()*(var_range_model[0][1] - var_range_model[0][0]) * 0.01;
-  for(i=1; i<3; i++)
+  //pm[0] = var_range_model[0][1] - dnest_rand()*(var_range_model[0][1] - var_range_model[0][0]) * 0.01;
+  for(i=0; i<3; i++)
   {
     pm[i] = var_range_model[i][0] + dnest_rand()*(var_range_model[i][1] - var_range_model[i][0]);
   }
