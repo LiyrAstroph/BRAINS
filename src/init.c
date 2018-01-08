@@ -86,6 +86,11 @@ void init()
   gsl_acc = gsl_interp_accel_alloc();
   gsl_linear = gsl_interp_alloc(gsl_interp_linear, parset.n_con_recon);
   
+  if(parset.flag_dim > 0)
+  {
+    parset.tau_max_set = fmin(parset.tau_max_set, Tline_data[n_line_data -1] - Tcon_data[0]);
+  }
+
   /* set the range of cloud radial distribution */
   rcloud_min_set = parset.tau_min_set;
   rcloud_max_set = parset.tau_max_set*0.5;
@@ -316,7 +321,7 @@ void set_blr_range_model1()
   blr_range_model[i++][1] = 3.0;
   //mu
   blr_range_model[i][0] = log(0.1);
-  blr_range_model[i++][1] = log(rcloud_max_set);
+  blr_range_model[i++][1] = log(0.5*rcloud_max_set);
   //beta
   blr_range_model[i][0] = 0.001;
   blr_range_model[i++][1] = 1.0;
@@ -346,7 +351,7 @@ void set_blr_range_model1()
   blr_range_model[i++][1] = log(1.0+100.0);
 
   /* setup extra limits to the range of mu */
-  blr_range_model[0][1] = fmin(blr_range_model[0][1], log(rcloud_max_set));
+  blr_range_model[2][1] = fmin(blr_range_model[0][1], log(rcloud_max_set));
 }
 
 // model 2
@@ -363,7 +368,7 @@ void set_blr_range_model2()
   blr_range_model[i++][1] = 3.0;
   //mu
   blr_range_model[i][0] = log(0.1);
-  blr_range_model[i++][1] = log(rcloud_max_set);
+  blr_range_model[i++][1] = log(0.5*rcloud_max_set);
   //beta
   blr_range_model[i][0] = 0.001;
   blr_range_model[i++][1] = 1.0;
@@ -393,7 +398,7 @@ void set_blr_range_model2()
   blr_range_model[i++][1] = log(1.0+100.0);
 
   /* setup extra limits to the range of mu */
-  blr_range_model[0][1] = fmin(blr_range_model[0][1], log(rcloud_max_set));
+  blr_range_model[2][1] = fmin(blr_range_model[0][1], log(rcloud_max_set));
 }
 
 // model 3
@@ -413,10 +418,10 @@ void set_blr_range_model3()
   blr_range_model[i++][1] = 3.0;
   //Rin
   blr_range_model[i][0] = log(0.1);
-  blr_range_model[i++][1] = log(rcloud_max_set);
+  blr_range_model[i++][1] = log(0.5*rcloud_max_set);
   //F
   blr_range_model[i][0] = log(1.0);
-  blr_range_model[i++][1] = log(1.0e3);
+  blr_range_model[i++][1] = log(1.0e2);
   //inc
   blr_range_model[i][0] = 0.0;
   blr_range_model[i++][1] = 90.0;
@@ -440,7 +445,7 @@ void set_blr_range_model3()
   blr_range_model[i++][1] = log(1.0+100.0);
 
   /* setup extra limits to the range of mu */
-  blr_range_model[1][1] = fmin(blr_range_model[1][1], log(rcloud_max_set));
+  blr_range_model[3][1] = fmin(blr_range_model[1][1], log(rcloud_max_set));
 }
 
 // model 3
@@ -460,10 +465,10 @@ void set_blr_range_model4()
   blr_range_model[i++][1] = 3.0;
   //Rin
   blr_range_model[i][0] = log(0.1);
-  blr_range_model[i++][1] = log(rcloud_max_set);
+  blr_range_model[i++][1] = log(0.5*rcloud_max_set);
   //F
   blr_range_model[i][0] = log(1.0);
-  blr_range_model[i++][1] = log(1.0e3);
+  blr_range_model[i++][1] = log(1.0e2);
   //inc
   blr_range_model[i][0] = 0.0;
   blr_range_model[i++][1] = 90.0;
@@ -504,13 +509,13 @@ void set_blr_range_model5()
   blr_range_model[i++][1] = 3.0;
   //mu
   blr_range_model[i][0] = log(0.1);
-  blr_range_model[i++][1] = log(rcloud_max_set);
+  blr_range_model[i++][1] = log(rcloud_max_set*0.5);
   //Fin
   blr_range_model[i][0] = 0.0;
   blr_range_model[i++][1] = 1.0;
   //Fout
   blr_range_model[i][0] = log(1.0);
-  blr_range_model[i++][1] = log(1000.0);
+  blr_range_model[i++][1] = log(10.0);
   //alpha
   blr_range_model[i][0] = 1.0;
   blr_range_model[i++][1] = 3.0;

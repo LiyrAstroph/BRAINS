@@ -444,12 +444,9 @@ double perturb_line1d_model3(void *model)
     pm[which] += dnest_randh() * width;
     wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
 
-    if(pm[3] + pm[4] > log(rcloud_max_set))
+    if((which == 4) && (pm[3] + pm[4] > log(rcloud_max_set)))
     {
-      if(which == 3)
-        wrap(&pm[which], par_range_model[which][0], log(rcloud_max_set) - pm[4]);
-      if(which == 4)
-        wrap(&pm[which], par_range_model[which][0], log(rcloud_max_set) - pm[3]);
+      wrap(&pm[which], par_range_model[which][0], log(rcloud_max_set) - pm[3]);
     }
   }
   else if(which < num_params_blr + 4 + parset.flag_trend)
@@ -533,12 +530,9 @@ double perturb_line1d_model5(void *model)
     pm[which] += dnest_randh() * width;
     wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
 
-    if((which == 2 || which == 4) && (pm[2] + pm[4] > log(rcloud_max_set)))
+    if((which == 4) && (pm[2] + pm[4] > log(rcloud_max_set)))
     {
-      if(which == 2)
-        wrap(&pm[which], par_range_model[which][0], log(rcloud_max_set)-pm[4]);
-      if(which == 4)
-        wrap(&pm[which], par_range_model[which][0], log(rcloud_max_set) - pm[2]);
+      wrap(&pm[which], par_range_model[which][0], log(rcloud_max_set) - pm[2]);
     }
   }
   else if(which < num_params_blr + 4 + parset.flag_trend)
