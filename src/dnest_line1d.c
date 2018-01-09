@@ -41,9 +41,12 @@ int dnest_line1d(int argc, char **argv)
       transfun_1d_cloud_direct = transfun_1d_cloud_direct_model1;
       perturb = perturb_line1d_model1;
 
-      num_params_radial_samp=1;
+      num_params_radial_samp=3;
       params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
-      params_radial_samp[0] = 3;
+      params_radial_samp[0] = 2;
+      params_radial_samp[1] = 3;
+      params_radial_samp[2] = 4;
+
 
       break;
     case 2:
@@ -51,9 +54,11 @@ int dnest_line1d(int argc, char **argv)
       transfun_1d_cloud_direct = transfun_1d_cloud_direct_model1;
       perturb = perturb_line1d_model1;
 
-      num_params_radial_samp=1;
+      num_params_radial_samp=3;
       params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
-      params_radial_samp[0] = 3;
+      params_radial_samp[0] = 2;
+      params_radial_samp[1] = 3;
+      params_radial_samp[2] = 4;
 
       break;
     case 3:
@@ -61,10 +66,11 @@ int dnest_line1d(int argc, char **argv)
       transfun_1d_cloud_direct = transfun_1d_cloud_direct_model3;
       perturb = perturb_line1d_model3;
 
-      num_params_radial_samp=2;
+      num_params_radial_samp=3;
       params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
       params_radial_samp[0] = 2;
-      params_radial_samp[1] = 4;
+      params_radial_samp[1] = 3;
+      params_radial_samp[2] = 4;
 
       break;
     case 4:
@@ -72,10 +78,11 @@ int dnest_line1d(int argc, char **argv)
       transfun_1d_cloud_direct = transfun_1d_cloud_direct_model3;
       perturb = perturb_line1d_model3;
 
-      num_params_radial_samp=2;
+      num_params_radial_samp=3;
       params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
       params_radial_samp[0] = 2;
-      params_radial_samp[1] = 4;
+      params_radial_samp[1] = 3;
+      params_radial_samp[2] = 4;
 
       break;
 
@@ -84,11 +91,12 @@ int dnest_line1d(int argc, char **argv)
       transfun_1d_cloud_direct = transfun_1d_cloud_direct_model5;
       perturb = perturb_line1d_model5;
 
-      num_params_radial_samp=3;
+      num_params_radial_samp=4;
       params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
-      params_radial_samp[0] = 3;
-      params_radial_samp[1] = 4;
-      params_radial_samp[2] = 5;
+      params_radial_samp[0] = 2;
+      params_radial_samp[1] = 3;
+      params_radial_samp[2] = 4;
+      params_radial_samp[3] = 5;
       break;
 
     default:
@@ -96,9 +104,11 @@ int dnest_line1d(int argc, char **argv)
       transfun_1d_cloud_direct = transfun_1d_cloud_direct_model1;
       perturb = perturb_line1d_model1;
 
-      num_params_radial_samp=1;
+      num_params_radial_samp=3;
       params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
-      params_radial_samp[0] = 3;
+      params_radial_samp[0] = 2;
+      params_radial_samp[1] = 3;
+      params_radial_samp[2] = 4;
       break;
   }
   
@@ -210,7 +220,7 @@ void from_prior_line1d(void *model)
   if(parset.flag_blrmodel == 5)
   {
     if( pm[2] + pm[4] > log(rcloud_max_set) )
-      wrap( &pm[4], par_range_model[4][0], log(rcloud_max_set) -pm[2] );
+      wrap( &pm[4], par_range_model[4][0], log(rcloud_max_set) - pm[2] );
   }
 
   // set an upper limit to the MCMC steps of systematic errors

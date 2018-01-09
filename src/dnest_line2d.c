@@ -42,9 +42,11 @@ int dnest_line2d(int argc, char **argv)
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model1;
       perturb = perturb_line2d_model1;
 
-      num_params_radial_samp=1;
+      num_params_radial_samp=3;
       params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
-      params_radial_samp[0] = 3;
+      params_radial_samp[0] = 2;
+      params_radial_samp[1] = 3;
+      params_radial_samp[2] = 4;
 
       break;
     case 2:
@@ -52,9 +54,11 @@ int dnest_line2d(int argc, char **argv)
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model2;
       perturb = perturb_line2d_model1;
 
-      num_params_radial_samp=1;
+      num_params_radial_samp=3;
       params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
-      params_radial_samp[0] = 3;
+      params_radial_samp[0] = 2;
+      params_radial_samp[1] = 3;
+      params_radial_samp[2] = 4;
 
       break;
     case 3:
@@ -62,10 +66,11 @@ int dnest_line2d(int argc, char **argv)
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model3;
       perturb = perturb_line2d_model3;
 
-      num_params_radial_samp=2;
+      num_params_radial_samp=3;
       params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
       params_radial_samp[0] = 2;
-      params_radial_samp[1] = 4;
+      params_radial_samp[1] = 3;
+      params_radial_samp[2] = 4;
 
       break;
     case 4:
@@ -73,10 +78,11 @@ int dnest_line2d(int argc, char **argv)
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model4;
       perturb = perturb_line2d_model3;
 
-      num_params_radial_samp=2;
+      num_params_radial_samp=3;
       params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
       params_radial_samp[0] = 2;
-      params_radial_samp[1] = 4;
+      params_radial_samp[1] = 3;
+      params_radial_samp[2] = 4;
       
       break;
     case 5:
@@ -84,11 +90,12 @@ int dnest_line2d(int argc, char **argv)
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model5;
       perturb = perturb_line2d_model5;
 
-      num_params_radial_samp=3;
+      num_params_radial_samp=4;
       params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
-      params_radial_samp[0] = 3;
-      params_radial_samp[1] = 4;
-      params_radial_samp[2] = 5;
+      params_radial_samp[0] = 2;
+      params_radial_samp[1] = 3;
+      params_radial_samp[2] = 4;
+      params_radial_samp[3] = 5;
       break;
 
     default:
@@ -96,9 +103,11 @@ int dnest_line2d(int argc, char **argv)
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model1;
       perturb = perturb_line2d_model1;
 
-      num_params_radial_samp=1;
+      num_params_radial_samp=3;
       params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
-      params_radial_samp[0] = 3;
+      params_radial_samp[0] = 2;
+      params_radial_samp[1] = 3;
+      params_radial_samp[2] = 4;
 
       break;
   }

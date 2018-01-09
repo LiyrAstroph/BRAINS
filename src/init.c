@@ -351,7 +351,7 @@ void set_blr_range_model1()
   blr_range_model[i++][1] = log(1.0+100.0);
 
   /* setup extra limits to the range of mu */
-  blr_range_model[2][1] = fmin(blr_range_model[0][1], log(rcloud_max_set));
+  blr_range_model[2][1] = fmin(blr_range_model[2][1], log(rcloud_max_set));
 }
 
 // model 2
@@ -398,7 +398,7 @@ void set_blr_range_model2()
   blr_range_model[i++][1] = log(1.0+100.0);
 
   /* setup extra limits to the range of mu */
-  blr_range_model[2][1] = fmin(blr_range_model[0][1], log(rcloud_max_set));
+  blr_range_model[2][1] = fmin(blr_range_model[2][1], log(rcloud_max_set));
 }
 
 // model 3
@@ -445,7 +445,7 @@ void set_blr_range_model3()
   blr_range_model[i++][1] = log(1.0+100.0);
 
   /* setup extra limits to the range of mu */
-  blr_range_model[3][1] = fmin(blr_range_model[1][1], log(rcloud_max_set));
+  blr_range_model[3][1] = fmin(blr_range_model[3][1], log(rcloud_max_set));
 }
 
 // model 3
@@ -492,7 +492,7 @@ void set_blr_range_model4()
   blr_range_model[i++][1] = log(1.0+100.0);
 
   /* setup extra limits to the range of mu */
-  blr_range_model[1][1] = fmin(blr_range_model[1][1], log(rcloud_max_set));
+  blr_range_model[3][1] = fmin(blr_range_model[3][1], log(rcloud_max_set));
 }
 
 // model 5
@@ -509,7 +509,7 @@ void set_blr_range_model5()
   blr_range_model[i++][1] = 3.0;
   //mu
   blr_range_model[i][0] = log(0.1);
-  blr_range_model[i++][1] = log(rcloud_max_set*0.5);
+  blr_range_model[i++][1] = log(10.0);
   //Fin
   blr_range_model[i][0] = 0.0;
   blr_range_model[i++][1] = 1.0;

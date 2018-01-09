@@ -160,7 +160,8 @@ void sim()
   {
     if( (Tcon[i] > Tcon_data[0]) && (Tcon[i] <=Tcon_data[n_con_data-1]) )
     {
-      fprintf(fp, "%f %f %f\n", Tcon[i], Fcon[i]/con_scale, Fcerrs[i]/con_scale);
+      //fprintf(fp, "%f %f %f\n", Tcon[i], Fcon[i]/con_scale, Fcerrs[i]/con_scale);
+      fprintf(fp, "%f %f %f\n", Tcon[i], (Fcon[i]+gsl_ran_ugaussian(gsl_r)*0.01)/con_scale, 0.01/con_scale);
     }
   }
   fclose(fp);

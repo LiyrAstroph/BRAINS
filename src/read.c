@@ -259,6 +259,14 @@ void read_parset()
     {
       parset.flag_trend_diff = 0;
     }
+
+    if(parset.flag_dim < 0) // create mock data
+    {
+      // set large values
+      parset.n_cloud_per_task = fmax(2.0e5, parset.n_cloud_per_task);
+      parset.n_vel_per_cloud = fmax(10.0, parset.n_vel_per_cloud);
+      printf("# set NCloudPerCore and NVPerCloud: %d %d\n", parset.n_cloud_per_task, parset.n_vel_per_cloud);
+    }
   }
   
   MPI_Bcast(&parset, sizeof(parset), MPI_BYTE, roottask, MPI_COMM_WORLD);
