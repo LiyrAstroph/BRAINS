@@ -192,39 +192,42 @@ void reconstruct_con()
   reconstruct_con_init();
   dnest_con(argc, argv);
 
-  postprocess_con();
-
-  if(thistask == roottask)
+  if(parset.flag_exam_prior != 1)
   {
-    which_parameter_update = -1;
-    which_particle_update = 0;
-    Fcon = Fcon_particles[which_particle_update];
-
-    calculate_con_from_model(best_model_con);
-
-    FILE *fp;
-    char fname[200];
-    int i;
-    sprintf(fname, "%s/%s", parset.file_dir, parset.pcon_out_file);
-    fp = fopen(fname, "w");
-    if(fp == NULL)
+    postprocess_con();
+  
+    if(thistask == roottask)
     {
-      fprintf(stderr, "# Error: Cannot open file %s\n", fname);
-      exit(-1);
-    }
+      which_parameter_update = -1;
+      which_particle_update = 0;
+      Fcon = Fcon_particles[which_particle_update];
 
-    for(i=0; i<parset.n_con_recon; i++)
-    {
-      fprintf(fp, "%f %f %f\n", Tcon[i], Fcon[i] / con_scale, Fcerrs[i]/con_scale);
+      calculate_con_from_model(best_model_con);
+ 
+      FILE *fp;
+      char fname[200];
+      int i;
+      sprintf(fname, "%s/%s", parset.file_dir, parset.pcon_out_file);
+      fp = fopen(fname, "w");
+      if(fp == NULL)
+      {
+        fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+        exit(-1);
+      }
+ 
+      for(i=0; i<parset.n_con_recon; i++)
+      {
+        fprintf(fp, "%f %f %f\n", Tcon[i], Fcon[i] / con_scale, Fcerrs[i]/con_scale);
+      }
+      fclose(fp);
+ 
+      memcpy(var_param, best_model_con, num_params_var*sizeof(double));
+      memcpy(var_param_std, best_model_std_con, num_params_var*sizeof(double));
     }
-    fclose(fp);
-
-    memcpy(var_param, best_model_con, num_params_var*sizeof(double));
-    memcpy(var_param_std, best_model_std_con, num_params_var*sizeof(double));
+  
+    MPI_Bcast(var_param, num_params_var, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(var_param_std, num_params_var, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
   }
-
-  MPI_Bcast(var_param, num_params_var, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
-  MPI_Bcast(var_param_std, num_params_var, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
 
   reconstruct_con_end();
 

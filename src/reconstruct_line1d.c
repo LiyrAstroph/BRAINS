@@ -268,73 +268,76 @@ void reconstruct_line1d()
 // dnest run
   dnest_line1d(argc, argv);
 
-  postprocess1d();
-
-  if(thistask == roottask)
+  if(parset.flag_exam_prior != 1)
   {
-    FILE *fp;
-    char fname[200];
-    int i;
+    postprocess1d();
 
-    force_update = 1;
-    which_parameter_update = -1; // force to update the transfer function
-    which_particle_update = 0;
+    if(thistask == roottask)
+    {
+      FILE *fp;
+      char fname[200];
+      int i;
 
-    con_q = con_q_particles[which_particle_update];
-    Fcon = Fcon_particles[which_particle_update];
-    Trans1D = Trans1D_particles[which_particle_update];
+      force_update = 1;
+      which_parameter_update = -1; // force to update the transfer function
+      which_particle_update = 0;
 
-    calculate_con_from_model(best_model_line1d + num_params_blr *sizeof(double));
-    gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
+      con_q = con_q_particles[which_particle_update];
+      Fcon = Fcon_particles[which_particle_update];
+      Trans1D = Trans1D_particles[which_particle_update];
+
+      calculate_con_from_model(best_model_line1d + num_params_blr *sizeof(double));
+      gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
     
     
-    // output continuum light curve
-    sprintf(fname, "%s/%s", parset.file_dir, parset.pcon_out_file);
-    fp = fopen(fname, "w");
-    if(fp == NULL)
-    {
-      fprintf(stderr, "# Error: Cannot open file %s\n", fname);
-      exit(-1);
-    }
+      // output continuum light curve
+      sprintf(fname, "%s/%s", parset.file_dir, parset.pcon_out_file);
+      fp = fopen(fname, "w");
+      if(fp == NULL)
+      {
+        fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+        exit(-1);
+      }
 
-    for(i=0; i<parset.n_con_recon; i++)
-    {
-      fprintf(fp, "%f %f\n", Tcon[i], Fcon[i] / con_scale);
-    }
-    fclose(fp);
+      for(i=0; i<parset.n_con_recon; i++)
+      {
+        fprintf(fp, "%f %f\n", Tcon[i], Fcon[i] / con_scale);
+      }
+      fclose(fp);
 
-    transfun_1d_cloud_direct(best_model_line1d, parset.flag_save_clouds);
-    calculate_line_from_blrmodel(best_model_line1d, Tline, Fline, parset.n_line_recon);
+      transfun_1d_cloud_direct(best_model_line1d, parset.flag_save_clouds);
+      calculate_line_from_blrmodel(best_model_line1d, Tline, Fline, parset.n_line_recon);
 
-    // output reconstructed line light curve
-    sprintf(fname, "%s/%s", parset.file_dir, parset.pline_out_file);
-    fp = fopen(fname, "w");
-    if(fp == NULL)
-    {
-      fprintf(stderr, "# Error: Cannot open file %s\n", fname);
-      exit(-1);
-    }
+      // output reconstructed line light curve
+      sprintf(fname, "%s/%s", parset.file_dir, parset.pline_out_file);
+      fp = fopen(fname, "w");
+      if(fp == NULL)
+      {
+        fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+        exit(-1);
+      }
 
-    for(i=0; i<parset.n_line_recon; i++)
-    {
-      fprintf(fp, "%f %f\n", Tline[i], Fline[i] / line_scale);
-    }
-    fclose(fp);
+      for(i=0; i<parset.n_line_recon; i++)
+      {
+        fprintf(fp, "%f %f\n", Tline[i], Fline[i] / line_scale);
+      }
+      fclose(fp);
 
-    // output transfer function.
-    sprintf(fname, "%s/%s", parset.file_dir, parset.tran_out_file);
-    fp = fopen(fname, "w");
-    if(fp == NULL)
-    {
-      fprintf(stderr, "# Error: Cannot open file %s\n", fname);
-      exit(-1);
-    }
+      // output transfer function.
+      sprintf(fname, "%s/%s", parset.file_dir, parset.tran_out_file);
+      fp = fopen(fname, "w");
+      if(fp == NULL)
+      {
+        fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+        exit(-1);
+      }
 
-    for(i=0; i<parset.n_tau; i++)
-    {
-      fprintf(fp, "%f %f\n", TransTau[i], Trans1D[i]);
+      for(i=0; i<parset.n_tau; i++)
+      {
+        fprintf(fp, "%f %f\n", TransTau[i], Trans1D[i]);
+      }
+      fclose(fp);
     }
-    fclose(fp);
   }
 
   reconstruct_line1d_end();

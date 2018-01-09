@@ -31,6 +31,9 @@ double perturb_line2d_model1(void *model);
 double perturb_line2d_model3(void *model);
 double perturb_line2d_model5(void *model);
 
+double log_likelihoods_cal_line2d_exam(const void *model);
+
+
 void (*print_particle)(FILE *fp, const void *model);
 void (*from_prior)(void *model);
 double (*log_likelihoods_cal)(const void *model);

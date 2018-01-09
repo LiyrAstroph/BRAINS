@@ -124,12 +124,22 @@ int dnest_line1d(int argc, char **argv)
 
   /* setup functions used for dnest*/
   from_prior = from_prior_line1d;
-  log_likelihoods_cal_initial = log_likelihoods_cal_initial_line1d;
-  log_likelihoods_cal_restart = log_likelihoods_cal_restart_line1d;
-  log_likelihoods_cal = log_likelihoods_cal_line1d;
   print_particle = print_particle_line1d;
   get_num_params = get_num_params_line1d;
   restart_clouds = restart_clouds_1d;
+
+  if(parset.flag_exam_prior != 1)
+  {
+    log_likelihoods_cal_initial = log_likelihoods_cal_initial_line1d;
+    log_likelihoods_cal_restart = log_likelihoods_cal_restart_line1d;
+    log_likelihoods_cal = log_likelihoods_cal_line1d;
+  }
+  else
+  {
+    log_likelihoods_cal_initial = log_likelihoods_cal_line1d_exam;
+    log_likelihoods_cal_restart = log_likelihoods_cal_line1d_exam;
+    log_likelihoods_cal = log_likelihoods_cal_line1d_exam;
+  }
   
   set_par_range_model1d();
   set_par_fix(num_params_blr);
@@ -565,4 +575,14 @@ double perturb_line1d_model5(void *model)
     logH += (-0.5*pow(pm[which], 2.0) );
   }
   return logH;
+}
+
+
+
+/*!
+ * This function calculate log likelihood probability.
+ */
+double log_likelihoods_cal_line1d_exam(const void *model)
+{
+  return 0.0;
 }

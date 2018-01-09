@@ -86,10 +86,10 @@ void init()
   gsl_acc = gsl_interp_accel_alloc();
   gsl_linear = gsl_interp_alloc(gsl_interp_linear, parset.n_con_recon);
   
-  if(parset.flag_dim > 0)
+  /*if(parset.flag_dim > 0)
   {
     parset.tau_max_set = fmin(parset.tau_max_set, Tline_data[n_line_data -1] - Tcon_data[0]);
-  }
+  }*/
 
   /* set the range of cloud radial distribution */
   rcloud_min_set = parset.tau_min_set;

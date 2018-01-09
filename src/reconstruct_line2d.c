@@ -332,134 +332,137 @@ void reconstruct_line2d()
   dnest_line2d(argc, argv);
   smooth_end();
 
-  postprocess2d();
-
-  // calculate light curves using the best model
-  if(thistask == roottask)
+  if(parset.flag_exam_prior != 1)
   {
-    force_update = 1; 
-    which_parameter_update = -1;
-    which_particle_update = 0;
-    con_q = con_q_particles[which_particle_update];
-    Fcon = Fcon_particles[which_particle_update];
-    Trans2D_at_veldata = Trans2D_at_veldata_particles[which_particle_update];
-    Fline2d_at_data = Fline_at_data_particles[which_particle_update];
+    postprocess2d();
+
+    // calculate light curves using the best model
+    if(thistask == roottask)
+    {
+      force_update = 1; 
+      which_parameter_update = -1;
+      which_particle_update = 0;
+      con_q = con_q_particles[which_particle_update];
+      Fcon = Fcon_particles[which_particle_update];
+      Trans2D_at_veldata = Trans2D_at_veldata_particles[which_particle_update];
+      Fline2d_at_data = Fline_at_data_particles[which_particle_update];
     
-    calculate_con_from_model(best_model_line2d + num_params_blr *sizeof(double));
-    gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
+      calculate_con_from_model(best_model_line2d + num_params_blr *sizeof(double));
+      gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
 
-    FILE *fp;
-    char fname[200];
-    int i, j;
+      FILE *fp;
+      char fname[200];
+      int i, j;
 
-    sprintf(fname, "%s/%s", parset.file_dir, parset.pcon_out_file);
-    fp = fopen(fname, "w");
-    if(fp == NULL)
-    {
-      fprintf(stderr, "# Error: Cannot open file %s\n", fname);
-      exit(-1);
-    }
+      sprintf(fname, "%s/%s", parset.file_dir, parset.pcon_out_file);
+      fp = fopen(fname, "w");
+      if(fp == NULL)
+      {
+        fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+        exit(-1);
+      }
 
-    for(i=0; i<parset.n_con_recon; i++)
-    {
-      fprintf(fp, "%f %f\n", Tcon[i], Fcon[i] / con_scale);
-    }
-    fclose(fp);
+      for(i=0; i<parset.n_con_recon; i++)
+      {
+        fprintf(fp, "%f %f\n", Tcon[i], Fcon[i] / con_scale);
+      }
+      fclose(fp);
 
-    smooth_init(n_vel_data, Vline_data);
-    // recovered line2d at data points
-    transfun_2d_cloud_direct(best_model_line2d, Vline_data, Trans2D_at_veldata, 
+      smooth_init(n_vel_data, Vline_data);
+      // recovered line2d at data points
+      transfun_2d_cloud_direct(best_model_line2d, Vline_data, Trans2D_at_veldata, 
                                               n_vel_data, parset.flag_save_clouds);
-    calculate_line2d_from_blrmodel(best_model_line2d, Tline_data, Vline_data, Trans2D_at_veldata, 
+      calculate_line2d_from_blrmodel(best_model_line2d, Tline_data, Vline_data, Trans2D_at_veldata, 
                                                        Fline2d_at_data, n_line_data, n_vel_data);
     
-    sprintf(fname, "%s/%s", parset.file_dir, parset.pline2d_data_out_file);
-    fp = fopen(fname, "w");
-    if(fp == NULL)
-    {
-      fprintf(stderr, "# Error: Cannot open file %s\n", fname);
-      exit(-1);
-    }
-    
-    for(i=0; i<n_line_data; i++)
-    {
-      for(j=0; j<n_vel_data; j++)
+      sprintf(fname, "%s/%s", parset.file_dir, parset.pline2d_data_out_file);
+      fp = fopen(fname, "w");
+      if(fp == NULL)
       {
-        fprintf(fp, "%f %f %f\n", Vline_data[j]*VelUnit, Tline_data[i],  Fline2d_at_data[i*n_vel_data + j] / line_scale);
+        fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+        exit(-1);
       }
-      fprintf(fp, "\n");
-    }
-    fclose(fp);
-
-    sprintf(fname, "%s/%s", parset.file_dir, parset.tran2d_data_out_file);
-    fp = fopen(fname, "w");
-    if(fp == NULL)
-    {
-      fprintf(stderr, "# Error: Cannot open file %s\n", fname);
-      exit(-1);
-    }
     
-    fprintf(fp, "# %d %d\n", parset.n_tau, n_vel_data);
-    for(i=0; i<parset.n_tau; i++)
-    {
-      for(j=0; j<n_vel_data; j++)
+      for(i=0; i<n_line_data; i++)
       {
-        fprintf(fp, "%f %f %f\n", Vline_data[j]*VelUnit, TransTau[i],  Trans2D_at_veldata[i*n_vel_data + j]);
+        for(j=0; j<n_vel_data; j++)
+        {
+          fprintf(fp, "%f %f %f\n", Vline_data[j]*VelUnit, Tline_data[i],  Fline2d_at_data[i*n_vel_data + j] / line_scale);
+        }
+        fprintf(fp, "\n");
       }
-      fprintf(fp, "\n");
-    }
-    fclose(fp);
+      fclose(fp);
 
-    smooth_end();
+      sprintf(fname, "%s/%s", parset.file_dir, parset.tran2d_data_out_file);
+      fp = fopen(fname, "w");
+      if(fp == NULL)
+      {
+        fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+        exit(-1);
+      }
     
-    // recovered line2d at specified points
-    smooth_init(parset.n_vel_recon, TransV);
+      fprintf(fp, "# %d %d\n", parset.n_tau, n_vel_data);
+      for(i=0; i<parset.n_tau; i++)
+      {
+        for(j=0; j<n_vel_data; j++)
+        {
+          fprintf(fp, "%f %f %f\n", Vline_data[j]*VelUnit, TransTau[i],  Trans2D_at_veldata[i*n_vel_data + j]);
+        }
+        fprintf(fp, "\n");
+      }
+      fclose(fp);
 
-    which_parameter_update = -1;
-    which_particle_update = 0;
-    transfun_2d_cloud_direct(best_model_line2d, TransV, Trans2D, parset.n_vel_recon, 0);
-    calculate_line2d_from_blrmodel(best_model_line2d, Tline, TransV, 
+      smooth_end();
+    
+      // recovered line2d at specified points
+      smooth_init(parset.n_vel_recon, TransV);
+
+      which_parameter_update = -1;
+      which_particle_update = 0;
+      transfun_2d_cloud_direct(best_model_line2d, TransV, Trans2D, parset.n_vel_recon, 0);
+      calculate_line2d_from_blrmodel(best_model_line2d, Tline, TransV, 
           Trans2D, Fline2d, parset.n_line_recon, parset.n_vel_recon);
 
-    sprintf(fname, "%s/%s", parset.file_dir, parset.pline2d_out_file);
-    fp = fopen(fname, "w");
-    if(fp == NULL)
-    {
-      fprintf(stderr, "# Error: Cannot open file %s\n", fname);
-      exit(-1);
-    }
-
-    for(i=0; i<parset.n_line_recon; i++)
-    {
-      for(j=0; j<parset.n_vel_recon; j++)
+      sprintf(fname, "%s/%s", parset.file_dir, parset.pline2d_out_file);
+      fp = fopen(fname, "w");
+      if(fp == NULL)
       {
-        fprintf(fp, "%f %f %f\n", TransV[j]*VelUnit, Tline[i],  Fline2d[i*parset.n_vel_recon + j] / line_scale);
+        fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+        exit(-1);
       }
 
-      fprintf(fp, "\n");
-    }
-    fclose(fp);
-
-    // output 2d transfer function
-    sprintf(fname, "%s/%s", parset.file_dir, parset.tran2d_out_file);
-    fp = fopen(fname, "w");
-    if(fp == NULL)
-    {
-      fprintf(stderr, "# Error: Cannot open file %s\n", fname);
-      exit(-1);
-    }
-    fprintf(fp, "# %d %d\n", parset.n_tau, parset.n_vel_recon);
-    for(i=0; i<parset.n_tau; i++)
-    {
-      for(j=0; j<parset.n_vel_recon; j++)
+      for(i=0; i<parset.n_line_recon; i++)
       {
-        fprintf(fp, "%f %f %f\n", TransV[j]*VelUnit, TransTau[i], Trans2D[i*parset.n_vel_recon + j]);
-      }
+        for(j=0; j<parset.n_vel_recon; j++)
+        {
+          fprintf(fp, "%f %f %f\n", TransV[j]*VelUnit, Tline[i],  Fline2d[i*parset.n_vel_recon + j] / line_scale);
+        }
 
-      fprintf(fp, "\n");
+        fprintf(fp, "\n");
+      }
+      fclose(fp);
+
+      // output 2d transfer function
+      sprintf(fname, "%s/%s", parset.file_dir, parset.tran2d_out_file);
+      fp = fopen(fname, "w");
+      if(fp == NULL)
+      {
+        fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+        exit(-1);
+      }
+      fprintf(fp, "# %d %d\n", parset.n_tau, parset.n_vel_recon);
+      for(i=0; i<parset.n_tau; i++)
+      {
+        for(j=0; j<parset.n_vel_recon; j++)
+        {
+          fprintf(fp, "%f %f %f\n", TransV[j]*VelUnit, TransTau[i], Trans2D[i*parset.n_vel_recon + j]);
+        }
+
+        fprintf(fp, "\n");
+      }
+      fclose(fp);
+      smooth_end();
     }
-    fclose(fp);
-    smooth_end();
   }
 
   reconstruct_line2d_end();

@@ -27,6 +27,9 @@ double perturb_con(void *model);
 int get_num_params_con();
 void restart_clouds_con(int iflag);
 
+double log_likelihoods_cal_con_exam(const void *model);
+
+
 void (*print_particle)(FILE *fp, const void *model);
 void (*from_prior)(void *model);
 double (*log_likelihoods_cal)(const void *model);

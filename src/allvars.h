@@ -103,6 +103,7 @@ typedef struct
   int flag_restart;
   int flag_sample_info;
   int flag_temp;
+  int flag_exam_prior;
 
   int flag_fixvar;
   

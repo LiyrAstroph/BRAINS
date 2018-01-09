@@ -48,8 +48,9 @@ int main(int argc, char **argv)
     parset.flag_restart = 0;
     parset.flag_sample_info = 0;
     parset.flag_temp = 0;
+    parset.flag_exam_prior=0;
 
-    while( (opt = getopt(argc, argv, "pt:rch")) != -1)
+    while( (opt = getopt(argc, argv, "pt:rceh")) != -1)
     {
       switch(opt)
       {
@@ -82,6 +83,11 @@ int main(int argc, char **argv)
         case 'c':
           printf("# Recalculate the sample info.\n");
           parset.flag_sample_info = 1;
+          break;
+
+        case 'e':
+          printf("# Examine priors.\n");
+          parset.flag_exam_prior = 1;
           break;
 
         case 'h':

@@ -45,13 +45,23 @@ int dnest_con(int argc, char **argv)
   
   /* setup functions used for dnest*/
   from_prior = from_prior_con;
-  log_likelihoods_cal = log_likelihoods_cal_con;
-  log_likelihoods_cal_initial = log_likelihoods_cal_initial_con;
-  log_likelihoods_cal_restart = log_likelihoods_cal_restart_con;
   perturb = perturb_con;
   print_particle = print_particle_con;
   get_num_params = get_num_params_con;
   restart_clouds = restart_clouds_con;
+  
+  if(parset.flag_exam_prior != 1)
+  {
+    log_likelihoods_cal = log_likelihoods_cal_con;
+    log_likelihoods_cal_initial = log_likelihoods_cal_initial_con;
+    log_likelihoods_cal_restart = log_likelihoods_cal_restart_con;
+  }
+  else
+  {
+    log_likelihoods_cal = log_likelihoods_cal_con_exam;
+    log_likelihoods_cal_initial = log_likelihoods_cal_con_exam;
+    log_likelihoods_cal_restart = log_likelihoods_cal_con_exam;
+  }
   
   set_par_range_con();
   
@@ -262,4 +272,13 @@ int get_num_params_con()
 void restart_clouds_con(int iflag)
 {
   return;
+}
+
+
+/*!
+ * exam for prior
+ */
+double log_likelihoods_cal_con_exam(const void *model)
+{
+  return 0.0;
 }
