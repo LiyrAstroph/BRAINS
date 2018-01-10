@@ -49,6 +49,7 @@ void set_covar_Pmat_data(double sigma, double tau, double alpha,double syserr);
 void set_covar_Umat(double sigma, double tau, double alpha);
 void calculate_con_from_model(const void *model);
 void reconstruct_con_from_varmodel(double sigma_hat, double tau, double alpha, double syserr);
+void create_con_from_random(double sigma_hat, double tau, double alpha, double syserr);
 void postprocess_con();
 void set_par_range_con();
 

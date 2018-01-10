@@ -15,6 +15,7 @@
 #include <math.h>
 #include <gsl/gsl_cblas.h>
 #include <gsl/gsl_interp.h>
+#include <gsl/gsl_randist.h>
 
 #include "dnestvars.h"
 #include "allvars.h"
@@ -429,6 +430,7 @@ void reconstruct_con_from_varmodel(double sigma_hat, double tau, double alpha, d
   free(PEmat4);
   return;
 }
+
 /*!
  * this function calculates likelihood 
  */
@@ -724,5 +726,52 @@ void reconstruct_con_end()
   free(best_model_std_con);
 
   free(con_q);
+  return;
+}
+
+/*!
+ *  create continumm from random number generate based on damped random walk model.
+ */
+
+void create_con_from_random(double sigma_hat, double tau, double alpha, double syserr)
+{
+  int i, info;
+  double *Prandvec;
+  double sigma = sigma_hat * sqrt(tau);
+  double mean;
+
+  Prandvec = malloc(parset.n_con_recon*sizeof(double));
+
+  set_covar_Pmat(sigma, tau, alpha);
+
+  for(i=0; i<parset.n_con_recon; i++)
+  {
+    Prandvec[i] = gsl_ran_ugaussian(gsl_r);
+  }
+
+  Chol_decomp_L(PSmat, parset.n_con_recon, &info);
+
+  multiply_matvec(PSmat, Prandvec, parset.n_con_recon, Fcon);
+  
+  mean = 0.0;
+  for(i=0; i<parset.n_con_recon; i++)
+  {
+    Fcon[i] += sigma*3.0;
+    mean += Fcon[i];
+  }
+  mean /= parset.n_con_recon;
+
+  for(i=0; i<parset.n_con_recon; i++)
+  {
+    Fcon[i] /= mean;
+  }
+  
+  for(i=0; i<parset.n_con_recon; i++)
+  {
+    Fcon[i] +=  gsl_ran_ugaussian(gsl_r) * 0.01;
+    Fcerrs[i] = 0.01;
+  }
+
+  free(Prandvec);
   return;
 }

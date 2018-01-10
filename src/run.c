@@ -29,17 +29,21 @@ void begin_run()
 
   /* read parameter file */
   read_parset();
-  /* read data files */
-  read_data();
-  /* scale continuum and line to an order of unity */
-  scale_con_line();
+  
+  if(parset.flag_dim != -2) // if not randomly create mock data 
+  {
+    /* read data files */
+    read_data();
+    /* scale continuum and line to an order of unity */
+    scale_con_line();
+  }
 
   /* initialization */
   init();
   
   /* now run dnest and reconstruct the model. */
   MPI_Barrier(MPI_COMM_WORLD);
-  if(parset.flag_dim == -1)
+  if(parset.flag_dim == -1 || parset.flag_dim == -2)
   {
     sim();
   }

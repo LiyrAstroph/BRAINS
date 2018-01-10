@@ -34,8 +34,6 @@ void sim()
   char fname[200];
   int i, j;
 
-  printf("%f\n", line_scale);
-
   sim_init();
   
   double *pm = (double *)model;
@@ -130,8 +128,17 @@ void sim()
 
   smooth_init(parset.n_vel_recon, TransV);
   
-  //note that here use sigma_hat = sigma/sqrt(tau).
-  reconstruct_con_from_varmodel(0.03, 45.0, 1.0, 0.0); 
+  if(parset.flag_dim == -1)
+  {
+    //note that here use sigma_hat = sigma/sqrt(tau).
+    reconstruct_con_from_varmodel(0.03, 45.0, 1.0, 0.0); 
+  }
+  else
+  {
+    con_scale = 1.0;
+    line_scale = 1.0;
+    create_con_from_random(0.03, 45.0, 1.0, 0.0); 
+  }
   gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
   
   sprintf(fname, "%s/%s", parset.file_dir, "/data/sim_con_full.txt");
@@ -156,16 +163,27 @@ void sim()
     exit(-1);
   }
   
-  for(i=0; i<parset.n_con_recon; i++)
+  if(parset.flag_dim != -2)
   {
-    if( (Tcon[i] > Tcon_data[0]) && (Tcon[i] <=Tcon_data[n_con_data-1]) )
+    for(i=0; i<parset.n_con_recon; i++)
     {
-      //fprintf(fp, "%f %f %f\n", Tcon[i], Fcon[i]/con_scale, Fcerrs[i]/con_scale);
-      fprintf(fp, "%f %f %f\n", Tcon[i], (Fcon[i]+gsl_ran_ugaussian(gsl_r)*0.01)/con_scale, 0.01/con_scale);
+      if( (Tcon[i] > Tcon_data[0]) && (Tcon[i] <=Tcon_data[n_con_data-1]) )
+      {
+        //fprintf(fp, "%f %f %f\n", Tcon[i], Fcon[i]/con_scale, Fcerrs[i]/con_scale);
+        fprintf(fp, "%f %f %f\n", Tcon[i], (Fcon[i]+gsl_ran_ugaussian(gsl_r)*0.01)/con_scale, 0.01/con_scale);
+      }
+    }
+  }
+  else
+  {
+    for(i=0; i<parset.n_con_recon; i++)
+    {
+      fprintf(fp, "%f %f %f\n", Tcon[i], Fcon[i]/con_scale, Fcerrs[i]/con_scale);
     }
   }
   fclose(fp);
   
+
   transfun_1d_cloud_direct(model, 0);
   calculate_line_from_blrmodel(model, Tline, Fline, parset.n_line_recon);
 
@@ -298,16 +316,33 @@ void sim_init()
 
   Fcon = malloc(parset.n_con_recon * sizeof(double));
 
-  Tspan = Tcon_data[n_con_data -1] - Tcon_data[0];
+  if(parset.flag_dim == -1)
+  {
+    Tspan = Tcon_data[n_con_data -1] - Tcon_data[0];
   
   /* set time array for continuum */
-  Tcon_min = Tcon_data[0] - fmax(0.05*Tspan, parset.tau_max_set);
-  Tcon_max = Tcon_data[n_con_data-1] + fmax(0.05*Tspan, 10.0);
-  dT = (Tcon_max - Tcon_min)/(parset.n_con_recon -1);
+    Tcon_min = Tcon_data[0] - fmax(0.05*Tspan, parset.tau_max_set);
+    Tcon_max = Tcon_data[n_con_data-1] + fmax(0.05*Tspan, 10.0);
+    dT = (Tcon_max - Tcon_min)/(parset.n_con_recon -1);
   
-  for(i=0; i<parset.n_con_recon; i++)
+    for(i=0; i<parset.n_con_recon; i++)
+    {
+      Tcon[i] = Tcon_min + i*dT;
+    }
+  }
+  else
   {
-    Tcon[i] = Tcon_min + i*dT;
+    Tspan = 120.0;
+
+    Tcon_min = 0.0;
+    Tcon_max = Tspan;
+
+    dT = (Tcon_max - Tcon_min)/(parset.n_con_recon -1);
+  
+    for(i=0; i<parset.n_con_recon; i++)
+    {
+      Tcon[i] = Tcon_min + i*dT;
+    } 
   }
 
   TransTau = malloc(parset.n_tau * sizeof(double));
@@ -318,14 +353,29 @@ void sim_init()
   Fline = malloc(parset.n_line_recon * sizeof(double));
   Fline2d = malloc(parset.n_line_recon * parset.n_vel_recon * sizeof(double));
 
-  Tline_min = Tcon_data[0] + 10.0;
-  Tline_max = Tcon_data[n_con_data-1];
-
-  dT = (Tline_max - Tline_min)/(parset.n_line_recon - 1);
-
-  for(i=0; i<parset.n_line_recon; i++)
+  if(parset.flag_dim == -1)
   {
-    Tline[i] = Tline_min + i*dT;
+    Tline_min = Tcon_data[0] + 10.0;
+    Tline_max = Tcon_data[n_con_data-1];
+
+    dT = (Tline_max - Tline_min)/(parset.n_line_recon - 1);
+
+    for(i=0; i<parset.n_line_recon; i++)
+    {
+      Tline[i] = Tline_min + i*dT;
+    }
+  }
+  else
+  {
+    Tline_min = Tcon_min + 10.0;
+    Tline_max = Tcon_max;
+
+    dT = (Tline_max - Tline_min)/(parset.n_line_recon - 1);
+
+    for(i=0; i<parset.n_line_recon; i++)
+    {
+      Tline[i] = Tline_min + i*dT;
+    }
   }
   
   dTransTau = (parset.tau_max_set - parset.tau_min_set)/(parset.n_tau - 1);

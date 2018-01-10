@@ -230,9 +230,9 @@ void read_parset()
     }
     fclose(fparam);
 
-    if(parset.flag_dim > 2 || parset.flag_dim < -1)
+    if(parset.flag_dim > 2 || parset.flag_dim < -2)
     {
-      fprintf(stderr, "# Error in flag_dim: value %d is not allowed.\nPlease specify a value in [-1-2].\n", parset.flag_dim);
+      fprintf(stderr, "# Error in flag_dim: value %d is not allowed.\nPlease specify a value in [-2-2].\n", parset.flag_dim);
       exit(0);
     }
 
