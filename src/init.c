@@ -64,6 +64,10 @@ void init()
       BLRmodel_size = sizeof(BLRmodel5);
       set_blr_range_model = set_blr_range_model5;
       break;
+    case 6:
+      BLRmodel_size = sizeof(BLRmodel6);
+      set_blr_range_model = set_blr_range_model6;
+      break;
     default:
       BLRmodel_size = sizeof(BLRmodel1);
       set_blr_range_model = set_blr_range_model1;
@@ -529,6 +533,75 @@ void set_blr_range_model5()
   blr_range_model[i][0] = -0.5;
   blr_range_model[i++][1] = 0.5;
   //beta
+  blr_range_model[i][0] = 1.0;
+  blr_range_model[i++][1] = 5.0;
+  //xi
+  blr_range_model[i][0] = 0.0;
+  blr_range_model[i++][1] = 1.0;
+  //mbh
+  blr_range_model[i][0] = log(0.1);
+  blr_range_model[i++][1] = log(1000.0);
+  //fellip
+  blr_range_model[i][0] = 0.0;
+  blr_range_model[i++][1] = 1.0;
+  //fflow
+  blr_range_model[i][0] = 0.0;
+  blr_range_model[i++][1] = 1.0;
+  //sigr_circ
+  blr_range_model[i][0] = log(0.001);
+  blr_range_model[i++][1] = log(0.1);
+  //sigthe_circ
+  blr_range_model[i][0] = log(0.001);
+  blr_range_model[i++][1] = log(1.0);
+  //sigr_rad
+  blr_range_model[i][0] = log(0.001);
+  blr_range_model[i++][1] = log(0.1);
+  //sigthe_rad
+  blr_range_model[i][0] = log(0.001);
+  blr_range_model[i++][1] = log(1.0);
+  //theta_rot
+  blr_range_model[i][0] = 0.0;
+  blr_range_model[i++][1] = 90.0;
+  //logse
+  blr_range_model[i][0] = log(1.0);
+  blr_range_model[i++][1] = log(1.0+100.0);
+
+  /* setup extra limits to the range of mu */
+  blr_range_model[2][1] = fmin(blr_range_model[2][1], log(rcloud_max_set));
+}
+
+
+// model 6
+void set_blr_range_model6()
+{
+  int i;
+  
+  i = 0;
+  //A
+  blr_range_model[i][0] = log(0.01);
+  blr_range_model[i++][1] = log(10.0);
+  //Ag
+  blr_range_model[i][0] = -1.0;
+  blr_range_model[i++][1] = 3.0;
+  //mu
+  blr_range_model[i][0] = log(0.1);
+  blr_range_model[i++][1] = log(100.0);
+  //F
+  blr_range_model[i][0] = 0.0;
+  blr_range_model[i++][1] = 1.0;
+  //beta
+  blr_range_model[i][0] = 0.001;
+  blr_range_model[i++][1] = 1.0;
+  //inc
+  blr_range_model[i][0] = 0.0;
+  blr_range_model[i++][1] = 90.0;
+  //opn
+  blr_range_model[i][0] = 0.0;
+  blr_range_model[i++][1] = 90.0;
+  //k
+  blr_range_model[i][0] = -0.5;
+  blr_range_model[i++][1] = 0.5;
+  //gamma
   blr_range_model[i][0] = 1.0;
   blr_range_model[i++][1] = 5.0;
   //xi

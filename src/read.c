@@ -242,6 +242,12 @@ void read_parset()
       exit(0);
     }
 
+    if(parset.flag_blrmodel > 6 || parset.flag_blrmodel < 1)
+    {
+      fprintf(stderr, "# Error in flag_blrmodel: value %d is not allowed.\nPlease specify a value in [1-6].\n", parset.flag_trend);
+      exit(0);
+    }
+
     if(parset.flag_narrowline == 1 && parset.flag_dim == 2)
     {
       printf("# add narrow-line: flux=%e, width=%fkm/s, shift=%fkm/s.\n", parset.flux_narrowline, 

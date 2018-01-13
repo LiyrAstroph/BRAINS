@@ -231,6 +231,30 @@ typedef struct
   double logse;         /*!< \brief 20. */
 }BLRmodel5;
 
+/* Pancoast 2014's model */
+typedef struct 
+{
+  double A;             /*!< \brief 1. line response*/    
+  double Ag;            /*!< \brief 2. no-linearity */
+  double mu;            /*!< \brief 3. peak radius*/
+  double F;             /*!< \brief 4. fraction of outer radius*/
+  double beta;          /*!< \brief 5. fraction of inner radius*/
+  double inc;           /*!< \brief 6. inclination */
+  double opn;           /*!< \brief 7. opening angle */
+  double k;             /*!< \brief 8. kappa */
+  double gamma;         /*!< \brief 9.beta */
+  double xi;            /*!< \brief 10.obscuration */
+  double mbh;           /*!< \brief 11.black hole mass */
+  double fellip;        /*!< \brief 12.ellipitic orbits */
+  double fflow;         /*!< \brief 13.inflow/outflow */
+  double sigr_circ;     /*!< \brief 14. */
+  double sigthe_circ;   /*!< \brief 15. */
+  double sigr_rad;      /*!< \brief 16. */
+  double sigthe_rad;    /*!< \brief 17. */
+  double theta_rot;     /*!< \brief 18. */
+  double logse;         /*!< \brief 19. */
+}BLRmodel6;
+
 extern int BLRmodel_size;
 extern int *par_fix, npar_fix;
 extern double *par_fix_val;

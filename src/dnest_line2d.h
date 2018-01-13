@@ -30,6 +30,7 @@ int get_num_params_line2d();
 double perturb_line2d_model1(void *model);
 double perturb_line2d_model3(void *model);
 double perturb_line2d_model5(void *model);
+double perturb_line2d_model6(void *model);
 
 double log_likelihoods_cal_line2d_exam(const void *model);
 

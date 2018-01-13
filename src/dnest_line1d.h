@@ -31,6 +31,7 @@ int get_num_params_line1d();
 double perturb_line1d_model1(void *model);
 double perturb_line1d_model3(void *model);
 double perturb_line1d_model5(void *model);
+double perturb_line1d_model6(void *model);
 
 double log_likelihoods_cal_line1d_exam(const void *model);
 
