@@ -586,11 +586,11 @@ void set_blr_range_model6()
   //mu
   blr_range_model[i][0] = log(0.1);
   blr_range_model[i++][1] = log(100.0);
-  //F
-  blr_range_model[i][0] = 0.0;
-  blr_range_model[i++][1] = 1.0;
   //beta
   blr_range_model[i][0] = 0.001;
+  blr_range_model[i++][1] = 1.0;
+  //F
+  blr_range_model[i][0] = 0.0;
   blr_range_model[i++][1] = 1.0;
   //inc
   blr_range_model[i][0] = 0.0;

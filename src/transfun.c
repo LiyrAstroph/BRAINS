@@ -162,7 +162,7 @@ void transfun_1d_cloud_direct_model1(const void *pm, int flag_save)
   int i, idt, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb;
-  double inc, F, beta, mu, k, gam, a, s, rin, sig;
+  double inc, F, beta, mu, k, a, s, rin, sig;
   double Lphi, Lthe;
   double Anorm, weight, rnd;
   BLRmodel1 *model = (BLRmodel1 *)pm;
@@ -173,7 +173,6 @@ void transfun_1d_cloud_direct_model1(const void *pm, int flag_save)
   F = model->F;
   mu = exp(model->mu);                 /* mean radius */
   k = model->k;  
-  gam = model-> Ag;
 
   a = 1.0/beta/beta;
   s = mu/a;
@@ -329,8 +328,8 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
 {
   int i, j, idV, idt, nc, flag_update=0;
   double r, phi, dis, Lopn_cos, u;
-  double x, y, z, xb, yb, zb, vx, vy, vz, vxb, vyb, vzb;
-  double inc, F, beta, mu, k, gam, a, s, rin, sig;
+  double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
+  double inc, F, beta, mu, k, a, s, rin, sig;
   double Lphi, Lthe, L, E, vcloud_max, vcloud_min;
   double dV, V, Anorm, weight, rnd;
   BLRmodel1 *model = (BLRmodel1 *)pm;
@@ -344,7 +343,6 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
   F = model->F;
   mu = exp(model->mu);
   k = model->k;
-  gam = model->Ag;
 
   a = 1.0/beta/beta;
   s = mu/a;
@@ -434,7 +432,8 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
     yb = -cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y;
     zb =  sin(Lthe) * x;
 
-    if(zb < 0.0)
+    zb0 = zb;
+    if(zb0 < 0.0)
       zb = -zb;
 
 // conter-rotate around y
@@ -574,8 +573,8 @@ void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *tra
 {
   int i, j, idV, idt, nc, flag_update=0;
   double r, phi, dis, Lopn_cos, u;
-  double x, y, z, xb, yb, zb, vx, vy, vz, vxb, vyb, vzb;
-  double inc, F, beta, mu, k, gam, a, s, rin, sig;
+  double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
+  double inc, F, beta, mu, k, a, s, rin, sig;
   double Lphi, Lthe, L, E, vcloud_max, vcloud_min;
   double dV, V, Anorm, weight, rnd;
   BLRmodel2 *model = (BLRmodel2 *)pm;
@@ -589,7 +588,6 @@ void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *tra
   F = model->F;
   mu = exp(model->mu);
   k = model->k;
-  gam = model->Ag;
 
   a = 1.0/beta/beta;
   s = mu/a;
@@ -679,7 +677,8 @@ void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *tra
     yb = -cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y;
     zb =  sin(Lthe) * x;
 
-    if(zb < 0.0)
+    zb0 = zb;
+    if(zb0 < 0.0)
       zb = -zb;
 
 // conter-rotate around y
@@ -726,7 +725,7 @@ void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *tra
       vyb =-cos(Lthe)*sin(Lphi) * vx + cos(Lphi) * vy;
       vzb = sin(Lthe) * vx;
 
-      if(zb < 0.0)
+      if(zb0 < 0.0)
         vzb = -vzb;
     
       vx = vxb * cos(PI/2.0-inc) + vzb * sin(PI/2.0-inc);
@@ -805,8 +804,8 @@ void transfun_1d_cloud_direct_model3(const void *pm, int flag_save)
   FILE *fcloud_out;
   int i, idt, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
-  double x, y, z, xb, yb, zb;
-  double inc, F, alpha, Rin, k, gam;
+  double x, y, z, xb, yb, zb, zb0;
+  double inc, F, alpha, Rin, k;
   double Lphi, Lthe;
   double Anorm, weight, rnd;
   BLRmodel3 *model = (BLRmodel3 *)pm;
@@ -817,7 +816,6 @@ void transfun_1d_cloud_direct_model3(const void *pm, int flag_save)
   F = exp(model->F);
   Rin = exp(model->Rin);                 /* mean radius */
   k = model->k;  
-  gam = model-> Ag;
   
   if(flag_save && thistask == roottask)
   {
@@ -902,7 +900,8 @@ void transfun_1d_cloud_direct_model3(const void *pm, int flag_save)
     yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y;
     zb = sin(Lthe) * x;
 
-    if(zb < 0.0)
+    zb0 = zb;
+    if(zb0 < 0.0)
       zb = -zb;
 
 // conter-rotate around y, LOS is x-axis 
@@ -969,8 +968,8 @@ void transfun_2d_cloud_direct_model3(const void *pm, double *transv, double *tra
 {
   int i, j, idV, idt, nc, flag_update=0;
   double r, phi, dis, Lopn_cos, u;
-  double x, y, z, xb, yb, zb, vx, vy, vz, vxb, vyb, vzb;
-  double inc, F, alpha, Rin, mu, k, gam;
+  double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
+  double inc, F, alpha, Rin, mu, k;
   double Lphi, Lthe, L, E, vcloud_max, vcloud_min;
   double dV, V, Anorm, weight, rnd;
   BLRmodel3 *model = (BLRmodel3 *)pm;
@@ -984,8 +983,6 @@ void transfun_2d_cloud_direct_model3(const void *pm, double *transv, double *tra
   F = model->F;
   Rin = exp(model->Rin);
   k = model->k;
-  gam = model->Ag;
-
 
   mbh = exp(model->mbh);
   xi = model->xi;
@@ -1072,7 +1069,8 @@ void transfun_2d_cloud_direct_model3(const void *pm, double *transv, double *tra
     yb = -cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y;
     zb =  sin(Lthe) * x;
 
-    if(zb < 0.0)
+    zb0 = zb;
+    if(zb0 < 0.0)
       zb = -zb;
 
 // conter-rotate around y
@@ -1122,7 +1120,7 @@ void transfun_2d_cloud_direct_model3(const void *pm, double *transv, double *tra
       vyb =-cos(Lthe)*sin(Lphi) * vx + cos(Lphi) * vy;
       vzb = sin(Lthe) * vx;
 
-      if(zb < 0.0)
+      if(zb0 < 0.0)
         vzb = -vzb;
     
       vx = vxb * cos(PI/2.0-inc) + vzb * sin(PI/2.0-inc);
@@ -1195,8 +1193,8 @@ void transfun_2d_cloud_direct_model4(const void *pm, double *transv, double *tra
 {
   int i, j, idV, idt, nc, flag_update=0;
   double r, phi, dis, Lopn_cos, u;
-  double x, y, z, xb, yb, zb, vx, vy, vz, vxb, vyb, vzb;
-  double inc, F, alpha, Rin, mu, k, gam;
+  double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
+  double inc, F, alpha, Rin, mu, k;
   double Lphi, Lthe, L, E, vcloud_max, vcloud_min;
   double dV, V, Anorm, weight, rnd;
   BLRmodel4 *model = (BLRmodel4 *)pm;
@@ -1210,8 +1208,6 @@ void transfun_2d_cloud_direct_model4(const void *pm, double *transv, double *tra
   F = model->F;
   Rin = exp(model->Rin);
   k = model->k;
-  gam = model->Ag;
-
 
   mbh = exp(model->mbh);
   xi = model->xi;
@@ -1298,8 +1294,8 @@ void transfun_2d_cloud_direct_model4(const void *pm, double *transv, double *tra
     yb = -cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y;
     zb =  sin(Lthe) * x;
 
-
-    if(zb < 0.0)
+    zb0 = zb;
+    if(zb0 < 0.0)
       zb = -zb;
 
 // conter-rotate around y
@@ -1349,7 +1345,7 @@ void transfun_2d_cloud_direct_model4(const void *pm, double *transv, double *tra
       vyb =-cos(Lthe)*sin(Lphi) * vx + cos(Lphi) * vy;
       vzb = sin(Lthe) * vx;
 
-      if(zb < 0.0)
+      if(zb0 < 0.0)
         vzb = -vzb;
     
       vx = vxb * cos(PI/2.0-inc) + vzb * sin(PI/2.0-inc);
@@ -1427,8 +1423,8 @@ void transfun_1d_cloud_direct_model5(const void *pm, int flag_save)
   FILE *fcloud_out;
   int i, idt, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
-  double x, y, z, xb, yb, zb;
-  double inc, Fin, Fout, alpha, Rin, k, gam, beta, mu, xi;
+  double x, y, z, xb, yb, zb, zb0;
+  double inc, Fin, Fout, alpha, Rin, k, gam, mu, xi;
   double Lphi, Lthe;
   double Anorm, weight, rndr, rnd, rnd_xi, rnd_frac, frac1, frac2, ratio;
   BLRmodel5 *model = (BLRmodel5 *)pm;
@@ -1440,8 +1436,7 @@ void transfun_1d_cloud_direct_model5(const void *pm, int flag_save)
   Fout = exp(model->Fout);                 
   mu = exp(model->mu);            /* mean radius */
   k = model->k;  
-  beta = model->beta;
-  gam = model-> Ag;
+  gam = model-> gam;
   xi = model->xi;
   
 
@@ -1484,7 +1479,7 @@ void transfun_1d_cloud_direct_model5(const void *pm, int flag_save)
   {
 // generate a direction of the angular momentum of the orbit   
     Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_r), beta));
+    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_r), gam));
     
     // "which_parameter_update = -1" means that all parameters are updated, usually occurs at the 
     // initial step.
@@ -1539,8 +1534,9 @@ void transfun_1d_cloud_direct_model5(const void *pm, int flag_save)
     yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y;
     zb = sin(Lthe) * x;
     
+    zb0 = zb;
     rnd_xi = gsl_rng_uniform(gsl_r);
-    if( (rnd_xi < 1.0 - xi) && zb < 0.0)
+    if( (rnd_xi < 1.0 - xi) && zb0 < 0.0)
       zb = -zb;
 
 // conter-rotate around y, LOS is x-axis 
@@ -1607,8 +1603,8 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
   FILE *fcloud_out;
   int i, j, idt, idV, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
-  double x, y, z, xb, yb, zb;
-  double inc, Fin, Fout, alpha, Rin, k, gam, beta, mu, xi;
+  double x, y, z, xb, yb, zb, zb0;
+  double inc, Fin, Fout, alpha, Rin, k, gam, mu, xi;
   double mbh, fellip, fflow, sigr_circ, sigthe_circ, sigr_rad, sigthe_rad, theta_rot;
   double Lphi, Lthe, V, Vr, Vph, Vkep, rhoV, theV;
   double Anorm, weight, rndr, rnd, rnd_frac, rnd_xi,rnd_flow, frac1, frac2, ratio;
@@ -1622,8 +1618,7 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
   Fout = exp(model->Fout);                 
   mu = exp(model->mu);            /* mean radius */
   k = model->k;  
-  beta = model->beta;
-  gam = model-> Ag;
+  gam = model->gam;
   xi = model->xi;
 
   mbh = exp(model->mbh);
@@ -1635,7 +1630,9 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
   sigthe_rad = exp(model->sigthe_rad);
   theta_rot = model->theta_rot*PI/180.0;
 
-  frac1 = 1.0/(alpha+1.0) * (1.0 - pow(Fin, alpha+1.0));
+  printf("%f %f %f\n", Fout, mu, alpha);
+
+  frac1 = 1.0/(alpha+1.0) * (1.0 - pow(Fin,   alpha+1.0));
   frac2 = 1.0/(alpha-1.0) * (1.0 - pow(Fout, -alpha+1.0));
   ratio = frac1/(frac1 + frac2);
 
@@ -1677,7 +1674,7 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
   {
 // generate a direction of the angular momentum of the orbit   
     Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_r), beta));
+    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_r), gam));
     
     // "which_parameter_update = -1" means that all parameters are updated, usually occurs at the 
     // initial step.
@@ -1732,11 +1729,12 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
     yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y;
     zb = sin(Lthe) * x;
     
+    zb0 = zb;
     rnd_xi = gsl_rng_uniform(gsl_r);
-    if( (rnd_xi < 1.0 - xi) && zb < 0.0)
+    if( (rnd_xi < 1.0 - xi) && zb0 < 0.0)
       zb = -zb;
 
-// conter-rotate around y, LOS is x-axis 
+// counter-rotate around y, LOS is x-axis 
     x = xb * cos(PI/2.0-inc) + zb * sin(PI/2.0-inc);
     y = yb;
     z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
@@ -1794,7 +1792,7 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
       vyb =-cos(Lthe)*sin(Lphi) * vx + cos(Lphi) * vy;
       vzb = sin(Lthe) * vx;
 
-      if((rnd_xi < 1.0-xi) && zb < 0.0)
+      if((rnd_xi < 1.0-xi) && zb0 < 0.0)
         vzb = -vzb;
     
       vx = vxb * cos(PI/2.0-inc) + vzb * sin(PI/2.0-inc);
@@ -1872,7 +1870,7 @@ void transfun_1d_cloud_direct_model6(const void *pm, int flag_save)
   FILE *fcloud_out;
   int i, idt, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
-  double x, y, z, xb, yb, zb;
+  double x, y, z, xb, yb, zb, zb0;
   double inc, F, beta, mu, k, gam, xi, a, s, rin, sig;
   double Lphi, Lthe;
   double Anorm, weight, rnd, rnd_xi;
@@ -1884,7 +1882,7 @@ void transfun_1d_cloud_direct_model6(const void *pm, int flag_save)
   F = model->F;
   mu = exp(model->mu);                 /* mean radius */
   k = model->k;  
-  gam = model-> gamma;
+  gam = model-> gam;
   xi = model->xi;
 
   a = 1.0/beta/beta;
@@ -1973,8 +1971,9 @@ void transfun_1d_cloud_direct_model6(const void *pm, int flag_save)
     yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y;
     zb = sin(Lthe) * x;
 
+    zb0 = zb;
     rnd_xi = gsl_rng_uniform(gsl_r);
-    if( (rnd_xi < 1.0 - xi) && zb < 0.0)
+    if( (rnd_xi < 1.0 - xi) && zb0 < 0.0)
       zb = -zb;
 
 // conter-rotate around y, LOS is x-axis 
@@ -2041,7 +2040,7 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
   FILE *fcloud_out;
   int i, j, idt, idV, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
-  double x, y, z, xb, yb, zb, vx, vy, vz, vxb, vyb, vzb, vcloud_min, vcloud_max;
+  double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb, vcloud_min, vcloud_max;
   double V, dV, rhotheta, rhor, rhoV, theV, Vr, Vph, Vkep;
   double inc, F, beta, mu, k, gam, xi, a, s, sig, rin;
   double mbh, fellip, fflow, sigr_circ, sigthe_circ, sigr_rad, sigthe_rad, theta_rot;
@@ -2055,7 +2054,7 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
   F = model->F;
   mu = exp(model->mu);                 /* mean radius */
   k = model->k;  
-  gam = model-> gamma;
+  gam = model-> gam;
   xi = model->xi;
 
   mbh = exp(model->mbh);
@@ -2156,8 +2155,9 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
     yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y;
     zb = sin(Lthe) * x;
 
+    zb0 = zb;
     rnd_xi = gsl_rng_uniform(gsl_r);
-    if( (rnd_xi < 1.0 - xi) && zb < 0.0)
+    if( (rnd_xi < 1.0 - xi) && zb0 < 0.0)
       zb = -zb;
 
 // conter-rotate around y, LOS is x-axis 
@@ -2219,7 +2219,7 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
       vyb =-cos(Lthe)*sin(Lphi) * vx + cos(Lphi) * vy;
       vzb = sin(Lthe) * vx;
 
-      if((rnd_xi < 1.0-xi) && zb < 0.0)
+      if((rnd_xi < 1.0-xi) && zb0 < 0.0)
         vzb = -vzb;
     
       vx = vxb * cos(PI/2.0-inc) + vzb * sin(PI/2.0-inc);

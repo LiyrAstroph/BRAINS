@@ -218,7 +218,7 @@ typedef struct
   double inc;           /*!< \brief 7. inclination */
   double opn;           /*!< \brief 8. opening angle */
   double k;             /*!< \brief 9. kappa */
-  double beta;          /*!< \brief 10.beta */
+  double gam;           /*!< \brief 10.gamma */
   double xi;            /*!< \brief 11.obscuration */
   double mbh;           /*!< \brief 12.black hole mass */
   double fellip;        /*!< \brief 13.ellipitic orbits */
@@ -237,12 +237,12 @@ typedef struct
   double A;             /*!< \brief 1. line response*/    
   double Ag;            /*!< \brief 2. no-linearity */
   double mu;            /*!< \brief 3. peak radius*/
-  double F;             /*!< \brief 4. fraction of outer radius*/
   double beta;          /*!< \brief 5. fraction of inner radius*/
+  double F;             /*!< \brief 4. fraction of outer radius*/
   double inc;           /*!< \brief 6. inclination */
   double opn;           /*!< \brief 7. opening angle */
   double k;             /*!< \brief 8. kappa */
-  double gamma;         /*!< \brief 9.beta */
+  double gam;           /*!< \brief 9. gamma */
   double xi;            /*!< \brief 10.obscuration */
   double mbh;           /*!< \brief 11.black hole mass */
   double fellip;        /*!< \brief 12.ellipitic orbits */
