@@ -347,7 +347,7 @@ double perturb_line1d_model1(void *model)
 {
   double *pm = (double *)model;
   double logH = 0.0, limit1, limit2, width, rnd;
-  int which;
+  int which, which_level;
 
   /*
    * sample BLR and variability parameters more frequently; 
@@ -372,13 +372,12 @@ double perturb_line1d_model1(void *model)
   which_parameter_update = which;
 
   /* level-dependent width */
-  which_level_update = which_level_update > (size_levels - 50)?(size_levels -50):which_level_update;
-  which_level_update = which_level_update <0?0:which_level_update;
+  which_level = which_level_update > (size_levels - 50)?(size_levels -50):which_level_update;
 
-  if( which_level_update != 0)
+  if( which_level > 0)
   {
-    limit1 = limits[(which_level_update-1) * num_params *2 + which *2];
-    limit2 = limits[(which_level_update-1) * num_params *2 + which *2 + 1];
+    limit1 = limits[(which_level-1) * num_params *2 + which *2];
+    limit2 = limits[(which_level-1) * num_params *2 + which *2 + 1];
     width = limit2 - limit1;
   }
   else
@@ -428,7 +427,7 @@ double perturb_line1d_model3(void *model)
 {
   double *pm = (double *)model;
   double logH = 0.0, limit1, limit2, width, rnd;
-  int which;
+  int which, which_level;
 
   /*
    * sample BLR and variability parameters more frequently; 
@@ -453,13 +452,12 @@ double perturb_line1d_model3(void *model)
   which_parameter_update = which;
 
   /* level-dependent width */
-  which_level_update = which_level_update > (size_levels - 50)?(size_levels -50):which_level_update;
-  which_level_update = which_level_update <0?0:which_level_update;
+  which_level = which_level_update > (size_levels - 50)?(size_levels -50):which_level_update;
 
-  if( which_level_update != 0)
+  if( which_level > 0)
   {
-    limit1 = limits[(which_level_update-1) * num_params *2 + which *2];
-    limit2 = limits[(which_level_update-1) * num_params *2 + which *2 + 1];
+    limit1 = limits[(which_level-1) * num_params *2 + which *2];
+    limit2 = limits[(which_level-1) * num_params *2 + which *2 + 1];
     width = limit2 - limit1;
   }
   else
@@ -514,7 +512,7 @@ double perturb_line1d_model5(void *model)
 {
   double *pm = (double *)model;
   double logH = 0.0, limit1, limit2, width, rnd;
-  int which;
+  int which, which_level;
 
   /*
    * sample BLR and variability parameters more frequently; 
@@ -539,13 +537,12 @@ double perturb_line1d_model5(void *model)
   which_parameter_update = which;
 
   /* level-dependent width */
-  which_level_update = which_level_update > (size_levels - 50)?(size_levels -50):which_level_update;
-  which_level_update = which_level_update <0?0:which_level_update;
+  which_level = which_level_update > (size_levels - 50)?(size_levels -50):which_level_update;
 
-  if( which_level_update != 0)
+  if( which_level > 0)
   {
-    limit1 = limits[(which_level_update-1) * num_params *2 + which *2];
-    limit2 = limits[(which_level_update-1) * num_params *2 + which *2 + 1];
+    limit1 = limits[(which_level-1) * num_params *2 + which *2];
+    limit2 = limits[(which_level-1) * num_params *2 + which *2 + 1];
     width = limit2 - limit1;
   }
   else
@@ -600,7 +597,7 @@ double perturb_line1d_model6(void *model)
 {
   double *pm = (double *)model;
   double logH = 0.0, limit1, limit2, width, rnd;
-  int which;
+  int which, which_level;
 
   /*
    * sample BLR and variability parameters more frequently; 
@@ -625,13 +622,12 @@ double perturb_line1d_model6(void *model)
   which_parameter_update = which;
 
   /* level-dependent width */
-  which_level_update = which_level_update > (size_levels - 50)?(size_levels -50):which_level_update;
-  which_level_update = which_level_update <0?0:which_level_update;
+  which_level = which_level_update > (size_levels - 50)?(size_levels -50):which_level_update;
 
-  if( which_level_update != 0)
+  if( which_level >  0)
   {
-    limit1 = limits[(which_level_update-1) * num_params *2 + which *2];
-    limit2 = limits[(which_level_update-1) * num_params *2 + which *2 + 1];
+    limit1 = limits[(which_level-1) * num_params *2 + which *2];
+    limit2 = limits[(which_level-1) * num_params *2 + which *2 + 1];
     width = limit2 - limit1;
   }
   else

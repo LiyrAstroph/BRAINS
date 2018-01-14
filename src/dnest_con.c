@@ -181,7 +181,7 @@ double perturb_con(void *model)
 {
   double *pm = (double *)model;
   double logH = 0.0, limit1, limit2, width, rnd;
-  int which;
+  int which, which_level;
   
   /* sample variability parameters more frequently */
   do
@@ -202,12 +202,11 @@ double perturb_con(void *model)
   which_parameter_update = which;
   
   /* level-dependent width */
-  which_level_update = which_level_update > (size_levels - 50)?(size_levels-50):which_level_update;
-  which_level_update = which_level_update <0?0:which_level_update;
-  if( which_level_update != 0)
+  which_level = which_level_update > (size_levels - 50)?(size_levels-50):which_level_update;
+  if( which_level > 0)
   {
-    limit1 = limits[(which_level_update-1) * num_params *2 + which *2];
-    limit2 = limits[(which_level_update-1) * num_params *2 + which *2 + 1];
+    limit1 = limits[(which_level-1) * num_params *2 + which *2];
+    limit2 = limits[(which_level-1) * num_params *2 + which *2 + 1];
     width = limit2 - limit1;
   }
   else
