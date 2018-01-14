@@ -102,20 +102,20 @@ void sim()
       break;
 
     case 5:
-      pm[0] = log(1.0);
-      pm[1] = 0.0;
-      pm[2] = log(4.0);
-      pm[3] = 0.5;
-      pm[4] = log(2.0);
-      pm[5] = 1.5;
-      pm[6] = 20.0;
-      pm[7] = 40.0;
-      pm[8] = 0.0;
-      pm[9] = 1.0;
-      pm[10] = 1.0;
-      pm[11] = log(2.0);
-      pm[12] = 0.0;
-      pm[13] = 0.5;
+      pm[0] = log(1.0);  //A
+      pm[1] = 0.0;       //Ag
+      pm[2] = log(4.0);  //mu
+      pm[3] = 0.5;       //Fin
+      pm[4] = log(2.0);  //Fout
+      pm[5] = 1.5;       //alpha
+      pm[6] = 20.0;      //inc
+      pm[7] = 40.0;      //opn
+      pm[8] = 0.0;       //k
+      pm[9] = 2.0;       //gam
+      pm[10] = 0.5;      //xi
+      pm[11] = log(2.0); //mbh
+      pm[12] = 0.0;      //fellip
+      pm[13] = 0.2;      //fflow
       pm[14] = log(0.01);
       pm[15] = log(0.1);
       pm[16] = log(0.01);
@@ -350,7 +350,7 @@ void sim_init()
     Tspan = Tcon_data[n_con_data -1] - Tcon_data[0];
   
   /* set time array for continuum */
-    Tcon_min = Tcon_data[0] - fmax(0.05*Tspan, parset.tau_max_set);
+    Tcon_min = Tcon_data[0] - fmax(0.05*Tspan, fmin(Tspan, parset.tau_max_set));
     Tcon_max = Tcon_data[n_con_data-1] + fmax(0.05*Tspan, 10.0);
     dT = (Tcon_max - Tcon_min)/(parset.n_con_recon -1);
   

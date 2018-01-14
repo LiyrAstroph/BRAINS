@@ -574,10 +574,10 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
 void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
   int i, j, idV, idt, nc, flag_update=0;
-  double r, phi, dis, Lopn_cos, u;
+  double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
   double inc, F, beta, mu, k, a, s, rin, sig;
-  double Lphi, Lthe, L, E, vcloud_max, vcloud_min;
+  double Lphi, Lthe, vcloud_max, vcloud_min;
   double dV, V, Anorm, weight, rnd;
   BLRmodel2 *model = (BLRmodel2 *)pm;
   FILE *fcloud_out;
@@ -971,7 +971,7 @@ void transfun_2d_cloud_direct_model3(const void *pm, double *transv, double *tra
   int i, j, idV, idt, nc, flag_update=0;
   double r, phi, dis, Lopn_cos, u;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
-  double inc, F, alpha, Rin, mu, k;
+  double inc, F, alpha, Rin, k;
   double Lphi, Lthe, L, E, vcloud_max, vcloud_min;
   double dV, V, Anorm, weight, rnd;
   BLRmodel3 *model = (BLRmodel3 *)pm;
@@ -1196,7 +1196,7 @@ void transfun_2d_cloud_direct_model4(const void *pm, double *transv, double *tra
   int i, j, idV, idt, nc, flag_update=0;
   double r, phi, dis, Lopn_cos, u;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
-  double inc, F, alpha, Rin, mu, k;
+  double inc, F, alpha, Rin, k;
   double Lphi, Lthe, L, E, vcloud_max, vcloud_min;
   double dV, V, Anorm, weight, rnd;
   BLRmodel4 *model = (BLRmodel4 *)pm;
@@ -1426,7 +1426,7 @@ void transfun_1d_cloud_direct_model5(const void *pm, int flag_save)
   int i, idt, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0;
-  double inc, Fin, Fout, alpha, Rin, k, gam, mu, xi;
+  double inc, Fin, Fout, alpha, k, gam, mu, xi;
   double Lphi, Lthe;
   double Anorm, weight, rndr, rnd, rnd_xi, rnd_frac, frac1, frac2, ratio;
   BLRmodel5 *model = (BLRmodel5 *)pm;
@@ -1606,7 +1606,7 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
   int i, j, idt, idV, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0;
-  double inc, Fin, Fout, alpha, Rin, k, gam, mu, xi;
+  double inc, Fin, Fout, alpha, k, gam, mu, xi;
   double mbh, fellip, fflow, sigr_circ, sigthe_circ, sigr_rad, sigthe_rad, theta_rot;
   double Lphi, Lthe, V, Vr, Vph, Vkep, rhoV, theV;
   double Anorm, weight, rndr, rnd, rnd_frac, rnd_xi,rnd_flow, frac1, frac2, ratio;
@@ -2042,7 +2042,7 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
   int i, j, idt, idV, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb, vcloud_min, vcloud_max;
-  double V, dV, rhotheta, rhor, rhoV, theV, Vr, Vph, Vkep;
+  double V, dV, rhoV, theV, Vr, Vph, Vkep;
   double inc, F, beta, mu, k, gam, xi, a, s, sig, rin;
   double mbh, fellip, fflow, sigr_circ, sigthe_circ, sigr_rad, sigthe_rad, theta_rot;
   double Lphi, Lthe;
