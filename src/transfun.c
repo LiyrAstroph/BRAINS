@@ -151,6 +151,7 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
 
 /*================================================================
  * model 1
+ * Brewer et al. (2011)'s model
  *================================================================
  */
 /* 
@@ -161,7 +162,7 @@ void transfun_1d_cloud_direct_model1(const void *pm, int flag_save)
   FILE *fcloud_out;
   int i, idt, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
-  double x, y, z, xb, yb, zb;
+  double x, y, z, xb, yb, zb, zb0;
   double inc, F, beta, mu, k, a, s, rin, sig;
   double Lphi, Lthe;
   double Anorm, weight, rnd;
@@ -199,6 +200,9 @@ void transfun_1d_cloud_direct_model1(const void *pm, int flag_save)
       break;
     }
   }
+
+  // "which_parameter_update = -1" means that all parameters are updated, usually occurs at the 
+  // initial step.
   if(force_update == 1 || which_parameter_update == -1 )
   {
     flag_update = 1;
@@ -216,8 +220,6 @@ void transfun_1d_cloud_direct_model1(const void *pm, int flag_save)
     Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
     Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
 
-    // "which_parameter_update = -1" means that all parameters are updated, usually occurs at the 
-    // initial step.
     if( flag_update == 1 ) //
     {
       nc = 0;
@@ -260,7 +262,8 @@ void transfun_1d_cloud_direct_model1(const void *pm, int flag_save)
     yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y;
     zb = sin(Lthe) * x;
 
-    if(zb < 0.0)
+    zb0 = zb;
+    if(zb0 < 0.0)
       zb = -zb;
 
 // conter-rotate around y, LOS is x-axis 
@@ -394,7 +397,6 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
     Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
     Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
 
-    // which_parameter_update == 1 ==> beta is being updated.
     if( flag_update == 1 )
     {
       nc = 0;
@@ -495,7 +497,7 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
       vyb =-cos(Lthe)*sin(Lphi) * vx + cos(Lphi) * vy;
       vzb = sin(Lthe) * vx;
 
-      if(zb < 0.0)
+      if(zb0 < 0.0)
         vzb = -vzb;
     
       vx = vxb * cos(PI/2.0-inc) + vzb * sin(PI/2.0-inc);
@@ -1630,8 +1632,6 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
   sigthe_rad = exp(model->sigthe_rad);
   theta_rot = model->theta_rot*PI/180.0;
 
-  printf("%f %f %f\n", Fout, mu, alpha);
-
   frac1 = 1.0/(alpha+1.0) * (1.0 - pow(Fin,   alpha+1.0));
   frac2 = 1.0/(alpha-1.0) * (1.0 - pow(Fout, -alpha+1.0));
   ratio = frac1/(frac1 + frac2);
@@ -1860,6 +1860,7 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
 
 /*================================================================
  * model 6
+ * Pancoast et al. (2014)'s model
  *================================================================
  */
 /* 
@@ -1910,6 +1911,8 @@ void transfun_1d_cloud_direct_model6(const void *pm, int flag_save)
       break;
     }
   }
+  // "which_parameter_update = -1" means that all parameters are updated, usually occurs at the 
+  // initial step.
   if(force_update == 1 || which_parameter_update == -1 )
   {
     flag_update = 1;
@@ -1927,8 +1930,6 @@ void transfun_1d_cloud_direct_model6(const void *pm, int flag_save)
     Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
     Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_r), gam));
 
-    // "which_parameter_update = -1" means that all parameters are updated, usually occurs at the 
-    // initial step.
     if( flag_update == 1 ) //
     {
       nc = 0;
@@ -1954,7 +1955,7 @@ void transfun_1d_cloud_direct_model6(const void *pm, int flag_save)
     }
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
-    /* Polar coordinates to Cartesian coordinate */
+    /* Polar coordinates to Cartesian coordinates */
     x = r * cos(phi); 
     y = r * sin(phi);
     z = 0.0;
@@ -2100,6 +2101,9 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
       break;
     }
   }
+
+  // "which_parameter_update = -1" means that all parameters are updated, usually occurs at the 
+  // initial step.
   if(force_update == 1 || which_parameter_update == -1 )
   {
     flag_update = 1;
@@ -2111,8 +2115,6 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
     Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
     Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_r), gam));
 
-    // "which_parameter_update = -1" means that all parameters are updated, usually occurs at the 
-    // initial step.
     if( flag_update == 1 ) //
     {
       nc = 0;

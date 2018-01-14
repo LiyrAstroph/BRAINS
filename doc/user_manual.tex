@@ -2,9 +2,49 @@
 \usepackage{apjfonts}
 \usepackage{geometry}
 \usepackage{graphicx}
+\usepackage{titletoc, titlesec}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage{xcolor}
+\usepackage{amsmath,mathrsfs,amsfonts}
+
+\definecolor{main}{RGB}{0,120,2}%
+\definecolor{seco}{RGB}{230,90,7}%
+\definecolor{thid}{RGB}{0,160,152}%
+
+\hypersetup{
+ breaklinks,
+ unicode,                
+ bookmarksnumbered  =true,
+ bookmarksopen      =true, 
+ pdfsubject         =\@author \@title Book,
+ pdfkeywords        ={ElegantBook},
+ pdfcreator         ={XeLaTeX with ElegantBook class},
+ colorlinks,
+ linkcolor          =main,
+ plainpages         =false,
+ pdfstartview       =FitH,
+ pdfborder={0 0 0},
+ linktocpage
+ }
+
+
+\geometry{
+    a4paper,
+   left=27mm,  %% or inner=23mm
+   right=27mm, %% or outer=18mm
+   top=25.4mm, bottom=25.4mm,
+   headheight=2.17cm,
+   headsep=4mm,
+   footskip=12mm
+}
+
+\titleformat{\chapter}[hang]{\Huge\bfseries}{Chapter \thechapter}{1cm}{}[]
 
 \DeclareMathAlphabet{\mathbi}{OT1}{cmr}{bx}{it}
 \SetMathAlphabet\mathbi{bold}{OT1}{cmr}{bx}{it}
+
+\def\brains{{\texttt{brains}}}
 
 \begin{document}
 
@@ -15,8 +55,37 @@ with Nested Sampling}
 Institute of High Energy Physics}
 
 \maketitle
+\tableofcontents
+\mainmatter
 
-\chapter{BLR modeling}
+\clearpage
+\newpage
+
+\vspace*{10cm}
+{\Huge\centerline{\bf Part I: Users' Guide}}
+
+
+\chapter{Installation}
+\section{Third-Party Packages}
+{\brains} requires following thrid-party packages:
+\begin{itemize}
+ \item GSL.
+ 
+ GSL is used to 
+ \item FFTW
+ \item LAPACK
+ \item MPICH
+\end{itemize}
+
+
+\clearpage
+\newpage
+
+\vspace*{10cm}
+{\Huge\centerline{\bf Part II: Broad-Line Region Modeling}}
+
+\setcounter{chapter}{0}
+\chapter{BLR Modeling}
 
 \section{Coordinate rotation}
 \begin{figure}[h!]
@@ -24,7 +93,7 @@ Institute of High Energy Physics}
 \includegraphics[width=0.5\textwidth]{coord.pdf}
 \end{figure}
 
-Rotate an coordinate (XOY) by an angle of $\theta$ to (X'OY'), there are relations
+For the rotation of a coordinate (XOY) by an angle of $\theta$ to (X'OY'), there are relations
 \begin{equation}
 \left[\begin{array}{c}
 \mathbi{e}_{x'} \\
@@ -50,7 +119,7 @@ and
 \mathbi{e}_{y'}
 \end{array}\right].
 \end{equation}
-Therefore, for a vector $A$, its components in (XOY) and (X'OY') have relation 
+Therefore, for a vector $A$, its components in (XOY) and (X'OY') are related by
 \begin{equation}
 A=[x', y'] \left[\begin{array}{c}
 \mathbi{e}_{x'} \\
