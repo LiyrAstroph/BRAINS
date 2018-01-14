@@ -236,12 +236,11 @@ void transfun_1d_cloud_direct_model1(const void *pm, int flag_save)
         r = rin + sig * rnd;
         nc++;
       }
-      clouds_particles_perturb[which_particle_update][i] = rnd;
+      clouds_particles_perturb[which_particle_update][i] = r;
     }
     else
     {
-      rnd = clouds_particles[which_particle_update][i];
-      r = rin + sig * rnd;
+      r = clouds_particles[which_particle_update][i];
     }
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
@@ -413,12 +412,11 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
         r = rin + sig * rnd;
         nc++;
       }
-      clouds_particles_perturb[which_particle_update][i] = rnd;
+      clouds_particles_perturb[which_particle_update][i] = r;
     }
     else
     {
-      rnd = clouds_particles[which_particle_update][i];
-      r = rin + sig * rnd;
+      r = clouds_particles[which_particle_update][i];
     }
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
@@ -657,12 +655,11 @@ void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *tra
         r = rin + sig * rnd;
         nc++;
       }
-      clouds_particles_perturb[which_particle_update][i] = rnd;
+      clouds_particles_perturb[which_particle_update][i] = r;
     }
     else
     {
-      rnd = clouds_particles[which_particle_update][i];
-      r = rin + sig * rnd;
+      r = clouds_particles[which_particle_update][i];
     }
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
@@ -876,12 +873,11 @@ void transfun_1d_cloud_direct_model3(const void *pm, int flag_save)
         r = Rin * rnd ;
         nc++;
       }
-      clouds_particles_perturb[which_particle_update][i] = rnd;
+      clouds_particles_perturb[which_particle_update][i] = r;
     }
     else
     {
-      rnd = clouds_particles[which_particle_update][i];
-      r = Rin * rnd;
+      r = clouds_particles[which_particle_update][i];
     }
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
@@ -1049,12 +1045,11 @@ void transfun_2d_cloud_direct_model3(const void *pm, double *transv, double *tra
         r = Rin * rnd ;
         nc++;
       }
-      clouds_particles_perturb[which_particle_update][i] = rnd;
+      clouds_particles_perturb[which_particle_update][i] = r;
     }
     else
     {
-      rnd = clouds_particles[which_particle_update][i];
-      r = Rin * rnd;
+      r = clouds_particles[which_particle_update][i];
     }
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
@@ -1274,12 +1269,11 @@ void transfun_2d_cloud_direct_model4(const void *pm, double *transv, double *tra
         r = Rin * rnd ;
         nc++;
       }
-      clouds_particles_perturb[which_particle_update][i] = rnd;
+      clouds_particles_perturb[which_particle_update][i] = r;
     }
     else
     {
-      rnd = clouds_particles[which_particle_update][i];
-      r = Rin * rnd;
+      r = clouds_particles[which_particle_update][i];
     }
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
@@ -1510,12 +1504,11 @@ void transfun_1d_cloud_direct_model5(const void *pm, int flag_save)
         r = rndr*mu;
         nc++;
       }
-      clouds_particles_perturb[which_particle_update][i] = rndr;
+      clouds_particles_perturb[which_particle_update][i] = r;
     }
     else
     {
-      rndr = clouds_particles[which_particle_update][i];
-      r = rndr*mu;
+      r = clouds_particles[which_particle_update][i];
     }
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
@@ -1703,12 +1696,11 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
         r = rndr*mu;
         nc++;
       }
-      clouds_particles_perturb[which_particle_update][i] = rndr;
+      clouds_particles_perturb[which_particle_update][i] = r;
     }
     else
     {
-      rndr = clouds_particles[which_particle_update][i];
-      r = rndr*mu;
+      r = clouds_particles[which_particle_update][i];
     }
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
@@ -1946,12 +1938,11 @@ void transfun_1d_cloud_direct_model6(const void *pm, int flag_save)
         r = rin + sig * rnd;
         nc++;
       }
-      clouds_particles_perturb[which_particle_update][i] = rnd;
+      clouds_particles_perturb[which_particle_update][i] = r;
     }
     else
     {
-      rnd = clouds_particles[which_particle_update][i];
-      r = rin + sig * rnd;
+      r = clouds_particles[which_particle_update][i];
     }
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
@@ -2131,12 +2122,11 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
         r = rin + sig * rnd;
         nc++;
       }
-      clouds_particles_perturb[which_particle_update][i] = rnd;
+      clouds_particles_perturb[which_particle_update][i] = r;
     }
     else
     {
-      rnd = clouds_particles[which_particle_update][i];
-      r = rin + sig * rnd;
+      r = clouds_particles[which_particle_update][i];
     }
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
