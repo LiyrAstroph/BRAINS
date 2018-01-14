@@ -624,7 +624,7 @@ double perturb_line2d_model6(void *model)
   which_parameter_update = which;
 
   /* level-dependent width */
-  which_level_update = which_level_update > (size_levels - 50)?(size_levels -50):which_level_update;
+  which_level = which_level_update > (size_levels - 50)?(size_levels -50):which_level_update;
 
   if( which_level > 0)
   {
