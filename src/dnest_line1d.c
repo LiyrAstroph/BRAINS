@@ -372,7 +372,7 @@ double perturb_line1d_model1(void *model)
   which_parameter_update = which;
 
   /* level-dependent width */
-  which_level_update = which_level_update > (size_levels - 30)?(size_levels -30):which_level_update;
+  which_level_update = which_level_update > (size_levels - 50)?(size_levels -50):which_level_update;
   which_level_update = which_level_update <0?0:which_level_update;
 
   if( which_level_update != 0)
@@ -453,7 +453,7 @@ double perturb_line1d_model3(void *model)
   which_parameter_update = which;
 
   /* level-dependent width */
-  which_level_update = which_level_update > (size_levels - 30)?(size_levels -30):which_level_update;
+  which_level_update = which_level_update > (size_levels - 50)?(size_levels -50):which_level_update;
   which_level_update = which_level_update <0?0:which_level_update;
 
   if( which_level_update != 0)
@@ -539,7 +539,7 @@ double perturb_line1d_model5(void *model)
   which_parameter_update = which;
 
   /* level-dependent width */
-  which_level_update = which_level_update > (size_levels - 30)?(size_levels -30):which_level_update;
+  which_level_update = which_level_update > (size_levels - 50)?(size_levels -50):which_level_update;
   which_level_update = which_level_update <0?0:which_level_update;
 
   if( which_level_update != 0)
@@ -625,7 +625,7 @@ double perturb_line1d_model6(void *model)
   which_parameter_update = which;
 
   /* level-dependent width */
-  which_level_update = which_level_update > (size_levels - 30)?(size_levels -30):which_level_update;
+  which_level_update = which_level_update > (size_levels - 50)?(size_levels -50):which_level_update;
   which_level_update = which_level_update <0?0:which_level_update;
 
   if( which_level_update != 0)

@@ -225,10 +225,18 @@ void reconstruct_con()
       memcpy(var_param, best_model_con, num_params_var*sizeof(double));
       memcpy(var_param_std, best_model_std_con, num_params_var*sizeof(double));
     }
-  
-    MPI_Bcast(var_param, num_params_var, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
-    MPI_Bcast(var_param_std, num_params_var, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
   }
+  else
+  {
+    for(i=0; i<num_params_var; i++)
+    {
+      var_param[i] = 0.5*(par_range_model[i][0] + par_range_model[i][1]);
+      var_param_std[i] =0.5*(par_range_model[i][1] - par_range_model[i][0])/2.35;
+    }
+  }
+
+  MPI_Bcast(var_param, num_params_var, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+  MPI_Bcast(var_param_std, num_params_var, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
 
   reconstruct_con_end();
 
