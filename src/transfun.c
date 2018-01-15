@@ -85,7 +85,7 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
                                               double *fl2d, int nl, int nv)
 {
   int i, j, k, m;
-  double fline, tau, tl, tc, fcon, A, Ag, ftrend;
+  double fline, tau, tl, tc, fcon, A, Ag, ftrend, fnarrow;
   double *pmodel = (double *)pm;
 
   A=exp(pmodel[0]);
@@ -93,43 +93,47 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
 
   for(j=0;j<nl; j++)
   {
-    tl = Tl[j];
     for(i=0; i<nv; i++)
+      fl2d[j*nv + i] = 0.0;
+
+    tl = Tl[j];
+    for(k=0; k<parset.n_tau; k++)
     {
-      fline = 0.0;
-      for(k=0; k<parset.n_tau; k++)
+      tau = TransTau[k];
+      tc = tl - tau;
+      if(tc>=Tcon_min && tc <=Tcon_max)
       {
-        tau = TransTau[k];
-        tc = tl - tau;
-        if(tc>=Tcon_min && tc <=Tcon_max)
+        fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, tc, gsl_acc);          
+      }
+      else
+      {
+        //fcon = mean; 
+        fcon = con_q[0];
+        for(m=1; m < nq; m++)/*  beyond the range, set to be the long-term trend */
         {
-          fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, tc, gsl_acc);          
-        }
-        else
-        {
-          //fcon = mean; 
-          fcon = con_q[0];
-          for(m=1; m < nq; m++)/*  beyond the range, set to be the long-term trend */
-          {
             fcon += con_q[m] * pow(tc, m);
-          }
         }
+      }
 
-        // add different trend in continuum and emission line
-        if(parset.flag_trend_diff)
-        {
-          ftrend = pmodel[num_params_blr + 4 + parset.flag_trend] * (tc - 0.5*(Tcon_data[0] + Tcon_data[n_con_data-1]));
-          fcon += ftrend;
-        }
+      // add different trend in continuum and emission line
+      if(parset.flag_trend_diff)
+      {
+        ftrend = pmodel[num_params_blr + 4 + parset.flag_trend] * (tc - 0.5*(Tcon_data[0] + Tcon_data[n_con_data-1]));
+        fcon += ftrend;
+      }
 
+      for(i=0; i<nv; i++)
+      {
         if(fcon > 0.0)
         {
-           fline += trans2d[k*nv+i] * fcon * pow(fcon, Ag);
+           fl2d[j*nv + i] += trans2d[k*nv+i] * fcon * pow(fcon, Ag);
            //fline += trans2d[k*nv+i] * fcon;
         }
       }
-      fline *= dTransTau * A ;
-      fl2d[j*nv + i] = fline;
+    }
+    for(i=0; i<nv; i++)
+    {
+      fl2d[j*nv + i] *= dTransTau * A;
     }
   }
 
@@ -138,12 +142,13 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
 // add narrow line
   if(parset.flag_narrowline == 1)
   {
-    for(j = 0; j<nl; j++)
+    for(i=0; i<nv; i++)
     {
-      for(i=0; i<nv; i++)
-      {
-        fl2d[j*nv + i] += parset.flux_narrowline  
+      fnarrow = parset.flux_narrowline  
                * exp( -0.5 * pow( (transv[i] - parset.shift_narrowline)/(parset.width_narrowline), 2.0) ) * line_scale;
+      for(j = 0; j<nl; j++)
+      {
+        fl2d[j*nv + i] += fnarrow;
       }
     } 
   }
