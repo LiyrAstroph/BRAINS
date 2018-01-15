@@ -354,6 +354,7 @@ void set_blr_range_model1()
   blr_range_model[i][0] = log(1.0);
   blr_range_model[i++][1] = log(1.0+10.0);
 
+  return;
 }
 
 // model 2
@@ -399,6 +400,7 @@ void set_blr_range_model2()
   blr_range_model[i][0] = log(1.0);
   blr_range_model[i++][1] = log(1.0+10.0);
 
+  return;
 }
 
 // model 3
@@ -445,7 +447,8 @@ void set_blr_range_model3()
   blr_range_model[i++][1] = log(1.0+10.0);
 
   rcloud_max_set = fmax(rcloud_max_set, exp(blr_range_model[3][1] + blr_range_model[4][1]));
-
+  
+  return;
 }
 
 // model 3
@@ -492,6 +495,8 @@ void set_blr_range_model4()
   blr_range_model[i++][1] = log(1.0+10.0);
 
   rcloud_max_set = fmax(rcloud_max_set, exp(blr_range_model[3][1] + blr_range_model[4][1]));
+
+  return;
 }
 
 // model 5
@@ -562,6 +567,8 @@ void set_blr_range_model5()
   blr_range_model[i++][1] = log(1.0+10.0);
 
   rcloud_max_set = fmax(rcloud_max_set, exp(blr_range_model[2][1] + blr_range_model[4][1]));
+
+  return;
 }
 
 
@@ -629,4 +636,5 @@ void set_blr_range_model6()
   blr_range_model[i][0] = log(1.0);
   blr_range_model[i++][1] = log(1.0+10.0);
 
+  return;
 }
