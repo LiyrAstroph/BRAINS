@@ -232,18 +232,6 @@ void from_prior_line1d(void *model)
   {
     pm[i] = par_range_model[i][0] + dnest_rand() * ( par_range_model[i][1] - par_range_model[i][0]  );
   }
-  
-  if(parset.flag_blrmodel == 3 || parset.flag_blrmodel == 4)
-  {
-    if( pm[3] + pm[4] > log(rcloud_max_set))
-      wrap(&pm[4], par_range_model[4][0], log(rcloud_max_set) - pm[3]);
-  }
-
-  if(parset.flag_blrmodel == 5)
-  {
-    if( pm[2] + pm[4] > log(rcloud_max_set) )
-      wrap( &pm[4], par_range_model[4][0], log(rcloud_max_set) - pm[2] );
-  }
 
   // set an upper limit to the MCMC steps of systematic errors
   //i=num_params_blr-1;
@@ -474,10 +462,6 @@ double perturb_line1d_model3(void *model)
     pm[which] += dnest_randh() * width;
     wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
 
-    if((which == 4) && (pm[3] + pm[4] > log(rcloud_max_set)))
-    {
-      wrap(&pm[which], par_range_model[which][0], log(rcloud_max_set) - pm[3]);
-    }
   }
   else if(which < num_params_blr + 4 + parset.flag_trend)
   {
@@ -559,10 +543,6 @@ double perturb_line1d_model5(void *model)
     pm[which] += dnest_randh() * width;
     wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
 
-    if((which == 4) && (pm[2] + pm[4] > log(rcloud_max_set)))
-    {
-      wrap(&pm[which], par_range_model[which][0], log(rcloud_max_set) - pm[2]);
-    }
   }
   else if(which < num_params_blr + 4 + parset.flag_trend)
   {

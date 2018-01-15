@@ -275,8 +275,10 @@ void transfun_1d_cloud_direct_model1(const void *pm, int flag_save)
     //if(dis<parset.tau_min_set || dis>=parset.tau_max_set+dTransTau)
     //	continue;
     idt = (dis - parset.tau_min_set)/dTransTau;
-    if(idt < 0 || idt >= parset.n_tau)
-      continue;
+    if(idt < 0)
+      idt = 0;
+    if(idt >= parset.n_tau)
+      idt = parset.n_tau - 1;
 
     weight = 0.5 + k*(x/r);
     //weight = 0.5 + k * x/sqrt(x*x+y*y);
@@ -446,8 +448,10 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
     //if(dis< parset.tau_min_set || dis>= parset.tau_max_set + dTransTau)
     //  continue;
     idt = (dis - parset.tau_min_set)/dTransTau;
-    if(idt < 0 || idt >= parset.n_tau)
-      continue;
+    if(idt < 0)
+      idt = 0;
+    if(idt >= parset.n_tau)
+      idt = parset.n_tau - 1;
 
     weight = 0.5 + k*(x/r);
     //weight = 0.5 + k * x/sqrt(x*x+y*y);
@@ -511,8 +515,12 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
       //  continue
 
       idV = (V - transv[0])/dV;
-      if(idV < 0 || idV >= n_vel)
-        continue;
+      if(idV < 0)
+        idV = 0;
+      if(idV >= n_vel)
+        idV = n_vel - 1;
+
+
       //trans2d[idt*n_vel + idV] += pow(1.0/r, 2.0*(1 + gam)) * weight;
       trans2d[idt*n_vel + idV] += weight;
 
@@ -690,8 +698,10 @@ void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *tra
     //if(dis< parset.tau_min_set || dis>= parset.tau_max_set + dTransTau)
     //  continue;
     idt = (dis - parset.tau_min_set)/dTransTau;
-    if(idt < 0 || idt >= parset.n_tau)
-      continue;
+    if(idt < 0)
+      idt = 0;
+    if(idt >= parset.n_tau)
+      idt = parset.n_tau - 1;
 
     weight = 0.5 + k*(x/r);
     //weight = 0.5 + k * x/sqrt(x*x+y*y);
@@ -740,8 +750,11 @@ void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *tra
       //  continue
 
       idV = (V - transv[0])/dV;
-      if(idV < 0 || idV >= n_vel)
-        continue;
+      if(idV < 0)
+        idV = 0;
+      if(idV >= n_vel)
+        idV = n_vel - 1;
+
       //trans2d[idt*n_vel + idV] += pow(1.0/r, 2.0*(1 + gam)) * weight;
       trans2d[idt*n_vel + idV] += weight;
 
@@ -912,8 +925,10 @@ void transfun_1d_cloud_direct_model3(const void *pm, int flag_save)
     //if(dis<parset.tau_min_set || dis>=parset.tau_max_set+dTransTau)
     //  continue;
     idt = (dis - parset.tau_min_set)/dTransTau;
-    if(idt < 0 || idt >= parset.n_tau)
-      continue;
+    if(idt < 0)
+      idt = 0;
+    if(idt >= parset.n_tau)
+      idt = parset.n_tau - 1;
 
     weight = 0.5 + k*(x/r);
     //weight = 0.5 + k * x/sqrt(x*x+y*y);
@@ -1080,8 +1095,10 @@ void transfun_2d_cloud_direct_model3(const void *pm, double *transv, double *tra
     //if(dis< parset.tau_min_set || dis>= parset.tau_max_set + dTransTau)
     //  continue;
     idt = (dis - parset.tau_min_set)/dTransTau;
-    if(idt < 0 || idt >= parset.n_tau)
-      continue;
+    if(idt < 0)
+      idt = 0;
+    if(idt >= parset.n_tau)
+      idt = parset.n_tau - 1;
 
     weight = 0.5 + k*(x/r);
     //weight = 0.5 + k * x/sqrt(x*x+y*y);
@@ -1133,8 +1150,11 @@ void transfun_2d_cloud_direct_model3(const void *pm, double *transv, double *tra
       //  continue
 
       idV = (V - transv[0])/dV;
-      if(idV < 0 || idV >= n_vel)
-        continue;
+      if(idV < 0)
+        idV = 0;
+      if(idV >= n_vel)
+        idV = n_vel - 1;
+
       //trans2d[idt*n_vel + idV] += pow(1.0/r, 2.0*(1 + gam)) * weight;
       trans2d[idt*n_vel + idV] += weight;
 
@@ -1304,8 +1324,10 @@ void transfun_2d_cloud_direct_model4(const void *pm, double *transv, double *tra
     //if(dis< parset.tau_min_set || dis>= parset.tau_max_set + dTransTau)
     //  continue;
     idt = (dis - parset.tau_min_set)/dTransTau;
-    if(idt < 0 || idt >= parset.n_tau)
-      continue;
+    if(idt < 0)
+      idt = 0;
+    if(idt >= parset.n_tau)
+      idt = parset.n_tau - 1;
 
     weight = 0.5 + k*(x/r);
     //weight = 0.5 + k * x/sqrt(x*x+y*y);
@@ -1357,8 +1379,11 @@ void transfun_2d_cloud_direct_model4(const void *pm, double *transv, double *tra
       //  continue
 
       idV = (V - transv[0])/dV;
-      if(idV < 0 || idV >= n_vel)
-        continue;
+      if(idV < 0)
+        idV = 0;
+      if(idV >= n_vel)
+        idV = n_vel - 1;
+
       //trans2d[idt*n_vel + idV] += pow(1.0/r, 2.0*(1 + gam)) * weight;
       trans2d[idt*n_vel + idV] += weight;
 
@@ -1809,7 +1834,7 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
         idV = 0;
       if(idV >= n_vel)
         idV = n_vel - 1;
-      
+
       //trans2d[idt*n_vel + idV] += pow(1.0/r, 2.0*(1 + gam)) * weight;
       trans2d[idt*n_vel + idV] += weight;
 
@@ -1986,8 +2011,10 @@ void transfun_1d_cloud_direct_model6(const void *pm, int flag_save)
     //if(dis<parset.tau_min_set || dis>=parset.tau_max_set+dTransTau)
     //  continue;
     idt = (dis - parset.tau_min_set)/dTransTau;
-    if(idt < 0 || idt >= parset.n_tau)
-      continue;
+    if(idt < 0)
+      idt = 0;
+    if(idt >= parset.n_tau)
+      idt = parset.n_tau - 1;
 
     weight = 0.5 + k*(x/r);
     //weight = 0.5 + k * x/sqrt(x*x+y*y);
@@ -2170,8 +2197,10 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
     //if(dis<parset.tau_min_set || dis>=parset.tau_max_set+dTransTau)
     //  continue;
     idt = (dis - parset.tau_min_set)/dTransTau;
-    if(idt < 0 || idt >= parset.n_tau)
-      continue;
+    if(idt < 0)
+      idt = 0;
+    if(idt >= parset.n_tau)
+      idt = parset.n_tau - 1;
 
     weight = 0.5 + k*(x/r);
     //weight = 0.5 + k * x/sqrt(x*x+y*y);
@@ -2235,8 +2264,11 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
       //  continue
 
       idV = (V - transv[0])/dV;
-      if(idV < 0 || idV >= n_vel)
-        continue;
+      if(idV < 0)
+        idV = 0;
+      if(idV >= n_vel)
+        idV = n_vel - 1;
+
       //trans2d[idt*n_vel + idV] += pow(1.0/r, 2.0*(1 + gam)) * weight;
       trans2d[idt*n_vel + idV] += weight;
 
