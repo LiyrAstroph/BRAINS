@@ -39,9 +39,9 @@ void smooth_init(int nv, const double *transv)
 {
   nd_fft = nv;
 
-  data_fft = (fftw_complex *) fftw_malloc(nd_fft * sizeof(fftw_complex));
-  resp_fft = (fftw_complex *) fftw_malloc(nd_fft * sizeof(fftw_complex));
-  conv_fft = (fftw_complex *) fftw_malloc(nd_fft * sizeof(fftw_complex));
+  data_fft = (fftw_complex *) fftw_malloc((nd_fft/2+1) * sizeof(fftw_complex));
+  resp_fft = (fftw_complex *) fftw_malloc((nd_fft/2+1) * sizeof(fftw_complex));
+  conv_fft = (fftw_complex *) fftw_malloc((nd_fft/2+1) * sizeof(fftw_complex));
 
   real_data = (double *)fftw_malloc(nd_fft * sizeof(double));
   real_resp = (double *)fftw_malloc(nd_fft * sizeof(double));
@@ -160,9 +160,9 @@ void smooth_test()
   in_b = (double*) fftw_malloc(sizeof(double) * N);
   re = (double*) fftw_malloc(sizeof(double) * N);
   
-  out_a = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * N);
-  out_b = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * N);
-  out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * N);
+  out_a = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * (N/2+1));
+  out_b = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * (N/2+1));
+  out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * (N/2+1));
   
   pa = fftw_plan_dft_r2c_1d(N, in_a, out_a, FFTW_MEASURE);
   pb = fftw_plan_dft_r2c_1d(N, in_b, out_b, FFTW_MEASURE); 
@@ -207,7 +207,7 @@ void smooth_test()
  
     fftw_execute(pb);
   
-    for(i=0; i<N; i++)
+    for(i=0; i<N/2+1; i++)
     {
       out[i][0] = out_a[i][0]*out_b[i][0] - out_a[i][1]*out_b[i][1];
       out[i][1] = out_a[i][0]*out_b[i][1] + out_a[i][1]*out_b[i][0];

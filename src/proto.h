@@ -100,6 +100,7 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
 
 void smooth_init(int nv, const double *transv);
 void smooth_end();
+void smooth_test();
 
 void restart_clouds_2d(int iflag);
 
