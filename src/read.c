@@ -42,7 +42,7 @@ void read_parset()
     addr[nt] = &parset.file_dir;
     id[nt++] = STRING;
 
-    strcpy(tag[nt], "ContinnumFile");
+    strcpy(tag[nt], "ContinuumFile");
     addr[nt] = &parset.continuum_file;
     id[nt++] = STRING;
 

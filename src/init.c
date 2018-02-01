@@ -103,7 +103,7 @@ void init()
   var_range_model[0][0] = log(1.0e-10);; // systematic error in continuum
   var_range_model[0][1] = log(1.0e6);;
 
-  var_range_model[1][0] = -6.0; // log(sigma)
+  var_range_model[1][0] = -15.0; // log(sigma)
   var_range_model[1][1] = -1.0; 
 
   var_range_model[2][0] = log(1.0); // log(tau)
