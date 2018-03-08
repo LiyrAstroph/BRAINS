@@ -82,7 +82,7 @@ int dnest_line2d(int argc, char **argv)
       
       break;
     case 5:
-      num_params_blr = 20;
+      num_params_blr = 21;
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model5;
 
       num_params_radial_samp=4;
@@ -95,7 +95,7 @@ int dnest_line2d(int argc, char **argv)
       break;
     
     case 6:
-      num_params_blr = 19;
+      num_params_blr = 20;
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model6;
 
       num_params_radial_samp=3;

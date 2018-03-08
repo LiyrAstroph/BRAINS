@@ -1616,9 +1616,9 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0;
   double inc, Fin, Fout, alpha, k, gam, mu, xi;
-  double mbh, fellip, fflow, sigr_circ, sigthe_circ, sigr_rad, sigthe_rad, theta_rot;
+  double mbh, fellip, fflow, sigr_circ, sigthe_circ, sigr_rad, sigthe_rad, theta_rot, rf;
   double Lphi, Lthe, V, Vr, Vph, Vkep, rhoV, theV;
-  double Anorm, weight, rndr, rnd, rnd_frac, rnd_xi,rnd_flow, frac1, frac2, ratio;
+  double Anorm, weight, rndr, rnd, rnd_frac, rnd_xi,rnd_flow, frac1, frac2, ratio, fe;
   double vx, vy, vz, vxb, vyb, vzb, dV, vcloud_max, vcloud_min;
   BLRmodel5 *model = (BLRmodel5 *)pm;
 
@@ -1635,6 +1635,7 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
   mbh = exp(model->mbh);
   fellip = model->fellip;
   fflow = model->fflow;
+  rf = exp(model->rf);
   sigr_circ = exp(model->sigr_circ);
   sigthe_circ = exp(model->sigthe_circ);
   sigr_rad = exp(model->sigr_rad);
@@ -1762,13 +1763,18 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
     //Trans1D[idt] += pow(1.0/r, 2.0*(1 + gam)) * weight;
 
     Vkep = sqrt(mbh/r);
+     
+    if(r >= rf)
+      fe = fellip;
+    else
+      fe = 0.0;
 
     for(j=0; j<parset.n_vel_per_cloud; j++)
     {
       rnd = gsl_rng_uniform(gsl_r);
       rnd_flow = gsl_rng_uniform(gsl_r);
 
-      if(rnd < fellip)
+      if(rnd < fe)
       {
         rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_circ  + 1.0) * Vkep;
         theV =  gsl_ran_ugaussian(gsl_r) * sigthe_circ + PI/2.0;
@@ -2051,10 +2057,10 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
   FILE *fcloud_out;
   int i, j, idt, idV, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
-  double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb, vcloud_min, vcloud_max;
+  double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb, vcloud_min, vcloud_max, fe;
   double V, dV, rhoV, theV, Vr, Vph, Vkep;
   double inc, F, beta, mu, k, gam, xi, a, s, sig, rin;
-  double mbh, fellip, fflow, sigr_circ, sigthe_circ, sigr_rad, sigthe_rad, theta_rot;
+  double mbh, fellip, fflow, sigr_circ, sigthe_circ, sigr_rad, sigthe_rad, theta_rot, rf;
   double Lphi, Lthe;
   double Anorm, weight, rnd, rnd_xi, rnd_flow;
   BLRmodel6 *model = (BLRmodel6 *)pm;
@@ -2071,6 +2077,7 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
   mbh = exp(model->mbh);
   fellip = model->fellip;
   fflow = model->fflow;
+  rf = exp(model->rf);
   sigr_circ = exp(model->sigr_circ);
   sigthe_circ = exp(model->sigthe_circ);
   sigr_rad = exp(model->sigr_rad);
@@ -2192,13 +2199,18 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
 
 
     Vkep = sqrt(mbh/r);
+    
+    if(r >= rf)
+      fe = fellip;
+    else
+      fe = 0.0;
 
     for(j=0; j<parset.n_vel_per_cloud; j++)
     {
       rnd = gsl_rng_uniform(gsl_r);
       rnd_flow = gsl_rng_uniform(gsl_r);
 
-      if(rnd < fellip)
+      if(rnd < fe)
       {
         rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_circ  + 1.0) * Vkep;
         theV =  gsl_ran_ugaussian(gsl_r) * sigthe_circ + PI/2.0;

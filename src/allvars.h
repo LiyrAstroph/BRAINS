@@ -223,12 +223,13 @@ typedef struct
   double mbh;           /*!< \brief 12.black hole mass */
   double fellip;        /*!< \brief 13.ellipitic orbits */
   double fflow;         /*!< \brief 14.inflow/outflow */
-  double sigr_circ;     /*!< \brief 15. */
-  double sigthe_circ;   /*!< \brief 16. */
-  double sigr_rad;      /*!< \brief 17. */
-  double sigthe_rad;    /*!< \brief 18. */
-  double theta_rot;     /*!< \brief 19. */
-  double logse;         /*!< \brief 20. */
+  double rf;            /*!< \brief 15  */
+  double sigr_circ;     /*!< \brief 16. */
+  double sigthe_circ;   /*!< \brief 17. */
+  double sigr_rad;      /*!< \brief 18. */
+  double sigthe_rad;    /*!< \brief 19. */
+  double theta_rot;     /*!< \brief 20. */
+  double logse;         /*!< \brief 21. */
 }BLRmodel5;
 
 /* Pancoast 2014's model */
@@ -247,6 +248,7 @@ typedef struct
   double mbh;           /*!< \brief 11.black hole mass */
   double fellip;        /*!< \brief 12.ellipitic orbits */
   double fflow;         /*!< \brief 13.inflow/outflow */
+  double rf;
   double sigr_circ;     /*!< \brief 14. */
   double sigthe_circ;   /*!< \brief 15. */
   double sigr_rad;      /*!< \brief 16. */
