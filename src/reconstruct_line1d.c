@@ -557,9 +557,13 @@ double prob_initial_line1d(const void *model)
   var2_se = (exp(pm[num_params_blr-1])-1.0) * (exp(pm[num_params_blr-1])-1.0) * line_error_mean*line_error_mean;
   for(i=0; i<n_line_data; i++)
   {
-    dy = Fline_data[i] - Fline_at_data[i] ;
-    var2 = Flerrs_data[i]*Flerrs_data[i] + var2_se;
-    prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
+    // note mask with error >= 1.0e100
+    if(Flerrs_data[i] < 0.99e100)
+    {
+      dy = Fline_data[i] - Fline_at_data[i] ;
+      var2 = Flerrs_data[i]*Flerrs_data[i] + var2_se;
+      prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
+    }
   }
   prob_line_particles[which_particle_update] = prob_line;
 
@@ -594,9 +598,13 @@ double prob_restart_line1d(const void *model)
   var2_se = (exp(pm[num_params_blr-1])-1.0) * (exp(pm[num_params_blr-1])-1.0) * line_error_mean*line_error_mean;
   for(i=0; i<n_line_data; i++)
   {
-    dy = Fline_data[i] - Fline_at_data[i] ;
-    var2 = Flerrs_data[i]*Flerrs_data[i] + var2_se;
-    prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
+    // note mask with error >= 1.0e100
+    if(Flerrs_data[i] < 0.99e100)
+    {
+      dy = Fline_data[i] - Fline_at_data[i] ;
+      var2 = Flerrs_data[i]*Flerrs_data[i] + var2_se;
+      prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
+    }
   }
   prob_line_particles[which_particle_update] = prob_line;
 
@@ -741,9 +749,13 @@ double prob_line1d(const void *model)
     var2_se = (exp(pm[num_params_blr-1])-1.0) * (exp(pm[num_params_blr-1])-1.0) * line_error_mean*line_error_mean;
     for(i=0; i<n_line_data; i++)
     {
-      dy = Fline_data[i] - Fline_at_data[i] ;
-      var2 = Flerrs_data[i]*Flerrs_data[i] + var2_se;
-      prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
+      //note mask with error >= 1.0e100
+      if(Flerrs_data[i] < 0.99e100)
+      {
+        dy = Fline_data[i] - Fline_at_data[i] ;
+        var2 = Flerrs_data[i]*Flerrs_data[i] + var2_se;
+        prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
+      }
     }
     /* backup prob_line */
     prob_line_particles_perturb[which_particle_update] = prob_line;
@@ -755,9 +767,13 @@ double prob_line1d(const void *model)
     var2_se = (exp(pm[num_params_blr-1])-1.0) * (exp(pm[num_params_blr-1])-1.0) * line_error_mean*line_error_mean;
     for(i=0; i<n_line_data; i++)
     {
-      dy = Fline_data[i] - Fline_at_data[i] ;
-      var2 = Flerrs_data[i]*Flerrs_data[i] + var2_se;
-      prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
+      //note mask with error >= 1.0e100
+      if(Flerrs_data[i] < 0.99e100)
+      {
+        dy = Fline_data[i] - Fline_at_data[i] ;
+        var2 = Flerrs_data[i]*Flerrs_data[i] + var2_se;
+        prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
+      }
     }
     /* backup prob_line */
     prob_line_particles_perturb[which_particle_update] = prob_line;

@@ -239,14 +239,22 @@ void scale_con_line()
 
   for(i=0; i<n_line_data; i++)
   {
-    Fline_data[i] *= line_scale;
-    Flerrs_data[i] *= line_scale;
+    // note mask with error >= 1.0e100
+    if(Flerrs_data[i] < 0.99e100)
+    {
+      Fline_data[i] *= line_scale;
+      Flerrs_data[i] *= line_scale;
+    }
 
     if(parset.flag_dim==2)
       for(j=0; j<n_vel_data; j++)
       {
-        Fline2d_data[i*n_vel_data + j] *= line_scale;
-        Flerrs2d_data[i*n_vel_data + j] *= line_scale;
+        // note mask with error >= 1.0e100
+        if(Flerrs2d_data[i*n_vel_data + j] < 0.99e100)
+        {
+          Fline2d_data[i*n_vel_data + j] *= line_scale;
+          Flerrs2d_data[i*n_vel_data + j] *= line_scale;
+        } 
       } 
   }
   line_error_mean *= line_scale;

@@ -431,6 +431,7 @@ void read_data()
       line_error_mean = 0.0;
       for(i=0; i<n_line_data;i++)
       {
+        // note mask with error >= 1.0e100
         if(Flerrs_data[i] < 0.99e100)
           line_error_mean += Flerrs_data[i];
       }
@@ -488,6 +489,7 @@ void read_data()
       for(i=0; i<n_line_data;i++)
         for(j=0; j<n_vel_data; j++)
         {
+          // note mask with error >= 1.0e100
           if(Flerrs2d_data[i*n_vel_data + j] < 0.99e100)
             line_error_mean += Flerrs2d_data[i*n_vel_data + j];
         }
