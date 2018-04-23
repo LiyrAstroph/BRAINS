@@ -431,7 +431,8 @@ void read_data()
       line_error_mean = 0.0;
       for(i=0; i<n_line_data;i++)
       {
-        line_error_mean += Flerrs_data[i];
+        if(Flerrs_data[i] < 0.99e100)
+          line_error_mean += Flerrs_data[i];
       }
       line_error_mean /= n_line_data;
     }
@@ -487,7 +488,8 @@ void read_data()
       for(i=0; i<n_line_data;i++)
         for(j=0; j<n_vel_data; j++)
         {
-          line_error_mean += Flerrs2d_data[i];
+          if(Flerrs2d_data[i*n_vel_data + j] < 0.99e100)
+            line_error_mean += Flerrs2d_data[i*n_vel_data + j];
         }
 
       line_error_mean /= (n_line_data*n_vel_data);
