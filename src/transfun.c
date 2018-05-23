@@ -85,7 +85,7 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
                                               double *fl2d, int nl, int nv)
 {
   int i, j, k, m;
-  double fline, tau, tl, tc, fcon, A, Ag, ftrend, fnarrow;
+  double tau, tl, tc, fcon, A, Ag, ftrend, fnarrow;
   double *pmodel = (double *)pm;
 
   A=exp(pmodel[0]);
@@ -2057,10 +2057,10 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
   FILE *fcloud_out;
   int i, j, idt, idV, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
-  double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb, vcloud_min, vcloud_max, fe;
+  double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb, vcloud_min, vcloud_max;
   double V, dV, rhoV, theV, Vr, Vph, Vkep;
   double inc, F, beta, mu, k, gam, xi, a, s, sig, rin;
-  double mbh, fellip, fflow, sigr_circ, sigthe_circ, sigr_rad, sigthe_rad, theta_rot, rf;
+  double mbh, fellip, fflow, sigr_circ, sigthe_circ, sigr_rad, sigthe_rad, theta_rot, sig_turb;
   double Lphi, Lthe;
   double Anorm, weight, rnd, rnd_xi, rnd_flow;
   BLRmodel6 *model = (BLRmodel6 *)pm;
@@ -2077,12 +2077,12 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
   mbh = exp(model->mbh);
   fellip = model->fellip;
   fflow = model->fflow;
-  rf = exp(model->rf);
   sigr_circ = exp(model->sigr_circ);
   sigthe_circ = exp(model->sigthe_circ);
   sigr_rad = exp(model->sigr_rad);
   sigthe_rad = exp(model->sigthe_rad);
   theta_rot = model->theta_rot*PI/180.0;
+  sig_turb = exp(model->sig_turb);
 
   a = 1.0/beta/beta;
   s = mu/a;
@@ -2200,17 +2200,12 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
 
     Vkep = sqrt(mbh/r);
     
-    if(r >= rf)
-      fe = fellip;
-    else
-      fe = 0.0;
-
     for(j=0; j<parset.n_vel_per_cloud; j++)
     {
       rnd = gsl_rng_uniform(gsl_r);
       rnd_flow = gsl_rng_uniform(gsl_r);
 
-      if(rnd < fe)
+      if(rnd < fellip)
       {
         rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_circ  + 1.0) * Vkep;
         theV =  gsl_ran_ugaussian(gsl_r) * sigthe_circ + PI/2.0;
@@ -2256,6 +2251,9 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
 
       V = -vx;  //note the definition of the line-of-sight velocity. postive means a receding 
                 // velocity relative to the observer.
+
+      V += gsl_ran_ugaussian(gsl_r) * sig_turb * Vkep; // add turbulence velocity
+
       if(V<transv[0] || V>=transv[n_vel-1]+dV)
         continue;
 
