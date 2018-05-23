@@ -25,7 +25,7 @@
 #include "proto.h"
 
 
-int nd_fft;
+int nd_fft, npad;
 
 fftw_complex *data_fft, *resp_fft, *conv_fft;
 fftw_plan pdata, presp, pback;
@@ -37,7 +37,9 @@ double *real_data, *real_resp, *real_conv;
  */
 void smooth_init(int nv, const double *transv)
 {
-  nd_fft = nv;
+  npad = fmin(nv * 0.2, 100);
+  npad = (npad/2) * 2;
+  nd_fft = nv+npad;
 
   data_fft = (fftw_complex *) fftw_malloc((nd_fft/2+1) * sizeof(fftw_complex));
   resp_fft = (fftw_complex *) fftw_malloc((nd_fft/2+1) * sizeof(fftw_complex));
@@ -100,7 +102,7 @@ void smooth_end()
   fftw_free(data_fft);
   fftw_free(resp_fft);
   fftw_free(conv_fft);
-
+  
   fftw_free(real_data);
   fftw_free(real_resp);
   fftw_free(real_conv);
@@ -115,7 +117,9 @@ void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int
 
   for(j=0; j<nl; j++)
   {
-    memcpy(real_data, &fl2d[j*nv], nv*sizeof(double));
+    memcpy(real_data+npad/2, &fl2d[j*nv], nv*sizeof(double));
+    for(i=0; i<npad/2; i++)
+      real_data[i] = real_data[nd_fft-1-i] = 0.0;
 
     /* FFT of line */
     fftw_execute(pdata);
@@ -134,7 +138,7 @@ void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int
     for(i=0; i<nv; i++)
     {
       //fl2d[j*nv + i] = real_conv[i] * dV / nd_fft;
-      memcpy(&fl2d[j*nv], real_conv, nd_fft*sizeof(double));
+      memcpy(&fl2d[j*nv], real_conv+npad/2, nv*sizeof(double));
     }
   }
   return;
