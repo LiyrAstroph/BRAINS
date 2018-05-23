@@ -257,6 +257,40 @@ typedef struct
   double logse;         /*!< \brief 20. */
 }BLRmodel6;
 
+
+/* shadowed model */
+typedef struct 
+{
+  double A;             /*!< \brief 1. line response*/    
+  double Ag;            /*!< \brief 2. no-linearity */
+  double mu;            /*!< \brief 3. peak radius*/
+  double beta;          /*!< \brief 4. fraction of inner radius*/
+  double F;             /*!< \brief 5. fraction of outer radius*/
+  double inc;           /*!< \brief 6. inclination */
+  double opn;           /*!< \brief 7. opening angle */
+  double k;             /*!< \brief 8. kappa */
+  double gam;           /*!< \brief 9. gamma */
+  double xi;            /*!< \brief 10.obscuration */
+
+  double fsh;           /*!< 11 */
+  double mu_un;         /*!< \brief 12 peak radius*/
+  double beta_un;       /*!< \brief 13 fraction of inner radius*/
+  double F_un;          /*!< \brief 14 fraction of outer radius*/
+  double opn_un;        /*!< \brief 15 opening angle */
+
+  double mbh;           /*!< \brief 16.black hole mass */
+  double fellip;        /*!< \brief 17.ellipitic orbits */
+  double fflow;         /*!< \brief 18.inflow/outflow */
+  double sigr_circ;     /*!< \brief 19. */
+  double sigthe_circ;   /*!< \brief 20. */
+  double sigr_rad;      /*!< \brief 21. */
+  double sigthe_rad;    /*!< \brief 22. */
+  double theta_rot;     /*!< \brief 23. */
+  double fellip_un;        /*!< \brief 24.ellipitic orbits */
+  double fflow_un;         /*!< \brief 25.inflow/outflow */
+  double logse;         /*!< \brief 26. */
+}BLRmodel7;
+
 extern int BLRmodel_size;
 extern int *par_fix, npar_fix;
 extern double *par_fix_val;

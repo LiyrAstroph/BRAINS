@@ -38,7 +38,7 @@ int dnest_line2d(int argc, char **argv)
   switch(parset.flag_blrmodel)
   {
     case 1:
-      num_params_blr = 12;
+      num_params_blr = sizeof(BLRmodel1)/sizeof(double);
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model1;
 
       num_params_radial_samp=3;
@@ -49,7 +49,7 @@ int dnest_line2d(int argc, char **argv)
 
       break;
     case 2:
-      num_params_blr = 12;
+      num_params_blr = sizeof(BLRmodel2)/sizeof(double);
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model2;
 
       num_params_radial_samp=3;
@@ -60,7 +60,7 @@ int dnest_line2d(int argc, char **argv)
 
       break;
     case 3:
-      num_params_blr = 12;
+      num_params_blr = sizeof(BLRmodel3)/sizeof(double);
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model3;
 
       num_params_radial_samp=3;
@@ -71,7 +71,7 @@ int dnest_line2d(int argc, char **argv)
 
       break;
     case 4:
-      num_params_blr = 12;
+      num_params_blr = sizeof(BLRmodel4)/sizeof(double);
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model4;
 
       num_params_radial_samp=3;
@@ -82,7 +82,7 @@ int dnest_line2d(int argc, char **argv)
       
       break;
     case 5:
-      num_params_blr = 21;
+      num_params_blr = sizeof(BLRmodel5)/sizeof(double);
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model5;
 
       num_params_radial_samp=4;
@@ -95,7 +95,7 @@ int dnest_line2d(int argc, char **argv)
       break;
     
     case 6:
-      num_params_blr = 20;
+      num_params_blr = sizeof(BLRmodel6)/sizeof(double);
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model6;
 
       num_params_radial_samp=3;
@@ -103,6 +103,22 @@ int dnest_line2d(int argc, char **argv)
       params_radial_samp[0] = 2;
       params_radial_samp[1] = 3;
       params_radial_samp[2] = 4;
+      
+      break;
+    
+    case 7:
+      num_params_blr = sizeof(BLRmodel7)/sizeof(double);
+      transfun_2d_cloud_direct = transfun_2d_cloud_direct_model7;
+
+      num_params_radial_samp=7;
+      params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
+      params_radial_samp[0] = 2;
+      params_radial_samp[1] = 3;
+      params_radial_samp[2] = 4;
+      params_radial_samp[3] = 10;
+      params_radial_samp[4] = 11;
+      params_radial_samp[5] = 12;
+      params_radial_samp[6] = 13;
       
       break;
 

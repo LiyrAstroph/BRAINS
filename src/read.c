@@ -242,9 +242,9 @@ void read_parset()
       exit(0);
     }
 
-    if(parset.flag_blrmodel > 6 || parset.flag_blrmodel < 1)
+    if(parset.flag_blrmodel > 7 || parset.flag_blrmodel < 1)
     {
-      fprintf(stderr, "# Error in flag_blrmodel: value %d is not allowed.\nPlease specify a value in [1-6].\n", parset.flag_trend);
+      fprintf(stderr, "# Error in flag_blrmodel: value %d is not allowed.\nPlease specify a value in [1-7].\n", parset.flag_trend);
       exit(0);
     }
 

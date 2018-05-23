@@ -2305,6 +2305,684 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
   return;
 }
 
+/*================================================================
+ * model 7
+ * shadowed model
+ *================================================================
+ */
+/* 
+ * This function caclulate 1d transfer function.
+ */
+void transfun_1d_cloud_direct_model7(const void *pm, int flag_save)
+{
+  FILE *fcloud_out;
+  int i, idt, nc, flag_update=0, num_sh;
+  double r, phi, dis, Lopn_cos;
+  double x, y, z, xb, yb, zb, zb0;
+  double inc, F, beta, mu, k, gam, xi, a, s, rin, sig;
+  double Lphi, Lthe;
+  double Anorm, weight, rnd, rnd_xi;
+  BLRmodel7 *model = (BLRmodel7 *)pm;
+
+  Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
+  inc = model->inc * PI/180.0;         /* inclination angle in rad */
+  beta = model->beta;         
+  F = model->F;
+  mu = exp(model->mu);                 /* mean radius */
+  k = model->k;  
+  gam = model-> gam;
+  xi = model->xi;
+
+  a = 1.0/beta/beta;
+  s = mu/a;
+  rin=mu*F;
+  sig=(1.0-F)*s;
+  
+  if(flag_save && thistask == roottask)
+  {
+    char fname[200];
+    sprintf(fname, "%s/%s", parset.file_dir, parset.cloud_out_file);
+    fcloud_out = fopen(fname, "w");
+    if(fcloud_out == NULL)
+    {
+      fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+      exit(-1);
+    }
+  }
+
+  for(i=0; i<num_params_radial_samp;i++)
+  {
+    if(which_parameter_update == params_radial_samp[i])
+    {
+      flag_update = 1;
+      break;
+    }
+  }
+  // "which_parameter_update = -1" means that all parameters are updated, usually occurs at the 
+  // initial step.
+  if(force_update == 1 || which_parameter_update == -1 )
+  {
+    flag_update = 1;
+  }
+
+  /* reset transfer function */
+  for(i=0; i<parset.n_tau; i++)
+  {
+    Trans1D[i] = 0.0;
+  }
+  
+  // number of particles in first region
+  
+  num_sh = (int)(parset.n_cloud_per_task * model->fsh);
+
+  for(i=0; i<num_sh; i++)
+  {
+// generate a direction of the angular momentum of the orbit   
+    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
+    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_r), gam));
+
+    if( flag_update == 1 ) //
+    {
+      nc = 0;
+      r = rcloud_max_set+1.0;
+      while(r>rcloud_max_set || r<rcloud_min_set)
+      {
+        if(nc > 1000)
+        {
+          printf("# Error, too many tries in generating ridial localtion of clouds.\n");
+          exit(0);
+        }
+        rnd = gsl_ran_gamma(gsl_r, a, 1.0);
+//      r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
+        r = rin + sig * rnd;
+        nc++;
+      }
+      clouds_particles_perturb[which_particle_update][i] = r;
+    }
+    else
+    {
+      r = clouds_particles[which_particle_update][i];
+    }
+    phi = 2.0*PI * gsl_rng_uniform(gsl_r);
+
+    /* Polar coordinates to Cartesian coordinates */
+    x = r * cos(phi); 
+    y = r * sin(phi);
+    z = 0.0;
+
+/* right-handed framework
+ * first rotate around y axis by an angle of Lthe, then roate around z axis 
+ * by an angle of Lphi
+ */
+  /*xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
+    yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
+    zb = sin(Lthe) * x + cos(Lthe) * z; */
+    
+    xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y;
+    yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y;
+    zb = sin(Lthe) * x;
+
+    zb0 = zb;
+    rnd_xi = gsl_rng_uniform(gsl_r);
+    if( (rnd_xi < 1.0 - xi) && zb0 < 0.0)
+      zb = -zb;
+
+// conter-rotate around y, LOS is x-axis 
+    x = xb * cos(PI/2.0-inc) + zb * sin(PI/2.0-inc);
+    y = yb;
+    z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
+
+    dis = r - x;
+
+    //if(dis<parset.tau_min_set || dis>=parset.tau_max_set+dTransTau)
+    //  continue;
+    idt = (dis - parset.tau_min_set)/dTransTau;
+    if(idt < 0)
+      idt = 0;
+    if(idt >= parset.n_tau)
+      idt = parset.n_tau - 1;
+
+    weight = 0.5 + k*(x/r);
+    //weight = 0.5 + k * x/sqrt(x*x+y*y);
+    //Trans1D[idt] += pow(1.0/r, 2.0*(1 + gam)) * weight;
+    Trans1D[idt] += weight;
+
+    if(flag_save && thistask==roottask)
+    {
+      fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+    }
+  }
+
+  //second BLR region
+  rin = exp(model->mu_un) * model->F_un;
+  a = 1.0/(model->beta_un * model->beta_un);
+  sig = exp(model->mu_un) * (1.0-model->F_un)/a;
+  double Lopn_cos_un1, Lopn_cos_un2;
+  Lopn_cos_un1 = Lopn_cos;
+  if(model->opn + model->opn_un < 90.0)
+    Lopn_cos_un2 = cos((model->opn + model->opn_un)/180.0*PI);
+  else
+    Lopn_cos_un2 = 0.0;
+
+  for(i=num_sh; i<parset.n_cloud_per_task; i++)
+  {
+// generate a direction of the angular momentum of the orbit   
+    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
+    Lthe = acos(Lopn_cos_un2 + (Lopn_cos_un1-Lopn_cos_un2) * pow(gsl_rng_uniform(gsl_r), gam));
+
+    if( flag_update == 1 ) //
+    {
+      nc = 0;
+      r = rcloud_max_set+1.0;
+      while(r>rcloud_max_set || r<rcloud_min_set)
+      {
+        if(nc > 1000)
+        {
+          printf("# Error, too many tries in generating ridial localtion of clouds.\n");
+          exit(0);
+        }
+        rnd = gsl_ran_gamma(gsl_r, a, 1.0);
+//      r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
+        r = rin + sig * rnd;
+        nc++;
+      }
+      clouds_particles_perturb[which_particle_update][i] = r;
+    }
+    else
+    {
+      r = clouds_particles[which_particle_update][i];
+    }
+    phi = 2.0*PI * gsl_rng_uniform(gsl_r);
+
+    /* Polar coordinates to Cartesian coordinates */
+    x = r * cos(phi); 
+    y = r * sin(phi);
+    z = 0.0;
+
+/* right-handed framework
+ * first rotate around y axis by an angle of Lthe, then roate around z axis 
+ * by an angle of Lphi
+ */
+  /*xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
+    yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
+    zb = sin(Lthe) * x + cos(Lthe) * z; */
+    
+    xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y;
+    yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y;
+    zb = sin(Lthe) * x;
+
+    zb0 = zb;
+    rnd_xi = gsl_rng_uniform(gsl_r);
+    if( (rnd_xi < 1.0 - xi) && zb0 < 0.0)
+      zb = -zb;
+
+// conter-rotate around y, LOS is x-axis 
+    x = xb * cos(PI/2.0-inc) + zb * sin(PI/2.0-inc);
+    y = yb;
+    z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
+
+    dis = r - x;
+
+    //if(dis<parset.tau_min_set || dis>=parset.tau_max_set+dTransTau)
+    //  continue;
+    idt = (dis - parset.tau_min_set)/dTransTau;
+    if(idt < 0)
+      idt = 0;
+    if(idt >= parset.n_tau)
+      idt = parset.n_tau - 1;
+
+    weight = 0.5 + k*(x/r);
+    //weight = 0.5 + k * x/sqrt(x*x+y*y);
+    //Trans1D[idt] += pow(1.0/r, 2.0*(1 + gam)) * weight;
+    Trans1D[idt] += weight;
+
+    if(flag_save && thistask==roottask)
+    {
+      fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+    }
+  }
+
+  /* normalize transfer function */
+  Anorm = 0.0;
+  for(i=0;i<parset.n_tau;i++)
+  {
+    Anorm += Trans1D[i];
+  }
+  Anorm *= dTransTau;
+  /* check if we get a zero transfer function */
+  if(Anorm > 0.0)
+  {
+    for(i=0; i<parset.n_tau; i++)
+    {
+      Trans1D[i] /= Anorm;
+    }
+  }
+  else
+  {
+    printf(" Warning, zero transfer function at task %d.\n", thistask);
+    for(i=0; i<parset.n_tau; i++)
+    {
+      Trans1D[i] = 0.0;
+    }
+  }
+  
+  if(flag_save && thistask==roottask)
+  {
+    fclose(fcloud_out);
+  }
+
+  return;
+}
+
+/* 
+ * This function caclulate 2d transfer function.
+ */
+void transfun_2d_cloud_direct_model7(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
+{
+  FILE *fcloud_out;
+  int i, j, idt, idV, nc, flag_update=0, num_sh;
+  double r, phi, dis, Lopn_cos;
+  double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb, vcloud_min, vcloud_max, fe;
+  double V, dV, rhoV, theV, Vr, Vph, Vkep;
+  double inc, F, beta, mu, k, gam, xi, a, s, sig, rin;
+  double mbh, fellip, fflow, sigr_circ, sigthe_circ, sigr_rad, sigthe_rad, theta_rot;
+  double Lphi, Lthe;
+  double Anorm, weight, rnd, rnd_xi, rnd_flow;
+  BLRmodel7 *model = (BLRmodel7 *)pm;
+
+  Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
+  inc = model->inc * PI/180.0;         /* inclination angle in rad */
+  beta = model->beta;         
+  F = model->F;
+  mu = exp(model->mu);                 /* mean radius */
+  k = model->k;  
+  gam = model-> gam;
+  xi = model->xi;
+
+  mbh = exp(model->mbh);
+  fellip = model->fellip;
+  fflow = model->fflow;
+  sigr_circ = exp(model->sigr_circ);
+  sigthe_circ = exp(model->sigthe_circ);
+  sigr_rad = exp(model->sigr_rad);
+  sigthe_rad = exp(model->sigthe_rad);
+  theta_rot = model->theta_rot*PI/180.0;
+
+  a = 1.0/beta/beta;
+  s = mu/a;
+  rin=mu*F;
+  sig=(1.0-F)*s;
+  
+  dV =(transv[1] - transv[0]); // velocity grid width
+
+  for(i=0; i<parset.n_tau; i++)
+    for(j=0;j<n_vel;j++)
+      trans2d[i*n_vel+j]=0.0;   // cleanup of transfer function
+
+  vcloud_max = -DBL_MAX;
+  vcloud_min = DBL_MAX;
+
+  if(flag_save && thistask == roottask)
+  {
+    char fname[200];
+    sprintf(fname, "%s/%s", parset.file_dir, parset.cloud_out_file);
+    fcloud_out = fopen(fname, "w");
+    if(fcloud_out == NULL)
+    {
+      fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+      exit(-1);
+    }
+  }
+
+  for(i=0; i<num_params_radial_samp;i++)
+  {
+    if(which_parameter_update == params_radial_samp[i])
+    {
+      flag_update = 1;
+      break;
+    }
+  }
+
+  // "which_parameter_update = -1" means that all parameters are updated, usually occurs at the 
+  // initial step.
+  if(force_update == 1 || which_parameter_update == -1 )
+  {
+    flag_update = 1;
+  }
+  
+  num_sh = (int)(parset.n_cloud_per_task * model->fsh);
+  for(i=0; i<num_sh; i++)
+  {
+// generate a direction of the angular momentum of the orbit   
+    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
+    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_r), gam));
+
+    if( flag_update == 1 ) //
+    {
+      nc = 0;
+      r = rcloud_max_set+1.0;
+      while(r>rcloud_max_set || r<rcloud_min_set)
+      {
+        if(nc > 1000)
+        {
+          printf("# Error, too many tries in generating ridial localtion of clouds.\n");
+          exit(0);
+        }
+        rnd = gsl_ran_gamma(gsl_r, a, 1.0);
+//      r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
+        r = rin + sig * rnd;
+        nc++;
+      }
+      clouds_particles_perturb[which_particle_update][i] = r;
+    }
+    else
+    {
+      r = clouds_particles[which_particle_update][i];
+    }
+    phi = 2.0*PI * gsl_rng_uniform(gsl_r);
+
+    /* Polar coordinates to Cartesian coordinate */
+    x = r * cos(phi); 
+    y = r * sin(phi);
+    z = 0.0;
+
+/* right-handed framework
+ * first rotate around y axis by an angle of Lthe, then roate around z axis 
+ * by an angle of Lphi
+ */
+  /*xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
+    yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
+    zb = sin(Lthe) * x + cos(Lthe) * z; */
+    
+    xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y;
+    yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y;
+    zb = sin(Lthe) * x;
+
+    zb0 = zb;
+    rnd_xi = gsl_rng_uniform(gsl_r);
+    if( (rnd_xi < 1.0 - xi) && zb0 < 0.0)
+      zb = -zb;
+
+// conter-rotate around y, LOS is x-axis 
+    x = xb * cos(PI/2.0-inc) + zb * sin(PI/2.0-inc);
+    y = yb;
+    z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
+
+    dis = r - x;
+
+    //if(dis<parset.tau_min_set || dis>=parset.tau_max_set+dTransTau)
+    //  continue;
+    idt = (dis - parset.tau_min_set)/dTransTau;
+    if(idt < 0)
+      idt = 0;
+    if(idt >= parset.n_tau)
+      idt = parset.n_tau - 1;
+
+    weight = 0.5 + k*(x/r);
+    //weight = 0.5 + k * x/sqrt(x*x+y*y);
+    //Trans1D[idt] += pow(1.0/r, 2.0*(1 + gam)) * weight;
+
+
+    Vkep = sqrt(mbh/r);
+
+    for(j=0; j<parset.n_vel_per_cloud; j++)
+    {
+      rnd = gsl_rng_uniform(gsl_r);
+      rnd_flow = gsl_rng_uniform(gsl_r);
+
+      if(rnd < fellip)
+      {
+        rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_circ  + 1.0) * Vkep;
+        theV =  gsl_ran_ugaussian(gsl_r) * sigthe_circ + PI/2.0;
+      }
+      else
+      {
+        if(rnd_flow < fflow)
+        {
+          rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_rad  + 1.0) * Vkep;
+          theV =  gsl_ran_ugaussian(gsl_r) * sigthe_rad + theta_rot;
+        }
+        else
+        {
+          rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_rad  + 1.0) * Vkep;
+          theV =  gsl_ran_ugaussian(gsl_r) * sigthe_rad + PI + theta_rot;
+        }
+      }
+      
+      Vr = sqrt(2.0) * rhoV * cos(theV);
+      Vph = rhoV * sin(theV);
+
+      vx = Vr * cos(phi) - Vph * sin(phi);
+      vy = Vr * sin(phi) + Vph * cos(phi);
+      vz = 0.0;     
+
+    /*vxb = cos(Lthe)*cos(Lphi) * vx + sin(Lphi) * vy - sin(Lthe)*cos(Lphi) * vz;
+      vyb =-cos(Lthe)*sin(Lphi) * vx + cos(Lphi) * vy + sin(Lthe)*sin(Lphi) * vz;
+      vzb = sin(Lthe) * vx + cos(Lthe) * vz;*/
+
+      vxb = cos(Lthe)*cos(Lphi) * vx + sin(Lphi) * vy;
+      vyb =-cos(Lthe)*sin(Lphi) * vx + cos(Lphi) * vy;
+      vzb = sin(Lthe) * vx;
+
+      if((rnd_xi < 1.0-xi) && zb0 < 0.0)
+        vzb = -vzb;
+    
+      vx = vxb * cos(PI/2.0-inc) + vzb * sin(PI/2.0-inc);
+      vy = vyb;
+      vz =-vxb * sin(PI/2.0-inc) + vzb * cos(PI/2.0-inc);
+
+      vcloud_max = fmax(vx, vcloud_max);
+      vcloud_min = fmin(vx, vcloud_min);
+
+      V = -vx;  //note the definition of the line-of-sight velocity. postive means a receding 
+                // velocity relative to the observer.
+      if(V<transv[0] || V>=transv[n_vel-1]+dV)
+        continue;
+
+      idV = (V - transv[0])/dV;
+
+      //trans2d[idt*n_vel + idV] += pow(1.0/r, 2.0*(1 + gam)) * weight;
+      trans2d[idt*n_vel + idV] += weight;
+
+      if(flag_save && thistask==roottask)
+      {
+        fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx, vy, vz);
+      }
+    }
+  }
+
+  //second BLR region
+  fellip = model->fellip_un;
+  fflow = model->fflow_un;
+  rin = exp(model->mu_un) * model->F_un;
+  a = 1.0/(model->beta_un * model->beta_un);
+  sig = exp(model->mu_un) * (1.0-model->F_un)/a;
+  double Lopn_cos_un1, Lopn_cos_un2;
+  Lopn_cos_un1 = Lopn_cos;
+  if(model->opn + model->opn_un < 90.0)
+    Lopn_cos_un2 = cos((model->opn + model->opn_un)/180.0*PI);
+  else
+    Lopn_cos_un2 = 0.0;
+
+  for(i=num_sh; i<parset.n_cloud_per_task; i++)
+  {
+// generate a direction of the angular momentum of the orbit   
+    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
+    Lthe = acos(Lopn_cos_un2 + (Lopn_cos_un1-Lopn_cos_un2) * pow(gsl_rng_uniform(gsl_r), gam));
+    //Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_r), gam));
+
+    if( flag_update == 1 ) //
+    {
+      nc = 0;
+      r = rcloud_max_set+1.0;
+      while(r>rcloud_max_set || r<rcloud_min_set)
+      {
+        if(nc > 1000)
+        {
+          printf("# Error, too many tries in generating ridial localtion of clouds.\n");
+          exit(0);
+        }
+        rnd = gsl_ran_gamma(gsl_r, a, 1.0);
+//      r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
+        r = rin + sig * rnd;
+        nc++;
+      }
+      clouds_particles_perturb[which_particle_update][i] = r;
+    }
+    else
+    {
+      r = clouds_particles[which_particle_update][i];
+    }
+    phi = 2.0*PI * gsl_rng_uniform(gsl_r);
+
+    /* Polar coordinates to Cartesian coordinate */
+    x = r * cos(phi); 
+    y = r * sin(phi);
+    z = 0.0;
+
+/* right-handed framework
+ * first rotate around y axis by an angle of Lthe, then roate around z axis 
+ * by an angle of Lphi
+ */
+  /*xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
+    yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
+    zb = sin(Lthe) * x + cos(Lthe) * z; */
+    
+    xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y;
+    yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y;
+    zb = sin(Lthe) * x;
+
+    zb0 = zb;
+    rnd_xi = gsl_rng_uniform(gsl_r);
+    if( (rnd_xi < 1.0 - xi) && zb0 < 0.0)
+      zb = -zb;
+
+// conter-rotate around y, LOS is x-axis 
+    x = xb * cos(PI/2.0-inc) + zb * sin(PI/2.0-inc);
+    y = yb;
+    z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
+
+    dis = r - x;
+
+    //if(dis<parset.tau_min_set || dis>=parset.tau_max_set+dTransTau)
+    //  continue;
+    idt = (dis - parset.tau_min_set)/dTransTau;
+    if(idt < 0)
+      idt = 0;
+    if(idt >= parset.n_tau)
+      idt = parset.n_tau - 1;
+
+    weight = 0.5 + k*(x/r);
+    //weight = 0.5 + k * x/sqrt(x*x+y*y);
+    //Trans1D[idt] += pow(1.0/r, 2.0*(1 + gam)) * weight;
+
+
+    Vkep = sqrt(mbh/r);
+
+    for(j=0; j<parset.n_vel_per_cloud; j++)
+    {
+      rnd = gsl_rng_uniform(gsl_r);
+      rnd_flow = gsl_rng_uniform(gsl_r);
+
+      if(rnd < fellip)
+      {
+        rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_circ  + 1.0) * Vkep;
+        theV =  gsl_ran_ugaussian(gsl_r) * sigthe_circ + PI/2.0;
+      }
+      else
+      {
+        if(rnd_flow < fflow)
+        {
+          rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_rad  + 1.0) * Vkep;
+          theV =  gsl_ran_ugaussian(gsl_r) * sigthe_rad + theta_rot;
+        }
+        else
+        {
+          rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_rad  + 1.0) * Vkep;
+          theV =  gsl_ran_ugaussian(gsl_r) * sigthe_rad + PI + theta_rot;
+        }
+      }
+      
+      Vr = sqrt(2.0) * rhoV * cos(theV);
+      Vph = rhoV * sin(theV);
+
+      vx = Vr * cos(phi) - Vph * sin(phi);
+      vy = Vr * sin(phi) + Vph * cos(phi);
+      vz = 0.0;     
+
+    /*vxb = cos(Lthe)*cos(Lphi) * vx + sin(Lphi) * vy - sin(Lthe)*cos(Lphi) * vz;
+      vyb =-cos(Lthe)*sin(Lphi) * vx + cos(Lphi) * vy + sin(Lthe)*sin(Lphi) * vz;
+      vzb = sin(Lthe) * vx + cos(Lthe) * vz;*/
+
+      vxb = cos(Lthe)*cos(Lphi) * vx + sin(Lphi) * vy;
+      vyb =-cos(Lthe)*sin(Lphi) * vx + cos(Lphi) * vy;
+      vzb = sin(Lthe) * vx;
+
+      if((rnd_xi < 1.0-xi) && zb0 < 0.0)
+        vzb = -vzb;
+    
+      vx = vxb * cos(PI/2.0-inc) + vzb * sin(PI/2.0-inc);
+      vy = vyb;
+      vz =-vxb * sin(PI/2.0-inc) + vzb * cos(PI/2.0-inc);
+
+      vcloud_max = fmax(vx, vcloud_max);
+      vcloud_min = fmin(vx, vcloud_min);
+
+      V = -vx;  //note the definition of the line-of-sight velocity. postive means a receding 
+                // velocity relative to the observer.
+      if(V<transv[0] || V>=transv[n_vel-1]+dV)
+        continue;
+
+      idV = (V - transv[0])/dV;
+
+      //trans2d[idt*n_vel + idV] += pow(1.0/r, 2.0*(1 + gam)) * weight;
+      trans2d[idt*n_vel + idV] += weight;
+
+      if(flag_save && thistask==roottask)
+      {
+        fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx, vy, vz);
+      }
+    }
+  }
+
+  /* normalize transfer function */
+  Anorm = 0.0;
+  for(i=0; i<parset.n_tau; i++)
+    for(j=0; j<n_vel; j++)
+    {
+      Anorm += trans2d[i*n_vel+j];
+    }
+  Anorm *= (dV * dTransTau);
+  /* check if we get a zero transfer function */
+  if(Anorm > 0.0)
+  {
+    for(i=0; i<parset.n_tau; i++)
+    {
+      for(j=0; j<n_vel; j++)
+      {
+        trans2d[i*n_vel+j] /= Anorm;
+      }
+    }
+  }
+  else
+  {
+    printf(" Warning, zero transfer function at task %d.\n", thistask);
+    for(i=0; i<parset.n_tau; i++)
+    {
+      for(j=0; j<n_vel; j++)
+      {
+        trans2d[i*n_vel+j] = 0.0;
+      }
+    }
+  }
+
+  if(flag_save && thistask == roottask)
+    fclose(fcloud_out);
+
+  return;
+}
+
+
 void restart_clouds_1d(int iflag)
 {
   FILE *fp;

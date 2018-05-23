@@ -105,6 +105,21 @@ int dnest_line1d(int argc, char **argv)
       params_radial_samp[2] = 4;
       break;
 
+    case 7:
+      num_params_blr = 16;
+      transfun_1d_cloud_direct = transfun_1d_cloud_direct_model7;
+
+      num_params_radial_samp=7;
+      params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
+      params_radial_samp[0] = 2;
+      params_radial_samp[1] = 3;
+      params_radial_samp[2] = 4;
+      params_radial_samp[3] = 10;
+      params_radial_samp[4] = 11;
+      params_radial_samp[5] = 12;
+      params_radial_samp[6] = 13;
+      break;
+
     default:
       num_params_blr = 9;
       transfun_1d_cloud_direct = transfun_1d_cloud_direct_model1;
