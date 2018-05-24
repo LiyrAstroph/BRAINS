@@ -33,17 +33,17 @@ MPICHLIB    = $(shell pkg-config --libs mpich)
 endif
 
 ifeq ($(SYSTEM), "Cluster")
-GSL_INCL = -I/mbh/mbhd01/user/liyanrong/soft/gsl/include
-GSL_LIBS = -L/mbh/mbhd01/user/liyanrong/soft/gsl/lib  -lgsl -lgslcblas -lm
-MPICHLIB = -L/mbh/mbhd01/user/liyanrong/soft/mpich3/lib -lmpich
-MPIINCL  = -I/mbh/mbhd01/user/liyanrong/soft/mpich3/include
-LAPACK_INCL = -I/mbh/mbhd01/user/liyanrong/soft/lapack/include
-LAPACK_LIBS = -L/mbh/mbhd01/user/liyanrong/soft/lapack/lib -llapacke -llapack -lblas -lgfortran
-FFTW_INCL = -I/mbh/mbhd01/user/liyanrong/soft/fftw/include
-FFTW_LIBS = -L/mbh/mbhd01/user/liyanrong/soft/fftw/lib -lfftw3
+GSL_INCL = -I/sharefs/mbh/user/liyanrong/soft/gsl/include
+GSL_LIBS = -L/sharefs/mbh/user/liyanrong/soft/gsl/lib  -lgsl -lgslcblas -lm
+MPICHLIB = -L/sharefs/mbh/user/liyanrong/soft/mpich3/lib -lmpich
+MPIINCL  = -I/sharefs/mbh/user/liyanrong/soft/mpich3/include
+LAPACK_INCL = -I/sharefs/mbh/user/liyanrong/soft/lapack/include
+LAPACK_LIBS = -L/sharefs/mbh/user/liyanrong/soft/lapack/lib -llapacke -llapack -lblas -lgfortran
+FFTW_INCL = -I/sharefs/mbh/user/liyanrong/soft/fftw/include
+FFTW_LIBS = -L/sharefs/mbh/user/liyanrong/soft/fftw/lib -lfftw3
 
-DNEST_INCL  = -I /mbh/mbhd01/user/liyanrong/GIT/DNest/
-DNEST_LIBS  = -L /mbh/mbhd01/user/liyanrong/GIT/DNest -ldnest
+DNEST_INCL  = -I /sharefs/mbh/user/liyanrong/GIT/DNest/
+DNEST_LIBS  = -L /sharefs/mbh/user/liyanrong/GIT/DNest -ldnest
 endif
 
 ifeq ($(SYSTEM), "TianheII")
