@@ -249,6 +249,7 @@ void from_prior_line2d(void *model)
 
 
   // variability parameters
+  // use priors from continuum reconstruction.
   for(i=num_params_blr; i<num_params_blr+3; i++)
   {
     pm[i] = dnest_randn()*var_param_std[i-num_params_blr] + var_param[i-num_params_blr];

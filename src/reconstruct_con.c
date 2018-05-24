@@ -235,6 +235,8 @@ void reconstruct_con()
     }
   }
 
+  //use the posterior mean and standard variance as the prior for the 1d and 2d RM.
+  //only for variability parameters.
   MPI_Bcast(var_param, num_params_var, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
   MPI_Bcast(var_param_std, num_params_var, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
 

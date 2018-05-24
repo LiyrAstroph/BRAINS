@@ -249,6 +249,7 @@ void from_prior_line1d(void *model)
   //pm[i] = par_range_model[i][1] - dnest_rand() * ( par_range_model[i][1] - par_range_model[i][0] )*0.01;
   
   // variability parameters
+  // use priors from continuum reconstruction.
   for(i=num_params_blr; i<num_params_blr+3; i++)
   {
     pm[i] = dnest_randn()*var_param_std[i-num_params_blr] + var_param[i-num_params_blr];
