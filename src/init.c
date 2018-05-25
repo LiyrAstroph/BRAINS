@@ -392,15 +392,15 @@ void set_blr_range_model1()
   blr_range_model[i++][1] = log(parset.tau_max_set);
   //beta
   blr_range_model[i][0] = 0.001;
-  blr_range_model[i++][1] = 1.0;
+  blr_range_model[i++][1] = 2.0;
   //F
   blr_range_model[i][0] = 0.001;
   blr_range_model[i++][1] = 0.999;
   //inc
-  blr_range_model[i][0] = 0.0;
-  blr_range_model[i++][1] = 90.0;
+  blr_range_model[i][0] = 0.0;  // in cosine
+  blr_range_model[i++][1] = 1.0;
   //opn
-  blr_range_model[i][0] = 0.0;
+  blr_range_model[i][0] = 0.0;  // in rad
   blr_range_model[i++][1] = 90.0;
   //k
   blr_range_model[i][0] = -0.5;
@@ -438,15 +438,15 @@ void set_blr_range_model2()
   blr_range_model[i++][1] = log(parset.tau_max_set);
   //beta
   blr_range_model[i][0] = 0.001;
-  blr_range_model[i++][1] = 1.0;
+  blr_range_model[i++][1] = 2.0;
   //F
   blr_range_model[i][0] = 0.001;
   blr_range_model[i++][1] = 0.999;
   //inc
-  blr_range_model[i][0] = 0.0;
-  blr_range_model[i++][1] = 90.0;
+  blr_range_model[i][0] = 0.0;  // in cosine
+  blr_range_model[i++][1] = 1.0;
   //opn
-  blr_range_model[i][0] = 0.0;
+  blr_range_model[i][0] = 0.0;  // in rad
   blr_range_model[i++][1] = 90.0;
   //k
   blr_range_model[i][0] = -0.5;
@@ -489,10 +489,10 @@ void set_blr_range_model3()
   blr_range_model[i][0] = log(1.0);
   blr_range_model[i++][1] = log(1.0e2);
   //inc
-  blr_range_model[i][0] = 0.0;
-  blr_range_model[i++][1] = 90.0;
-  //opn
-  blr_range_model[i][0] = 0.0;
+  blr_range_model[i][0] = 0.0;  // in cosine
+  blr_range_model[i++][1] = 1.0;
+  //opn 
+  blr_range_model[i][0] = 0.0;   // in rad
   blr_range_model[i++][1] = 90.0;
   //k
   blr_range_model[i][0] = -0.5;
@@ -537,10 +537,10 @@ void set_blr_range_model4()
   blr_range_model[i][0] = log(1.0);
   blr_range_model[i++][1] = log(1.0e2);
   //inc
-  blr_range_model[i][0] = 0.0;
-  blr_range_model[i++][1] = 90.0;
+  blr_range_model[i][0] = 0.0; // in cosine
+  blr_range_model[i++][1] = 1.0;
   //opn
-  blr_range_model[i][0] = 0.0;
+  blr_range_model[i][0] = 0.0;  // in rad
   blr_range_model[i++][1] = 90.0;
   //k
   blr_range_model[i][0] = -0.5;
@@ -588,10 +588,10 @@ void set_blr_range_model5()
   blr_range_model[i][0] = 1.0;
   blr_range_model[i++][1] = 3.0;
   //inc
-  blr_range_model[i][0] = 0.0;
-  blr_range_model[i++][1] = 90.0;
+  blr_range_model[i][0] = 0.0; // in cosine
+  blr_range_model[i++][1] = 1.0;
   //opn
-  blr_range_model[i][0] = 0.0;
+  blr_range_model[i][0] = 0.0;  // in rad
   blr_range_model[i++][1] = 90.0;
   //k
   blr_range_model[i][0] = -0.5;
@@ -656,15 +656,15 @@ void set_blr_range_model6()
   blr_range_model[i++][1] = log(parset.tau_max_set);
   //beta
   blr_range_model[i][0] = 0.001;
-  blr_range_model[i++][1] = 1.0;
+  blr_range_model[i++][1] = 2.0;
   //F
   blr_range_model[i][0] = 0.0;
   blr_range_model[i++][1] = 1.0;
   //inc
-  blr_range_model[i][0] = 0.0;
-  blr_range_model[i++][1] = 90.0;
+  blr_range_model[i][0] = 0.0; //in cosine
+  blr_range_model[i++][1] = 1.0;
   //opn
-  blr_range_model[i][0] = 0.0;
+  blr_range_model[i][0] = 0.0;  // in rad
   blr_range_model[i++][1] = 90.0;
   //k
   blr_range_model[i][0] = -0.5;
@@ -727,15 +727,15 @@ void set_blr_range_model7()
   blr_range_model[i++][1] = log(parset.tau_max_set);
   //beta
   blr_range_model[i][0] = 0.001;
-  blr_range_model[i++][1] = 1.0;
+  blr_range_model[i++][1] = 2.0;
   //F
   blr_range_model[i][0] = 0.0;
   blr_range_model[i++][1] = 1.0;
   //inc
-  blr_range_model[i][0] = 0.0;
-  blr_range_model[i++][1] = 90.0;
+  blr_range_model[i][0] = 0.0;  // in cosine
+  blr_range_model[i++][1] = 1.0;
   //opn
-  blr_range_model[i][0] = 0.0;
+  blr_range_model[i][0] = 0.0;  // in rad
   blr_range_model[i++][1] = 90.0;
   //k
   blr_range_model[i][0] = -0.5;
@@ -755,7 +755,7 @@ void set_blr_range_model7()
   blr_range_model[i++][1] = log(parset.tau_max_set);
   //beta_un
   blr_range_model[i][0] = 0.001;
-  blr_range_model[i++][1] = 1.0;
+  blr_range_model[i++][1] = 2.0;
   //F_un
   blr_range_model[i][0] = 0.0;
   blr_range_model[i++][1] = 1.0;

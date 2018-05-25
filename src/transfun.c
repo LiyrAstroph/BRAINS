@@ -188,7 +188,7 @@ void transfun_1d_cloud_direct_model1(const void *pm, int flag_save)
   BLRmodel1 *model = (BLRmodel1 *)pm;
 
   Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
-  inc = model->inc * PI/180.0;         /* inclination angle in rad */
+  inc = acos(model->inc);         /* inclination angle in rad */
   beta = model->beta;         
   F = model->F;
   mu = exp(model->mu);                 /* mean radius */
@@ -361,7 +361,7 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
   
 
   Lopn_cos = cos(model->opn*PI/180.0);
-  inc = model->inc * PI/180.0;
+  inc = acos(model->inc);
   beta = model->beta;
   F = model->F;
   mu = exp(model->mu);
@@ -605,7 +605,7 @@ void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *tra
   
 
   Lopn_cos = cos(model->opn*PI/180.0);
-  inc = model->inc * PI/180.0;
+  inc = acos(model->inc);
   beta = model->beta;
   F = model->F;
   mu = exp(model->mu);
@@ -833,7 +833,7 @@ void transfun_1d_cloud_direct_model3(const void *pm, int flag_save)
   BLRmodel3 *model = (BLRmodel3 *)pm;
 
   Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
-  inc = model->inc * PI/180.0;         /* inclination angle in rad */
+  inc = acos(model->inc);         /* inclination angle in rad */
   alpha = model->alpha;         
   F = exp(model->F);
   Rin = exp(model->Rin);                 /* mean radius */
@@ -1001,7 +1001,7 @@ void transfun_2d_cloud_direct_model3(const void *pm, double *transv, double *tra
   
 
   Lopn_cos = cos(model->opn*PI/180.0);
-  inc = model->inc * PI/180.0;
+  inc = acos(model->inc);
   alpha = model->alpha;
   F = model->F;
   Rin = exp(model->Rin);
@@ -1226,7 +1226,7 @@ void transfun_2d_cloud_direct_model4(const void *pm, double *transv, double *tra
   
 
   Lopn_cos = cos(model->opn*PI/180.0);
-  inc = model->inc * PI/180.0;
+  inc = acos(model->inc);
   alpha = model->alpha;
   F = model->F;
   Rin = exp(model->Rin);
@@ -1453,7 +1453,7 @@ void transfun_1d_cloud_direct_model5(const void *pm, int flag_save)
   BLRmodel5 *model = (BLRmodel5 *)pm;
 
   Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
-  inc = model->inc * PI/180.0;         /* inclination angle in rad */
+  inc = acos(model->inc);         /* inclination angle in rad */
   alpha = model->alpha;         
   Fin = model->Fin;
   Fout = exp(model->Fout);                 
@@ -1637,7 +1637,7 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
   BLRmodel5 *model = (BLRmodel5 *)pm;
 
   Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
-  inc = model->inc * PI/180.0;         /* inclination angle in rad */
+  inc = acos(model->inc);         /* inclination angle in rad */
   alpha = model->alpha;         
   Fin = model->Fin;
   Fout = exp(model->Fout);                 
@@ -1907,7 +1907,7 @@ void transfun_1d_cloud_direct_model6(const void *pm, int flag_save)
   BLRmodel6 *model = (BLRmodel6 *)pm;
 
   Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
-  inc = model->inc * PI/180.0;         /* inclination angle in rad */
+  inc = acos(model->inc);         /* inclination angle in rad */
   beta = model->beta;         
   F = model->F;
   mu = exp(model->mu);                 /* mean radius */
@@ -2080,7 +2080,7 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
   BLRmodel6 *model = (BLRmodel6 *)pm;
 
   Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
-  inc = model->inc * PI/180.0;         /* inclination angle in rad */
+  inc = acos(model->inc);         /* inclination angle in rad */
   beta = model->beta;         
   F = model->F;
   mu = exp(model->mu);                 /* mean radius */
@@ -2339,7 +2339,7 @@ void transfun_1d_cloud_direct_model7(const void *pm, int flag_save)
   BLRmodel7 *model = (BLRmodel7 *)pm;
 
   Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
-  inc = model->inc * PI/180.0;         /* inclination angle in rad */
+  inc = acos(model->inc);         /* inclination angle in rad */
   beta = model->beta;         
   F = model->F;
   mu = exp(model->mu);                 /* mean radius */
@@ -2605,7 +2605,7 @@ void transfun_2d_cloud_direct_model7(const void *pm, double *transv, double *tra
   BLRmodel7 *model = (BLRmodel7 *)pm;
 
   Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
-  inc = model->inc * PI/180.0;         /* inclination angle in rad */
+  inc = acos(model->inc);         /* inclination angle in rad */
   beta = model->beta;         
   F = model->F;
   mu = exp(model->mu);                 /* mean radius */
