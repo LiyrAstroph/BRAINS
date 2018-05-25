@@ -137,21 +137,35 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
     }
   }
 
-// smooth the line profile
-  line_gaussian_smooth_2D_FFT(transv, fl2d, nl, nv);
-// add narrow line
-  if(parset.flag_narrowline == 1)
+  // add intrinsic narrow line
+  if(parset.flag_narrowline != 0)
   {
+    double flux, width, shift;
+    if(parset.flag_narrowline == 1)
+    {
+      flux = parset.flux_narrowline;
+      width = parset.width_narrowline;
+      shift = parset.shift_narrowline;
+    }
+    else
+    {
+      flux = parset.flux_narrowline + pmodel[num_params_blr-1-3] * parset.flux_narrowline_err;
+      width = parset.width_narrowline + pmodel[num_params_blr-1-2] * parset.width_narrowline_err;
+      shift = parset.shift_narrowline + pmodel[num_params_blr-1-1] * parset.shift_narrowline_err;
+    }
+
     for(i=0; i<nv; i++)
     {
-      fnarrow = parset.flux_narrowline  
-               * exp( -0.5 * pow( (transv[i] - parset.shift_narrowline)/(parset.width_narrowline), 2.0) ) * line_scale;
+      fnarrow = flux * exp( -0.5 * pow( (transv[i] - shift)/(width), 2.0) );
       for(j = 0; j<nl; j++)
       {
         fl2d[j*nv + i] += fnarrow;
       }
     } 
   }
+
+// smooth the line profile
+  line_gaussian_smooth_2D_FFT(transv, fl2d, nl, nv);
 }
 
 /*================================================================

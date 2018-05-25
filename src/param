@@ -5,13 +5,13 @@
 FileDir                     /home/liyropt/Projects/GIT/BRAINS
 %FileDir                     /ihepbatch/mbhd01/user/liyanrong/RM/Test/mrk493
 
-FlagDim                     0                           % -1, simulation; 0, only continuum; 1, 1d line; 2, 2d line
-FlagBLRModel                5                           % 1, 2, 3, 4, BLR model type
+FlagDim                     2                           % -1, simulation; 0, only continuum; 1, 1d line; 2, 2d line
+FlagBLRModel                6                           % 1, 2, 3, 4, BLR model type
 %===============================
 % data file
-ContinuumFile               data/075051.72+245409.3.diffmag.day.calib          % file for contnnum data
-LineFile                    data/sim_hb.txt           % file for line data
-Line2DFile                  data/sim_hb2d.txt         % file for line 2d data
+ContinuumFile               data/arp151_con.txt          % file for contnnum data
+LineFile                    data/arp151_hb.txt           % file for line data
+Line2DFile                  data/arp151_hb2d.txt         % file for line 2d data
 %===============================
 % reconstruction
 NConRecon                   200                         % number of points for continuum reconstruction
@@ -30,7 +30,7 @@ Line2DDataConstructFileOut  data/pline2d_data.txt       % output filename for 2d
 Tran2DFileOut               data/tran2d.txt             % output filename for 2d transfer function
 Tran2DDataFileOut           data/tran2d_data.txt             % output filename for 2d transfer function
 
-NCloudPerCore               1000                        % number of clouds per task
+NCloudPerCore               5000                        % number of clouds per task
 NVPerCloud                  5                           % number of velocities per cloud
 
 NTau                        200                         % number of time-lag points calculated in transfer function
@@ -40,15 +40,18 @@ TauMaxSet                   50.0                        % maximum time lag calcu
 FlagCloudsOut               1                           % 1, save clouds at the last run; 0, do not save
 CloudsFileOut               data/clouds.txt             % output filename for clouds 
 
-InstRes                     220                         % instrument resolution, in km/s
+InstRes                     344.0                         % instrument resolution, in km/s
 
 %===============================
 % narrow-line component
 % use a gaussian to model the narrow-line component
-FlagNarrowLine              0                           % 0, no narrow line; 1, add narrow line
-FluxNarrowLine              0.507                       % 
-WidthNarrowLine             355                         % km/s
-ShiftNarrowLine             -160                        % km/s, with respect to broad line center.  
+FlagNarrowLine              2                           % 0, no narrow line; 1, add fixed narrow line; 2, add priors on narrow line
+FluxNarrowLine              0.5                         % flux of narrow line
+FluxNarrowLineErr           0.10                        % flux error of narrow line
+WidthNarrowLine             94.0                        % width km/s
+WidthNarrowLineErr          4.4                         % width error
+ShiftNarrowLine             0.0                         % shift, km/s, with respect to broad line center.  
+ShiftNarrowLineErr          0.0                         % shift error
 
 %===============================
 % set fixed BLR parameters and their fixed values

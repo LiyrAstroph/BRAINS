@@ -98,6 +98,7 @@ typedef struct
 
   int flag_narrowline;
   double flux_narrowline, width_narrowline, shift_narrowline;
+  double flux_narrowline_err, width_narrowline_err, shift_narrowline_err;
 
   int flag_postprc;
   int flag_restart;
@@ -295,10 +296,11 @@ extern int BLRmodel_size;
 extern int *par_fix, npar_fix;
 extern double *par_fix_val;
 
-extern int num_params, num_params_blr, num_params_var, num_params_trend;
+extern int num_params, num_params_blr, num_params_blr_model, num_params_var, num_params_trend, num_params_nlr;
 
 extern double **blr_range_model, **par_range_model;
 extern double var_range_model[7][2];
+extern double nlr_range_model[3][2];
 
 /* transfer function / velocity-delay map */
 extern double *TransTau, *TransV, *Trans1D, *Trans2D_at_veldata, *Trans2D;

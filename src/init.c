@@ -42,6 +42,11 @@ void init()
   
   num_params_var = 4 + parset.flag_trend + num_params_trend;
 
+  // number of parameters for narrow line, only valid for 2d RM.
+  num_params_nlr = 0;
+  if(parset.flag_narrowline == 2)
+    num_params_nlr = 3;
+  
   switch(parset.flag_blrmodel)
   {
     case 1:
@@ -121,6 +126,19 @@ void init()
 
   var_range_model[5][0] = -10.0; // light curve values
   var_range_model[5][1] = 10.0; 
+
+  
+  if(num_params_nlr > 1)
+  {
+    nlr_range_model[0][0] = parset.flux_narrowline - 10.0 * parset.flux_narrowline_err;
+    nlr_range_model[0][1] = parset.flux_narrowline + 10.0 * parset.flux_narrowline_err;
+
+    nlr_range_model[1][0] = parset.width_narrowline - 10.0 * parset.width_narrowline_err;
+    nlr_range_model[1][1] = parset.width_narrowline + 10.0 * parset.width_narrowline_err;
+
+    nlr_range_model[2][0] = parset.shift_narrowline - 10.0 * parset.shift_narrowline_err;
+    nlr_range_model[2][1] = parset.shift_narrowline + 10.0 * parset.shift_narrowline_err;
+  }
 
   set_blr_range_model();
 }
@@ -262,6 +280,9 @@ void scale_con_line()
       } 
   }
   line_error_mean *= line_scale;
+
+  parset.flux_narrowline *= line_scale;
+  parset.flux_narrowline_err *= line_scale;
 }
 
 /*!
@@ -282,7 +303,7 @@ void set_par_fix(int num_params_blr)
     for(i=strlen(parset.str_par_fix); i<num_params_blr; i++)
       parset.str_par_fix[i] = '0';
 
-    for(i=0; i<num_params_blr; i++)
+    for(i=0; i<num_params_blr_model; i++)
     {
       if(parset.str_par_fix[i] == '0')
       {
@@ -310,6 +331,28 @@ void set_par_fix(int num_params_blr)
       {
         par_fix[i] = 0;
         par_fix_val[i] = -DBL_MAX;
+      }
+    }
+
+    // cope with narrow line
+    if(parset.flag_narrowline == 2)
+    {
+      if(parset.flux_narrowline_err == 0.0)
+      {
+        par_fix[num_params_blr_model - 1] = 1.0;
+        par_fix_val[num_params_blr_model -1] = 0.0;
+      }
+
+      if(parset.width_narrowline_err == 0.0)
+      {
+        par_fix[num_params_blr_model-1+1] = 1.0;
+        par_fix_val[num_params_blr_model-1+1] = 0.0;
+      } 
+
+      if(parset.shift_narrowline_err == 0.0)
+      {
+        par_fix[num_params_blr_model-1+2] = 1.0;
+        par_fix_val[num_params_blr_model-1+2] = 0.0;
       }
     }
   }

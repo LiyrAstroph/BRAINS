@@ -142,12 +142,24 @@ void read_parset()
     addr[nt] = &parset.flux_narrowline;
     id[nt++] = DOUBLE;
 
+    strcpy(tag[nt], "FluxNarrowLineErr");
+    addr[nt] = &parset.flux_narrowline_err;
+    id[nt++] = DOUBLE;
+
     strcpy(tag[nt], "WidthNarrowLine");
     addr[nt] = &parset.width_narrowline;
     id[nt++] = DOUBLE;
 
+    strcpy(tag[nt], "WidthNarrowLineErr");
+    addr[nt] = &parset.width_narrowline_err;
+    id[nt++] = DOUBLE;
+
     strcpy(tag[nt], "ShiftNarrowLine");
     addr[nt] = &parset.shift_narrowline;
+    id[nt++] = DOUBLE;
+
+    strcpy(tag[nt], "ShiftNarrowLineErr");
+    addr[nt] = &parset.shift_narrowline_err;
     id[nt++] = DOUBLE;
 
     strcpy(tag[nt], "BLRParFix");
@@ -178,6 +190,8 @@ void read_parset()
     parset.flag_fixvar = 0;
     parset.flag_blrmodel = 1;
     parset.flag_trend_diff = 0;
+    parset.flag_narrowline = 0;
+
     
     char fname[200];
     sprintf(fname, "%s", parset.param_file);
@@ -248,7 +262,7 @@ void read_parset()
       exit(0);
     }
 
-    if(parset.flag_narrowline == 1)
+    if(parset.flag_narrowline != 0)
     {
       printf("# add narrow-line: flux=%e, width=%fkm/s, shift=%fkm/s.\n", parset.flux_narrowline, 
         parset.width_narrowline, parset.shift_narrowline);
@@ -258,9 +272,12 @@ void read_parset()
         printf("# Error narrow line width %f.\n", parset.width_narrowline);
         exit(0);
       }
-      
+
       parset.width_narrowline /= VelUnit;
+      parset.width_narrowline_err /= VelUnit;
+
       parset.shift_narrowline /= VelUnit;
+      parset.shift_narrowline_err /= VelUnit;
     }
 
     if(parset.flag_blrmodel == 3 || parset.flag_blrmodel == 4)

@@ -37,7 +37,7 @@ int dnest_line1d(int argc, char **argv)
   switch(parset.flag_blrmodel)
   {
     case 1:
-      num_params_blr = 9;
+      num_params_blr_model = 9;
       transfun_1d_cloud_direct = transfun_1d_cloud_direct_model1;
 
       num_params_radial_samp=3;
@@ -49,7 +49,7 @@ int dnest_line1d(int argc, char **argv)
 
       break;
     case 2:
-      num_params_blr = 9;
+      num_params_blr_model = 9;
       transfun_1d_cloud_direct = transfun_1d_cloud_direct_model1;
 
       num_params_radial_samp=3;
@@ -60,7 +60,7 @@ int dnest_line1d(int argc, char **argv)
 
       break;
     case 3:
-      num_params_blr = 9;
+      num_params_blr_model = 9;
       transfun_1d_cloud_direct = transfun_1d_cloud_direct_model3;
 
       num_params_radial_samp=3;
@@ -71,7 +71,7 @@ int dnest_line1d(int argc, char **argv)
 
       break;
     case 4:
-      num_params_blr = 9;
+      num_params_blr_model = 9;
       transfun_1d_cloud_direct = transfun_1d_cloud_direct_model3;
 
       num_params_radial_samp=3;
@@ -83,7 +83,7 @@ int dnest_line1d(int argc, char **argv)
       break;
 
     case 5:
-      num_params_blr = 12;
+      num_params_blr_model = 12;
       transfun_1d_cloud_direct = transfun_1d_cloud_direct_model5;
 
       num_params_radial_samp=4;
@@ -95,7 +95,7 @@ int dnest_line1d(int argc, char **argv)
       break;
 
     case 6:
-      num_params_blr = 11;
+      num_params_blr_model = 11;
       transfun_1d_cloud_direct = transfun_1d_cloud_direct_model6;
 
       num_params_radial_samp=3;
@@ -106,7 +106,7 @@ int dnest_line1d(int argc, char **argv)
       break;
 
     case 7:
-      num_params_blr = 16;
+      num_params_blr_model = 16;
       transfun_1d_cloud_direct = transfun_1d_cloud_direct_model7;
 
       num_params_radial_samp=7;
@@ -121,7 +121,7 @@ int dnest_line1d(int argc, char **argv)
       break;
 
     default:
-      num_params_blr = 9;
+      num_params_blr_model = 9;
       transfun_1d_cloud_direct = transfun_1d_cloud_direct_model1;
 
       num_params_radial_samp=3;
@@ -132,6 +132,7 @@ int dnest_line1d(int argc, char **argv)
       break;
   }
   
+  num_params_blr = num_params_blr_model;
   num_params = parset.n_con_recon + num_params_var + num_params_blr;
   size_of_modeltype = num_params * sizeof(double);
 

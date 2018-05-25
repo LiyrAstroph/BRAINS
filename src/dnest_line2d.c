@@ -38,7 +38,7 @@ int dnest_line2d(int argc, char **argv)
   switch(parset.flag_blrmodel)
   {
     case 1:
-      num_params_blr = sizeof(BLRmodel1)/sizeof(double);
+      num_params_blr_model = sizeof(BLRmodel1)/sizeof(double);
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model1;
 
       num_params_radial_samp=3;
@@ -49,7 +49,7 @@ int dnest_line2d(int argc, char **argv)
 
       break;
     case 2:
-      num_params_blr = sizeof(BLRmodel2)/sizeof(double);
+      num_params_blr_model = sizeof(BLRmodel2)/sizeof(double);
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model2;
 
       num_params_radial_samp=3;
@@ -60,7 +60,7 @@ int dnest_line2d(int argc, char **argv)
 
       break;
     case 3:
-      num_params_blr = sizeof(BLRmodel3)/sizeof(double);
+      num_params_blr_model = sizeof(BLRmodel3)/sizeof(double);
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model3;
 
       num_params_radial_samp=3;
@@ -71,7 +71,7 @@ int dnest_line2d(int argc, char **argv)
 
       break;
     case 4:
-      num_params_blr = sizeof(BLRmodel4)/sizeof(double);
+      num_params_blr_model = sizeof(BLRmodel4)/sizeof(double);
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model4;
 
       num_params_radial_samp=3;
@@ -82,7 +82,7 @@ int dnest_line2d(int argc, char **argv)
       
       break;
     case 5:
-      num_params_blr = sizeof(BLRmodel5)/sizeof(double);
+      num_params_blr_model = sizeof(BLRmodel5)/sizeof(double);
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model5;
 
       num_params_radial_samp=4;
@@ -95,7 +95,7 @@ int dnest_line2d(int argc, char **argv)
       break;
     
     case 6:
-      num_params_blr = sizeof(BLRmodel6)/sizeof(double);
+      num_params_blr_model = sizeof(BLRmodel6)/sizeof(double);
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model6;
 
       num_params_radial_samp=3;
@@ -107,7 +107,7 @@ int dnest_line2d(int argc, char **argv)
       break;
     
     case 7:
-      num_params_blr = sizeof(BLRmodel7)/sizeof(double);
+      num_params_blr_model = sizeof(BLRmodel7)/sizeof(double);
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model7;
 
       num_params_radial_samp=7;
@@ -123,7 +123,7 @@ int dnest_line2d(int argc, char **argv)
       break;
 
     default:
-      num_params_blr = 12;
+      num_params_blr_model = 12;
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model1;
 
       num_params_radial_samp=3;
@@ -134,7 +134,8 @@ int dnest_line2d(int argc, char **argv)
 
       break;
   }
-
+  
+  num_params_blr = num_params_blr_model + num_params_nlr;
   num_params = parset.n_con_recon + num_params_blr + num_params_var;
   size_of_modeltype = num_params * sizeof(double);
   par_fix = (int *) malloc(num_params * sizeof(int));
@@ -171,7 +172,6 @@ int dnest_line2d(int argc, char **argv)
     par_fix[i] = 0;
     par_fix_val[i] = -DBL_MAX;
   }
-
   // fix continuum variation parameter sigma and tau
   if(parset.flag_fixvar == 1)
   {
@@ -197,11 +197,22 @@ void set_par_range_model2d()
   int i;
 
   /* setup parameter range, BLR parameters first */
-  for(i=0; i<num_params_blr; i++)
+  for(i=0; i<num_params_blr_model-1; i++)
   {
     par_range_model[i][0] = blr_range_model[i][0];
     par_range_model[i][1] = blr_range_model[i][1];
   }
+  //cope with narrow line
+  for(i=num_params_blr_model-1; i<num_params_blr-1; i++)
+  {
+    par_range_model[i][0] = nlr_range_model[i - (num_params_blr_model-1)][0];
+    par_range_model[i][1] = nlr_range_model[i - (num_params_blr_model-1)][1];
+  }
+  // the last is systematic error
+  i = num_params_blr-1;
+  par_range_model[i][0] = blr_range_model[num_params_blr_model-1][0];
+  par_range_model[i][1] = blr_range_model[num_params_blr_model-1][1];
+
   // variability parameters
   for(i=num_params_blr; i<3 + num_params_blr; i++)
   {
@@ -237,16 +248,17 @@ void from_prior_line2d(void *model)
   int i;
   double *pm = (double *)model;
 
-  for(i=0; i<num_params_blr ; i++)
+  for(i=0; i<num_params_blr_model -1 ; i++)
   {
     pm[i] = par_range_model[i][0] + dnest_rand() * ( par_range_model[i][1] - par_range_model[i][0]  );
   }
-
-  //i=num_params_blr-1;
-  //pm[i] = par_range_model[i][1] - dnest_rand() * ( par_range_model[i][1] - par_range_model[0][0] )*0.01;
-  //i=num_params_blr;
-  //pm[i] = par_range_model[i][0] - dnest_rand() * ( par_range_model[i][1] - par_range_model[0][0] )*0.01;
-
+  //cope with narrow line
+  for(i=num_params_blr_model -1; i<num_params_blr-1; i++)
+  {
+    pm[i] = dnest_randn();
+  }
+  i=num_params_blr-1;
+  pm[i] = par_range_model[i][1] - dnest_rand() * ( par_range_model[i][1] - par_range_model[0][0] );
 
   // variability parameters
   // use priors from continuum reconstruction.
@@ -382,12 +394,24 @@ double perturb_line2d(void *model)
     width = ( par_range_model[which][1] - par_range_model[which][0] );
   }
 
-  if(which < num_params_blr)
+  if(which < num_params_blr_model - 1)
   {
     // set an upper limit to move steps of systematic error parameters.
     //if(which == num_params_blr-1)
     //   width = fmin(width, (par_range_model[which][1] - par_range_model[which][0])*0.01 );
 
+    pm[which] += dnest_randh() * width;
+    wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
+  }
+  else if(which < num_params_blr-1) // cope with narrow line
+  {
+    logH -= (-0.5*pow(pm[which], 2.0) );
+    pm[which] += dnest_randh() * width;
+    wrap(&pm[which], par_range_model[which][0], par_range_model[which][1]);
+    logH += (-0.5*pow(pm[which], 2.0) );
+  }
+  else if(which < num_params_blr) // systematic error
+  {
     pm[which] += dnest_randh() * width;
     wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
   }
