@@ -245,6 +245,11 @@ void scale_con_line()
   
   if(parset.flag_dim <= 0)
   {
+    if(parset.flag_narrowline!=0)
+    {
+      parset.flux_narrowline *= line_scale;
+      parset.flux_narrowline_err *= line_scale;
+    }
     return;
   }
 
@@ -281,8 +286,12 @@ void scale_con_line()
   }
   line_error_mean *= line_scale;
 
-  parset.flux_narrowline *= line_scale;
-  parset.flux_narrowline_err *= line_scale;
+  if(parset.flag_dim==2 && parset.flag_narrowline!=0)
+  {
+    parset.flux_narrowline *= line_scale;
+    parset.flux_narrowline_err *= line_scale;
+  }
+  return;
 }
 
 /*!

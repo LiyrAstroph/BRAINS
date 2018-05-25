@@ -144,7 +144,39 @@ void sim()
       pm[15] = log(0.01);
       pm[16] = log(0.1);
       pm[17] = 0.0;
-      pm[18] = log(1.0);
+      pm[18] = 0.0;
+      pm[19] = log(1.0);
+      break;
+
+    case 7:
+      pm[0] = log(1.0);
+      pm[1] = 0.0;
+      pm[2] = log(4.0);
+      pm[3] = 0.5;
+      pm[4] = 0.1;
+      pm[5] = 20.0;
+      pm[6] = 40.0;
+      pm[7] = 0.0;
+      pm[8] = 1.0;
+      pm[9] = 0.0;
+
+      pm[10] = 0.5;
+      pm[11] = log(8.0);
+      pm[12] = 0.5;
+      pm[13] = 0.1;
+      pm[14] = 20.0;
+
+      pm[15] = log(2.0);
+      pm[16] = 1.0;
+      pm[17] = 0.4;
+      pm[18] = log(0.01);
+      pm[19] = log(0.1);
+      pm[20] = log(0.01);
+      pm[21] = log(0.1);
+      pm[22] = 0.0;
+      pm[23] = 0.5;
+      pm[24] = 0.5;
+      pm[25] = log(1.0);
       break;
   }
 
@@ -333,6 +365,8 @@ void sim_init()
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model1;
       break;
   }
+
+  parset.flag_narrowline = 1;
 
   parset.num_particles = 1;
   which_particle_update = 0;
