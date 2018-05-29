@@ -216,8 +216,10 @@ void set_par_range_model2d()
   // variability parameters
   for(i=num_params_blr; i<3 + num_params_blr; i++)
   {
-    par_range_model[i][0] = var_range_model[i-num_params_blr][0];
-    par_range_model[i][1] = var_range_model[i-num_params_blr][1];
+    //par_range_model[i][0] = var_range_model[i-num_params_blr][0];
+    //par_range_model[i][1] = var_range_model[i-num_params_blr][1];
+      par_range_model[i][0] = var_param[i-num_params_blr] - 5.0 * var_param_std[i-num_params_blr];
+      par_range_model[i][1] = var_param[i-num_params_blr] + 5.0 * var_param_std[i-num_params_blr];
   }
   for(i=3 + num_params_blr; i< 4 + parset.flag_trend + num_params_blr; i++)
   {
