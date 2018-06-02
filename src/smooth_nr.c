@@ -26,7 +26,7 @@
 void convlv(double data[], unsigned long n, double respns[], unsigned long m,
   int isign, double ans[]);
 
-void smooth_init(int nv, const double *transv);
+void smooth_init(int nv, const double *transv)
 {
 
 }

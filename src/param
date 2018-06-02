@@ -40,18 +40,18 @@ TauMaxSet                   50.0                        % maximum time lag calcu
 FlagCloudsOut               1                           % 1, save clouds at the last run; 0, do not save
 CloudsFileOut               data/clouds.txt             % output filename for clouds 
 
-InstRes                     344.0                         % instrument resolution, in km/s
+InstRes                     317.0                         % instrument resolution, in km/s
 
 %===============================
 % narrow-line component
 % use a gaussian to model the narrow-line component
-FlagNarrowLine              2                           % 0, no narrow line; 1, add fixed narrow line; 2, add priors on narrow line
-FluxNarrowLine              0.5                         % flux of narrow line
-FluxNarrowLineErr           0.10                        % flux error of narrow line
+FlagNarrowLine              3                           % 0, no narrow line; 1, add fixed narrow line; 2, add Gaussian priors for narrow line; 3, add logarithmic prior for narrow line
+FluxNarrowLine              1.5                         % flux of narrow line
+FluxNarrowLineErr           0.50                        % flux error of narrow line
 WidthNarrowLine             94.0                        % width km/s
 WidthNarrowLineErr          4.4                         % width error
 ShiftNarrowLine             0.0                         % shift, km/s, with respect to broad line center.  
-ShiftNarrowLineErr          0.0                         % shift error
+ShiftNarrowLineErr          10.0                         % shift error
 
 %===============================
 % set fixed BLR parameters and their fixed values

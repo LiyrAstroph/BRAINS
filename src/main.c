@@ -41,8 +41,8 @@ int main(int argc, char **argv)
   /* cope with command options. */
   if(thistask == roottask)
   {
-    opterr = 0;
-    optind = 0; // reset getopt. 
+    opterr = 0; /* reset getopt. */
+    optind = 0; /* reset getopt. */
     parset.flag_postprc = 0; /* default value, 0 means postprocessing after runing MCMC sampling. */
     parset.temperature = 1.0; /* default value */
     parset.flag_restart = 0;
@@ -75,22 +75,22 @@ int main(int argc, char **argv)
           }
           break;
 
-        case 'r':
+        case 'r':   /* restart from restored file */
           parset.flag_restart = 1;
           printf("# Restart run.\n");
           break;
 
-        case 'c':
+        case 'c':  /* calculate sample information */
           printf("# Recalculate the sample info.\n");
           parset.flag_sample_info = 1;
           break;
 
-        case 'e':
+        case 'e':  /* examine the priors assigned */
           printf("# Examine priors.\n");
           parset.flag_exam_prior = 1;
           break;
 
-        case 'h':
+        case 'h':  /* print help */
           flag_help = 1;
           print_help();
           break;

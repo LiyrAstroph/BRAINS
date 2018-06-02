@@ -264,8 +264,21 @@ void read_parset()
 
     if(parset.flag_narrowline != 0)
     {
-      printf("# add narrow-line: flux=%e, width=%fkm/s, shift=%fkm/s.\n", parset.flux_narrowline, 
-        parset.width_narrowline, parset.shift_narrowline);
+      if(parset.flag_narrowline == 1)
+      {
+        printf("# add fixed narrow-line: flux=%e, width=%fkm/s, shift=%fkm/s.\n", parset.flux_narrowline, 
+           parset.width_narrowline, parset.shift_narrowline);
+      }
+      else if(parset.flag_narrowline == 2 )
+      {
+        printf("# add narrow-line with Gaussian priors: flux=%e, width=%fkm/s, shift=%fkm/s.\n", parset.flux_narrowline, 
+           parset.width_narrowline, parset.shift_narrowline);
+      }
+      else
+      {
+        printf("# add narrow-line with logrithmic prior of flux and Gaussian priors of width and shist: width=%fkm/s, shift=%fkm/s.\n",
+           parset.width_narrowline, parset.shift_narrowline);
+      }
 
       if(parset.width_narrowline<=0.0)
       {

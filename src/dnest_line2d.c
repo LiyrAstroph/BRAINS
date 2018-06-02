@@ -254,11 +254,25 @@ void from_prior_line2d(void *model)
   {
     pm[i] = par_range_model[i][0] + dnest_rand() * ( par_range_model[i][1] - par_range_model[i][0]  );
   }
-  //cope with narrow line
-  for(i=num_params_blr_model -1; i<num_params_blr-1; i++)
+  //cope with flux of narrow line
+  for(i=num_params_blr_model-1; i<num_params_blr-1-2; i++)
+  {
+    if(parset.flag_narrowline == 2) // Gaussian prior
+    {
+      pm[i] = dnest_randn();
+    }
+    else  // logrithmic prior
+    {
+      pm[i] = par_range_model[i][0] + dnest_rand() * ( par_range_model[i][1] - par_range_model[i][0]  );
+    }
+  }
+  // cope with width and shift of narrow line
+  for(i=num_params_blr_model; i<num_params_blr-1; i++)
   {
     pm[i] = dnest_randn();
   }
+
+  // systematic error
   i=num_params_blr-1;
   pm[i] = par_range_model[i][1] - dnest_rand() * ( par_range_model[i][1] - par_range_model[0][0] );
 
@@ -398,14 +412,25 @@ double perturb_line2d(void *model)
 
   if(which < num_params_blr_model - 1)
   {
-    // set an upper limit to move steps of systematic error parameters.
-    //if(which == num_params_blr-1)
-    //   width = fmin(width, (par_range_model[which][1] - par_range_model[which][0])*0.01 );
-
     pm[which] += dnest_randh() * width;
     wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
   }
-  else if(which < num_params_blr-1) // cope with narrow line
+  else if(which < num_params_blr_model && parset.flag_narrowline > 1) // cope with flux of narrow line
+  {
+    if(parset.flag_narrowline==2)  // Gaussian prior
+    {
+      logH -= (-0.5*pow(pm[which], 2.0) );
+      pm[which] += dnest_randh() * width;
+      wrap(&pm[which], par_range_model[which][0], par_range_model[which][1]);
+      logH += (-0.5*pow(pm[which], 2.0) );
+    }
+    else  // logrithmic prior
+    {
+      pm[which] += dnest_randh() * width;
+      wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
+    }
+  }
+  else if(which < num_params_blr-1 && parset.flag_narrowline > 1)  // cope with width and shift of narrow line
   {
     logH -= (-0.5*pow(pm[which], 2.0) );
     pm[which] += dnest_randh() * width;

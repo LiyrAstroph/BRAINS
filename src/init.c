@@ -44,7 +44,7 @@ void init()
 
   // number of parameters for narrow line, only valid for 2d RM.
   num_params_nlr = 0;
-  if(parset.flag_narrowline == 2)
+  if(parset.flag_narrowline >= 2)
     num_params_nlr = 3;
   
   switch(parset.flag_blrmodel)
@@ -130,14 +130,22 @@ void init()
   
   if(num_params_nlr > 1)
   {
-    nlr_range_model[0][0] = parset.flux_narrowline - 10.0 * parset.flux_narrowline_err;
-    nlr_range_model[0][1] = parset.flux_narrowline + 10.0 * parset.flux_narrowline_err;
+    if(parset.flag_narrowline == 2)
+    {
+      nlr_range_model[0][0] = 10.0;
+      nlr_range_model[0][1] = -10.0;
+    }
+    else
+    {
+      nlr_range_model[0][0] = log(1.0e-1);
+      nlr_range_model[0][1] = log(1.0e4);
+    }
 
-    nlr_range_model[1][0] = parset.width_narrowline - 10.0 * parset.width_narrowline_err;
-    nlr_range_model[1][1] = parset.width_narrowline + 10.0 * parset.width_narrowline_err;
+    nlr_range_model[1][0] = -10.0;
+    nlr_range_model[1][1] = 10.0;
 
-    nlr_range_model[2][0] = parset.shift_narrowline - 10.0 * parset.shift_narrowline_err;
-    nlr_range_model[2][1] = parset.shift_narrowline + 10.0 * parset.shift_narrowline_err;
+    nlr_range_model[2][0] = -10.0;
+    nlr_range_model[2][1] = 10.0;
   }
 
   set_blr_range_model();
