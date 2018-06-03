@@ -46,6 +46,10 @@ void init()
   num_params_nlr = 0;
   if(parset.flag_narrowline >= 2)
     num_params_nlr = 3;
+
+  num_params_res = 1;
+  if(parset.InstRes < 0.0)
+    num_params_res = n_line_data;
   
   switch(parset.flag_blrmodel)
   {

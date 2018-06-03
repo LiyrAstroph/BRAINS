@@ -46,48 +46,13 @@ void smooth_init(int nv, const double *transv)
   conv_fft = (fftw_complex *) fftw_malloc((nd_fft/2+1) * sizeof(fftw_complex));
 
   real_data = (double *)fftw_malloc(nd_fft * sizeof(double));
-  real_resp = (double *)fftw_malloc(nd_fft * sizeof(double));
+  //real_resp = (double *)fftw_malloc(nd_fft * sizeof(double));
   real_conv = (double *)fftw_malloc(nd_fft * sizeof(double));
 
   pdata = fftw_plan_dft_r2c_1d(nd_fft, real_data, data_fft, FFTW_MEASURE);
-  presp = fftw_plan_dft_r2c_1d(nd_fft, real_resp, resp_fft, FFTW_MEASURE);
+  //presp = fftw_plan_dft_r2c_1d(nd_fft, real_resp, resp_fft, FFTW_MEASURE);
   pback = fftw_plan_dft_c2r_1d(nd_fft, conv_fft, real_conv, FFTW_MEASURE);
 
-  // initialize response and its fft.
-  int i;
-  double sigV, dV, tot;
-
-  sigV = parset.InstRes / VelUnit;
-  dV = transv[1] - transv[0];
-
-  /* setup response, whose negective-time part is wrapped around and stored at the right hand*/
-  tot = 0.0;
-  for (i = 0; i<nd_fft/2; i++)
-  {
-    real_resp[i] = 1.0/sqrt(2.0*M_PI)/sigV * exp(-0.5*(i*dV)*(i*dV)/sigV/sigV);
-    tot += real_resp[i];
-  }
-  for (i = nd_fft-1; i>= nd_fft/2; i--)
-  {
-    real_resp[i] = 1.0/sqrt(2.0*M_PI)/sigV * exp(-0.5*((i-nd_fft)*dV)*((i-nd_fft)*dV)/sigV/sigV);
-    tot += real_resp[i];
-  }  
-  
-  /* normalize response */
-  for(i=0; i<nd_fft; i++)
-  {
-    //real_resp[i] /= (tot * dV);
-    /* note the factor nd_fft. 
-       FFTW does not include the factor 1/nd_fft when transforming backforward.
-       So include here, effectively increase the grid width
-       f(a*x) ==> 1/a * F(w/a)
-       Thereby, need not to mannually multiply 1/nd_fft in the final output.
-     */
-    real_resp[i] /= (tot * nd_fft);
-  }
-
-  /* FFT of response */
-  fftw_execute(presp);
 }
 
 /*!
@@ -96,7 +61,7 @@ void smooth_init(int nv, const double *transv)
 void smooth_end()
 {
   fftw_destroy_plan(pdata);
-  fftw_destroy_plan(presp);
+  //fftw_destroy_plan(presp);
   fftw_destroy_plan(pback);
 
   fftw_free(data_fft);
@@ -104,41 +69,107 @@ void smooth_end()
   fftw_free(conv_fft);
   
   fftw_free(real_data);
-  fftw_free(real_resp);
+  //fftw_free(real_resp);
   fftw_free(real_conv);
 }
 
 /*!
  * This function performs FFT-smoothing to 2d line.
  */
-void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int nv)
+void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int nv, const void *pm)
 {
   int i, j;
+  // initialize response and its fft.
+  double sigV, sigV_instrinsic, dV, tot;
+  double *pmodel = (double *)pm;
 
-  for(j=0; j<nl; j++)
+  dV = transv[1] - transv[0];
+  sigV_instrinsic = parset.width_narrowline + pmodel[num_params_blr-num_params_res-1-2] * parset.width_narrowline_err;
+
+  if(parset.InstRes >= 0.0)
   {
-    memcpy(real_data+npad/2, &fl2d[j*nv], nv*sizeof(double));
-    for(i=0; i<npad/2; i++)
-      real_data[i] = real_data[nd_fft-1-i] = 0.0;
+    sigV = parset.InstRes + pmodel[num_params_blr-num_params_res-1]*parset.InstRes_err;
+    sigV = fmax(0.0, sigV*sigV - sigV_instrinsic*sigV_instrinsic);
+    sigV = sqrt(sigV);
 
-    /* FFT of line */
-    fftw_execute(pdata);
-    
-    /* complex multiply and inverse FFT 
-     * note that for FFT of real data, FFTW outputs n/2+1 complex numbers.
-     * similarly, for complex to real transform, FFTW needs input of n/2+1 complex numbers.
+    /* setup response 
+       note the factor nd_fft. 
+       FFTW does not include the factor 1/nd_fft when transforming backforward.
+       So include here. Thereby, need not to mannually multiply 1/nd_fft in the final output.
      */
-    for(i=0; i<nd_fft/2 + 1; i++)
-    {
-      conv_fft[i][0] = data_fft[i][0]*resp_fft[i][0] - data_fft[i][1]*resp_fft[i][1];
-      conv_fft[i][1] = data_fft[i][0]*resp_fft[i][1] + data_fft[i][1]*resp_fft[i][0];
-    }
-    fftw_execute(pback);
 
-    for(i=0; i<nv; i++)
+    for(i=0; i<nd_fft/2+1; i++)
     {
+      resp_fft[i][0] = exp(-2.0 * PI*PI * sigV/dV*sigV/dV * i*i*1.0/nd_fft/nd_fft)/nd_fft;
+      resp_fft[i][1] = 0.0;
+    }
+    
+    for(j=0; j<nl; j++)
+    {
+      memcpy(real_data+npad/2, &fl2d[j*nv], nv*sizeof(double));
+      for(i=0; i<npad/2; i++)
+        real_data[i] = real_data[nd_fft-1-i] = 0.0;
+
+      /* FFT of line */
+      fftw_execute(pdata);
+    
+      /* complex multiply and inverse FFT 
+       * note that for FFT of real data, FFTW outputs n/2+1 complex numbers.
+       * similarly, for complex to real transform, FFTW needs input of n/2+1 complex numbers.
+       */
+      for(i=0; i<nd_fft/2 + 1; i++)
+      {
+        conv_fft[i][0] = data_fft[i][0]*resp_fft[i][0] - data_fft[i][1]*resp_fft[i][1];
+        conv_fft[i][1] = data_fft[i][0]*resp_fft[i][1] + data_fft[i][1]*resp_fft[i][0];
+      }
+      fftw_execute(pback);
+
+      for(i=0; i<nv; i++)
+      {
       //fl2d[j*nv + i] = real_conv[i] * dV / nd_fft;
-      memcpy(&fl2d[j*nv], real_conv+npad/2, nv*sizeof(double));
+        memcpy(&fl2d[j*nv], real_conv+npad/2, nv*sizeof(double));
+      }
+    }
+
+  }
+  else
+  {
+    for(j=0; j<nl; j++)
+    {
+      sigV = instres_epoch[j] + pmodel[num_params_blr-num_params_res-1 + j]*instres_err_epoch[j];
+      sigV = fmax(0.0, sigV*sigV - sigV_instrinsic*sigV_instrinsic);
+      sigV = sqrt(sigV);
+
+      /* setup response */
+      for(i=0; i<nd_fft/2+1; i++)
+      {
+        resp_fft[i][0] = exp(-2.0 * PI*PI * sigV/dV*sigV/dV * i*i*1.0/nd_fft/nd_fft)/nd_fft;
+        resp_fft[i][1] = 0.0;
+      }
+    
+      memcpy(real_data+npad/2, &fl2d[j*nv], nv*sizeof(double));
+      for(i=0; i<npad/2; i++)
+        real_data[i] = real_data[nd_fft-1-i] = 0.0;
+
+      /* FFT of line */
+      fftw_execute(pdata);
+    
+      /* complex multiply and inverse FFT 
+       * note that for FFT of real data, FFTW outputs n/2+1 complex numbers.
+       * similarly, for complex to real transform, FFTW needs input of n/2+1 complex numbers.
+       */
+      for(i=0; i<nd_fft/2 + 1; i++)
+      {
+        conv_fft[i][0] = data_fft[i][0]*resp_fft[i][0] - data_fft[i][1]*resp_fft[i][1];
+        conv_fft[i][1] = data_fft[i][0]*resp_fft[i][1] + data_fft[i][1]*resp_fft[i][0];
+      }
+      fftw_execute(pback);
+
+      for(i=0; i<nv; i++)
+      {
+        //fl2d[j*nv + i] = real_conv[i] * dV / nd_fft;
+        memcpy(&fl2d[j*nv], real_conv+npad/2, nv*sizeof(double));
+      }
     }
   }
   return;
@@ -177,7 +208,7 @@ void smooth_test()
   fb = 5.0;
   fa = 10.0;
   
-  for(j=0; j<2; j++)
+  for(j=0; j<1; j++)
   {
   
     sig_a = 10.0*(j+1);
@@ -192,7 +223,7 @@ void smooth_test()
   
     fftw_execute(pa);
   
-    tot = 0.0;
+    /*tot = 0.0;
     for(i=0; i<N/2; i++)
     {
       in_b[i] = 1.0/sqrt(2.0*PI)/sig_b * exp(-0.5 * (i*dV)*(i*dV)/sig_b/sig_b);
@@ -209,7 +240,19 @@ void smooth_test()
       in_b[i] = in_b[i]/ (tot) / N / fb;
     }
  
-    fftw_execute(pb);
+    fftw_execute(pb);*/
+
+    for(i=0; i<N/2+1; i++)
+    {
+      out_b[i][0] = exp(-2.0 * PI*PI * sig_b/dV*sig_b/dV * i*i*1.0/N/N)/N/fb;
+      out_b[i][1] = 0.0; //-sin(2.0 * PI*PI * sig_b/dV*sig_b/dV * i*i*1.0/N/N)/N/fb;
+    }
+    
+    /*for(i=0; i<N/2+1; i++)
+    {
+      printf("%f %f %f\n", i*1.0/N, out_b[i][0], out_b[i][1]);
+    }*/
+
   
     for(i=0; i<N/2+1; i++)
     {
@@ -221,7 +264,8 @@ void smooth_test()
   
     for(i=0; i<N; i++)
     {
-      printf("%d %f %f %f\n", i, in[i],  re[i] * fb, 1.0/sqrt(2.0*PI)/sqrt(sig_a*sig_a+sig_b*sig_b) * exp(-0.5 * (i-N/2.0)*(i-N/2.0)*dV*dV/(sig_a*sig_a+sig_b*sig_b))/fa);
+      printf("%d %f %f %f\n", i, in[i],  re[i] * fb, 
+        1.0/sqrt(2.0*PI)/sqrt(sig_a*sig_a+sig_b*sig_b) * exp(-0.5 * (i-N/2.0)*(i-N/2.0)*dV*dV/(sig_a*sig_a+sig_b*sig_b))/fa);
     }
   }
   

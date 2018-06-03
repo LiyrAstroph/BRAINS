@@ -78,10 +78,13 @@ double *par_fix_val;
 double **blr_range_model, **par_range_model;
 double nlr_range_model[3][2];
 
-int num_params, num_params_blr, num_params_blr_model, num_params_var, num_params_trend, num_params_nlr;
+int num_params, num_params_blr, num_params_blr_model, num_params_var, num_params_trend, num_params_nlr, num_params_res;
 
 // continuum variation
 double var_range_model[7][2]; /*!< define the range of variability parameters */
+
+// epoch dependent spectral broadening
+double *instres_epoch, *instres_err_epoch;
 
 /* transfer function / velocity-delay map */
 double *TransTau, *TransV, *Trans1D, *Trans2D_at_veldata, *Trans2D;

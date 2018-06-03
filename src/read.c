@@ -134,6 +134,14 @@ void read_parset()
     addr[nt] = &parset.InstRes;
     id[nt++] = DOUBLE;
 
+    strcpy(tag[nt], "InstResErr");
+    addr[nt] = &parset.InstRes_err;
+    id[nt++] = DOUBLE;
+
+    strcpy(tag[nt], "InstResFile");
+    addr[nt] = &parset.file_instres;
+    id[nt++] = STRING;
+
     strcpy(tag[nt], "FlagNarrowLine");
     addr[nt] = &parset.flag_narrowline;
     id[nt++] = INT;
@@ -276,7 +284,7 @@ void read_parset()
       }
       else
       {
-        printf("# add narrow-line with logrithmic prior of flux and Gaussian priors of width and shist: width=%fkm/s, shift=%fkm/s.\n",
+        printf("# add narrow-line with logrithmic prior of flux and Gaussian priors of width and shift: width=%fkm/s, shift=%fkm/s.\n",
            parset.width_narrowline, parset.shift_narrowline);
       }
 
@@ -293,6 +301,16 @@ void read_parset()
       parset.shift_narrowline_err /= VelUnit;
     }
 
+    if(parset.InstRes < 0.0)
+    {
+      printf("# use epoch dependent spectral resolution, stored at %s.\n", parset.file_instres);
+    }
+    else
+    {
+      parset.InstRes /= VelUnit;
+      parset.InstRes_err /= VelUnit;
+    }
+    
     if(parset.flag_blrmodel == 3 || parset.flag_blrmodel == 4)
     {
       parset.n_vel_per_cloud = 1;
@@ -538,6 +556,30 @@ void read_data()
     cal_emission_flux();
   }
 
+  if(parset.InstRes < 0.0 && parset.flag_dim == 2)
+  {
+    if(thistask == roottask)
+    {
+      sprintf(fname, "%s/%s", parset.file_dir, parset.file_instres);
+      fp = fopen(fname, "r");
+      if(fp == NULL)
+      {
+        fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+        exit(-1);
+      }
+
+      for(i=0; i<n_line_data; i++)
+      {
+        fscanf(fp, "%lf %lf\n", &instres_epoch[i], &instres_err_epoch[i]);
+        //printf("%d %f %f\n", i, instres_epoch[i], instres_err_epoch[i]);
+        instres_epoch[i] /= VelUnit;
+        instres_err_epoch[i] /= VelUnit;
+      }
+      fclose(fp);
+    }
+    MPI_Bcast(instres_epoch, n_line_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(instres_err_epoch, n_line_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+  }
   return;
 }
 
@@ -567,6 +609,12 @@ void allocate_memory_data()
     Fline2d_data = malloc(n_line_data * n_vel_data * sizeof(double *));
     Flerrs2d_data = malloc(n_line_data * n_vel_data * sizeof(double *));
   }
+
+  if(parset.InstRes < 0.0 && parset.flag_dim == 2)
+  {
+    instres_epoch = malloc(n_line_data * sizeof(double));
+    instres_err_epoch = malloc(n_line_data * sizeof(double));
+  }
 }
 
 /*!
@@ -594,6 +642,13 @@ void free_memory_data()
 
     free(Fline2d_data);
     free(Flerrs2d_data);
+  }
+
+
+  if(parset.InstRes < 0.0 && parset.flag_dim == 2)
+  {
+    free(instres_epoch); 
+    free(instres_err_epoch);
   }
 }
 

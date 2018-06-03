@@ -149,15 +149,15 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
     }
     else if(parset.flag_narrowline == 2)
     {
-      flux = parset.flux_narrowline + pmodel[num_params_blr-1-3] * parset.flux_narrowline_err;
-      width = parset.width_narrowline + pmodel[num_params_blr-1-2] * parset.width_narrowline_err;
-      shift = parset.shift_narrowline + pmodel[num_params_blr-1-1] * parset.shift_narrowline_err;
+      flux = parset.flux_narrowline + pmodel[num_params_blr-num_params_res-1-3] * parset.flux_narrowline_err;
+      width = parset.width_narrowline + pmodel[num_params_blr-num_params_res-1-2] * parset.width_narrowline_err;
+      shift = parset.shift_narrowline + pmodel[num_params_blr-num_params_res-1-1] * parset.shift_narrowline_err;
     }
     else
     {
-      flux = exp(pmodel[num_params_blr-1-3]);
-      width = parset.width_narrowline + pmodel[num_params_blr-1-2] * parset.width_narrowline_err;
-      shift = parset.shift_narrowline + pmodel[num_params_blr-1-1] * parset.shift_narrowline_err;
+      flux = exp(pmodel[num_params_blr-num_params_res-1-3]);
+      width = parset.width_narrowline + pmodel[num_params_blr-num_params_res-1-2] * parset.width_narrowline_err;
+      shift = parset.shift_narrowline + pmodel[num_params_blr-num_params_res-1-1] * parset.shift_narrowline_err;
     }
 
     width = fmax(1.0e-10, width); /* make sure thant width is not zero */
@@ -173,7 +173,7 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
   }
 
 // smooth the line profile
-  line_gaussian_smooth_2D_FFT(transv, fl2d, nl, nv);
+  line_gaussian_smooth_2D_FFT(transv, fl2d, nl, nv, pm);
 }
 
 /*================================================================
@@ -2251,8 +2251,8 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
 
       vx = Vr * cos(phi) - Vph * sin(phi);
       vy = Vr * sin(phi) + Vph * cos(phi);
-      vz = 0.0;     
-
+      vz = 0.0;    
+      
     /*vxb = cos(Lthe)*cos(Lphi) * vx + sin(Lphi) * vy - sin(Lthe)*cos(Lphi) * vz;
       vyb =-cos(Lthe)*sin(Lphi) * vx + cos(Lphi) * vy + sin(Lthe)*sin(Lphi) * vz;
       vzb = sin(Lthe) * vx + cos(Lthe) * vz;*/
@@ -2260,6 +2260,7 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
       vxb = cos(Lthe)*cos(Lphi) * vx + sin(Lphi) * vy;
       vyb =-cos(Lthe)*sin(Lphi) * vx + cos(Lphi) * vy;
       vzb = sin(Lthe) * vx;
+
 
       if((rnd_xi < 1.0-xi) && zb0 < 0.0)
         vzb = -vzb;

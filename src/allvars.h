@@ -90,7 +90,8 @@ typedef struct
 
   int flag_save_clouds;
 
-  double InstRes;
+  double InstRes, InstRes_err;
+  char file_instres[BRAINS_MAX_STR_LENGTH];
 
   int num_particles;
 
@@ -296,11 +297,13 @@ extern int BLRmodel_size;
 extern int *par_fix, npar_fix;
 extern double *par_fix_val;
 
-extern int num_params, num_params_blr, num_params_blr_model, num_params_var, num_params_trend, num_params_nlr;
+extern int num_params, num_params_blr, num_params_blr_model, num_params_var, num_params_trend, num_params_nlr, num_params_res;
 
 extern double **blr_range_model, **par_range_model;
 extern double var_range_model[7][2];
 extern double nlr_range_model[3][2];
+
+extern double *instres_epoch, *instres_err_epoch;
 
 /* transfer function / velocity-delay map */
 extern double *TransTau, *TransV, *Trans1D, *Trans2D_at_veldata, *Trans2D;

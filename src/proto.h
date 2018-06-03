@@ -86,7 +86,7 @@ double prob_restart_line2d(const void *model);
 void reconstruct_line2d();
 void reconstruct_line2d_init();
 void reconstruct_line2d_end();
-void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int nv);
+void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int nv, const void *pm);
 void (*transfun_2d_cloud_direct)(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save);
 void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const double *transv, const double *trans2d, 
                                               double *fl2d, int nl, int nv);
