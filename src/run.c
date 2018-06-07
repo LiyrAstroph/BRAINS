@@ -26,6 +26,7 @@ void begin_run()
    *   needs to be converted using this unit in read.c. 
    */
   VelUnit = sqrt( GRAVITY * 1.0e6 * SOLAR_MASS / CM_PER_LD ) / 1.0e5; 
+  C_Unit = C/1.0e5/VelUnit;
 
   /* read parameter file */
   read_parset();

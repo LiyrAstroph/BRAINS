@@ -2080,7 +2080,7 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
   int i, j, idt, idV, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb, vcloud_min, vcloud_max;
-  double V, dV, rhoV, theV, Vr, Vph, Vkep;
+  double V, dV, rhoV, theV, Vr, Vph, Vkep, Rs, g, Vt;
   double inc, F, beta, mu, k, gam, xi, a, s, sig, rin;
   double mbh, fellip, fflow, sigr_circ, sigthe_circ, sigr_rad, sigthe_rad, theta_rot, sig_turb;
   double Lphi, Lthe;
@@ -2105,6 +2105,8 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
   sigthe_rad = exp(model->sigthe_rad);
   theta_rot = model->theta_rot*PI/180.0;
   sig_turb = exp(model->sig_turb);
+
+  Rs = 3.0e11*mbh/CM_PER_LD; // Schwarzchild radius in a unit of light-days
 
   a = 1.0/beta/beta;
   s = mu/a;
@@ -2176,6 +2178,8 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
     {
       r = clouds_particles[which_particle_update][i];
     }
+
+    r += Rs; //add Schwarzschild radius
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
     /* Polar coordinates to Cartesian coordinate */
@@ -2217,8 +2221,6 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
 
     weight = 0.5 + k*(x/r);
     //weight = 0.5 + k * x/sqrt(x*x+y*y);
-    //Trans1D[idt] += pow(1.0/r, 2.0*(1 + gam)) * weight;
-
 
     Vkep = sqrt(mbh/r);
     
@@ -2277,6 +2279,12 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
 
       V += gsl_ran_ugaussian(gsl_r) * sig_turb * Vkep; // add turbulence velocity
 
+      if(fabs(V) >= C_Unit) // make sure that the velocity is smaller than speed of light
+        V = 0.9999*C_Unit * (V>0.0?1.0:-1.0);
+
+      g = sqrt( (1.0 + V/C_Unit) / (1.0 - V/C_Unit) ) / sqrt(1.0 - Rs/r); //relativistic effects
+      V = (g-1.0)*C_Unit;
+      
       if(V<transv[0] || V>=transv[n_vel-1]+dV)
         continue;
 

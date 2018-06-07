@@ -113,7 +113,7 @@ typedef struct
 }PARSET;
 extern PARSET parset;
 
-extern double VelUnit;
+extern double VelUnit, C_Unit;
 
 extern int n_con_data, n_line_data, n_vel_data;
 extern double *Tcon_data, *Fcon_data,  *Fcerrs_data;
