@@ -270,7 +270,13 @@ void read_parset()
       exit(0);
     }
 
-    if(parset.flag_narrowline != 0)
+    if(parset.flag_narrowline > 3 || parset.flag_narrowline < 0)
+    {
+      fprintf(stderr, "# Error in flag_narrowline: value %d is not allowed.\nPlease specify a value in [0-3].\n", parset.flag_narrowline);
+      exit(0);
+    }
+
+    if(parset.flag_narrowline > 0)
     {
       if(parset.flag_narrowline == 1)
       {
@@ -290,7 +296,7 @@ void read_parset()
 
       if(parset.width_narrowline<=0.0)
       {
-        printf("# Error narrow line width %f.\n", parset.width_narrowline);
+        printf("# Error in narrow line width %f.\n", parset.width_narrowline);
         exit(0);
       }
 
@@ -301,8 +307,13 @@ void read_parset()
       parset.shift_narrowline_err /= VelUnit;
     }
 
-    if(parset.InstRes < 0.0)
+    if(parset.InstRes < 0.0) // epoch-dependent spectral broadening
     {
+      if(strlen(parset.file_instres) == 0)
+      {
+        printf("# Error in file_instres, not specified.\n");
+        exit(0);
+      }
       printf("# use epoch dependent spectral resolution, stored at %s.\n", parset.file_instres);
     }
     else
