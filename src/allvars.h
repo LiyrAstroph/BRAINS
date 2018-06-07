@@ -240,8 +240,8 @@ typedef struct
   double A;             /*!< \brief 1. line response*/    
   double Ag;            /*!< \brief 2. no-linearity */
   double mu;            /*!< \brief 3. peak radius*/
-  double beta;          /*!< \brief 5. fraction of inner radius*/
-  double F;             /*!< \brief 4. fraction of outer radius*/
+  double beta;          /*!< \brief 4. fraction of inner radius*/
+  double F;             /*!< \brief 5. fraction of outer radius*/
   double inc;           /*!< \brief 6. inclination */
   double opn;           /*!< \brief 7. opening angle */
   double k;             /*!< \brief 8. kappa */

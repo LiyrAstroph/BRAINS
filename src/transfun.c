@@ -2110,7 +2110,7 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
 
   a = 1.0/beta/beta;
   s = mu/a;
-  rin=mu*F;
+  rin=mu*F + Rs;  // include Scharzschild radius
   sig=(1.0-F)*s;
   
   dV =(transv[1] - transv[0]); // velocity grid width
@@ -2179,7 +2179,6 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
       r = clouds_particles[which_particle_update][i];
     }
 
-    r += Rs; //add Schwarzschild radius
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
     /* Polar coordinates to Cartesian coordinate */
