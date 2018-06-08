@@ -21,11 +21,14 @@
  */
 void begin_run()
 {
-  /*   Velocity unit 
-   *   This unit should be determined in the beginning because the data velocity
-   *   needs to be converted using this unit in read.c. 
+  /* Velocity unit 
+   * This unit should be determined in the beginning because the data velocity
+   * needs to be converted using this unit in read.c. 
    */
   VelUnit = sqrt( GRAVITY * 1.0e6 * SOLAR_MASS / CM_PER_LD ) / 1.0e5; 
+
+  /* dimensionless speed of light
+   */
   C_Unit = C/1.0e5/VelUnit;
 
   /* read parameter file */

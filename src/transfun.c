@@ -2276,9 +2276,6 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
       vy = vyb;
       vz =-vxb * sin(PI/2.0-inc) + vzb * cos(PI/2.0-inc);
 
-      vcloud_max = fmax(vx, vcloud_max);
-      vcloud_min = fmin(vx, vcloud_min);
-
       V = -vx;  //note the definition of the line-of-sight velocity. postive means a receding 
                 // velocity relative to the observer.
 
@@ -2291,6 +2288,9 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
       V = (g-1.0)*C_Unit;
 
       V += linecenter;
+
+      vcloud_max = fmax(V, vcloud_max);
+      vcloud_min = fmin(V, vcloud_min);
       
       if(V<transv[0] || V>=transv[n_vel-1]+dV)
         continue;

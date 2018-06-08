@@ -5,7 +5,7 @@
 FileDir                     /home/liyropt/Projects/GIT/BRAINS
 %FileDir                     /ihepbatch/mbhd01/user/liyanrong/RM/Test/mrk493
 
-FlagDim                     2                           % -1, simulation; 0, only continuum; 1, 1d line; 2, 2d line
+FlagDim                     -2                           % -1, simulation; 0, only continuum; 1, 1d line; 2, 2d line
 FlagBLRModel                6                           % 1, 2, 3, 4, BLR model type
 %===============================
 % data file
@@ -24,7 +24,7 @@ NLineRecon                  50                          % number of points for l
 LineConstructFileOut        data/pline.txt              % output filename
 TranFileOut                 data/tran.txt               % output filename for 1d transfer function
 
-NVelRecon                   50                          % number of points for line reconstruction along velocity axis
+NVelRecon                   100                          % number of points for line reconstruction along velocity axis
 Line2DConstructFileOut      data/pline2d.txt            % output filename  
 Line2DDataConstructFileOut  data/pline2d_data.txt       % output filename for 2d transfer function at points same with data
 Tran2DFileOut               data/tran2d.txt             % output filename for 2d transfer function
@@ -42,7 +42,7 @@ CloudsFileOut               data/clouds.txt             % output filename for cl
 
 %===============================
 % spectral broadening
-InstRes                     -1.0                         % instrument resolution, in km/s
+InstRes                     -1                         % instrument resolution, in km/s
                                                           % if seting to <0.0, the broadening is epoch dependent
 InstResErr                  10                            % in km/s
 InstResFile                 data/arp151_broaden.txt       %
@@ -61,6 +61,10 @@ WidthNarrowLine             94.0                        % width km/s
 WidthNarrowLineErr          4.4                         % width error
 ShiftNarrowLine             0.0                         % shift, km/s, with respect to broad line center.  
 ShiftNarrowLineErr          10.0                         % shift error
+
+%===============================
+FlagLineCenter              1
+LineCenterErr               62.0                        % km/s
 
 %===============================
 % set fixed BLR parameters and their fixed values

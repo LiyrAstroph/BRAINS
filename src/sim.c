@@ -145,7 +145,9 @@ void sim()
       pm[16] = log(0.1);
       pm[17] = 0.0;
       pm[18] = 0.0;
-      pm[19] = log(1.0);
+      pm[19] = 1.0;  // parameter for spectral broadening 
+      pm[20] = 0.0;  // parameter for line center
+      pm[21] = log(1.0);
       break;
 
     case 7:
@@ -328,51 +330,68 @@ void sim_init()
   switch(parset.flag_blrmodel)
   {
     case 1:
-      num_params_blr = 12;
+      num_params_blr_model = 12;
       transfun_1d_cloud_direct = transfun_1d_cloud_direct_model1;
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model1;
       break;
     case 2:
-      num_params_blr = 12;
+      num_params_blr_model = 12;
       transfun_1d_cloud_direct = transfun_1d_cloud_direct_model1;
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model2;
       break;
     case 3:
-      num_params_blr = 12;
+      num_params_blr_model = 12;
       transfun_1d_cloud_direct = transfun_1d_cloud_direct_model3;
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model3;
       break;
     case 4:
-      num_params_blr = 12;
+      num_params_blr_model = 12;
       transfun_1d_cloud_direct = transfun_1d_cloud_direct_model3;
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model4;
       break;
     case 5:
-      num_params_blr = 20;
+      num_params_blr_model = 20;
       transfun_1d_cloud_direct = transfun_1d_cloud_direct_model5;
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model5;
       break;
 
     case 6:
-      num_params_blr = 19;
+      num_params_blr_model = 20;
       transfun_1d_cloud_direct = transfun_1d_cloud_direct_model6;
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model6;
       break;
 
+    case 7:
+      num_params_blr_model = 26;
+      transfun_1d_cloud_direct = transfun_1d_cloud_direct_model7;
+      transfun_2d_cloud_direct = transfun_2d_cloud_direct_model7;
+      break;
+
     default:
-      num_params_blr = 12;
+      num_params_blr_model = 12;
       transfun_1d_cloud_direct = transfun_1d_cloud_direct_model1;
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model1;
       break;
   }
 
-  parset.flag_narrowline = 1;
+  if(parset.InstRes <= 0.0)
+  {
+    num_params_res = 1;
+    parset.InstRes = 220.0;
+  }
+
+  if(parset.flag_narrowline > 1)
+  {
+    printf("# set flag_narrowline to 1.\n");
+    parset.flag_narrowline = 1;
+  }
 
   parset.num_particles = 1;
   which_particle_update = 0;
   force_update = 1;
   which_parameter_update = -1;
   
+  num_params_blr = num_params_blr_model + num_params_nlr + num_params_res + num_params_linecenter;
   num_params_var = 4 + parset.flag_trend;
   num_params = num_params_blr + num_params_var + parset.n_con_recon;
 
@@ -449,7 +468,7 @@ void sim_init()
   }
 
   double vel_max_set, vel_min_set;
-  vel_max_set = 3000.0/VelUnit;
+  vel_max_set = 5000.0/VelUnit;
   vel_min_set = - vel_max_set;
   double dVel = (vel_max_set- vel_min_set)/(parset.n_vel_recon -1.0);
 

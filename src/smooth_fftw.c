@@ -80,12 +80,20 @@ void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int
 {
   int i, j;
   // initialize response and its fft.
-  double sigV, sigV_instrinsic, dV, tot;
+  double sigV, sigV_instrinsic, dV;
   double *pmodel = (double *)pm;
 
   dV = transv[1] - transv[0];
-  sigV_instrinsic = parset.width_narrowline + pmodel[num_params_blr-num_params_res-num_params_linecenter-1-2] * parset.width_narrowline_err;
 
+  if(parset.flag_narrowline < 2)
+  {
+    sigV_instrinsic = parset.width_narrowline;
+  }
+  else
+  {
+    sigV_instrinsic = parset.width_narrowline + pmodel[num_params_blr-num_params_res-num_params_linecenter-1-2] * parset.width_narrowline_err;
+  }
+  
   if(parset.InstRes >= 0.0)
   {
     sigV = parset.InstRes + pmodel[num_params_blr-num_params_res-num_params_linecenter-1]*parset.InstRes_err;
@@ -182,7 +190,7 @@ void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int
 void smooth_test()
 {
   int i, j;
-  double tot, sig_a, sig_b;
+  double sig_a, sig_b;
   double dV, fb, fa;
 
   const int N=100;
