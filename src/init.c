@@ -50,6 +50,10 @@ void init()
   num_params_res = 1;
   if(parset.InstRes < 0.0)
     num_params_res = n_line_data;
+
+  num_params_linecenter = 0;
+  if(parset.flag_linecenter !=  0)
+    num_params_linecenter = 1;
   
   switch(parset.flag_blrmodel)
   {

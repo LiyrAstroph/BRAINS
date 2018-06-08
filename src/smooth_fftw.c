@@ -84,11 +84,11 @@ void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int
   double *pmodel = (double *)pm;
 
   dV = transv[1] - transv[0];
-  sigV_instrinsic = parset.width_narrowline + pmodel[num_params_blr-num_params_res-1-2] * parset.width_narrowline_err;
+  sigV_instrinsic = parset.width_narrowline + pmodel[num_params_blr-num_params_res-num_params_linecenter-1-2] * parset.width_narrowline_err;
 
   if(parset.InstRes >= 0.0)
   {
-    sigV = parset.InstRes + pmodel[num_params_blr-num_params_res-1]*parset.InstRes_err;
+    sigV = parset.InstRes + pmodel[num_params_blr-num_params_res-num_params_linecenter-1]*parset.InstRes_err;
     sigV = fmax(0.0, sigV*sigV - sigV_instrinsic*sigV_instrinsic);
     sigV = sqrt(sigV);
 
@@ -136,7 +136,7 @@ void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int
   {
     for(j=0; j<nl; j++)
     {
-      sigV = instres_epoch[j] + pmodel[num_params_blr-num_params_res-1 + j]*instres_err_epoch[j];
+      sigV = instres_epoch[j] + pmodel[num_params_blr-num_params_res-num_params_linecenter-1 + j]*instres_err_epoch[j];
       sigV = fmax(0.0, sigV*sigV - sigV_instrinsic*sigV_instrinsic);
       sigV = sqrt(sigV);
 

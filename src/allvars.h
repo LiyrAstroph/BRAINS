@@ -100,6 +100,9 @@ typedef struct
   int flag_narrowline;
   double flux_narrowline, width_narrowline, shift_narrowline;
   double flux_narrowline_err, width_narrowline_err, shift_narrowline_err;
+  
+  int flag_linecenter;
+  double linecenter_err;
 
   int flag_postprc;
   int flag_restart;
@@ -298,6 +301,7 @@ extern int *par_fix, npar_fix;
 extern double *par_fix_val;
 
 extern int num_params, num_params_blr, num_params_blr_model, num_params_var, num_params_trend, num_params_nlr, num_params_res;
+extern int num_params_linecenter;
 
 extern double **blr_range_model, **par_range_model;
 extern double var_range_model[7][2];

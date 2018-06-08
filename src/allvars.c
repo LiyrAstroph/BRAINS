@@ -79,6 +79,7 @@ double **blr_range_model, **par_range_model;
 double nlr_range_model[3][2];
 
 int num_params, num_params_blr, num_params_blr_model, num_params_var, num_params_trend, num_params_nlr, num_params_res;
+int num_params_linecenter;
 
 // continuum variation
 double var_range_model[7][2]; /*!< define the range of variability parameters */

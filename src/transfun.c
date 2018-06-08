@@ -149,15 +149,15 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
     }
     else if(parset.flag_narrowline == 2)
     {
-      flux = parset.flux_narrowline + pmodel[num_params_blr-num_params_res-1-3] * parset.flux_narrowline_err;
-      width = parset.width_narrowline + pmodel[num_params_blr-num_params_res-1-2] * parset.width_narrowline_err;
-      shift = parset.shift_narrowline + pmodel[num_params_blr-num_params_res-1-1] * parset.shift_narrowline_err;
+      flux =  parset.flux_narrowline  + pmodel[num_params_blr-num_params_res-num_params_linecenter-1-3] * parset.flux_narrowline_err;
+      width = parset.width_narrowline + pmodel[num_params_blr-num_params_res-num_params_linecenter-1-2] * parset.width_narrowline_err;
+      shift = parset.shift_narrowline + pmodel[num_params_blr-num_params_res-num_params_linecenter-1-1] * parset.shift_narrowline_err;
     }
     else
     {
-      flux = exp(pmodel[num_params_blr-num_params_res-1-3]);
-      width = parset.width_narrowline + pmodel[num_params_blr-num_params_res-1-2] * parset.width_narrowline_err;
-      shift = parset.shift_narrowline + pmodel[num_params_blr-num_params_res-1-1] * parset.shift_narrowline_err;
+      flux =  exp(pmodel[num_params_blr-num_params_res-num_params_linecenter-1-3]);
+      width = parset.width_narrowline + pmodel[num_params_blr-num_params_res-num_params_linecenter-1-2] * parset.width_narrowline_err;
+      shift = parset.shift_narrowline + pmodel[num_params_blr-num_params_res-num_params_linecenter-1-1] * parset.shift_narrowline_err;
     }
 
     width = fmax(1.0e-10, width); /* make sure thant width is not zero */
@@ -2083,8 +2083,9 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
   double V, dV, rhoV, theV, Vr, Vph, Vkep, Rs, g, Vt;
   double inc, F, beta, mu, k, gam, xi, a, s, sig, rin;
   double mbh, fellip, fflow, sigr_circ, sigthe_circ, sigr_rad, sigthe_rad, theta_rot, sig_turb;
-  double Lphi, Lthe;
+  double Lphi, Lthe, linecenter=0.0;
   double Anorm, weight, rnd, rnd_xi, rnd_flow;
+  double *pmodel = (double *)pm;
   BLRmodel6 *model = (BLRmodel6 *)pm;
 
   Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
@@ -2112,6 +2113,11 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
   s = mu/a;
   rin=mu*F + Rs;  // include Scharzschild radius
   sig=(1.0-F)*s;
+  
+  if(parset.flag_linecenter !=0)
+  {
+    linecenter = pmodel[num_params_blr - num_params_linecenter - 1] * parset.linecenter_err; 
+  }
   
   dV =(transv[1] - transv[0]); // velocity grid width
 
@@ -2283,6 +2289,8 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
 
       g = sqrt( (1.0 + V/C_Unit) / (1.0 - V/C_Unit) ) / sqrt(1.0 - Rs/r); //relativistic effects
       V = (g-1.0)*C_Unit;
+
+      V += linecenter;
       
       if(V<transv[0] || V>=transv[n_vel-1]+dV)
         continue;

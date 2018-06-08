@@ -190,6 +190,14 @@ void read_parset()
     addr[nt] = &parset.flag_trend_diff;
     id[nt++] = INT;
 
+    strcpy(tag[nt], "FlagLineCenter");
+    addr[nt] = &parset.flag_linecenter;
+    id[nt++] = INT;
+
+    strcpy(tag[nt], "LineCenterErr");
+    addr[nt] = &parset.linecenter_err;
+    id[nt++] = DOUBLE;
+
 
     /* default values */
     parset.flag_dim = 0;
@@ -199,6 +207,7 @@ void read_parset()
     parset.flag_blrmodel = 1;
     parset.flag_trend_diff = 0;
     parset.flag_narrowline = 0;
+    parset.flag_linecenter = 0;
 
     
     char fname[200];
@@ -338,6 +347,12 @@ void read_parset()
       parset.n_cloud_per_task = fmax(2.0e5, parset.n_cloud_per_task);
       parset.n_vel_per_cloud = fmax(10.0, parset.n_vel_per_cloud);
       printf("# set NCloudPerCore and NVPerCloud: %d %d\n", parset.n_cloud_per_task, parset.n_vel_per_cloud);
+    }
+
+
+    if(parset.flag_linecenter != 0)
+    {
+      parset.linecenter_err /= VelUnit;
     }
   }
   

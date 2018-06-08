@@ -136,7 +136,7 @@ int dnest_line2d(int argc, char **argv)
       break;
   }
   
-  num_params_blr = num_params_blr_model + num_params_nlr + num_params_res;
+  num_params_blr = num_params_blr_model + num_params_nlr + num_params_res + num_params_linecenter;
   num_params = parset.n_con_recon + num_params_blr + num_params_var;
   size_of_modeltype = num_params * sizeof(double);
   par_fix = (int *) malloc(num_params * sizeof(int));
@@ -204,15 +204,22 @@ void set_par_range_model2d()
     par_range_model[i][1] = blr_range_model[i][1];
   }
   //cope with narrow line
-  for(i=num_params_blr_model-1; i<num_params_blr-num_params_res-1; i++)
+  for(i=num_params_blr_model-1; i<num_params_blr-num_params_res-num_params_linecenter-1; i++)
   {
     par_range_model[i][0] = nlr_range_model[i - (num_params_blr_model-1)][0];
     par_range_model[i][1] = nlr_range_model[i - (num_params_blr_model-1)][1];
   }
-  for(i=num_params_blr-num_params_res-1; i<num_params_blr-1; i++)
+  // cope with spectral broadening
+  for(i=num_params_blr-num_params_res-num_params_linecenter-1; i<num_params_blr-num_params_linecenter-1; i++)
   {
     par_range_model[i][0] = -10.0;
     par_range_model[i][1] = 10.0;
+  }
+  //cope with line center
+  for(i=num_params_blr-num_params_linecenter-1; i< num_params_blr-1; i++)
+  {
+    par_range_model[i][0] = -10.0;
+    par_range_model[i][1] = -10.0;
   }
   // the last is systematic error
   i = num_params_blr-1;
@@ -261,7 +268,7 @@ void from_prior_line2d(void *model)
     pm[i] = par_range_model[i][0] + dnest_rand() * ( par_range_model[i][1] - par_range_model[i][0]  );
   }
   //cope with flux of narrow line
-  for(i=num_params_blr_model-1; i<num_params_blr-num_params_res-1-2; i++)
+  for(i=num_params_blr_model-1; i<num_params_blr-num_params_res-num_params_linecenter-1-2; i++)
   {
     if(parset.flag_narrowline == 2) // Gaussian prior
     {
@@ -273,12 +280,17 @@ void from_prior_line2d(void *model)
     }
   }
   // cope with width and shift of narrow line
-  for(i=num_params_blr_model; i<num_params_blr-num_params_res-1; i++)
+  for(i=num_params_blr_model; i<num_params_blr-num_params_res-num_params_linecenter-1; i++)
   {
     pm[i] = dnest_randn();
   }
   // cope with spectral boradening
-  for(i=num_params_blr-num_params_res-1; i<num_params_blr-1; i++)
+  for(i=num_params_blr-num_params_res-num_params_linecenter-1; i<num_params_blr-num_params_linecenter-1; i++)
+  {
+    pm[i] = dnest_randn();
+  }
+  //cope with line center
+  for(i=num_params_blr-num_params_linecenter-1; i< num_params_blr-1; i++)
   {
     pm[i] = dnest_randn();
   }
@@ -440,7 +452,7 @@ double perturb_line2d(void *model)
       wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
     }
   }
-  else if(which < num_params_blr-num_params_res-1 && parset.flag_narrowline > 1)  // cope with width and shift of narrow line
+  else if(which < num_params_blr-num_params_res-num_params_linecenter-1 && parset.flag_narrowline > 1)  // cope with width and shift of narrow line
   {
     logH -= (-0.5*pow(pm[which], 2.0) );
     pm[which] += dnest_randh() * width;
