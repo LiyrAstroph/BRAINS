@@ -342,7 +342,7 @@ void reconstruct_line1d()
 
   reconstruct_line1d_end();
 
-  for(i=0; i<5; i++)
+  for(i=0; i<9; i++)
   {
     free(argv[i]);
   }

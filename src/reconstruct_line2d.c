@@ -420,6 +420,22 @@ void reconstruct_line2d()
       which_parameter_update = -1;
       which_particle_update = 0;
       transfun_2d_cloud_direct(best_model_line2d, TransV, Trans2D, parset.n_vel_recon, 0);
+
+      /* there is no data for spectral broadening at given specified epoch, using the mean value
+       * and set InstRes_err=0.0.
+       */ 
+      if(parset.InstRes < 0.0) 
+      {
+        double instres_mean = 0.0, norm=0.0;
+        for(i=0; i<n_line_data; i++)
+        {
+          instres_mean += instres_epoch[i]/(instres_err_epoch[i]*instres_err_epoch[i]);
+          norm += 1.0/(instres_err_epoch[i]*instres_err_epoch[i]);
+        }
+        parset.InstRes = instres_mean/norm;
+        parset.InstRes_err = 0.0;
+      }
+      
       calculate_line2d_from_blrmodel(best_model_line2d, Tline, TransV, 
           Trans2D, Fline2d, parset.n_line_recon, parset.n_vel_recon);
 
@@ -468,7 +484,7 @@ void reconstruct_line2d()
   reconstruct_line2d_end();
 
   //clear up argv
-  for(i=0; i<5; i++)
+  for(i=0; i<9; i++)
   {
     free(argv[i]);
   }

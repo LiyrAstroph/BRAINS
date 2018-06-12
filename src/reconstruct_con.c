@@ -105,6 +105,7 @@ void postprocess_con()
     fclose(fp);
     fclose(fcon);
 
+    // calcaulte mean and standard deviation of posterior samples.
     pm = (double *)best_model_con;
     pmstd = (double *)best_model_std_con;
     for(j=0; j<num_params; j++)
