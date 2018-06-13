@@ -244,7 +244,7 @@ void reconstruct_con()
   reconstruct_con_end();
 
   //clear up argv 
-  for(i=0; i<5; i++)
+  for(i=0; i<9; i++)
   {
     free(argv[i]);
   }
