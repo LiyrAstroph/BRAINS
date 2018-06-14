@@ -43,17 +43,20 @@ void postprocess_con()
   {
     char fname[200];
     FILE *fp, *fcon;
-    // get number of lines in posterior sample file
+
+    /* get file name of posterior sample file */
     get_posterior_sample_file(dnest_options_file, posterior_sample_file);
 
-    //file for posterior sample
+    /* open file for posterior sample */
     fp = fopen(posterior_sample_file, "r");
     if(fp == NULL)
     {
       fprintf(stderr, "# Error: Cannot open file %s.\n", posterior_sample_file);
       exit(0);
     }
-    //file for continuum reconstruction
+
+
+    /* open file for continuum reconstruction */
     sprintf(fname, "%s/%s", parset.file_dir, "data/con_rec.txt");
     fcon = fopen(fname, "w");
     if(fcon == NULL)
@@ -61,7 +64,9 @@ void postprocess_con()
       fprintf(stderr, "# Error: Cannot open file %s.\n", fname);
       exit(0);
     }
-    // read numbers of points in posterior sample
+
+
+    /* read number of points in posterior sample */
     if(fscanf(fp, "# %d", &num_ps) < 1)
     {
       fprintf(stderr, "# Error: Cannot read file %s.\n", posterior_sample_file);
@@ -105,7 +110,7 @@ void postprocess_con()
     fclose(fp);
     fclose(fcon);
 
-    // calcaulte mean and standard deviation of posterior samples.
+    /* calcaulte mean and standard deviation of posterior samples. */
     pm = (double *)best_model_con;
     pmstd = (double *)best_model_std_con;
     for(j=0; j<num_params; j++)
@@ -767,7 +772,7 @@ void create_con_from_random(double sigma_hat, double tau, double alpha, double s
   mean = 0.0;
   for(i=0; i<parset.n_con_recon; i++)
   {
-    Fcon[i] += sigma*3.0;
+    Fcon[i] += sigma*3.0; /* shift light curve to have positive fluxes*/
     mean += Fcon[i];
   }
   mean /= parset.n_con_recon;

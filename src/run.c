@@ -27,14 +27,13 @@ void begin_run()
    */
   VelUnit = sqrt( GRAVITY * 1.0e6 * SOLAR_MASS / CM_PER_LD ) / 1.0e5; 
 
-  /* dimensionless speed of light
-   */
+  /* dimensionless speed of light */
   C_Unit = C/1.0e5/VelUnit;
 
   /* read parameter file */
   read_parset();
   
-  if(parset.flag_dim != -2) // if not randomly create mock data 
+  if(parset.flag_dim != -2) /* if not randomly create mock data */
   {
     /* read data files */
     read_data();
@@ -47,7 +46,9 @@ void begin_run()
   
   /* now run dnest and reconstruct the model. */
   MPI_Barrier(MPI_COMM_WORLD);
-  if(parset.flag_dim == -1 || parset.flag_dim == -2)
+
+
+  if(parset.flag_dim == -1 || parset.flag_dim == -2) /* only simulation */
   {
     sim();
   }

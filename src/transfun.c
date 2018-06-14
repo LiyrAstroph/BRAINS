@@ -2140,6 +2140,14 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
     }
   }
 
+  // "which_parameter_update = -1" means that all parameters are updated, usually occurs at the 
+  // initial step.
+  if(force_update == 1 || which_parameter_update == -1 )
+  {
+    flag_update = 1;
+  }
+
+  
   for(i=0; i<num_params_radial_samp;i++)
   {
     if(which_parameter_update == params_radial_samp[i])
@@ -2147,13 +2155,6 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
       flag_update = 1;
       break;
     }
-  }
-
-  // "which_parameter_update = -1" means that all parameters are updated, usually occurs at the 
-  // initial step.
-  if(force_update == 1 || which_parameter_update == -1 )
-  {
-    flag_update = 1;
   }
   
   for(i=0; i<parset.n_cloud_per_task; i++)
