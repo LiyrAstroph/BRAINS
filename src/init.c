@@ -33,14 +33,14 @@ void init()
   
   if(parset.flag_trend_diff)
   {
-    num_params_trend = 1; // differences of the trends between continuum and line
+    num_params_difftrend = 1; // differences of the trends between continuum and line
   }
   else
   {
-    num_params_trend = 0;
+    num_params_difftrend = 0;
   }
   
-  num_params_var = 4 + parset.flag_trend + num_params_trend;
+  num_params_var = 4 + parset.flag_trend + num_params_difftrend;
 
   // number of parameters for narrow line, only valid for 2d RM.
   num_params_nlr = 0;

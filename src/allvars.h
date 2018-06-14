@@ -300,7 +300,7 @@ extern int BLRmodel_size;
 extern int *par_fix, npar_fix;
 extern double *par_fix_val;
 
-extern int num_params, num_params_blr, num_params_blr_model, num_params_var, num_params_trend, num_params_nlr, num_params_res;
+extern int num_params, num_params_blr, num_params_blr_model, num_params_var, num_params_difftrend, num_params_nlr, num_params_res;
 extern int num_params_linecenter;
 
 extern double **blr_range_model, **par_range_model;
