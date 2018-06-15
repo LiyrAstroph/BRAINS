@@ -263,29 +263,29 @@ void read_parset()
 
     if(parset.flag_dim > 2 || parset.flag_dim < -2)
     {
-      fprintf(stderr, "# Error in flag_dim: value %d is not allowed.\nPlease specify a value in [-2-2].\n", parset.flag_dim);
+      fprintf(stderr, "# Error in FlagDim: value %d is not allowed.\n# Please specify a value in [-2-2].\n", parset.flag_dim);
       exit(0);
     }
 
     if(parset.flag_trend > 2 || parset.flag_trend < 0)
     {
-      fprintf(stderr, "# Error in flag_trend: value %d is not allowed.\nPlease specify a value in [0-1].\n", parset.flag_trend);
+      fprintf(stderr, "# Error in FlagTrend: value %d is not allowed.\n# Please specify a value in [0-1].\n", parset.flag_trend);
       exit(0);
     }
 
     if(parset.flag_blrmodel > 7 || parset.flag_blrmodel < 1)
     {
-      fprintf(stderr, "# Error in flag_blrmodel: value %d is not allowed.\nPlease specify a value in [1-7].\n", parset.flag_trend);
+      fprintf(stderr, "# Error in FlagBLRModel: value %d is not allowed.\n# Please specify a value in [1-7].\n", parset.flag_trend);
       exit(0);
     }
 
     if(parset.flag_narrowline > 3 || parset.flag_narrowline < 0)
     {
-      fprintf(stderr, "# Error in flag_narrowline: value %d is not allowed.\nPlease specify a value in [0-3].\n", parset.flag_narrowline);
+      fprintf(stderr, "# Error in FlagNarrowLine: value %d is not allowed.\n# Please specify a value in [0-3].\n", parset.flag_narrowline);
       exit(0);
     }
 
-    if(parset.flag_narrowline > 0)
+    if(parset.flag_narrowline >= 0 && parset.flag_narrowline <= 3)
     {
       if(parset.flag_narrowline == 1)
       {
