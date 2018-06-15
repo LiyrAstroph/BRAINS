@@ -437,7 +437,7 @@ double perturb_line2d(void *model)
     pm[which] += dnest_randh() * width;
     wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
   }
-  else if(which < num_params_blr_model && parset.flag_narrowline > 1) // cope with flux of narrow line
+  else if(which < num_params_blr-num_params_res-num_params_linecenter-1-2) // cope with flux of narrow line
   {
     if(parset.flag_narrowline==2)  // Gaussian prior
     {
@@ -452,7 +452,7 @@ double perturb_line2d(void *model)
       wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
     }
   }
-  else if(which < num_params_blr-num_params_res-num_params_linecenter-1 && parset.flag_narrowline > 1)  // cope with width and shift of narrow line
+  else if(which < num_params_blr-num_params_res-num_params_linecenter-1 )  // cope with width and shift of narrow line
   {
     logH -= (-0.5*pow(pm[which], 2.0) );
     pm[which] += dnest_randh() * width;
