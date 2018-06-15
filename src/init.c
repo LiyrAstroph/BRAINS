@@ -33,7 +33,7 @@ void init()
   
   if(parset.flag_trend_diff)
   {
-    num_params_difftrend = 1; // differences of the trends between continuum and line
+    num_params_difftrend = 1; /* differences of the trends between continuum and line */
   }
   else
   {
@@ -42,15 +42,17 @@ void init()
   
   num_params_var = 4 + parset.flag_trend + num_params_difftrend;
 
-  // number of parameters for narrow line, only valid for 2d RM.
+  /* number of parameters for narrow line, only valid for 2d RM. */
   num_params_nlr = 0;
   if(parset.flag_narrowline >= 2)
     num_params_nlr = 3;
 
+  /* number of parameters for spectral broadening, only valid for 2d RM */
   num_params_res = 1;
   if(parset.InstRes < 0.0)
     num_params_res = n_line_data;
 
+  /* number of parameters for line center, only valid for 2d RM */
   num_params_linecenter = 0;
   if(parset.flag_linecenter !=  0)
     num_params_linecenter = 1;
@@ -190,6 +192,11 @@ void allocate_memory()
 
   var_param = malloc(num_params_var * sizeof(double));
   var_param_std = malloc(num_params_var * sizeof(double));
+
+  for(i=0; i<num_params_var; i++)
+  {
+    var_param[i] = var_param_std[i] = 0.0;
+  }
 
   return;
 }
