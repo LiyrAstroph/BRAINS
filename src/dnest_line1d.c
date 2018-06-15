@@ -143,7 +143,7 @@ int dnest_line1d(int argc, char **argv)
   for(i=0; i<num_params; i++)
     par_range_model[i] = malloc(2*sizeof(double));
 
-  /* setup functions used for dnest*/
+  /* setup functions used for dnest */
   from_prior = from_prior_line1d;
   print_particle = print_particle_line1d;
   get_num_params = get_num_params_line1d;
@@ -169,7 +169,7 @@ int dnest_line1d(int argc, char **argv)
   for(i=num_params_blr; i<num_params; i++)
     par_fix[i] = 0;
 
-  // fix continuum variation parameter sigma and tau
+  /* fix continuum variation parameter sigma and tau if flag_fixvar is true */
   if(parset.flag_fixvar == 1)
   {
     par_fix[num_params_blr + 1] = 1;
@@ -193,18 +193,18 @@ void set_par_range_model1d()
 {
   int i;
 
-  // BLR parameters first
+  /* BLR parameters first */
   for(i=0; i<num_params_blr-1; i++)
   {
     par_range_model[i][0] = blr_range_model[i][0];
     par_range_model[i][1] = blr_range_model[i][1];
   }
-  // note that the last BLR parameters is the systematic error (1d)
+  /* note that the last BLR parameters is the systematic error (1d) */
   i = num_params_blr -1;
   par_range_model[i][0] = blr_range_model[BLRmodel_size/sizeof(double)-1][0];
   par_range_model[i][1] = blr_range_model[BLRmodel_size/sizeof(double)-1][1];
 
-  // variability parameters
+  /* variability parameters */
   for(i=num_params_blr; i<3 + num_params_blr; i++)
   {
     if(var_param_std[i-num_params_blr] > 0.0)
@@ -233,7 +233,7 @@ void set_par_range_model1d()
     par_range_model[i][1] = var_range_model[4 + i - (4 + parset.flag_trend + num_params_blr)][1];
   }
 
-  // continuum light curve parameters
+  /* continuum light curve parameters */
   for(i=num_params_blr+num_params_var; i<num_params; i++)
   {
     par_range_model[i][0] = var_range_model[5][0];
@@ -367,12 +367,6 @@ double perturb_line1d(void *model)
       which = dnest_rand_int(parset.n_con_recon) + num_params_blr + num_params_var;
 
   }while(par_fix[which]==1);
-
-  /*if(which >= num_params || which < 0)
-  {
-    printf("# Error: Incorrect which.\n");
-    exit(0);
-  }*/
   
   which_parameter_update = which;
 

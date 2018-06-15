@@ -11,6 +11,9 @@
  *
  *  References: Press et al., Numerical Recipes, Chapter 13.1.
  *              FFTW website: http://www.fftw.org/
+ *
+ *  To facilitate computation, we use the factor:
+ *  the Fourier transform a Gaussian is still a Gaussian, which can be expressed analytically.
  */
 
 

@@ -65,7 +65,7 @@ int dnest_con(int argc, char **argv)
   
   set_par_range_con();
   
-  //setup fixed parameters
+  /* setup fixed parameters */
   for(i=0; i<num_params; i++)
     par_fix[i] = 0;
 
@@ -82,27 +82,28 @@ void set_par_range_con()
 {
   int i;
 
-  // variability parameters
-
+  /* variability parameters */
   for(i=0; i<3; i++)
   {
     par_range_model[i][0] = var_range_model[i][0];
     par_range_model[i][1] = var_range_model[i][1];
   }
 
-  for(i=3; i<4 + parset.flag_trend; i++) // parameters for long-term trend
+  /* parameters for long-term trend */
+  for(i=3; i<4 + parset.flag_trend; i++) 
   {
     par_range_model[i][0] = var_range_model[3][0];
     par_range_model[i][1] = var_range_model[3][1];
   }
   
-  for(i= 4 + parset.flag_trend; i<num_params_var; i++) // parameter for trend difference
+  /* parameter for trend difference */
+  for(i= 4 + parset.flag_trend; i<num_params_var; i++) 
   {
     par_range_model[i][0] = var_range_model[4 + i - (4 + parset.flag_trend)][0];
     par_range_model[i][1] = var_range_model[4 + i - (4 + parset.flag_trend)][1];
   }
 
-  // continuum light curve parameters
+  /* continuum light curve parameters */
   for(i=num_params_var; i<num_params; i++)
   {
     par_range_model[i][0] = var_range_model[5][0];
@@ -119,14 +120,13 @@ void from_prior_con(void *model)
   int i;
   double *pm = (double *)model;
   
-  //pm[0] = var_range_model[0][1] - dnest_rand()*(var_range_model[0][1] - var_range_model[0][0]) * 0.01;
   for(i=0; i<3; i++)
   {
     pm[i] = var_range_model[i][0] + dnest_rand()*(var_range_model[i][1] - var_range_model[i][0]);
   }
   for(i=3; i<4 + parset.flag_trend; i++)
   {
-    pm[i] = dnest_randn(); //var_range_model[3][0] + dnest_rand()*(var_range_model[3][1] - var_range_model[3][0]);
+    pm[i] = dnest_randn();
   }
   for(i=4+parset.flag_trend; i<num_params_var; i++)
   {
@@ -192,12 +192,6 @@ double perturb_con(void *model)
     else
       which = dnest_rand_int(parset.n_con_recon) + num_params_var;
   }while(par_fix[which] == 1);
-
-  /*if(which >= num_params || which < 0)
-  {
-    printf("# Error: Incorrect which.\n");
-    exit(0);
-  }*/
   
   which_parameter_update = which;
   
@@ -216,10 +210,6 @@ double perturb_con(void *model)
 
   if(which < 3)
   {
-    // set an upper limit to the MCMC steps of systematic errors
-    //if(which == 0)
-    //   width = fmin(width, (par_range_model[which][1] - par_range_model[which][0])*0.01 );
-
     pm[which] += dnest_randh() * width;
     wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
   }
