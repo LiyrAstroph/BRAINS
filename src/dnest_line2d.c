@@ -166,14 +166,17 @@ int dnest_line2d(int argc, char **argv)
   }
   
   set_par_range_model2d();
+
   /* setup the fixed parameters */
   set_par_fix(num_params_blr);
+
+  /* setup the remaining paramters */
   for(i=num_params_blr; i<num_params; i++)
   {
     par_fix[i] = 0;
     par_fix_val[i] = -DBL_MAX;
   }
-  // fix continuum variation parameter sigma and tau
+  /* if flag_fixvar is true, fix continuum variation parameter sigma and tau */
   if(parset.flag_fixvar == 1)
   {
     par_fix[num_params_blr + 1] = 1;
@@ -192,6 +195,17 @@ int dnest_line2d(int argc, char **argv)
 
 /*!
  * this function setups parameter ranges.
+ * 
+ * The order of parameters is:
+ *   I.   blr model.............(except systematic error)
+ *   II.  narrow line...........(if flag_narrowline is true)
+ *   III. spectral broadening...()
+ *   IV.  line center...........(if flag_linecenter is true)
+ *   V.   systematic error......()
+ *   VI.  variability...........()
+ *   VII. long-term trend.......()
+ *   VIII.different trend.......()
+ *   IX.  continuum light curve.()
  */
 void set_par_range_model2d()
 {
@@ -203,49 +217,54 @@ void set_par_range_model2d()
     par_range_model[i][0] = blr_range_model[i][0];
     par_range_model[i][1] = blr_range_model[i][1];
   }
-  //cope with narrow line
+  /* cope with narrow line */
   for(i=num_params_blr_model-1; i<num_params_blr-num_params_res-num_params_linecenter-1; i++)
   {
     par_range_model[i][0] = nlr_range_model[i - (num_params_blr_model-1)][0];
     par_range_model[i][1] = nlr_range_model[i - (num_params_blr_model-1)][1];
   }
-  // cope with spectral broadening
+  /* cope with spectral broadening */
   for(i=num_params_blr-num_params_res-num_params_linecenter-1; i<num_params_blr-num_params_linecenter-1; i++)
   {
     par_range_model[i][0] = -10.0;
     par_range_model[i][1] = 10.0;
   }
-  //cope with line center
+  /* cope with line center */
   for(i=num_params_blr-num_params_linecenter-1; i< num_params_blr-1; i++)
   {
     par_range_model[i][0] = -10.0;
     par_range_model[i][1] = -10.0;
   }
-  // the last is systematic error
+  /* the last is systematic error */
   i = num_params_blr-1;
   par_range_model[i][0] = blr_range_model[num_params_blr_model-1][0];
   par_range_model[i][1] = blr_range_model[num_params_blr_model-1][1];
 
-  // variability parameters
+  /* variability parameters */
   for(i=num_params_blr; i<3 + num_params_blr; i++)
   {
     //par_range_model[i][0] = var_range_model[i-num_params_blr][0];
     //par_range_model[i][1] = var_range_model[i-num_params_blr][1];
       par_range_model[i][0] = var_param[i-num_params_blr] - 5.0 * var_param_std[i-num_params_blr];
       par_range_model[i][1] = var_param[i-num_params_blr] + 5.0 * var_param_std[i-num_params_blr];
+
+      /* make sure that the range lies within the initial range */
+      par_range_model[i][0] = fmax(par_range_model[i][0], var_range_model[i-num_params_blr][0]);
+      par_range_model[i][1] = fmin(par_range_model[i][1], var_range_model[i-num_params_blr][1]);
   }
+  /* long-term trend of continuum */
   for(i=3 + num_params_blr; i< 4 + parset.flag_trend + num_params_blr; i++)
   {
     par_range_model[i][0] = var_range_model[3][0];
     par_range_model[i][1] = var_range_model[3][1];
   }
+  /* different trend in continuum and line */
   for(i=4 + parset.flag_trend + num_params_blr; i< num_params_var + num_params_blr; i++)
   {
     par_range_model[i][0] = var_range_model[4 + i - (4 + parset.flag_trend + num_params_blr)][0];
     par_range_model[i][1] = var_range_model[4 + i - (4 + parset.flag_trend + num_params_blr)][1];
   }
-
-  // continuum ligth curve values
+  /* continuum ligth curve values */
   for(i=num_params_blr+num_params_var; i<num_params; i++)
   {
     par_range_model[i][0] = var_range_model[5][0];

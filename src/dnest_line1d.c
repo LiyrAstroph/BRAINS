@@ -211,6 +211,10 @@ void set_par_range_model1d()
     //par_range_model[i][1] = var_range_model[i-num_params_blr][1];
       par_range_model[i][0] = var_param[i-num_params_blr] - 5.0 * var_param_std[i-num_params_blr];
       par_range_model[i][1] = var_param[i-num_params_blr] + 5.0 * var_param_std[i-num_params_blr];
+
+      /* make sure that the range lies within the initial range */
+      par_range_model[i][0] = fmax(par_range_model[i][0], var_range_model[i-num_params_blr][0]);
+      par_range_model[i][1] = fmin(par_range_model[i][1], var_range_model[i-num_params_blr][1]);
   }
   for(i=3 + num_params_blr; i< 4 + parset.flag_trend + num_params_blr; i++)
   {

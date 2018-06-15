@@ -255,7 +255,7 @@ void transfun_1d_cloud_direct_model1(const void *pm, int flag_save)
       {
         if(nc > 1000)
         {
-          printf("# Error, too many tries in generating ridial localtion of clouds.\n");
+          printf("# Error, too many tries in generating ridial location of clouds.\n");
           exit(0);
         }
         rnd = gsl_ran_gamma(gsl_r, a, 1.0);
@@ -438,7 +438,7 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
       {
         if(nc > 1000)
         {
-          printf("# Error, too many tries in generating ridial localtion of clouds.\n");
+          printf("# Error, too many tries in generating ridial location of clouds.\n");
           exit(0);
         }
         rnd = gsl_ran_gamma(gsl_r, a, 1.0);
@@ -691,7 +691,7 @@ void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *tra
       {
         if(nc > 1000)
         {
-          printf("# Error, too many tries in generating ridial localtion of clouds.\n");
+          printf("# Error, too many tries in generating ridial location of clouds.\n");
           exit(0);
         }
         rnd = gsl_ran_gamma(gsl_r, a, 1.0);
@@ -911,7 +911,7 @@ void transfun_1d_cloud_direct_model3(const void *pm, int flag_save)
       {
         if(nc > 1000)
         {
-          printf("# Error, too many tries in generating ridial localtion of clouds.\n");
+          printf("# Error, too many tries in generating ridial location of clouds.\n");
           exit(0);
         }
         if(fabs(1.0-alpha) > 1.0e-4)
@@ -1091,7 +1091,7 @@ void transfun_2d_cloud_direct_model3(const void *pm, double *transv, double *tra
       {
         if(nc > 1000)
         {
-          printf("# Error, too many tries in generating ridial localtion of clouds.\n");
+          printf("# Error, too many tries in generating ridial location of clouds.\n");
           exit(0);
         }
         if(fabs(1.0-alpha) > 1.0e-4)
@@ -1325,7 +1325,7 @@ void transfun_2d_cloud_direct_model4(const void *pm, double *transv, double *tra
       {
         if(nc > 1000)
         {
-          printf("# Error, too many tries in generating ridial localtion of clouds.\n");
+          printf("# Error, too many tries in generating ridial location of clouds.\n");
           exit(0);
         }
         if(fabs(1.0-alpha) > 1.0e-4)
@@ -1557,7 +1557,7 @@ void transfun_1d_cloud_direct_model5(const void *pm, int flag_save)
       {
         if(nc > 1000)
         {
-          printf("# Error, too many tries in generating ridial localtion of clouds.\n");
+          printf("# Error, too many tries in generating ridial location of clouds.\n");
           exit(0);
         }
         
@@ -1759,7 +1759,7 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
       {
         if(nc > 1000)
         {
-          printf("# Error, too many tries in generating ridial localtion of clouds.\n");
+          printf("# Error, too many tries in generating ridial location of clouds.\n");
           exit(0);
         }
         
@@ -2019,7 +2019,7 @@ void transfun_1d_cloud_direct_model6(const void *pm, int flag_save)
       {
         if(nc > 1000)
         {
-          printf("# Error, too many tries in generating ridial localtion of clouds.\n");
+          printf("# Error, too many tries in generating ridial location of clouds.\n");
           exit(0);
         }
         rnd = gsl_ran_gamma(gsl_r, a, 1.0);
@@ -2215,7 +2215,7 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
       {
         if(nc > 1000)
         {
-          printf("# Error, too many tries in generating ridial localtion of clouds.\n");
+          printf("# Error, too many tries in generating ridial location of clouds.\n");
           exit(0);
         }
         rnd = gsl_ran_gamma(gsl_r, a, 1.0);
@@ -2472,7 +2472,7 @@ void transfun_1d_cloud_direct_model7(const void *pm, int flag_save)
       {
         if(nc > 1000)
         {
-          printf("# Error, too many tries in generating ridial localtion of clouds.\n");
+          printf("# Error, too many tries in generating ridial location of clouds.\n");
           exit(0);
         }
         rnd = gsl_ran_gamma(gsl_r, a, 1.0);
@@ -2561,7 +2561,7 @@ void transfun_1d_cloud_direct_model7(const void *pm, int flag_save)
       {
         if(nc > 1000)
         {
-          printf("# Error, too many tries in generating ridial localtion of clouds.\n");
+          printf("# Error, too many tries in generating ridial location of clouds.\n");
           exit(0);
         }
         rnd = gsl_ran_gamma(gsl_r, a, 1.0);
@@ -2754,7 +2754,7 @@ void transfun_2d_cloud_direct_model7(const void *pm, double *transv, double *tra
       {
         if(nc > 1000)
         {
-          printf("# Error, too many tries in generating ridial localtion of clouds.\n");
+          printf("# Error, too many tries in generating ridial location of clouds.\n");
           exit(0);
         }
         rnd = gsl_ran_gamma(gsl_r, a, 1.0);
@@ -2911,7 +2911,7 @@ void transfun_2d_cloud_direct_model7(const void *pm, double *transv, double *tra
       {
         if(nc > 1000)
         {
-          printf("# Error, too many tries in generating ridial localtion of clouds.\n");
+          printf("# Error, too many tries in generating ridial location of clouds.\n");
           exit(0);
         }
         rnd = gsl_ran_gamma(gsl_r, a, 1.0);
