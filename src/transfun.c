@@ -137,23 +137,23 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
     }
   }
 
-  // add intrinsic narrow line
+  /* add intrinsic narrow line */
   if(parset.flag_narrowline != 0)
   {
     double flux, width, shift;
-    if(parset.flag_narrowline == 1)
+    if(parset.flag_narrowline == 1)  /* fixed narrow line */
     {
       flux = parset.flux_narrowline;
       width = parset.width_narrowline;
       shift = parset.shift_narrowline;
     }
-    else if(parset.flag_narrowline == 2)
+    else if(parset.flag_narrowline == 2) /* narrow line with Gaussian priors */
     {
       flux =  parset.flux_narrowline  + pmodel[num_params_blr-num_params_res-num_params_linecenter-1-3] * parset.flux_narrowline_err;
       width = parset.width_narrowline + pmodel[num_params_blr-num_params_res-num_params_linecenter-1-2] * parset.width_narrowline_err;
       shift = parset.shift_narrowline + pmodel[num_params_blr-num_params_res-num_params_linecenter-1-1] * parset.shift_narrowline_err;
     }
-    else
+    else  /* narrow line with logrithmic prior of flux */
     {
       flux =  exp(pmodel[num_params_blr-num_params_res-num_params_linecenter-1-3]);
       width = parset.width_narrowline + pmodel[num_params_blr-num_params_res-num_params_linecenter-1-2] * parset.width_narrowline_err;
@@ -172,7 +172,7 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
     } 
   }
 
-// smooth the line profile
+  /* smooth the line profile */
   line_gaussian_smooth_2D_FFT(transv, fl2d, nl, nv, pm);
 }
 
@@ -361,8 +361,9 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
   double r, phi, dis, Lopn_cos, u;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
   double inc, F, beta, mu, k, a, s, rin, sig;
-  double Lphi, Lthe, L, E, vcloud_max, vcloud_min;
+  double Lphi, Lthe, L, E, vcloud_max, vcloud_min, linecenter;
   double dV, V, Anorm, weight, rnd;
+  double *pmodel = (double *)pm;
   BLRmodel1 *model = (BLRmodel1 *)pm;
   FILE *fcloud_out;
   double Emin, Lmax, Vr, Vr2, Vph, mbh, chi, lambda, q;
@@ -384,6 +385,10 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
   lambda = model->lambda;
   q = model->q;
   
+  if(parset.flag_linecenter !=0)
+  {
+    linecenter = pmodel[num_params_blr - num_params_linecenter - 1] * parset.linecenter_err; 
+  }
 
   dV =(transv[1] - transv[0]); // velocity grid width
 
@@ -538,6 +543,9 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
 
       V = -vx;  //note the definition of the line-of-sight velocity. postive means a receding 
                 // velocity relative to the observer.
+      
+      V += linecenter;
+
       if(V<transv[0] || V>=transv[n_vel-1]+dV)
         continue;
 
@@ -605,8 +613,9 @@ void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *tra
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
   double inc, F, beta, mu, k, a, s, rin, sig;
-  double Lphi, Lthe, vcloud_max, vcloud_min;
+  double Lphi, Lthe, vcloud_max, vcloud_min, linecenter;
   double dV, V, Anorm, weight, rnd;
+  double *pmodel = (double *)pm;
   BLRmodel2 *model = (BLRmodel2 *)pm;
   FILE *fcloud_out;
   double Emin, Ecirc, Lcirc, Vcirc, Vr, Vph, mbh, sigr, sigtheta, rhor, rhotheta;
@@ -627,6 +636,11 @@ void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *tra
   mbh = exp(model->mbh);
   sigr = model->sigr;
   sigtheta = model->sigtheta * PI;
+  
+  if(parset.flag_linecenter !=0)
+  {
+    linecenter = pmodel[num_params_blr - num_params_linecenter - 1] * parset.linecenter_err; 
+  }
 
   dV =(transv[1] - transv[0]); // velocity grid width
 
@@ -768,6 +782,9 @@ void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *tra
 
       V = -vx;  //note the definition of the line-of-sight velocity. postive means a receding 
                 // velocity relative to the observer.
+
+      V += linecenter;
+
       if(V<transv[0] || V>=transv[n_vel-1]+dV)
         continue;
 
@@ -1001,8 +1018,9 @@ void transfun_2d_cloud_direct_model3(const void *pm, double *transv, double *tra
   double r, phi, dis, Lopn_cos, u;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
   double inc, F, alpha, Rin, k;
-  double Lphi, Lthe, L, E, vcloud_max, vcloud_min;
+  double Lphi, Lthe, L, E, vcloud_max, vcloud_min, linecenter=0.0;
   double dV, V, Anorm, weight, rnd;
+  double *pmodel = (double *)pm;
   BLRmodel3 *model = (BLRmodel3 *)pm;
   FILE *fcloud_out;
   double Emin, Lmax, Vr, Vph, mbh, xi, q;
@@ -1019,6 +1037,11 @@ void transfun_2d_cloud_direct_model3(const void *pm, double *transv, double *tra
   xi = model->xi;
   q = model->q;
   
+  if(parset.flag_linecenter !=0)
+  {
+    linecenter = pmodel[num_params_blr - num_params_linecenter - 1] * parset.linecenter_err; 
+  }
+
   dV =(transv[1] - transv[0]); // velocity grid width
 
   for(i=0; i<parset.n_tau; i++)
@@ -1164,6 +1187,9 @@ void transfun_2d_cloud_direct_model3(const void *pm, double *transv, double *tra
 
       V = -vx;  //note the definition of the line-of-sight velocity. postive means a receding 
                 // velocity relative to the observer.
+
+      V += linecenter;
+
       if(V<transv[0] || V>=transv[n_vel-1]+dV)
         continue;
 
@@ -1226,8 +1252,9 @@ void transfun_2d_cloud_direct_model4(const void *pm, double *transv, double *tra
   double r, phi, dis, Lopn_cos, u;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
   double inc, F, alpha, Rin, k;
-  double Lphi, Lthe, L, E, vcloud_max, vcloud_min;
+  double Lphi, Lthe, L, E, vcloud_max, vcloud_min, linecenter;
   double dV, V, Anorm, weight, rnd;
+  double *pmodel = (double *)pm;
   BLRmodel4 *model = (BLRmodel4 *)pm;
   FILE *fcloud_out;
   double Emin, Lmax, Vr, Vph, mbh, xi, q;
@@ -1244,6 +1271,11 @@ void transfun_2d_cloud_direct_model4(const void *pm, double *transv, double *tra
   xi = model->xi;
   q = model->q;
   
+  if(parset.flag_linecenter !=0)
+  {
+    linecenter = pmodel[num_params_blr - num_params_linecenter - 1] * parset.linecenter_err; 
+  }
+
   dV =(transv[1] - transv[0]); // velocity grid width
 
   for(i=0; i<parset.n_tau; i++)
@@ -1389,6 +1421,9 @@ void transfun_2d_cloud_direct_model4(const void *pm, double *transv, double *tra
 
       V = -vx;  //note the definition of the line-of-sight velocity. postive means a receding 
                 // velocity relative to the observer.
+
+      V += linecenter;
+
       if(V<transv[0] || V>=transv[n_vel-1]+dV)
         continue;
 
@@ -1639,9 +1674,10 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
   double x, y, z, xb, yb, zb, zb0;
   double inc, Fin, Fout, alpha, k, gam, mu, xi;
   double mbh, fellip, fflow, sigr_circ, sigthe_circ, sigr_rad, sigthe_rad, theta_rot, rf;
-  double Lphi, Lthe, V, Vr, Vph, Vkep, rhoV, theV;
+  double Lphi, Lthe, V, Vr, Vph, Vkep, rhoV, theV, linecenter=0.0;
   double Anorm, weight, rndr, rnd, rnd_frac, rnd_xi,rnd_flow, frac1, frac2, ratio, fe;
   double vx, vy, vz, vxb, vyb, vzb, dV, vcloud_max, vcloud_min;
+  double *pmodel = (double *)pm;
   BLRmodel5 *model = (BLRmodel5 *)pm;
 
   Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
@@ -1667,6 +1703,11 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
   frac1 = 1.0/(alpha+1.0) * (1.0 - pow(Fin,   alpha+1.0));
   frac2 = 1.0/(alpha-1.0) * (1.0 - pow(Fout, -alpha+1.0));
   ratio = frac1/(frac1 + frac2);
+
+  if(parset.flag_linecenter !=0)
+  {
+    linecenter = pmodel[num_params_blr - num_params_linecenter - 1] * parset.linecenter_err; 
+  }
 
   dV =(transv[1] - transv[0]); // velocity grid width
 
@@ -1842,6 +1883,9 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
 
       V = -vx;  //note the definition of the line-of-sight velocity. postive means a receding 
                 // velocity relative to the observer.
+
+      V += linecenter;
+
       if(V<transv[0] || V>=transv[n_vel-1]+dV)
         continue;
 
@@ -2625,8 +2669,9 @@ void transfun_2d_cloud_direct_model7(const void *pm, double *transv, double *tra
   double V, dV, rhoV, theV, Vr, Vph, Vkep;
   double inc, F, beta, mu, k, gam, xi, a, s, sig, rin;
   double mbh, fellip, fflow, sigr_circ, sigthe_circ, sigr_rad, sigthe_rad, theta_rot;
-  double Lphi, Lthe;
+  double Lphi, Lthe, linecenter=0.0;
   double Anorm, weight, rnd, rnd_xi, rnd_flow;
+  double *pmodel = (double *)pm;
   BLRmodel7 *model = (BLRmodel7 *)pm;
 
   Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
@@ -2652,6 +2697,11 @@ void transfun_2d_cloud_direct_model7(const void *pm, double *transv, double *tra
   rin=mu*F;
   sig=(1.0-F)*s;
   
+  if(parset.flag_linecenter !=0)
+  {
+    linecenter = pmodel[num_params_blr - num_params_linecenter - 1] * parset.linecenter_err; 
+  }
+
   dV =(transv[1] - transv[0]); // velocity grid width
 
   for(i=0; i<parset.n_tau; i++)
@@ -2815,6 +2865,9 @@ void transfun_2d_cloud_direct_model7(const void *pm, double *transv, double *tra
 
       V = -vx;  //note the definition of the line-of-sight velocity. postive means a receding 
                 // velocity relative to the observer.
+
+      V += linecenter;
+
       if(V<transv[0] || V>=transv[n_vel-1]+dV)
         continue;
 
@@ -2969,6 +3022,9 @@ void transfun_2d_cloud_direct_model7(const void *pm, double *transv, double *tra
 
       V = -vx;  //note the definition of the line-of-sight velocity. postive means a receding 
                 // velocity relative to the observer.
+
+      V += linecenter;
+
       if(V<transv[0] || V>=transv[n_vel-1]+dV)
         continue;
 
