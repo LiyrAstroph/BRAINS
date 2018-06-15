@@ -255,39 +255,36 @@ void from_prior_line1d(void *model)
     pm[i] = par_range_model[i][0] + dnest_rand() * ( par_range_model[i][1] - par_range_model[i][0]  );
   }
 
-  // set an upper limit to the MCMC steps of systematic errors
-  //i=num_params_blr-1;
-  //pm[i] = par_range_model[i][1] - dnest_rand() * ( par_range_model[i][1] - par_range_model[i][0] )*0.01;
-  //i=num_params_blr;
-  //pm[i] = par_range_model[i][1] - dnest_rand() * ( par_range_model[i][1] - par_range_model[i][0] )*0.01;
-  
-  // variability parameters
-  // use priors from continuum reconstruction.
+  /* variability parameters
+   * use priors from continuum reconstruction.
+   */
   for(i=num_params_blr; i<num_params_blr+3; i++)
   {
     pm[i] = dnest_randn()*var_param_std[i-num_params_blr] + var_param[i-num_params_blr];
     wrap(&pm[i], par_range_model[i][0], par_range_model[i][1]);
   }
+  /* long-term trend */
   for(i=num_params_blr+3; i<num_params_blr+ 4 + parset.flag_trend; i++)
   {
     pm[i] = dnest_randn();
   }
+  /* different trend in continuum and line */
   for( i = num_params_blr+ 4 + parset.flag_trend; i< num_params_blr + num_params_var; i++)
   {
     pm[i] = par_range_model[i][0] + dnest_rand() * ( par_range_model[i][1] - par_range_model[i][0]  );
   }
+  
+  /* continuum light curve */
+  for(i=0; i<parset.n_con_recon; i++)
+    pm[i+num_params_var+num_params_blr] = dnest_randn();
 
-  // cope with fixed parameters.
+  /* cope with fixed parameters. */
   for(i=0; i<num_params_blr + num_params_var; i++)
   {
     if(par_fix[i] == 1)
       pm[i] = par_fix_val[i];
   }
 
-  for(i=0; i<parset.n_con_recon; i++)
-    pm[i+num_params_var+num_params_blr] = dnest_randn();
-
-  
   /* all parameters need to update at the initial step */
   which_parameter_update = -1;
   return;
@@ -347,10 +344,7 @@ int get_num_params_line1d()
   return num_params;
 }
 
-/*=======================================================================
- * model 
- *=======================================================================
- */
+
 /*!
  * this function perturbs the parameters.
  */
@@ -396,28 +390,31 @@ double perturb_line1d(void *model)
     width = ( par_range_model[which][1] - par_range_model[which][0] );
   }
 
-  if(which < num_params_blr)
+  if(which < num_params_blr)  /* blr model */
   {
-    // set an upper limit to the MCMC steps of systematic errors
-    //if(which == num_params_blr-1)
-    //   width = fmin(width, (par_range_model[which][1] - par_range_model[which][0])*0.01 );
-
     pm[which] += dnest_randh() * width;
     wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
   }
-  else if(which < num_params_blr + 4 + parset.flag_trend)
+  else if(which < num_params_blr + 3)  /* variability, Gaussion priors */
   {
     logH -= (-0.5*pow((pm[which]-var_param[which - num_params_blr])/var_param_std[which - num_params_blr], 2.0) );
     pm[which] += dnest_randh() * width;
     wrap(&pm[which], par_range_model[which][0], par_range_model[which][1]);
     logH += (-0.5*pow((pm[which]-var_param[which - num_params_blr])/var_param_std[which - num_params_blr], 2.0) );
   }
-  else if(which < num_params_blr + num_params_var)
+  else if(which < num_params_blr + 4 + parset.flag_trend) /* long-term trend */
+  {
+    logH -= (-0.5*pow(pm[which], 2.0) );
+    pm[which] += dnest_randh() * width;
+    wrap(&pm[which], par_range_model[which][0], par_range_model[which][1]);
+    logH += (-0.5*pow(pm[which], 2.0) );
+  }
+  else if(which < num_params_blr + num_params_var) /* different trend in continuum and line */
   {
     pm[which] += dnest_randh() * width;
     wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
   }
-  else
+  else   /* continuum light curve, Gaussion prior */
   {
     logH -= (-0.5*pow(pm[which], 2.0) );
     pm[which] += dnest_randh() * width;
