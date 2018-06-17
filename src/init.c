@@ -538,7 +538,7 @@ void set_blr_range_model3()
   return;
 }
 
-// model 3
+// model 4
 void set_blr_range_model4()
 {
   int i;

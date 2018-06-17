@@ -27,7 +27,15 @@
 /*!
  * This function calculate 1d line from a given BLR model.
  *
- * Note that the light curves has been obtained in advance 
+ * Note that continuum light curve has been obtained in advance 
+ *
+ * Input:
+ *   pm: model parameters
+ *   Tl: epochs of line
+ *   nl: number of points
+ * Output:
+ *   Fl: line fluxes
+ *
  */
 void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl)
 {
@@ -35,8 +43,8 @@ void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl
   double fline, fcon, tl, tc, tau, A, Ag, ftrend;
   double *pmodel = (double *)pm;
 
-  A=exp(pmodel[0]);
-  Ag=pmodel[1];
+  A=exp(pmodel[0]); /*  response coefficient */
+  Ag=pmodel[1];     /*  no-linearity of response */
 
   for(i=0;i<nl;i++)
   {
@@ -52,7 +60,7 @@ void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl
       }
       else
       {
-        //fcon = mean; 
+        /* fcon = mean */ 
         fcon = con_q[0];
         for(k=1; k < nq; k++)/*  beyond the range, set to be the long-term trend */
         {
@@ -60,20 +68,20 @@ void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl
         }
       }
       
-      // add different trend in continuum and emission
+      /* add different trend in continuum and emission */
       if(parset.flag_trend_diff)
       {
         ftrend = pmodel[num_params_blr + 4 + parset.flag_trend] * (tc - 0.5*(Tcon_data[0] + Tcon_data[n_con_data-1]));
         fcon += ftrend;
       }
 
+      /* take into account the possibility that fcon is negative */
       if(fcon > 0.0)
       {
         fline += Trans1D[j] * fcon * pow(fcon, Ag);     /*  line response */
       }	
     }
-    fline *= dTransTau * A;
-    Fl[i] = fline;
+    Fl[i] = fline * dTransTau * A;
   }
   return;
 }
@@ -107,7 +115,7 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
       }
       else
       {
-        //fcon = mean; 
+        /* fcon = mean */ 
         fcon = con_q[0];
         for(m=1; m < nq; m++)/*  beyond the range, set to be the long-term trend */
         {
@@ -115,7 +123,7 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
         }
       }
 
-      // add different trend in continuum and emission line
+      /* add different trend in continuum and emission line */
       if(parset.flag_trend_diff)
       {
         ftrend = pmodel[num_params_blr + 4 + parset.flag_trend] * (tc - 0.5*(Tcon_data[0] + Tcon_data[n_con_data-1]));
@@ -179,6 +187,9 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
 /*================================================================
  * model 1
  * Brewer et al. (2011)'s model
+ *
+ * geometry: radial Gamma distribution
+ * dynamics: elliptical orbits
  *================================================================
  */
 /* 
@@ -243,7 +254,7 @@ void transfun_1d_cloud_direct_model1(const void *pm, int flag_save)
   
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
-// generate a direction of the angular momentum of the orbit   
+    /* generate a direction of the angular momentum of the orbit  */
     Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
     Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
 
@@ -276,10 +287,11 @@ void transfun_1d_cloud_direct_model1(const void *pm, int flag_save)
     y = r * sin(phi);
     z = 0.0;
 
-/* right-handed framework
- * first rotate around y axis by an angle of Lthe, then roate around z axis 
- * by an angle of Lphi
- */
+   /* right-handed framework
+    * first rotate around y axis by an angle of Lthe, then roate around z axis 
+    * by an angle of Lphi
+    */
+  
   /*xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
     yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
     zb = sin(Lthe) * x + cos(Lthe) * z; */
@@ -292,7 +304,7 @@ void transfun_1d_cloud_direct_model1(const void *pm, int flag_save)
     if(zb0 < 0.0)
       zb = -zb;
 
-// conter-rotate around y, LOS is x-axis 
+    /* conter-rotate around y, LOS is x-axis */
     x = xb * cos(PI/2.0-inc) + zb * sin(PI/2.0-inc);
     y = yb;
     z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
@@ -601,6 +613,9 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
 
 /*================================================================
  * model 2
+ * 
+ * geometry: radial Gamma distribution
+ * dynamics: ellipitical orbits (Gaussian around circular orbits)
  *================================================================
  */
 /*! 
@@ -840,6 +855,9 @@ void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *tra
 
 /*====================================================================
  * model 3
+ *
+ * geometry: radial power law
+ * dynamics: 
  *====================================================================
  */
 
@@ -1478,6 +1496,9 @@ void transfun_2d_cloud_direct_model4(const void *pm, double *transv, double *tra
 
 /*====================================================================
  * model 5
+ *
+ * geometry: double pow-law 
+ * dynamics: ellipitical orbits and inflow/outflow as in Pancoast's model
  *====================================================================
  */
 
@@ -1675,7 +1696,7 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
   double inc, Fin, Fout, alpha, k, gam, mu, xi;
   double mbh, fellip, fflow, sigr_circ, sigthe_circ, sigr_rad, sigthe_rad, theta_rot, rf;
   double Lphi, Lthe, V, Vr, Vph, Vkep, rhoV, theV, linecenter=0.0;
-  double Anorm, weight, rndr, rnd, rnd_frac, rnd_xi,rnd_flow, frac1, frac2, ratio, fe;
+  double Anorm, weight, rndr, rnd, rnd_frac, rnd_xi, frac1, frac2, ratio, fe;
   double vx, vy, vz, vxb, vyb, vzb, dV, vcloud_max, vcloud_min;
   double *pmodel = (double *)pm;
   BLRmodel5 *model = (BLRmodel5 *)pm;
@@ -1745,7 +1766,7 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
   
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
-// generate a direction of the angular momentum of the orbit   
+    /* generate a direction of the angular momentum of the orbit  */ 
     Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
     Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_r), gam));
     
@@ -1835,7 +1856,6 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
     for(j=0; j<parset.n_vel_per_cloud; j++)
     {
       rnd = gsl_rng_uniform(gsl_r);
-      rnd_flow = gsl_rng_uniform(gsl_r);
 
       if(rnd < fe)
       {
@@ -1844,7 +1864,7 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
       }
       else
       {
-        if(rnd_flow < fflow)
+        if(fflow <= 0.5)
         {
           rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_rad  + 1.0) * Vkep;
           theV =  gsl_ran_ugaussian(gsl_r) * sigthe_rad + theta_rot;
@@ -1942,6 +1962,9 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
 /*================================================================
  * model 6
  * Pancoast et al. (2014)'s model
+ *
+ * geometry: radial Gamma distribution
+ * dynamics: ellipitcal orbits and inflow/outflow 
  *================================================================
  */
 /* 
@@ -2390,6 +2413,9 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
 /*================================================================
  * model 7
  * shadowed model
+ *
+ * geometry: radial Gamma distribution
+ * dynamics: elliptical orbits and inflow/outflow as in Pancoast'model
  *================================================================
  */
 /* 
@@ -2453,13 +2479,13 @@ void transfun_1d_cloud_direct_model7(const void *pm, int flag_save)
     Trans1D[i] = 0.0;
   }
   
-  // number of particles in first region
+  /* number of particles in first region */
   
   num_sh = (int)(parset.n_cloud_per_task * model->fsh);
 
   for(i=0; i<num_sh; i++)
   {
-// generate a direction of the angular momentum of the orbit   
+    /* generate a direction of the angular momentum of the orbit */ 
     Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
     Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_r), gam));
 
@@ -2535,7 +2561,7 @@ void transfun_1d_cloud_direct_model7(const void *pm, int flag_save)
     }
   }
 
-  //second BLR region
+  /* second BLR region */
   rin = exp(model->mu_un) * model->F_un;
   a = 1.0/(model->beta_un * model->beta_un);
   sig = exp(model->mu_un) * (1.0-model->F_un)/a;
@@ -2548,7 +2574,7 @@ void transfun_1d_cloud_direct_model7(const void *pm, int flag_save)
 
   for(i=num_sh; i<parset.n_cloud_per_task; i++)
   {
-// generate a direction of the angular momentum of the orbit   
+    /* generate a direction of the angular momentum of the orbit  */ 
     Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
     Lthe = acos(Lopn_cos_un2 + (Lopn_cos_un1-Lopn_cos_un2) * pow(gsl_rng_uniform(gsl_r), gam));
 
@@ -2669,7 +2695,7 @@ void transfun_2d_cloud_direct_model7(const void *pm, double *transv, double *tra
   double inc, F, beta, mu, k, gam, xi, a, s, sig, rin;
   double mbh, fellip, fflow, sigr_circ, sigthe_circ, sigr_rad, sigthe_rad, theta_rot;
   double Lphi, Lthe, linecenter=0.0;
-  double Anorm, weight, rnd, rnd_xi, rnd_flow;
+  double Anorm, weight, rnd, rnd_xi;
   double *pmodel = (double *)pm;
   BLRmodel7 *model = (BLRmodel7 *)pm;
 
@@ -2816,7 +2842,6 @@ void transfun_2d_cloud_direct_model7(const void *pm, double *transv, double *tra
     for(j=0; j<parset.n_vel_per_cloud; j++)
     {
       rnd = gsl_rng_uniform(gsl_r);
-      rnd_flow = gsl_rng_uniform(gsl_r);
 
       if(rnd < fellip)
       {
@@ -2825,7 +2850,7 @@ void transfun_2d_cloud_direct_model7(const void *pm, double *transv, double *tra
       }
       else
       {
-        if(rnd_flow < fflow)
+        if(fflow <= 0.5)
         {
           rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_rad  + 1.0) * Vkep;
           theV =  gsl_ran_ugaussian(gsl_r) * sigthe_rad + theta_rot;
@@ -2973,7 +2998,6 @@ void transfun_2d_cloud_direct_model7(const void *pm, double *transv, double *tra
     for(j=0; j<parset.n_vel_per_cloud; j++)
     {
       rnd = gsl_rng_uniform(gsl_r);
-      rnd_flow = gsl_rng_uniform(gsl_r);
 
       if(rnd < fellip)
       {
@@ -2982,7 +3006,7 @@ void transfun_2d_cloud_direct_model7(const void *pm, double *transv, double *tra
       }
       else
       {
-        if(rnd_flow < fflow)
+        if(fflow <= 0.5)
         {
           rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_rad  + 1.0) * Vkep;
           theV =  gsl_ran_ugaussian(gsl_r) * sigthe_rad + theta_rot;
