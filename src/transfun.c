@@ -693,7 +693,7 @@ void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *tra
 
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
-// generate a direction of the angular momentum     
+    /* generate a direction of the angular momentum */    
     Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
     Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
 
@@ -739,7 +739,7 @@ void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *tra
     if(zb0 < 0.0)
       zb = -zb;
 
-// conter-rotate around y
+    /* conter-rotate around y */
     x = xb * cos(PI/2.0-inc) + zb * sin(PI/2.0-inc);
     y = yb;
     z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
@@ -757,9 +757,10 @@ void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *tra
     weight = 0.5 + k*(x/r);
     //weight = 0.5 + k * x/sqrt(x*x+y*y);
     
-// velocity  
-// note that a cloud moves in its orbit plane, whose direction
-// is determined by the direction of its angular momentum.
+    /* velocity  
+     * note that a cloud moves in its orbit plane, whose direction
+     * is determined by the direction of its angular momentum.
+     */
     Emin = - mbh/r;
     Ecirc = 0.5 * Emin;
     Lcirc = sqrt(2.0 * r*r * (Ecirc + mbh/r));
@@ -952,10 +953,10 @@ void transfun_1d_cloud_direct_model3(const void *pm, int flag_save)
     y = r * sin(phi);
     z = 0.0;
 
-/* right-handed framework
- * first rotate around y axis by an angle of Lthe, then roate around z axis 
- * by an angle of Lphi
- */
+    /* right-handed framework
+     * first rotate around y axis by an angle of Lthe, then roate around z axis 
+     * by an angle of Lphi
+     */
   /*xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
     yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
     zb = sin(Lthe) * x + cos(Lthe) * z;*/
@@ -1177,8 +1178,8 @@ void transfun_2d_cloud_direct_model3(const void *pm, double *transv, double *tra
       L = Lmax;
  
       Vr = xi * sqrt(2.0*mbh/r);
-      u = gsl_rng_uniform(gsl_r);
-      Vr = Vr * (u<q?-1.0:1.0);
+      if(q <= 0.5)
+        Vr = -Vr;
       Vph = L/r; //RM cannot distiguish the orientation of the rotation.
 
       vx = Vr * cos(phi) - Vph * sin(phi);
@@ -1330,11 +1331,10 @@ void transfun_2d_cloud_direct_model4(const void *pm, double *transv, double *tra
 
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
-// generate a direction of the angular momentum     
+    /* generate a direction of the angular momentum   */ 
     Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
     Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
 
-    // which_parameter_update == 1 ==> beta is being updated.
     if( flag_update == 1 ) //
     {
       nc = 0;
@@ -1378,7 +1378,7 @@ void transfun_2d_cloud_direct_model4(const void *pm, double *transv, double *tra
     if(zb0 < 0.0)
       zb = -zb;
 
-// conter-rotate around y
+    /* conter-rotate around y */
     x = xb * cos(PI/2.0-inc) + zb * sin(PI/2.0-inc);
     y = yb;
     z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
@@ -1411,8 +1411,8 @@ void transfun_2d_cloud_direct_model4(const void *pm, double *transv, double *tra
       L = Lmax;
  
       Vr = xi * sqrt(2.0*mbh/r);
-      u = gsl_rng_uniform(gsl_r);
-      Vr = Vr * (u<q?-1.0:1.0);
+      if(q<=0.5)
+        Vr = -Vr;
       Vph = sqrt(1.0-2.0*xi*xi) * L/r; //RM cannot distiguish the orientation of the rotation.
 
       vx = Vr * cos(phi) - Vph * sin(phi);
