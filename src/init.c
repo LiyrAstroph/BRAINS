@@ -367,7 +367,7 @@ void set_par_fix(int num_params_blr)
     }
 
     // cope with narrow line
-    if(parset.flag_narrowline == 2)
+    if(parset.flag_narrowline >= 2)
     {
       if(parset.flux_narrowline_err == 0.0)
       {
