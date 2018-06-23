@@ -124,7 +124,7 @@ extern double *Tline_data, *Fline_data, *Flerrs_data;
 extern double *Vline_data, *Fline2d_data, *Flerrs2d_data;
 extern double con_scale, line_scale;
 
-extern double line_error_mean;
+extern double con_error_mean, line_error_mean;
 
 extern char dnest_options_file[BRAINS_MAX_STR_LENGTH];
 

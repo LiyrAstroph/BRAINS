@@ -69,6 +69,10 @@ int dnest_con(int argc, char **argv)
   for(i=0; i<num_params; i++)
     par_fix[i] = 0;
 
+  /* fix systematic error of continuum */
+  par_fix[0] = 1;
+  par_fix_val[0] = log(1.0);
+
   strcpy(options_file, dnest_options_file);
   dnest(argc, argv);
   
@@ -196,7 +200,7 @@ double perturb_con(void *model)
   which_parameter_update = which;
   
   /* level-dependent width */
-  which_level = which_level_update > (size_levels - 50)?(size_levels-50):which_level_update;
+  which_level = which_level_update > (size_levels - 10)?(size_levels-10):which_level_update;
   if( which_level > 0)
   {
     limit1 = limits[(which_level-1) * num_params *2 + which *2];

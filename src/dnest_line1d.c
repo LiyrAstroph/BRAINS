@@ -178,6 +178,14 @@ int dnest_line1d(int argc, char **argv)
     par_fix_val[num_params_blr + 2] = var_param[2];
   }
 
+  /* fix systematic error of line */
+  par_fix[num_params_blr-1] = 1;
+  par_fix_val[num_params_blr-1] = log(1.0);
+
+  /* fix systematic error of continuum */
+  par_fix[num_params_blr] = 1;
+  par_fix_val[num_params_blr] = log(1.0);
+   
   strcpy(options_file, dnest_options_file);
   
   force_update = 0;
@@ -371,7 +379,7 @@ double perturb_line1d(void *model)
   which_parameter_update = which;
 
   /* level-dependent width */
-  which_level = which_level_update > (size_levels - 50)?(size_levels -50):which_level_update;
+  which_level = which_level_update > (size_levels - 10)?(size_levels -10):which_level_update;
 
   if( which_level > 0)
   {

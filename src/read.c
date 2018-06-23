@@ -468,11 +468,20 @@ void read_data()
     }
     fclose(fp);
 
+    /* cal mean con error */
+    con_error_mean = 0.0;
+    for(i=0; i<n_con_data; i++)
+    {
+      con_error_mean += Fcon_data[i];
+    }
+    con_error_mean /= n_con_data;
+
   }
 
   MPI_Bcast(Tcon_data, n_con_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
   MPI_Bcast(Fcon_data, n_con_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
   MPI_Bcast(Fcerrs_data, n_con_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+  MPI_Bcast(&con_error_mean, 1, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
 
   // read line
   if(parset.flag_dim == 1)
@@ -501,7 +510,7 @@ void read_data()
         exit(-1);
       }
 
-    // cal mean line error
+      /* cal mean line error */
       line_error_mean = 0.0;
       for(i=0; i<n_line_data;i++)
       {

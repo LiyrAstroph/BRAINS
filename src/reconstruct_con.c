@@ -271,7 +271,7 @@ void calculate_con_from_model(const void *model)
   double sigma, tau, alpha;
   int i, j, info;
 
-  syserr = 0.0;//exp(pm[0]);  turn off systematic error 
+  syserr = (exp(pm[0]) - 1.0) * con_error_mean;  // systematic error 
   tau = exp(pm[2]);
   sigma = exp(pm[1]) * sqrt(tau);
   alpha = 1.0;
@@ -471,7 +471,7 @@ double prob_con_variability(const void *model)
   if( which_parameter_update < num_params_var)
   {
 
-    syserr = exp(pm[0]);
+    syserr = (exp(pm[0])-1.0)*con_error_mean;
     tau = exp(pm[2]);
     sigma = exp(pm[1]) * sqrt(tau);
     alpha = 1.0;
@@ -545,7 +545,7 @@ double prob_con_variability_initial(const void *model)
   double tau, sigma, alpha, lndet, syserr;
   double *Larr, *ybuf, *y, *yq, *Cq;
 
-  syserr = exp(pm[0]);
+  syserr = (exp(pm[0])-1.0)*con_error_mean;
   tau = exp(pm[2]);
   sigma = exp(pm[1]) * sqrt(tau);
   alpha = 1.0;
@@ -644,7 +644,7 @@ void set_covar_Pmat_data(double sigma, double tau, double alpha, double syserr)
     }
 
     PSmat_data[i*n_con_data+i] = sigma * sigma;
-    PNmat_data[i*n_con_data+i] = Fcerrs_data[i]*Fcerrs_data[i];// + syserr*syserr;
+    PNmat_data[i*n_con_data+i] = Fcerrs_data[i]*Fcerrs_data[i] + syserr*syserr;
     PCmat_data[i*n_con_data+i] = PSmat_data[i*n_con_data+i] + PNmat_data[i*n_con_data+i];
   }
   return;
