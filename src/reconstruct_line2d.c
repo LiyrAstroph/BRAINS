@@ -825,23 +825,26 @@ double prob_line2d(const void *model)
         Fline_at_data_particles[which_particle_update] = Fline_at_data_particles_perturb[which_particle_update];
         Fline_at_data_particles_perturb[which_particle_update] = ptemp;
 
-        // when beta is updated, store cloud distribution
-        for(i=0; i<num_params_radial_samp; i++)
+        /* when force_update is true, no need to store the perturbed value */
+        if(force_update == 0)
         {
-          if(param == params_radial_samp[i])
+          for(i=0; i<num_params_radial_samp; i++)
           {
-            flag_cpy = 1;
-            break;
+            if(param == params_radial_samp[i])
+            {
+              flag_cpy = 1;
+              break;
+            }
           }
-        }
-        if(flag_cpy == 1)
-        {
-          /*memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
-            parset.n_cloud_per_task * sizeof(double));*/
+          if(flag_cpy == 1)
+          {
+            /*memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
+              parset.n_cloud_per_task * sizeof(double));*/
 
-          ptemp = clouds_particles[which_particle_update];
-          clouds_particles[which_particle_update] = clouds_particles_perturb[which_particle_update];
-          clouds_particles_perturb[which_particle_update] = ptemp;
+            ptemp = clouds_particles[which_particle_update];
+            clouds_particles[which_particle_update] = clouds_particles_perturb[which_particle_update];
+            clouds_particles_perturb[which_particle_update] = ptemp;
+          }
         }
       }
     } 

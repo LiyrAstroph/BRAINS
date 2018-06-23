@@ -111,6 +111,8 @@ typedef struct
   int flag_exam_prior;
 
   int flag_fixvar;
+
+  int flag_force_update;
   
   double temperature;
 }PARSET;

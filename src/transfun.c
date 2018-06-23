@@ -229,20 +229,23 @@ void transfun_1d_cloud_direct_model1(const void *pm, int flag_save)
     }
   }
 
-  for(i=0; i<num_params_radial_samp;i++)
-  {
-    if(which_parameter_update == params_radial_samp[i])
-    {
-      flag_update = 1;
-      break;
-    }
-  }
 
   // "which_parameter_update = -1" means that all parameters are updated, usually occurs at the 
   // initial step.
   if(force_update == 1 || which_parameter_update == -1 )
   {
     flag_update = 1;
+  }
+  else
+  {
+    for(i=0; i<num_params_radial_samp;i++)
+    {
+      if(which_parameter_update == params_radial_samp[i])
+      {
+        flag_update = 1;
+        break;
+      }
+    }
   }
 
   /* reset transfer function */
@@ -422,17 +425,20 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
     }
   }
 
-  for(i=0; i<num_params_radial_samp;i++)
-  {
-    if(which_parameter_update == params_radial_samp[i])
-    {
-      flag_update = 1;
-      break;
-    }
-  }
   if(force_update == 1 || which_parameter_update == -1 )
   {
     flag_update = 1;
+  }
+  else
+  {
+    for(i=0; i<num_params_radial_samp;i++)
+    {
+      if(which_parameter_update == params_radial_samp[i])
+      {
+        flag_update = 1;
+        break;
+      }
+    }
   }
 
   for(i=0; i<parset.n_cloud_per_task; i++)
@@ -677,17 +683,20 @@ void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *tra
     }
   }
 
-  for(i=0; i<num_params_radial_samp;i++)
-  {
-    if(which_parameter_update == params_radial_samp[i])
-    {
-      flag_update = 1;
-      break;
-    }
-  }
   if(force_update == 1 || which_parameter_update == -1 )
   {
     flag_update = 1;
+  }
+  else
+  {
+    for(i=0; i<num_params_radial_samp;i++)
+    {
+      if(which_parameter_update == params_radial_samp[i])
+      {
+        flag_update = 1;
+        break;
+      }
+    }
   }
 
   for(i=0; i<parset.n_cloud_per_task; i++)
@@ -894,17 +903,20 @@ void transfun_1d_cloud_direct_model3(const void *pm, int flag_save)
     }
   }
 
-  for(i=0; i<num_params_radial_samp;i++)
-  {
-    if(which_parameter_update == params_radial_samp[i])
-    {
-      flag_update = 1;
-      break;
-    }
-  }
   if(force_update == 1 || which_parameter_update == -1 )
   {
     flag_update = 1;
+  }
+  else
+  {
+    for(i=0; i<num_params_radial_samp;i++)
+    {
+      if(which_parameter_update == params_radial_samp[i])
+      {
+        flag_update = 1;
+        break;
+      }
+    }
   }
 
   /* reset transfer function */
@@ -1081,17 +1093,20 @@ void transfun_2d_cloud_direct_model3(const void *pm, double *transv, double *tra
     }
   }
 
-  for(i=0; i<num_params_radial_samp;i++)
-  {
-    if(which_parameter_update == params_radial_samp[i])
-    {
-      flag_update = 1;
-      break;
-    }
-  }
   if(force_update == 1 || which_parameter_update == -1 )
   {
     flag_update = 1;
+  }
+  else
+  {
+    for(i=0; i<num_params_radial_samp;i++)
+    {
+      if(which_parameter_update == params_radial_samp[i])
+      {
+        flag_update = 1;
+        break;
+      }
+    }
   }
 
   for(i=0; i<parset.n_cloud_per_task; i++)
@@ -1315,17 +1330,20 @@ void transfun_2d_cloud_direct_model4(const void *pm, double *transv, double *tra
     }
   }
   
-  for(i=0; i<num_params_radial_samp;i++)
-  {
-    if(which_parameter_update == params_radial_samp[i])
-    {
-      flag_update = 1;
-      break;
-    }
-  }
   if(force_update == 1 || which_parameter_update == -1 )
   {
     flag_update = 1;
+  }
+  else
+  {
+    for(i=0; i<num_params_radial_samp;i++)
+    {
+      if(which_parameter_update == params_radial_samp[i])
+      {
+        flag_update = 1;
+        break;
+      }
+    }
   }
 
   for(i=0; i<parset.n_cloud_per_task; i++)
@@ -1542,17 +1560,20 @@ void transfun_1d_cloud_direct_model5(const void *pm, int flag_save)
     }
   }
 
-  for(i=0; i<num_params_radial_samp;i++)
-  {
-    if(which_parameter_update == params_radial_samp[i])
-    {
-      flag_update = 1;
-      break;
-    }
-  }
   if(force_update == 1 || which_parameter_update == -1 )
   {
     flag_update = 1;
+  }
+  else
+  {
+    for(i=0; i<num_params_radial_samp;i++)
+    {
+      if(which_parameter_update == params_radial_samp[i])
+      {
+        flag_update = 1;
+        break;
+      }
+    }
   }
 
   /* reset transfer function */
@@ -1750,17 +1771,20 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
     }
   }
 
-  for(i=0; i<num_params_radial_samp;i++)
-  {
-    if(which_parameter_update == params_radial_samp[i])
-    {
-      flag_update = 1;
-      break;
-    }
-  }
   if(force_update == 1 || which_parameter_update == -1 )
   {
     flag_update = 1;
+  }
+  else
+  {
+    for(i=0; i<num_params_radial_samp;i++)
+    {
+      if(which_parameter_update == params_radial_samp[i])
+      {
+        flag_update = 1;
+        break;
+      }
+    }
   }
   
   for(i=0; i<parset.n_cloud_per_task; i++)
@@ -2006,19 +2030,20 @@ void transfun_1d_cloud_direct_model6(const void *pm, int flag_save)
     }
   }
 
-  for(i=0; i<num_params_radial_samp;i++)
-  {
-    if(which_parameter_update == params_radial_samp[i])
-    {
-      flag_update = 1;
-      break;
-    }
-  }
-  // "which_parameter_update = -1" means that all parameters are updated, usually occurs at the 
-  // initial step.
   if(force_update == 1 || which_parameter_update == -1 )
   {
     flag_update = 1;
+  }
+  else
+  {
+    for(i=0; i<num_params_radial_samp;i++)
+    {
+      if(which_parameter_update == params_radial_samp[i])
+      {
+        flag_update = 1;
+        break;
+      }
+    }
   }
 
   /* reset transfer function */
@@ -2212,14 +2237,15 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
   {
     flag_update = 1;
   }
-
-  
-  for(i=0; i<num_params_radial_samp;i++)
+  else
   {
-    if(which_parameter_update == params_radial_samp[i])
+    for(i=0; i<num_params_radial_samp;i++)
     {
-      flag_update = 1;
-      break;
+      if(which_parameter_update == params_radial_samp[i])
+      {
+        flag_update = 1;
+        break;
+      }
     }
   }
   
@@ -2471,11 +2497,16 @@ void transfun_1d_cloud_direct_model7(const void *pm, int flag_save)
   {
     flag_update = 1;
   }
-
-  /* reset transfer function */
-  for(i=0; i<parset.n_tau; i++)
+  else
   {
-    Trans1D[i] = 0.0;
+    for(i=0; i<num_params_radial_samp;i++)
+    {
+      if(which_parameter_update == params_radial_samp[i])
+      {
+        flag_update = 1;
+        break;
+      }
+    }
   }
   
   /* number of particles in first region */
@@ -2747,20 +2778,20 @@ void transfun_2d_cloud_direct_model7(const void *pm, double *transv, double *tra
     }
   }
 
-  for(i=0; i<num_params_radial_samp;i++)
-  {
-    if(which_parameter_update == params_radial_samp[i])
-    {
-      flag_update = 1;
-      break;
-    }
-  }
-
-  // "which_parameter_update = -1" means that all parameters are updated, usually occurs at the 
-  // initial step.
   if(force_update == 1 || which_parameter_update == -1 )
   {
     flag_update = 1;
+  }
+  else
+  {
+    for(i=0; i<num_params_radial_samp;i++)
+    {
+      if(which_parameter_update == params_radial_samp[i])
+      {
+        flag_update = 1;
+        break;
+      }
+    }
   }
   
   num_sh = (int)(parset.n_cloud_per_task * model->fsh);

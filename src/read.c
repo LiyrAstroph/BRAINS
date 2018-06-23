@@ -130,6 +130,11 @@ void read_parset()
     addr[nt] = &parset.cloud_out_file;
     id[nt++] = STRING;
 
+    strcpy(tag[nt], "FlagCloudsForceUpdate");
+    addr[nt] = &parset.flag_force_update;
+    id[nt++] = INT;
+
+
     strcpy(tag[nt], "InstRes");
     addr[nt] = &parset.InstRes;
     id[nt++] = DOUBLE;
@@ -208,6 +213,7 @@ void read_parset()
     parset.flag_trend_diff = 0;
     parset.flag_narrowline = 0;
     parset.flag_linecenter = 0;
+    parset.flag_force_update=0;
 
     
     char fname[200];
