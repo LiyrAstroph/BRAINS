@@ -230,8 +230,9 @@ void transfun_1d_cloud_direct_model1(const void *pm, int flag_save)
   }
 
 
-  // "which_parameter_update = -1" means that all parameters are updated, usually occurs at the 
-  // initial step.
+  /* "which_parameter_update = -1" means that all parameters are updated, 
+   * usually occurs at the initial step.
+   */
   if(force_update == 1 || which_parameter_update == -1 )
   {
     flag_update = 1;
@@ -260,7 +261,7 @@ void transfun_1d_cloud_direct_model1(const void *pm, int flag_save)
     Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
     Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
 
-    if( flag_update == 1 ) //
+    if( flag_update == 1 ) /* update radial sampling when necessary */
     {
       nc = 0;
       r = rcloud_max_set+1.0;
@@ -404,7 +405,7 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
     linecenter = pmodel[num_params_blr - num_params_linecenter - 1] * parset.linecenter_err; 
   }
 
-  dV =(transv[1] - transv[0]); // velocity grid width
+  dV =(transv[1] - transv[0]); /* velocity grid width */
 
   for(i=0; i<parset.n_tau; i++)
     for(j=0;j<n_vel;j++)
@@ -487,7 +488,7 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
     if(zb0 < 0.0)
       zb = -zb;
 
-// conter-rotate around y
+    /* conter-rotate around y */
     x = xb * cos(PI/2.0-inc) + zb * sin(PI/2.0-inc);
     y = yb;
     z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
@@ -505,9 +506,10 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
     weight = 0.5 + k*(x/r);
     //weight = 0.5 + k * x/sqrt(x*x+y*y);
     
-// velocity  
-// note that a cloud moves in its orbit plane, whose direction
-// is determined by the direction of its angular momentum.
+    /* velocity  
+     * note that a cloud moves in its orbit plane, whose direction
+     * is determined by the direction of its angular momentum.
+     */
     Emin = - mbh/r;
     //Ecirc = 0.5 * Emin;
     //Lcirc = sqrt(2.0 * r*r * (Ecirc + mbh/r));
@@ -519,7 +521,7 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
 
       Lmax = sqrt(2.0 * r*r * (E + mbh/r));      
 
-      if(lambda>1.0e-2)   //make sure that exp is caculatable.
+      if(lambda>1.0e-2)   /* make sure that exp is caculatable. */
         L = Lmax * lambda * log( (exp(1.0/lambda) - 1.0) * gsl_rng_uniform(gsl_r) + 1.0 );
       else
         L = Lmax * (1.0 + lambda * log(gsl_rng_uniform(gsl_r)) );
@@ -534,7 +536,7 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
       {
         Vr = 0.0;
       }
-      Vph = L/r; //RM cannot distiguish the orientation of the rotation.
+      Vph = L/r; /* RM cannot distiguish the orientation of the rotation. */
 
       vx = Vr * cos(phi) - Vph * sin(phi);
       vy = Vr * sin(phi) + Vph * cos(phi);
@@ -662,11 +664,11 @@ void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *tra
     linecenter = pmodel[num_params_blr - num_params_linecenter - 1] * parset.linecenter_err; 
   }
 
-  dV =(transv[1] - transv[0]); // velocity grid width
+  dV =(transv[1] - transv[0]); /* velocity grid width */
 
   for(i=0; i<parset.n_tau; i++)
     for(j=0;j<n_vel;j++)
-      trans2d[i*n_vel+j]=0.0;   // cleanup of transfer function
+      trans2d[i*n_vel+j]=0.0;   /* cleanup of transfer function */
 
   vcloud_max = -DBL_MAX;
   vcloud_min = DBL_MAX;
@@ -927,13 +929,14 @@ void transfun_1d_cloud_direct_model3(const void *pm, int flag_save)
   
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
-// generate a direction of the angular momentum of the orbit   
+    /* generate a direction of the angular momentum of the orbit */
     Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
     Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
     
-    // "which_parameter_update = -1" means that all parameters are updated, usually occurs at the 
-    // initial step.
-    if( flag_update == 1 ) //
+    /* "which_parameter_update = -1" means that all parameters are updated, 
+     * usually occurs at the initial step.
+     */
+    if( flag_update == 1 ) /* update radial sampling when necessary */
     {
       nc = 0;
       r = rcloud_max_set+1.0;
@@ -980,7 +983,7 @@ void transfun_1d_cloud_direct_model3(const void *pm, int flag_save)
     if(zb0 < 0.0)
       zb = -zb;
 
-// conter-rotate around y, LOS is x-axis 
+    /* conter-rotate around y, LOS is x-axis */
     x = xb * cos(PI/2.0-inc) + zb * sin(PI/2.0-inc);
     y = yb;
     z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
