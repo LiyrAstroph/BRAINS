@@ -23,7 +23,6 @@
 #include "allvars.h"
 #include "proto.h"
 
-
 /*!
  * This function calculate 1d line from a given BLR model.
  *
@@ -1860,19 +1859,19 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
       if(rnd < fe)
       {
         rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_circ  + 1.0) * Vkep;
-        theV =  gsl_ran_ugaussian(gsl_r) * sigthe_circ + PI/2.0;
+        theV = (gsl_ran_ugaussian(gsl_r) * sigthe_circ + 0.5) * PI;
       }
       else
       {
         if(fflow <= 0.5)
         {
           rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_rad  + 1.0) * Vkep;
-          theV =  gsl_ran_ugaussian(gsl_r) * sigthe_rad + theta_rot;
+          theV = (gsl_ran_ugaussian(gsl_r) * sigthe_rad + 1.0) * PI + theta_rot;
         }
         else
         {
           rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_rad  + 1.0) * Vkep;
-          theV =  gsl_ran_ugaussian(gsl_r) * sigthe_rad + PI + theta_rot;
+          theV = (gsl_ran_ugaussian(gsl_r) * sigthe_rad ) * PI + theta_rot;
         }
       }
       
@@ -2304,19 +2303,19 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
       if(rnd < fellip)
       {
         rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_circ  + 1.0) * Vkep;
-        theV =  gsl_ran_ugaussian(gsl_r) * sigthe_circ + PI/2.0;
+        theV =  (gsl_ran_ugaussian(gsl_r) * sigthe_circ + 0.5)*PI;
       }
       else
       {
         if(fflow <= 0.5) /* inflow */
         {
-          rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_rad  + 1.0) * Vkep;
-          theV =  gsl_ran_ugaussian(gsl_r) * sigthe_rad + PI + theta_rot;
+          rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_rad   + 1.0) * Vkep;
+          theV = (gsl_ran_ugaussian(gsl_r) * sigthe_rad + 1.0) * PI + theta_rot;
         }
         else     /* outflow */
         {
           rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_rad  + 1.0) * Vkep;
-          theV =  gsl_ran_ugaussian(gsl_r) * sigthe_rad + theta_rot;
+          theV = (gsl_ran_ugaussian(gsl_r) * sigthe_rad) * PI + theta_rot;
         }
       }
       
@@ -2846,19 +2845,19 @@ void transfun_2d_cloud_direct_model7(const void *pm, double *transv, double *tra
       if(rnd < fellip)
       {
         rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_circ  + 1.0) * Vkep;
-        theV =  gsl_ran_ugaussian(gsl_r) * sigthe_circ + PI/2.0;
+        theV = (gsl_ran_ugaussian(gsl_r) * sigthe_circ + 0.5) * PI;
       }
       else
       {
         if(fflow <= 0.5)
         {
           rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_rad  + 1.0) * Vkep;
-          theV =  gsl_ran_ugaussian(gsl_r) * sigthe_rad + theta_rot;
+          theV = (gsl_ran_ugaussian(gsl_r) * sigthe_rad + 1.0) *PI + theta_rot;
         }
         else
         {
           rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_rad  + 1.0) * Vkep;
-          theV =  gsl_ran_ugaussian(gsl_r) * sigthe_rad + PI + theta_rot;
+          theV = (gsl_ran_ugaussian(gsl_r) * sigthe_rad) * PI + theta_rot;
         }
       }
       
@@ -3002,19 +3001,19 @@ void transfun_2d_cloud_direct_model7(const void *pm, double *transv, double *tra
       if(rnd < fellip)
       {
         rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_circ  + 1.0) * Vkep;
-        theV =  gsl_ran_ugaussian(gsl_r) * sigthe_circ + PI/2.0;
+        theV = (gsl_ran_ugaussian(gsl_r) * sigthe_circ + 0.5) * PI;
       }
       else
       {
         if(fflow <= 0.5)
         {
           rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_rad  + 1.0) * Vkep;
-          theV =  gsl_ran_ugaussian(gsl_r) * sigthe_rad + theta_rot;
+          theV = (gsl_ran_ugaussian(gsl_r) * sigthe_rad + 1.0) *PI + theta_rot;
         }
         else
         {
           rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_rad  + 1.0) * Vkep;
-          theV =  gsl_ran_ugaussian(gsl_r) * sigthe_rad + PI + theta_rot;
+          theV = (gsl_ran_ugaussian(gsl_r) * sigthe_rad) * PI + theta_rot;
         }
       }
       
