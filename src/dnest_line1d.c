@@ -147,7 +147,7 @@ int dnest_line1d(int argc, char **argv)
   from_prior = from_prior_line1d;
   print_particle = print_particle_line1d;
   get_num_params = get_num_params_line1d;
-  restart_clouds = restart_clouds_1d;
+  restart_action = restart_action_1d;
   perturb = perturb_line1d;
 
   if(parset.flag_exam_prior != 1)

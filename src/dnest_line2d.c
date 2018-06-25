@@ -149,7 +149,7 @@ int dnest_line2d(int argc, char **argv)
   from_prior = from_prior_line2d;
   print_particle = print_particle_line2d;
   get_num_params = get_num_params_line2d;
-  restart_clouds = restart_clouds_2d;
+  restart_action = restart_action_2d;
   perturb = perturb_line2d;
   
   if(parset.flag_exam_prior != 1)

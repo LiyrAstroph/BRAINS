@@ -3134,7 +3134,7 @@ void transfun_2d_cloud_direct_model7(const void *pm, double *transv, double *tra
 }
 
 
-void restart_clouds_1d(int iflag)
+void restart_action_1d(int iflag)
 {
   FILE *fp;
   char str[200];
@@ -3180,8 +3180,8 @@ void restart_clouds_1d(int iflag)
   fclose(fp);
 }
 
-void restart_clouds_2d(int iflag)
+void restart_action_2d(int iflag)
 {
-  restart_clouds_1d(iflag);
+  restart_action_1d(iflag);
 }
 

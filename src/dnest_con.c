@@ -48,7 +48,7 @@ int dnest_con(int argc, char **argv)
   perturb = perturb_con;
   print_particle = print_particle_con;
   get_num_params = get_num_params_con;
-  restart_clouds = restart_clouds_con;
+  restart_action = restart_action_con;
   
   if(parset.flag_exam_prior != 1)
   {
@@ -262,7 +262,7 @@ int get_num_params_con()
   return num_params;
 }
 
-void restart_clouds_con(int iflag)
+void restart_action_con(int iflag)
 {
   return;
 }

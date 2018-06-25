@@ -40,5 +40,5 @@ double (*log_likelihoods_cal_initial)(const void *model);
 double (*log_likelihoods_cal_restart)(const void *model);
 double (*perturb)(void *model);
 int (*get_num_params)();
-void (*restart_clouds)(int iflag);
+void (*restart_action)(int iflag);
 #endif

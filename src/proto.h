@@ -76,7 +76,7 @@ void transfun_1d_cloud_direct_model7(const void *pm, int flag_save);
 void postprocess1d();
 void set_par_range_model1d();
 
-void restart_clouds_1d(int iflag);
+void restart_action_1d(int iflag);
 
 /* 2d line reconstruction */
 int dnest_line2d(int argc, char **argv);
@@ -105,7 +105,7 @@ void smooth_init(int nv, const double *transv);
 void smooth_end();
 void smooth_test();
 
-void restart_clouds_2d(int iflag);
+void restart_action_2d(int iflag);
 
 /* sim */
 void sim();
