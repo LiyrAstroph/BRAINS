@@ -119,35 +119,35 @@ void init()
   rcloud_max_set = parset.tau_max_set*1.0e3;
   
   /* set the range of continuum variation  */
-  var_range_model[0][0] = log(1.0e-10);; // systematic error in continuum
-  var_range_model[0][1] = log(1.0e6);;
+  var_range_model[0][0] = log(1.0); /* systematic error in continuum */
+  var_range_model[0][1] = log(1.0+10.0);
 
-  var_range_model[1][0] = -15.0; // log(sigma)
+  var_range_model[1][0] = -15.0; /* log(sigma) */
   var_range_model[1][1] = -1.0; 
 
-  var_range_model[2][0] = log(1.0); // log(tau)
+  var_range_model[2][0] = log(1.0); /* log(tau) */
   var_range_model[2][1] = log(1.0e4); 
 
-  var_range_model[3][0] = -10.0; // mean value or trend parameter values
+  var_range_model[3][0] = -10.0; /* mean value or trend parameter values */
   var_range_model[3][1] =  10.0; 
 
-  var_range_model[4][0] = -0.1; // slope of the trend in the differences between contiuum and line
+  var_range_model[4][0] = -0.1; /* slope of the trend in the differences between contiuum and line */
   var_range_model[4][1] =  0.1; 
 
-  var_range_model[5][0] = -10.0; // light curve values
+  var_range_model[5][0] = -10.0; /* light curve values */
   var_range_model[5][1] = 10.0; 
 
   
   if(num_params_nlr > 1)
   {
-    if(parset.flag_narrowline == 2)
+    if(parset.flag_narrowline == 2) /* Gaussian prior */
     {
       nlr_range_model[0][0] = 10.0;
       nlr_range_model[0][1] = -10.0;
     }
     else
     {
-      nlr_range_model[0][0] = log(1.0e-1);
+      nlr_range_model[0][0] = log(1.0e-1); /* logrithmic prior */
       nlr_range_model[0][1] = log(1.0e4);
     }
 
