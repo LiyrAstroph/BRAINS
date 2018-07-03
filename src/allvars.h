@@ -230,12 +230,12 @@ typedef struct
   double mbh;           /*!< \brief 12.black hole mass */
   double fellip;        /*!< \brief 13.ellipitic orbits */
   double fflow;         /*!< \brief 14.inflow/outflow */
-  double rf;            /*!< \brief 15  */
-  double sigr_circ;     /*!< \brief 16. */
-  double sigthe_circ;   /*!< \brief 17. */
-  double sigr_rad;      /*!< \brief 18. */
-  double sigthe_rad;    /*!< \brief 19. */
-  double theta_rot;     /*!< \brief 20. */
+  double sigr_circ;     /*!< \brief 15. */
+  double sigthe_circ;   /*!< \brief 16. */
+  double sigr_rad;      /*!< \brief 17. */
+  double sigthe_rad;    /*!< \brief 18. */
+  double theta_rot;     /*!< \brief 19. */
+  double sig_turb;      /*!< \brief 20. turbulence velocity */
   double logse;         /*!< \brief 21. */
 }BLRmodel5;
 

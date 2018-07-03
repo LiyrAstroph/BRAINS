@@ -1719,7 +1719,7 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0;
   double inc, Fin, Fout, alpha, k, gam, mu, xi;
-  double mbh, fellip, fflow, sigr_circ, sigthe_circ, sigr_rad, sigthe_rad, theta_rot, rf;
+  double mbh, fellip, fflow, sigr_circ, sigthe_circ, sigr_rad, sigthe_rad, theta_rot, sig_turb;
   double Lphi, Lthe, V, Vr, Vph, Vkep, rhoV, theV, linecenter=0.0;
   double Anorm, weight, rndr, rnd, rnd_frac, rnd_xi, frac1, frac2, ratio, fe;
   double vx, vy, vz, vxb, vyb, vzb, dV, vcloud_max, vcloud_min;
@@ -1739,12 +1739,13 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
   mbh = exp(model->mbh);
   fellip = model->fellip;
   fflow = model->fflow;
-  rf = exp(model->rf);
   sigr_circ = exp(model->sigr_circ);
   sigthe_circ = exp(model->sigthe_circ);
   sigr_rad = exp(model->sigr_rad);
   sigthe_rad = exp(model->sigthe_rad);
   theta_rot = model->theta_rot*PI/180.0;
+  sig_turb = exp(model->sig_turb);
+
 
   frac1 = 1.0/(alpha+1.0) * (1.0 - pow(Fin,   alpha+1.0));
   frac2 = 1.0/(alpha-1.0) * (1.0 - pow(Fout, -alpha+1.0));
@@ -1875,17 +1876,12 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
     //Trans1D[idt] += pow(1.0/r, 2.0*(1 + gam)) * weight;
 
     Vkep = sqrt(mbh/r);
-     
-    if(r >= rf)
-      fe = fellip;
-    else
-      fe = 0.0;
 
     for(j=0; j<parset.n_vel_per_cloud; j++)
     {
       rnd = gsl_rng_uniform(gsl_r);
 
-      if(rnd < fe)
+      if(rnd < fellip)
       {
         rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_circ  + 1.0) * Vkep;
         theV = (gsl_ran_ugaussian(gsl_r) * sigthe_circ + 0.5) * PI;
@@ -1931,6 +1927,8 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
 
       V = -vx;  //note the definition of the line-of-sight velocity. postive means a receding 
                 // velocity relative to the observer.
+
+      V += gsl_ran_ugaussian(gsl_r) * sig_turb * Vkep; // add turbulence velocity
 
       V += linecenter;
 

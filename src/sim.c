@@ -110,19 +110,20 @@ void sim()
       pm[5] = 1.5;       //alpha
       pm[6] = cos(20.0/180.0*PI);      //inc
       pm[7] = 40.0;      //opn
-      pm[8] = 0.0;       //k
-      pm[9] = 1.0;       //gam
-      pm[10] = 0.0;      //xi
+      pm[8] = 0.5;       //k
+      pm[9] = 2.0;       //gam
+      pm[10] = 0.5;      //xi
       pm[11] = log(2.0); //mbh
-      pm[12] = 0.8;      //fellip
-      pm[13] = 0.9;      //fflow
-      pm[14] = log(4.0);
-      pm[15] = log(0.01);
-      pm[16] = log(0.1);
-      pm[17] = log(0.01);
-      pm[18] = log(0.1);
-      pm[19] = 0.0;
-      pm[20] = log(1.0);
+      pm[12] = 0.5;      //fellip
+      pm[13] = 0.5;      //fflow
+      pm[14] = log(0.01);
+      pm[15] = log(0.1);
+      pm[16] = log(0.01);
+      pm[17] = log(0.1);
+      pm[18] = 0.0;      //theta_rot
+      pm[19] = -DBL_MAX; //sig_turb
+      pm[20] = 0.0;      //spectral broadening
+      pm[21] = log(1.0); //systematic error
       break;
 
     case 6:
@@ -150,34 +151,35 @@ void sim()
       break;
 
     case 7:
-      pm[0] = log(1.0);
-      pm[1] = 0.0;
-      pm[2] = log(4.0);
-      pm[3] = 0.5;
-      pm[4] = 0.1;
-      pm[5] = cos(20.0/180.0*PI);
-      pm[6] = 40.0;
-      pm[7] = 0.0;
-      pm[8] = 1.0;
-      pm[9] = 0.0;
+      pm[0] = log(1.0);  //A
+      pm[1] = 0.0;       //Ag
+      pm[2] = log(4.0);  //mu
+      pm[3] = 0.5;       //beta
+      pm[4] = 0.1;       //F
+      pm[5] = cos(20.0/180.0*PI);//inc
+      pm[6] = 40.0;      //opn
+      pm[7] = 0.0;       //kappa
+      pm[8] = 1.0;       //gamma
+      pm[9] = 0.0;       //xi
 
-      pm[10] = 0.5;
-      pm[11] = log(8.0);
-      pm[12] = 0.5;
-      pm[13] = 0.1;
-      pm[14] = 20.0;
+      pm[10] = 0.5;      //fsh
+      pm[11] = log(8.0); //mu_un
+      pm[12] = 0.5;      //beta_un
+      pm[13] = 0.1;      //F_un
+      pm[14] = 20.0;     //opn_un
 
-      pm[15] = log(2.0);
-      pm[16] = 1.0;
-      pm[17] = 0.4;
-      pm[18] = log(0.01);
+      pm[15] = log(2.0); //mbh
+      pm[16] = 0.5;      //fellip
+      pm[17] = 0.4;      //fflow
+      pm[18] = log(0.01); 
       pm[19] = log(0.1);
       pm[20] = log(0.01);
       pm[21] = log(0.1);
-      pm[22] = 0.0;
-      pm[23] = 0.5;
-      pm[24] = 0.5;
-      pm[25] = log(1.0);
+      pm[22] = 0.0;      //theta_rot
+      pm[23] = 0.5;      //fellip_un
+      pm[24] = 0.5;      //fflow_un
+      pm[25] = 0.0;      // parameter for spectral broadening 
+      pm[26] = log(1.0); //systematic error
       break;
   }
 
@@ -338,45 +340,45 @@ void sim_init()
   switch(parset.flag_blrmodel)
   {
     case 1:
-      num_params_blr_model = 12;
+      num_params_blr_model = sizeof(BLRmodel1)/sizeof(double);
       transfun_1d_cloud_direct = transfun_1d_cloud_direct_model1;
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model1;
       break;
     case 2:
-      num_params_blr_model = 12;
+      num_params_blr_model = sizeof(BLRmodel2)/sizeof(double);
       transfun_1d_cloud_direct = transfun_1d_cloud_direct_model1;
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model2;
       break;
     case 3:
-      num_params_blr_model = 12;
+      num_params_blr_model = sizeof(BLRmodel3)/sizeof(double);
       transfun_1d_cloud_direct = transfun_1d_cloud_direct_model3;
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model3;
       break;
     case 4:
-      num_params_blr_model = 12;
+      num_params_blr_model = sizeof(BLRmodel4)/sizeof(double);
       transfun_1d_cloud_direct = transfun_1d_cloud_direct_model3;
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model4;
       break;
     case 5:
-      num_params_blr_model = 20;
+      num_params_blr_model = sizeof(BLRmodel5)/sizeof(double);
       transfun_1d_cloud_direct = transfun_1d_cloud_direct_model5;
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model5;
       break;
 
     case 6:
-      num_params_blr_model = 20;
+      num_params_blr_model = sizeof(BLRmodel6)/sizeof(double);
       transfun_1d_cloud_direct = transfun_1d_cloud_direct_model6;
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model6;
       break;
 
     case 7:
-      num_params_blr_model = 26;
+      num_params_blr_model = sizeof(BLRmodel7)/sizeof(double);
       transfun_1d_cloud_direct = transfun_1d_cloud_direct_model7;
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model7;
       break;
 
     default:
-      num_params_blr_model = 12;
+      num_params_blr_model = sizeof(BLRmodel1)/sizeof(double);
       transfun_1d_cloud_direct = transfun_1d_cloud_direct_model1;
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model1;
       break;
@@ -455,7 +457,6 @@ void sim_init()
   if(parset.flag_dim == -1)
   {
     memcpy(Tline, Tline_data, n_line_data * sizeof(double));
-
     memcpy(TransV, Vline_data, n_vel_data * sizeof(double));
   }
   else
