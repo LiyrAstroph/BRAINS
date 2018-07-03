@@ -36,7 +36,7 @@ void sim()
 
   sim_init();
   
-  double *pm = (double *)model;
+  double *pm = (double *)model, error, fcon;
   
   switch(parset.flag_blrmodel)
   {
@@ -126,28 +126,27 @@ void sim()
       break;
 
     case 6:
-      pm[0] = log(1.0);
-      pm[1] = 0.0;
-      pm[2] = log(4.0);
-      pm[3] = 0.5;
-      pm[4] = 0.1;
-      pm[5] = cos(20.0/180.0*PI);
-      pm[6] = 40.0;
-      pm[7] = 0.0;
-      pm[8] = 1.0;
-      pm[9] = 0.0;
-      pm[10] = log(2.0);
-      pm[11] = 1.0;
-      pm[12] = 0.4;
-      pm[13] = log(0.01);
-      pm[14] = log(0.1);
-      pm[15] = log(0.01);
-      pm[16] = log(0.1);
-      pm[17] = 0.0;
-      pm[18] = 0.0;
-      pm[19] = 1.0;  // parameter for spectral broadening 
-      pm[20] = 0.0;  // parameter for line center
-      pm[21] = log(1.0);
+      pm[0] = log(1.0);   // A
+      pm[1] = 0.0;        // Ag
+      pm[2] = log(4.0);   // mu
+      pm[3] = 0.5;        // beta
+      pm[4] = 0.1;        // F
+      pm[5] = cos(20.0/180.0*PI); // inc
+      pm[6] = 40.0;       // opn
+      pm[7] = 0.5;        // kappa
+      pm[8] = 1.0;        // gamma
+      pm[9] = 0.5;        // obscuration
+      pm[10] = log(2.0);  //mbh
+      pm[11] = 0.5;       //fellip
+      pm[12] = 0.4;       //fflow
+      pm[13] = log(0.01); //
+      pm[14] = log(0.1);  //
+      pm[15] = log(0.01); //
+      pm[16] = log(0.1);  //
+      pm[17] = 0.0;       // theta_rot
+      pm[18] = -DBL_MAX;  // sig_turb
+      pm[19] = 0.0;       // parameter for spectral broadening 
+      pm[20] = log(1.0);  // systematic error
       break;
 
     case 7:
@@ -182,18 +181,18 @@ void sim()
       break;
   }
 
-
   smooth_init(parset.n_vel_recon, TransV);
   
   if(parset.flag_dim == -1)
   {
     //note that here use sigma_hat = sigma/sqrt(tau).
-    reconstruct_con_from_varmodel(0.03, 45.0, 1.0, 0.0); 
+    reconstruct_con_from_varmodel(exp(-3.714542), exp(3.104897), 1.0, 0.0); 
   }
   else
   {
     con_scale = 1.0;
     line_scale = 1.0;
+    line_error_mean = con_error_mean = 0.01;
     create_con_from_random(0.03, 45.0, 1.0, 0.0); 
   }
   gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
@@ -222,13 +221,11 @@ void sim()
   
   if(parset.flag_dim != -2)
   {
-    for(i=0; i<parset.n_con_recon; i++)
+    for(i=0; i<n_con_data; i++)
     {
-      if( (Tcon[i] > Tcon_data[0]) && (Tcon[i] <=Tcon_data[n_con_data-1]) )
-      {
-        //fprintf(fp, "%f %f %f\n", Tcon[i], Fcon[i]/con_scale, Fcerrs[i]/con_scale);
-        fprintf(fp, "%f %f %f\n", Tcon[i], (Fcon[i]+gsl_ran_ugaussian(gsl_r)*0.01)/con_scale, 0.01/con_scale);
-      }
+      //fprintf(fp, "%f %f %f\n", Tcon[i], Fcon[i]/con_scale, Fcerrs[i]/con_scale);
+      fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, Tcon_data[i], gsl_acc);
+      fprintf(fp, "%f %f %f\n", Tcon_data[i], (fcon+gsl_ran_ugaussian(gsl_r)*con_error_mean)/con_scale, con_error_mean/con_scale);
     }
   }
   else
@@ -240,10 +237,12 @@ void sim()
   }
   fclose(fp);
   
-
+  
   transfun_1d_cloud_direct(model, 0);
+
   calculate_line_from_blrmodel(model, Tline, Fline, parset.n_line_recon);
 
+  
   sprintf(fname, "%s/%s", parset.file_dir, "/data/sim_hb.txt");
   fp = fopen(fname, "w");
   if(fp == NULL)
@@ -252,9 +251,18 @@ void sim()
     exit(-1);
   }
 
+  if(parset.flag_dim == -1)
+  {
+    error = line_error_mean * sqrt(n_line_data) * (Vline_data[1] - Vline_data[0]);
+  }
+  else
+  {
+    error = line_error_mean;
+  }
   for(i=0; i<parset.n_line_recon; i++)
   {
-    fprintf(fp, "%f %f %f\n", Tline[i], Fline[i] + gsl_ran_ugaussian(gsl_r)*0.01, 0.01);
+    fprintf(fp, "%f %f %f\n", Tline[i], Fline[i]/line_scale + gsl_ran_ugaussian(gsl_r)*error/line_scale, 
+      error/line_scale);
   }
 
   // output transfer function.
@@ -291,7 +299,7 @@ void sim()
     for(j=0; j<parset.n_vel_recon; j++)
     {
       fprintf(fp, "%f %f %f %f\n", TransV[j]*VelUnit, Tline[i],  
-        (Fline2d[i*parset.n_vel_recon + j] + gsl_ran_ugaussian(gsl_r)*0.01), 0.01);
+        (Fline2d[i*parset.n_vel_recon + j] + gsl_ran_ugaussian(gsl_r)*line_error_mean)/line_scale, line_error_mean/line_scale);
     }
 
     fprintf(fp, "\n");
@@ -386,6 +394,8 @@ void sim_init()
     parset.flag_narrowline = 1;
   }
 
+  parset.flag_linecenter = 0;
+
   parset.num_particles = 1;
   which_particle_update = 0;
   force_update = 1;
@@ -428,6 +438,12 @@ void sim_init()
     } 
   }
 
+  if(parset.flag_dim == -1)
+  {
+    parset.n_line_recon = n_line_data;
+    parset.n_vel_recon = n_vel_data;
+  }
+
   TransTau = malloc(parset.n_tau * sizeof(double));
   TransV = malloc(parset.n_vel_recon * sizeof(double));
   Trans1D = malloc(parset.n_tau * sizeof(double));
@@ -438,15 +454,9 @@ void sim_init()
 
   if(parset.flag_dim == -1)
   {
-    Tline_min = Tcon_data[0] + 10.0;
-    Tline_max = Tcon_data[n_con_data-1];
+    memcpy(Tline, Tline_data, n_line_data * sizeof(double));
 
-    dT = (Tline_max - Tline_min)/(parset.n_line_recon - 1);
-
-    for(i=0; i<parset.n_line_recon; i++)
-    {
-      Tline[i] = Tline_min + i*dT;
-    }
+    memcpy(TransV, Vline_data, n_vel_data * sizeof(double));
   }
   else
   {
@@ -459,22 +469,23 @@ void sim_init()
     {
       Tline[i] = Tline_min + i*dT;
     }
+    Tline[parset.n_line_recon - 1] = Tline_max-1.0e-10;
+
+    double vel_max_set, vel_min_set;
+    vel_max_set = 3000.0/VelUnit;
+    vel_min_set = - vel_max_set;
+    double dVel = (vel_max_set- vel_min_set)/(parset.n_vel_recon -1.0);
+
+    for(i=0; i<parset.n_vel_recon; i++)
+    {
+      TransV[i] = vel_min_set + dVel*i;
+    }
   }
   
   dTransTau = (parset.tau_max_set - parset.tau_min_set)/(parset.n_tau - 1);
   for(i=0; i<parset.n_tau; i++)
   {
     TransTau[i] = parset.tau_min_set + dTransTau * i;
-  }
-
-  double vel_max_set, vel_min_set;
-  vel_max_set = 5000.0/VelUnit;
-  vel_min_set = - vel_max_set;
-  double dVel = (vel_max_set- vel_min_set)/(parset.n_vel_recon -1.0);
-
-  for(i=0; i<parset.n_vel_recon; i++)
-  {
-    TransV[i] = vel_min_set + dVel*i;
   }
   
   clouds_particles = malloc(parset.num_particles * sizeof(double *));

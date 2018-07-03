@@ -266,13 +266,10 @@ void scale_con_line()
   if(thistask == roottask)
     printf("task %d con scale: %e\t%e\n", thistask, con_scale, ave_con);
   
-  if(parset.flag_dim <= 0)
+  con_error_mean *= con_scale;
+
+  if(parset.flag_dim == 0)
   {
-    if(parset.flag_narrowline!=0)
-    {
-      parset.flux_narrowline *= line_scale;
-      parset.flux_narrowline_err *= line_scale;
-    }
     return;
   }
 
@@ -296,7 +293,7 @@ void scale_con_line()
       Flerrs_data[i] *= line_scale;
     }
 
-    if(parset.flag_dim==2)
+    if(parset.flag_dim==2 || parset.flag_dim == -1)
       for(j=0; j<n_vel_data; j++)
       {
         // note mask with error >= 1.0e100
@@ -309,7 +306,7 @@ void scale_con_line()
   }
   line_error_mean *= line_scale;
 
-  if(parset.flag_dim==2 && parset.flag_narrowline!=0)
+  if( (parset.flag_dim==2 || parset.flag_dim == -1) && parset.flag_narrowline!=0)
   {
     parset.flux_narrowline *= line_scale;
     parset.flux_narrowline_err *= line_scale;
@@ -729,8 +726,8 @@ void set_blr_range_model6()
   blr_range_model[i][0] = log(1.0);
   blr_range_model[i++][1] = log(1.0+10.0);
 
-  rcloud_max_set = 44.85;
-  blr_range_model[2][1] = fmin(blr_range_model[2][1], log(rcloud_max_set));
+  //rcloud_max_set = 44.85;
+  //blr_range_model[2][1] = fmin(blr_range_model[2][1], log(rcloud_max_set));
   return;
 }
 

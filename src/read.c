@@ -381,29 +381,32 @@ void read_data()
     
     int count;
     
-    // continuum file
-    sprintf(fname, "%s/%s", parset.file_dir, parset.continuum_file);
-    fp = fopen(fname, "r");
-    if(fp == NULL)
-    {
-      fprintf(stderr, "# Error: Cannot open file %s\n", fname);
-      exit(-1);
-    }
-    // count the number of lines
-    count = 0;
-    while(1)
-    {
-      fgets(buf, 200, fp);
-      if(feof(fp)!=0)
-        break;
-      count++;
-    }
-    fclose(fp);
-    n_con_data = count;
+    if(parset.flag_dim >= -1)
+    { 
+      // continuum file
+      sprintf(fname, "%s/%s", parset.file_dir, parset.continuum_file);
+      fp = fopen(fname, "r");
+      if(fp == NULL)
+      {
+        fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+        exit(-1);
+      }
+      // count the number of lines
+      count = 0;
+      while(1)
+      {
+        fgets(buf, 200, fp);
+        if(feof(fp)!=0)
+          break;
+        count++;
+      }
+      fclose(fp);
+      n_con_data = count;
     
-    printf("continuum data points: %d\n", n_con_data);
+      printf("continuum data points: %d\n", n_con_data);
+    }
 
-    if(parset.flag_dim == 1)
+    if(parset.flag_dim == 1 || parset.flag_dim == -1)
     {
       sprintf(fname, "%s/%s", parset.file_dir, parset.line_file);
     // emission flux line
@@ -428,7 +431,7 @@ void read_data()
       printf("line data points: %d\n", n_line_data);
     }
 
-    if(parset.flag_dim == 2)
+    if(parset.flag_dim == 2 || parset.flag_dim == -1)
     {
       sprintf(fname, "%s/%s", parset.file_dir, parset.line2d_file);
       fp = fopen(fname, "r");
@@ -443,12 +446,15 @@ void read_data()
     }
   }
 
-  MPI_Bcast(&n_con_data, 1, MPI_INT, roottask, MPI_COMM_WORLD);
+  if(parset.flag_dim >= -1)
+  {
+    MPI_Bcast(&n_con_data, 1, MPI_INT, roottask, MPI_COMM_WORLD);
+  }
 
-  if(parset.flag_dim == 1)
+  if(parset.flag_dim == 1 || parset.flag_dim == -1)
     MPI_Bcast(&n_line_data, 1, MPI_INT, roottask, MPI_COMM_WORLD);
 
-  if(parset.flag_dim == 2)
+  if(parset.flag_dim == 2 || parset.flag_dim == -1)
   {
     MPI_Bcast(&n_line_data, 1, MPI_INT, roottask, MPI_COMM_WORLD);
     MPI_Bcast(&n_vel_data, 1, MPI_INT, roottask, MPI_COMM_WORLD);
@@ -458,39 +464,42 @@ void read_data()
   allocate_memory_data();
 
   // now read data
-  if(thistask == roottask)
+  if(parset.flag_dim >= -1)
   {
-    // continuum data
-    sprintf(fname, "%s/%s", parset.file_dir, parset.continuum_file);
-    fp = fopen(fname, "r");
-    if(fp == NULL)
+    if(thistask == roottask)
     {
-      fprintf(stderr, "# Error: Cannot open file %s\n", fname);
-      exit(-1);
-    }
-    for(i=0; i<n_con_data; i++)
-    {
-      fscanf(fp, "%lf %lf %lf \n", &Tcon_data[i], &Fcon_data[i], &Fcerrs_data[i]);
-    }
-    fclose(fp);
+      // continuum data
+      sprintf(fname, "%s/%s", parset.file_dir, parset.continuum_file);
+      fp = fopen(fname, "r");
+      if(fp == NULL)
+      {
+        fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+        exit(-1);
+      }
+      for(i=0; i<n_con_data; i++)
+      {
+        fscanf(fp, "%lf %lf %lf \n", &Tcon_data[i], &Fcon_data[i], &Fcerrs_data[i]);
+      }
+      fclose(fp);
 
-    /* cal mean con error */
-    con_error_mean = 0.0;
-    for(i=0; i<n_con_data; i++)
-    {
-      con_error_mean += Fcon_data[i];
-    }
-    con_error_mean /= n_con_data;
+      /* cal mean con error */
+      con_error_mean = 0.0;
+      for(i=0; i<n_con_data; i++)
+      {
+        con_error_mean += Fcerrs_data[i];
+      }
+      con_error_mean /= n_con_data;
 
+    }
+
+    MPI_Bcast(Tcon_data, n_con_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(Fcon_data, n_con_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(Fcerrs_data, n_con_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(&con_error_mean, 1, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
   }
 
-  MPI_Bcast(Tcon_data, n_con_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
-  MPI_Bcast(Fcon_data, n_con_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
-  MPI_Bcast(Fcerrs_data, n_con_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
-  MPI_Bcast(&con_error_mean, 1, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
-
   // read line
-  if(parset.flag_dim == 1)
+  if(parset.flag_dim == 1||parset.flag_dim == -1)
   {
     if(thistask == roottask)
     {
@@ -535,7 +544,7 @@ void read_data()
   }
 
   // read 2d line data
-  if(parset.flag_dim == 2)
+  if(parset.flag_dim == 2 || parset.flag_dim == -1)
   {
     if(thistask == roottask)
     {
@@ -597,6 +606,7 @@ void read_data()
     cal_emission_flux();
   }
 
+
   if(parset.InstRes < 0.0 && parset.flag_dim == 2)
   {
     if(thistask == roottask)
@@ -629,18 +639,21 @@ void read_data()
  */
 void allocate_memory_data()
 {
-  Tcon_data = malloc(n_con_data * sizeof(double));
-  Fcon_data = malloc(n_con_data * sizeof(double));
-  Fcerrs_data = malloc(n_con_data * sizeof(double));
+  if(parset.flag_dim >=-1)
+  {
+    Tcon_data = malloc(n_con_data * sizeof(double));
+    Fcon_data = malloc(n_con_data * sizeof(double));
+    Fcerrs_data = malloc(n_con_data * sizeof(double));
+  }
 
-  if(parset.flag_dim == 1)
+  if(parset.flag_dim == 1 || parset.flag_dim == -1)
   {
     Tline_data = malloc(n_line_data * sizeof(double));
     Fline_data = malloc(n_line_data * sizeof(double));
     Flerrs_data = malloc(n_line_data * sizeof(double));
   }
 
-  if(parset.flag_dim == 2)
+  if(parset.flag_dim == 2 || parset.flag_dim == -1)
   {
     Vline_data = malloc(n_vel_data * sizeof(double));
     Tline_data = malloc(n_line_data * sizeof(double));

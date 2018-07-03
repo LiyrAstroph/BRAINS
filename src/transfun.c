@@ -45,6 +45,7 @@ void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl
   A=exp(pmodel[0]); /*  response coefficient */
   Ag=pmodel[1];     /*  no-linearity of response */
 
+  
   for(i=0;i<nl;i++)
   {
     tl = Tl[i];
@@ -82,6 +83,7 @@ void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl
     }
     Fl[i] = fline * dTransTau * A;
   }
+
   return;
 }
 
