@@ -309,7 +309,7 @@ void read_parset()
            parset.width_narrowline, parset.shift_narrowline);
       }
 
-      if(parset.width_narrowline<=0.0)
+      if(parset.width_narrowline<=0.0 && parset.flag_narrowline > 0)
       {
         printf("# Error in narrow line width %f.\n", parset.width_narrowline);
         exit(0);
