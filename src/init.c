@@ -611,7 +611,7 @@ void set_blr_range_model5()
   blr_range_model[i][0] = 0.0; // in cosine
   blr_range_model[i++][1] = 1.0;
   //opn
-  blr_range_model[i][0] = 0.0;  // in rad
+  blr_range_model[i][0] = 0.0;  // in degree
   blr_range_model[i++][1] = 90.0;
   //k
   blr_range_model[i][0] = -0.5;
@@ -816,6 +816,10 @@ void set_blr_range_model7()
   //fflow_un
   blr_range_model[i][0] = 0.0;
   blr_range_model[i++][1] = 1.0;
+
+  //sig_turb
+  blr_range_model[i][0] = log(0.001);
+  blr_range_model[i++][1] = log(0.1);
 
   //logse
   blr_range_model[i][0] = log(1.0);

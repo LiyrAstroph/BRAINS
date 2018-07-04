@@ -1721,7 +1721,7 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
   double inc, Fin, Fout, alpha, k, gam, mu, xi;
   double mbh, fellip, fflow, sigr_circ, sigthe_circ, sigr_rad, sigthe_rad, theta_rot, sig_turb;
   double Lphi, Lthe, V, Vr, Vph, Vkep, rhoV, theV, linecenter=0.0;
-  double Anorm, weight, rndr, rnd, rnd_frac, rnd_xi, frac1, frac2, ratio, fe;
+  double Anorm, weight, rndr, rnd, rnd_frac, rnd_xi, frac1, frac2, ratio, fe, Rs, g;
   double vx, vy, vz, vxb, vyb, vzb, dV, vcloud_max, vcloud_min;
   double *pmodel = (double *)pm;
   BLRmodel5 *model = (BLRmodel5 *)pm;
@@ -1746,6 +1746,7 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
   theta_rot = model->theta_rot*PI/180.0;
   sig_turb = exp(model->sig_turb);
 
+  Rs = 3.0e11*mbh/CM_PER_LD; // Schwarzchild radius in a unit of light-days
 
   frac1 = 1.0/(alpha+1.0) * (1.0 - pow(Fin,   alpha+1.0));
   frac2 = 1.0/(alpha-1.0) * (1.0 - pow(Fout, -alpha+1.0));
@@ -1823,7 +1824,7 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
         {
           rndr = pow( 1.0 - rnd * (1.0 - pow(Fout, -alpha+1.0)), 1.0/(1.0-alpha));
         }
-        r = rndr*mu;
+        r = Rs + rndr*mu;
         nc++;
       }
       clouds_particles_perturb[which_particle_update][i] = r;
@@ -1929,6 +1930,12 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
                 // velocity relative to the observer.
 
       V += gsl_ran_ugaussian(gsl_r) * sig_turb * Vkep; // add turbulence velocity
+
+      if(fabs(V) >= C_Unit) // make sure that the velocity is smaller than speed of light
+        V = 0.9999*C_Unit * (V>0.0?1.0:-1.0);
+
+      g = sqrt( (1.0 + V/C_Unit) / (1.0 - V/C_Unit) ) / sqrt(1.0 - Rs/r); //relativistic effects
+      V = (g-1.0)*C_Unit;
 
       V += linecenter;
 
@@ -2723,7 +2730,7 @@ void transfun_2d_cloud_direct_model7(const void *pm, double *transv, double *tra
   FILE *fcloud_out;
   int i, j, idt, idV, nc, flag_update=0, num_sh;
   double r, phi, dis, Lopn_cos;
-  double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb, vcloud_min, vcloud_max, fe;
+  double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb, vcloud_min, vcloud_max, fe, Rs, g, sig_turb;
   double V, dV, rhoV, theV, Vr, Vph, Vkep;
   double inc, F, beta, mu, k, gam, xi, a, s, sig, rin;
   double mbh, fellip, fflow, sigr_circ, sigthe_circ, sigr_rad, sigthe_rad, theta_rot;
@@ -2749,10 +2756,13 @@ void transfun_2d_cloud_direct_model7(const void *pm, double *transv, double *tra
   sigr_rad = exp(model->sigr_rad);
   sigthe_rad = exp(model->sigthe_rad);
   theta_rot = model->theta_rot*PI/180.0;
+  sig_turb = exp(model->sig_turb);
+
+  Rs = 3.0e11*mbh/CM_PER_LD; // Schwarzchild radius in a unit of light-days
 
   a = 1.0/beta/beta;
   s = mu/a;
-  rin=mu*F;
+  rin=Rs + mu*F;
   sig=(1.0-F)*s;
   
   if(parset.flag_linecenter !=0)
@@ -2923,6 +2933,14 @@ void transfun_2d_cloud_direct_model7(const void *pm, double *transv, double *tra
       V = -vx;  //note the definition of the line-of-sight velocity. postive means a receding 
                 // velocity relative to the observer.
 
+      V += gsl_ran_ugaussian(gsl_r) * sig_turb * Vkep;
+
+      if(fabs(V) >= C_Unit) // make sure that the velocity is smaller than speed of light
+        V = 0.9999*C_Unit * (V>0.0?1.0:-1.0);
+
+      g = sqrt( (1.0 + V/C_Unit) / (1.0 - V/C_Unit) ) / sqrt(1.0 - Rs/r); //relativistic effects
+      V = (g-1.0)*C_Unit;
+
       V += linecenter;
 
       if(V<transv[0] || V>=transv[n_vel-1]+dV)
@@ -2943,7 +2961,7 @@ void transfun_2d_cloud_direct_model7(const void *pm, double *transv, double *tra
   //second BLR region
   fellip = model->fellip_un;
   fflow = model->fflow_un;
-  rin = exp(model->mu_un) * model->F_un;
+  rin = exp(model->mu_un) * model->F_un + Rs;
   a = 1.0/(model->beta_un * model->beta_un);
   sig = exp(model->mu_un) * (1.0-model->F_un)/a;
   double Lopn_cos_un1, Lopn_cos_un2;
@@ -3078,6 +3096,14 @@ void transfun_2d_cloud_direct_model7(const void *pm, double *transv, double *tra
 
       V = -vx;  //note the definition of the line-of-sight velocity. postive means a receding 
                 // velocity relative to the observer.
+
+      V += gsl_ran_ugaussian(gsl_r) * sig_turb * Vkep;
+
+      if(fabs(V) >= C_Unit) // make sure that the velocity is smaller than speed of light
+        V = 0.9999*C_Unit * (V>0.0?1.0:-1.0);
+
+      g = sqrt( (1.0 + V/C_Unit) / (1.0 - V/C_Unit) ) / sqrt(1.0 - Rs/r); //relativistic effects
+      V = (g-1.0)*C_Unit;
 
       V += linecenter;
 

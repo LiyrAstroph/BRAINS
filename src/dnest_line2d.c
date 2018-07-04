@@ -85,12 +85,13 @@ int dnest_line2d(int argc, char **argv)
       num_params_blr_model = sizeof(BLRmodel5)/sizeof(double);
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model5;
 
-      num_params_radial_samp=4;
+      num_params_radial_samp=5;
       params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
       params_radial_samp[0] = 2;
       params_radial_samp[1] = 3;
       params_radial_samp[2] = 4;
       params_radial_samp[3] = 5;
+      params_radial_samp[4] = 11; // black hole mass changes Schwarzschild radius
 
       break;
     
@@ -111,7 +112,7 @@ int dnest_line2d(int argc, char **argv)
       num_params_blr_model = sizeof(BLRmodel7)/sizeof(double);
       transfun_2d_cloud_direct = transfun_2d_cloud_direct_model7;
 
-      num_params_radial_samp=7;
+      num_params_radial_samp=8;
       params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
       params_radial_samp[0] = 2;
       params_radial_samp[1] = 3;
@@ -120,6 +121,7 @@ int dnest_line2d(int argc, char **argv)
       params_radial_samp[4] = 11;
       params_radial_samp[5] = 12;
       params_radial_samp[6] = 13;
+      params_radial_samp[7] = 15; // black hole mass changes Schwarzschild radius
       
       break;
 

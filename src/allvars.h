@@ -295,7 +295,8 @@ typedef struct
   double theta_rot;     /*!< \brief 23. */
   double fellip_un;        /*!< \brief 24.ellipitic orbits */
   double fflow_un;         /*!< \brief 25.inflow/outflow */
-  double logse;         /*!< \brief 26. */
+  double sig_turb;      /*!< \brief 26. */
+  double logse;         /*!< \brief 27. */
 }BLRmodel7;
 
 extern int BLRmodel_size;

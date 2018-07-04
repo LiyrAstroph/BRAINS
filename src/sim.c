@@ -121,7 +121,7 @@ void sim()
       pm[16] = log(0.01);
       pm[17] = log(0.1);
       pm[18] = 0.0;      //theta_rot
-      pm[19] = -DBL_MAX; //sig_turb
+      pm[19] = log(0.001); //sig_turb
       pm[20] = 0.0;      //spectral broadening
       pm[21] = log(1.0); //systematic error
       break;
@@ -145,7 +145,7 @@ void sim()
       pm[15] = log(0.01); //
       pm[16] = log(0.1);  //
       pm[17] = 0.0;       // theta_rot
-      pm[18] = -DBL_MAX;  // sig_turb
+      pm[18] = log(0.001);  // sig_turb
       pm[19] = 0.0;       // parameter for spectral broadening 
       pm[20] = log(1.0);  // systematic error
       break;
@@ -178,8 +178,9 @@ void sim()
       pm[22] = 0.0;      //theta_rot
       pm[23] = 0.5;      //fellip_un
       pm[24] = 0.5;      //fflow_un
-      pm[25] = 0.0;      // parameter for spectral broadening 
-      pm[26] = log(1.0); //systematic error
+      pm[25] = log(0.001); // sig_turb
+      pm[26] = 0.0;      // parameter for spectral broadening 
+      pm[27] = log(1.0); //systematic error
       break;
   }
 
