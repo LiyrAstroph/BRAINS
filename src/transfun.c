@@ -895,6 +895,9 @@ void transfun_1d_cloud_direct_model3(const void *pm, int flag_save)
   Rin = exp(model->Rin);                 /* mean radius */
   k = model->k;  
   
+  if(F*Rin > rcloud_max_set)
+    F = rcloud_max_set/Rin;
+
   if(flag_save && thistask == roottask)
   {
     char fname[200];
@@ -1072,6 +1075,9 @@ void transfun_2d_cloud_direct_model3(const void *pm, double *transv, double *tra
   xi = model->xi;
   q = model->q;
   
+  if(F*Rin > rcloud_max_set)
+    F = rcloud_max_set/Rin;
+
   if(parset.flag_linecenter !=0)
   {
     linecenter = pmodel[num_params_blr - num_params_linecenter - 1] * parset.linecenter_err; 
@@ -1308,6 +1314,9 @@ void transfun_2d_cloud_direct_model4(const void *pm, double *transv, double *tra
   mbh = exp(model->mbh);
   xi = model->xi;
   q = model->q;
+
+  if(Rin*F > rcloud_max_set)
+    F = rcloud_max_set/Rin;
   
   if(parset.flag_linecenter !=0)
   {
@@ -1549,6 +1558,9 @@ void transfun_1d_cloud_direct_model5(const void *pm, int flag_save)
   xi = model->xi;
   
 
+  if(mu*Fout > rcloud_max_set) // cloud radius samller than rcloud_max_set
+    Fout = rcloud_max_set/mu;
+
   frac1 = 1.0/(alpha+1.0) * (1.0 - pow(Fin, alpha+1.0));
   frac2 = 1.0/(alpha-1.0) * (1.0 - pow(Fout, -alpha+1.0));
   ratio = frac1/(frac1 + frac2);
@@ -1748,6 +1760,9 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
 
   Rs = 3.0e11*mbh/CM_PER_LD; // Schwarzchild radius in a unit of light-days
 
+  if(mu*Fout > rcloud_max_set)
+    Fout = rcloud_max_set/mu;
+  
   frac1 = 1.0/(alpha+1.0) * (1.0 - pow(Fin,   alpha+1.0));
   frac2 = 1.0/(alpha-1.0) * (1.0 - pow(Fout, -alpha+1.0));
   ratio = frac1/(frac1 + frac2);

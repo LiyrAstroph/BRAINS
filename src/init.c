@@ -108,16 +108,25 @@ void init()
 
   gsl_acc = gsl_interp_accel_alloc();
   gsl_linear = gsl_interp_alloc(gsl_interp_linear, parset.n_con_recon);
-  
-  /*if(parset.flag_dim > 0)
-  {
-    parset.tau_max_set = fmin(parset.tau_max_set, Tline_data[n_line_data -1] - Tcon_data[0]);
-  }*/
 
   /* set the range of cloud radial distribution */
   rcloud_min_set = parset.tau_min_set;
-  rcloud_max_set = parset.tau_max_set*1.0e3;
-  
+  rcloud_max_set = parset.tau_max_set;
+
+  if(parset.flag_dim > 0 || parset.flag_dim == -1)
+  {
+    //too large tau_max_set is nonsense
+    parset.tau_max_set = fmin(parset.tau_max_set, (Tline_data[n_line_data -1] - Tcon_data[0]));
+    //too large rcloud_max_set is also nonsense
+    rcloud_max_set = fmin(rcloud_max_set, (Tline_data[n_line_data -1] - Tcon_data[0])/2.0);
+  }
+
+  if(thistask == roottask)
+  {
+    printf("rcloud_max_set: %f\n", rcloud_max_set);
+    printf("tau_max_set: %f\n", parset.tau_max_set);
+  }
+   
   /* set the range of continuum variation  */
   var_range_model[0][0] = log(1.0); /* systematic error in continuum */
   var_range_model[0][1] = log(1.0+10.0);
@@ -409,7 +418,7 @@ void set_blr_range_model1()
   blr_range_model[i++][1] = 3.0;
   //mu
   blr_range_model[i][0] = log(0.1);
-  blr_range_model[i++][1] = log(parset.tau_max_set);
+  blr_range_model[i++][1] = log(rcloud_max_set);
   //beta
   blr_range_model[i][0] = 0.001;
   blr_range_model[i++][1] = 2.0;
@@ -438,6 +447,7 @@ void set_blr_range_model1()
   blr_range_model[i][0] = log(1.0);
   blr_range_model[i++][1] = log(1.0+10.0);
 
+  //blr_range_model[2][1] = fmin(blr_range_model[2][1], log(rcloud_max_set));
   return;
 }
 
@@ -455,7 +465,7 @@ void set_blr_range_model2()
   blr_range_model[i++][1] = 3.0;
   //mu
   blr_range_model[i][0] = log(0.1);
-  blr_range_model[i++][1] = log(parset.tau_max_set);
+  blr_range_model[i++][1] = log(rcloud_max_set);
   //beta
   blr_range_model[i][0] = 0.001;
   blr_range_model[i++][1] = 2.0;
@@ -504,7 +514,7 @@ void set_blr_range_model3()
   blr_range_model[i++][1] = 3.0;
   //Rin
   blr_range_model[i][0] = log(0.1);
-  blr_range_model[i++][1] = log(parset.tau_max_set);
+  blr_range_model[i++][1] = log(rcloud_max_set);
   //F
   blr_range_model[i][0] = log(1.0);
   blr_range_model[i++][1] = log(1.0e2);
@@ -530,8 +540,7 @@ void set_blr_range_model3()
   blr_range_model[i][0] = log(1.0);
   blr_range_model[i++][1] = log(1.0+10.0);
 
-  rcloud_max_set = fmax(rcloud_max_set, exp(blr_range_model[3][1] + blr_range_model[4][1]));
-  
+  //rcloud_max_set = fmax(rcloud_max_set, exp(blr_range_model[3][1] + blr_range_model[4][1]));
   return;
 }
 
@@ -552,7 +561,7 @@ void set_blr_range_model4()
   blr_range_model[i++][1] = 3.0;
   //Rin
   blr_range_model[i][0] = log(0.1);
-  blr_range_model[i++][1] = log(parset.tau_max_set);
+  blr_range_model[i++][1] = log(rcloud_max_set);
   //F
   blr_range_model[i][0] = log(1.0);
   blr_range_model[i++][1] = log(1.0e2);
@@ -578,8 +587,7 @@ void set_blr_range_model4()
   blr_range_model[i][0] = log(1.0);
   blr_range_model[i++][1] = log(1.0+10.0);
 
-  rcloud_max_set = fmax(rcloud_max_set, exp(blr_range_model[3][1] + blr_range_model[4][1]));
-
+  //rcloud_max_set = fmax(rcloud_max_set, exp(blr_range_model[3][1] + blr_range_model[4][1]));
   return;
 }
 
@@ -597,7 +605,7 @@ void set_blr_range_model5()
   blr_range_model[i++][1] = 3.0;
   //mu
   blr_range_model[i][0] = log(0.1);
-  blr_range_model[i++][1] = log(parset.tau_max_set);
+  blr_range_model[i++][1] = log(rcloud_max_set);
   //Fin
   blr_range_model[i][0] = 0.0;
   blr_range_model[i++][1] = 1.0;
@@ -653,7 +661,7 @@ void set_blr_range_model5()
   blr_range_model[i][0] = log(1.0);
   blr_range_model[i++][1] = log(1.0+10.0);
 
-  rcloud_max_set = fmax(rcloud_max_set, exp(blr_range_model[2][1] + blr_range_model[4][1]));
+  //rcloud_max_set = fmax(rcloud_max_set, exp(blr_range_model[2][1] + blr_range_model[4][1]));
 
   return;
 }
@@ -673,7 +681,7 @@ void set_blr_range_model6()
   blr_range_model[i++][1] = 3.0;
   //mu
   blr_range_model[i][0] = log(0.1);
-  blr_range_model[i++][1] = log(parset.tau_max_set);
+  blr_range_model[i++][1] = log(rcloud_max_set);
   //beta
   blr_range_model[i][0] = 0.001;
   blr_range_model[i++][1] = 2.0;
@@ -746,7 +754,7 @@ void set_blr_range_model7()
   blr_range_model[i++][1] = 3.0;
   //mu
   blr_range_model[i][0] = log(0.1);
-  blr_range_model[i++][1] = log(parset.tau_max_set);
+  blr_range_model[i++][1] = log(rcloud_max_set);
   //beta
   blr_range_model[i][0] = 0.001;
   blr_range_model[i++][1] = 2.0;
@@ -774,7 +782,7 @@ void set_blr_range_model7()
   blr_range_model[i++][1] = 1.0;
   //mu_un
   blr_range_model[i][0] = log(0.1);
-  blr_range_model[i++][1] = log(parset.tau_max_set);
+  blr_range_model[i++][1] = log(rcloud_max_set);
   //beta_un
   blr_range_model[i][0] = 0.001;
   blr_range_model[i++][1] = 2.0;
