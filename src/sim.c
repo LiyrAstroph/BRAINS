@@ -130,7 +130,7 @@ void sim()
       pm[0] = log(1.0);   // A
       pm[1] = 0.0;        // Ag
       pm[2] = log(4.0);   // mu
-      pm[3] = 0.5;        // beta
+      pm[3] = 0.8;        // beta
       pm[4] = 0.1;        // F
       pm[5] = cos(20.0/180.0*PI); // inc
       pm[6] = 40.0;       // opn
@@ -154,7 +154,7 @@ void sim()
       pm[0] = log(1.0);  //A
       pm[1] = 0.0;       //Ag
       pm[2] = log(4.0);  //mu
-      pm[3] = 0.5;       //beta
+      pm[3] = 0.8;       //beta
       pm[4] = 0.1;       //F
       pm[5] = cos(20.0/180.0*PI);//inc
       pm[6] = 40.0;      //opn
@@ -164,7 +164,7 @@ void sim()
 
       pm[10] = 0.5;      //fsh
       pm[11] = log(8.0); //mu_un
-      pm[12] = 0.5;      //beta_un
+      pm[12] = 1.2;      //beta_un
       pm[13] = 0.1;      //F_un
       pm[14] = 20.0;     //opn_un
 
@@ -177,7 +177,7 @@ void sim()
       pm[21] = log(0.1);
       pm[22] = 0.0;      //theta_rot
       pm[23] = 0.5;      //fellip_un
-      pm[24] = 0.5;      //fflow_un
+      pm[24] = 0.4;      //fflow_un
       pm[25] = log(0.001); // sig_turb
       pm[26] = 0.0;      // parameter for spectral broadening 
       pm[27] = log(1.0); //systematic error
@@ -302,7 +302,7 @@ void sim()
     for(j=0; j<parset.n_vel_recon; j++)
     {
       fprintf(fp, "%f %f %f %f\n", TransV[j]*VelUnit, Tline[i],  
-        (Fline2d[i*parset.n_vel_recon + j] + gsl_ran_ugaussian(gsl_r)*line_error_mean)/line_scale, line_error_mean/line_scale);
+        (Fline2d[i*parset.n_vel_recon + j] + gsl_ran_ugaussian(gsl_r)*line_error_mean*0.3)/line_scale, line_error_mean/line_scale);
     }
 
     fprintf(fp, "\n");

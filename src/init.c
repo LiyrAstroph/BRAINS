@@ -111,7 +111,7 @@ void init()
 
   /* set the range of cloud radial distribution */
   rcloud_min_set = parset.tau_min_set;
-  rcloud_max_set = parset.tau_max_set;
+  rcloud_max_set = parset.tau_max_set/2.0;
 
   if(parset.flag_dim > 0 || parset.flag_dim == -1)
   {
@@ -119,6 +119,8 @@ void init()
     parset.tau_max_set = fmin(parset.tau_max_set, (Tline_data[n_line_data -1] - Tcon_data[0]));
     //too large rcloud_max_set is also nonsense
     rcloud_max_set = fmin(rcloud_max_set, (Tline_data[n_line_data -1] - Tcon_data[0])/2.0);
+
+    rcloud_max_set = parset.tau_max_set/2.0;
   }
 
   if(thistask == roottask)
