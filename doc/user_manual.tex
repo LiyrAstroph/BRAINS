@@ -67,16 +67,30 @@ Institute of High Energy Physics}
 
 \chapter{Installation}
 \section{Third-Party Packages}
-{\brains} requires following thrid-party packages:
+{\brains} requires the following third-party packages:
 \begin{itemize}
- \item GSL.
+ \item {\bf GSL}. GSL is used to generate random numbers, perform interpolation, and calculate some special functions. GSL is available at 
+ \url{https://www.gnu.org/software/gsl}.
  
- GSL is used to 
- \item FFTW
- \item LAPACK
- \item MPICH
+ \item {\bf FFTW}. FFTW is used to implement Gaussian smoothing on the line profiles. FFTW is available at \url{http://fftw.org}.
+ 
+ \item {\bf LAPACK}. LAPACK is used to perform numerical linear algebra calculations, such as matrix operations and Cholesky decomposition.
+ LAPACK is a fortran library. Its C interface is LAPACKE, included in the LAPACK package. One needs to configure the LAPACK installation
+ options to switch on LAPACKE. LAPACK is available at \url{https://netlib.sandia.gov/lapack}.
+ 
+ \item {\bf MPICH}. MPICH is a high performace and widely portable implementation of the Message Passing Interface standard.
+ MPICH is available at \url{http://www.mpich.org}. 
+ 
+ \item {\bf DNest}. DNest is a library to implement diffusive nested sampling. DNest is available at \url{https://github.com/LiyrAstroph/DNest_C}.
 \end{itemize}
+In popular Linux distributions, one can use the system package manager to install the above packages. For example, in Fedora distribution, 
+the corresponding terminal commands are 
+\begin{verbatim}
+ sudo dnf install gsl fftw3 lapack mpich
+\end{verbatim} 
 
+\section{Configure the \texttt{Makefile}}
+To compile {\brains}, one needs first to proporiately configure the \texttt{Makefile}.
 
 \clearpage
 \newpage
