@@ -131,6 +131,7 @@ void from_prior_con(void *model)
   for(i=3; i<4 + parset.flag_trend; i++)
   {
     pm[i] = dnest_randn();
+    wrap(&pm[i], par_range_model[i][0], par_range_model[i][1]);
   }
   for(i=4+parset.flag_trend; i<num_params_var; i++)
   {
@@ -138,7 +139,10 @@ void from_prior_con(void *model)
   }
 
   for(i=0; i<parset.n_con_recon; i++)
+  {
     pm[i+num_params_var] = dnest_randn();
+    wrap(&pm[i], par_range_model[i][0], par_range_model[i][1]);
+  }
 
   for(i=0; i<num_params_var; i++)
   {

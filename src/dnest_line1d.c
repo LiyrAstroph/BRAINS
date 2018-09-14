@@ -275,6 +275,7 @@ void from_prior_line1d(void *model)
   for(i=num_params_blr+3; i<num_params_blr+ 4 + parset.flag_trend; i++)
   {
     pm[i] = dnest_randn();
+    wrap(&pm[i], par_range_model[i][0], par_range_model[i][1]);
   }
   /* different trend in continuum and line */
   for( i = num_params_blr+ 4 + parset.flag_trend; i< num_params_blr + num_params_var; i++)
@@ -284,7 +285,10 @@ void from_prior_line1d(void *model)
   
   /* continuum light curve */
   for(i=0; i<parset.n_con_recon; i++)
+  {
     pm[i+num_params_var+num_params_blr] = dnest_randn();
+    wrap(&pm[i], par_range_model[i][0], par_range_model[i][1]);
+  }
 
   /* cope with fixed parameters. */
   for(i=0; i<num_params_blr + num_params_var; i++)
