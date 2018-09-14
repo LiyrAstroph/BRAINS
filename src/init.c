@@ -146,15 +146,15 @@ void init()
   var_range_model[4][1] =  0.1; 
 
   var_range_model[5][0] = -10.0; /* light curve values */
-  var_range_model[5][1] = 10.0; 
+  var_range_model[5][1] =  10.0; 
 
   
   if(num_params_nlr > 1)
   {
     if(parset.flag_narrowline == 2) /* Gaussian prior */
     {
-      nlr_range_model[0][0] = 10.0;
-      nlr_range_model[0][1] = -10.0;
+      nlr_range_model[0][0] = -10.0;
+      nlr_range_model[0][1] =  10.0;
     }
     else
     {
@@ -163,10 +163,10 @@ void init()
     }
 
     nlr_range_model[1][0] = -10.0;
-    nlr_range_model[1][1] = 10.0;
+    nlr_range_model[1][1] =  10.0;
 
     nlr_range_model[2][0] = -10.0;
-    nlr_range_model[2][1] = 10.0;
+    nlr_range_model[2][1] =  10.0;
   }
 
   set_blr_range_model();
@@ -736,8 +736,8 @@ void set_blr_range_model6()
   blr_range_model[i][0] = log(1.0);
   blr_range_model[i++][1] = log(1.0+10.0);
 
-  //rcloud_max_set = 44.85;
-  //blr_range_model[2][1] = fmin(blr_range_model[2][1], log(rcloud_max_set));
+  rcloud_max_set = 44.85;
+  blr_range_model[2][1] = fmin(blr_range_model[2][1], log(rcloud_max_set));
   return;
 }
 

@@ -237,13 +237,13 @@ void set_par_range_model2d()
   for(i=num_params_blr-num_params_res-num_params_linecenter-1; i<num_params_blr-num_params_linecenter-1; i++)
   {
     par_range_model[i][0] = -10.0;
-    par_range_model[i][1] = 10.0;
+    par_range_model[i][1] =  10.0;
   }
   /* cope with line center */
   for(i=num_params_blr-num_params_linecenter-1; i< num_params_blr-1; i++)
   {
     par_range_model[i][0] = -10.0;
-    par_range_model[i][1] = -10.0;
+    par_range_model[i][1] =  10.0;
   }
   /* the last is systematic error */
   i = num_params_blr-1;
