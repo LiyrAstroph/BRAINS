@@ -484,12 +484,6 @@ void sim_init()
     }
   }
   
-  dTransTau = (parset.tau_max_set - parset.tau_min_set)/(parset.n_tau - 1);
-  for(i=0; i<parset.n_tau; i++)
-  {
-    TransTau[i] = parset.tau_min_set + dTransTau * i;
-  }
-  
   clouds_particles = malloc(parset.num_particles * sizeof(double *));
   clouds_particles_perturb = malloc(parset.num_particles * sizeof(double *));
   for(i=0; i<parset.num_particles; i++)
@@ -499,6 +493,11 @@ void sim_init()
   }
 
   con_q = malloc(nq * sizeof(double));
+
+  tmp_tau = malloc(parset.n_cloud_per_task * sizeof(double));
+  tmp_weight = malloc(parset.n_cloud_per_task * sizeof(double));
+  tmp_vel = malloc(parset.n_cloud_per_task * parset.n_vel_per_cloud * sizeof(double));
+
   return;
 }
 
@@ -524,4 +523,8 @@ void sim_end()
   free(clouds_particles_perturb);
 
   free(con_q);
+
+  free(tmp_tau);
+  free(tmp_weight);
+  free(tmp_vel);
 }

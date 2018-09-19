@@ -213,7 +213,7 @@ void read_parset()
     parset.flag_trend_diff = 0;
     parset.flag_narrowline = 0;
     parset.flag_linecenter = 0;
-    parset.flag_force_update=0;
+    parset.flag_force_update= 0;
 
     
     char fname[200];
@@ -482,7 +482,7 @@ void read_data()
       }
       fclose(fp);
 
-      /* cal mean con error */
+      /* cal mean continuum error */
       con_error_mean = 0.0;
       for(i=0; i<n_con_data; i++)
       {
@@ -503,7 +503,7 @@ void read_data()
   {
     if(thistask == roottask)
     {
-    // line flux data
+      // line flux data
       sprintf(fname, "%s/%s", parset.file_dir, parset.line_file);
       fp = fopen(fname, "r");
       if(fp == NULL)
@@ -606,7 +606,7 @@ void read_data()
     cal_emission_flux();
   }
 
-
+  /* read instrument broadening data */
   if(parset.InstRes < 0.0 && parset.flag_dim == 2)
   {
     if(thistask == roottask)
@@ -615,13 +615,16 @@ void read_data()
       fp = fopen(fname, "r");
       if(fp == NULL)
       {
-        fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+        fprintf(stderr, "# Error: Cannot open file %s.\n", fname);
         exit(-1);
       }
 
       for(i=0; i<n_line_data; i++)
       {
-        fscanf(fp, "%lf %lf\n", &instres_epoch[i], &instres_err_epoch[i]);
+        if(fscanf(fp, "%lf %lf\n", &instres_epoch[i], &instres_err_epoch[i]) < 2)
+        {
+          fprintf(stderr, "Error: Cannot read file %s.\n", fname);
+        }
         //printf("%d %f %f\n", i, instres_epoch[i], instres_err_epoch[i]);
         instres_epoch[i] /= VelUnit;
         instres_err_epoch[i] /= VelUnit;

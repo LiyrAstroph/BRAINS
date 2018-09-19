@@ -231,7 +231,6 @@ void transfun_1d_cloud_direct_model1(const void *pm, int flag_save)
     }
   }
 
-
   /* "which_parameter_update = -1" means that all parameters are updated, 
    * usually occurs at the initial step.
    */
@@ -249,12 +248,6 @@ void transfun_1d_cloud_direct_model1(const void *pm, int flag_save)
         break;
       }
     }
-  }
-
-  /* reset transfer function */
-  for(i=0; i<parset.n_tau; i++)
-  {
-    Trans1D[i] = 0.0;
   }
   
   for(i=0; i<parset.n_cloud_per_task; i++)
@@ -315,24 +308,39 @@ void transfun_1d_cloud_direct_model1(const void *pm, int flag_save)
     z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
 
     dis = r - x;
-
-    //if(dis<parset.tau_min_set || dis>=parset.tau_max_set+dTransTau)
-    //	continue;
-    idt = (dis - parset.tau_min_set)/dTransTau;
-    if(idt < 0)
-      idt = 0;
-    if(idt >= parset.n_tau)
-      idt = parset.n_tau - 1;
-
     weight = 0.5 + k*(x/r);
-    //weight = 0.5 + k * x/sqrt(x*x+y*y);
-    //Trans1D[idt] += pow(1.0/r, 2.0*(1 + gam)) * weight;
-    Trans1D[idt] += weight;
+    tmp_tau[i] = dis;
+    tmp_weight[i] = weight;
 
     if(flag_save && thistask==roottask)
     {
       fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
     }
+  }
+
+  tau_min = tmp_tau[0];
+  tau_max = tmp_tau[0];
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    if(tau_min > tmp_tau[i])
+      tau_min = tmp_tau[i];
+    if(tau_max < tmp_tau[i])
+      tau_max = tmp_tau[i];
+  }
+
+  dTransTau = (tau_max - tau_min)/(parset.n_tau - 1);
+  for(i=0; i<parset.n_tau; i++)
+  {
+    TransTau[i] = tau_min + dTransTau * i;
+    Trans1D[i] = 0.0;
+  }
+
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    dis = tmp_tau[i];
+    idt = (dis - tau_min)/dTransTau;
+    //Trans1D[idt] += pow(1.0/r, 2.0*(1 + gam)) * weight;
+    Trans1D[idt] += tmp_weight[i];
   }
 
   /* normalize transfer function */
@@ -363,7 +371,7 @@ void transfun_1d_cloud_direct_model1(const void *pm, int flag_save)
   {
     fclose(fcloud_out);
   }
-
+  
   return;
 }
 
@@ -378,7 +386,7 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
   double r, phi, dis, Lopn_cos, u;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
   double inc, F, beta, mu, k, a, s, rin, sig;
-  double Lphi, Lthe, L, E, vcloud_max, vcloud_min, linecenter;
+  double Lphi, Lthe, L, E, vcloud_max, vcloud_min, linecenter = 0.0;
   double dV, V, Anorm, weight, rnd;
   double *pmodel = (double *)pm;
   BLRmodel1 *model = (BLRmodel1 *)pm;
@@ -406,12 +414,6 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
   {
     linecenter = pmodel[num_params_blr - num_params_linecenter - 1] * parset.linecenter_err; 
   }
-
-  dV =(transv[1] - transv[0]); /* velocity grid width */
-
-  for(i=0; i<parset.n_tau; i++)
-    for(j=0;j<n_vel;j++)
-      trans2d[i*n_vel+j]=0.0;   // cleanup of transfer function
 
   vcloud_max = -DBL_MAX;
   vcloud_min = DBL_MAX;
@@ -496,17 +498,9 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
     z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
 
     dis = r - x;
-
-    //if(dis< parset.tau_min_set || dis>= parset.tau_max_set + dTransTau)
-    //  continue;
-    idt = (dis - parset.tau_min_set)/dTransTau;
-    if(idt < 0)
-      idt = 0;
-    if(idt >= parset.n_tau)
-      idt = parset.n_tau - 1;
-
     weight = 0.5 + k*(x/r);
-    //weight = 0.5 + k * x/sqrt(x*x+y*y);
+    tmp_tau[i] = dis;
+    tmp_weight[i] = weight;
     
     /* velocity  
      * note that a cloud moves in its orbit plane, whose direction
@@ -566,19 +560,49 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
                 // velocity relative to the observer.
       
       V += linecenter;
-
-      if(V<transv[0] || V>=transv[n_vel-1]+dV)
-        continue;
-
-      idV = (V - transv[0])/dV;
-
-      //trans2d[idt*n_vel + idV] += pow(1.0/r, 2.0*(1 + gam)) * weight;
-      trans2d[idt*n_vel + idV] += weight;
+      tmp_vel[i*parset.n_vel_per_cloud + j] = V;
 
       if(flag_save && thistask==roottask)
       {
         fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx, vy, vz);
       }
+    }
+  }
+
+  tau_min = tmp_tau[0];
+  tau_max = tmp_tau[0];
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    if(tau_min > tmp_tau[i])
+      tau_min = tmp_tau[i];
+    if(tau_max < tmp_tau[i])
+      tau_max = tmp_tau[i];
+  }
+
+  dTransTau = (tau_max - tau_min)/(parset.n_tau - 1);
+  for(i=0; i<parset.n_tau; i++)
+  {
+    TransTau[i] = tau_min + dTransTau * i;
+  }
+
+  dV =(transv[1] - transv[0]); /* velocity grid width */
+  for(i=0; i<parset.n_tau; i++)
+    for(j=0;j<n_vel;j++)
+      trans2d[i*n_vel+j]=0.0;   /* cleanup of transfer function */
+
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    dis = tmp_tau[i];
+    idt = (dis - tau_min)/dTransTau;
+
+    for(j=0; j<parset.n_vel_per_cloud; j++)
+    {
+      V = tmp_vel[i*parset.n_vel_per_cloud + j];
+      if(V<transv[0] || V >= transv[n_vel-1]+dV)
+        continue;
+      idV = (V - transv[0])/dV;
+      //trans2d[idt*n_vel + idV] += pow(1.0/r, 2.0*(1 + gam)) * weight;
+      trans2d[idt*n_vel + idV] += tmp_weight[i];
     }
   }
 
@@ -590,6 +614,7 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
       Anorm += trans2d[i*n_vel+j];
     }
   Anorm *= (dV * dTransTau);
+
   /* check if we get a zero transfer function */
   if(Anorm > 0.0)
   {
@@ -612,12 +637,13 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
       }
     }
   }
-
+  
   if(flag_save && thistask == roottask)
     fclose(fcloud_out);
 
   return;
 }
+
 
 
 /*================================================================
@@ -665,12 +691,6 @@ void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *tra
   {
     linecenter = pmodel[num_params_blr - num_params_linecenter - 1] * parset.linecenter_err; 
   }
-
-  dV =(transv[1] - transv[0]); /* velocity grid width */
-
-  for(i=0; i<parset.n_tau; i++)
-    for(j=0;j<n_vel;j++)
-      trans2d[i*n_vel+j]=0.0;   /* cleanup of transfer function */
 
   vcloud_max = -DBL_MAX;
   vcloud_min = DBL_MAX;
@@ -757,17 +777,10 @@ void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *tra
     z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
 
     dis = r - x;
-
-    //if(dis< parset.tau_min_set || dis>= parset.tau_max_set + dTransTau)
-    //  continue;
-    idt = (dis - parset.tau_min_set)/dTransTau;
-    if(idt < 0)
-      idt = 0;
-    if(idt >= parset.n_tau)
-      idt = parset.n_tau - 1;
-
     weight = 0.5 + k*(x/r);
-    //weight = 0.5 + k * x/sqrt(x*x+y*y);
+    tmp_tau[i] = dis;
+    tmp_weight[i] = weight;
+    
     
     /* velocity  
      * note that a cloud moves in its orbit plane, whose direction
@@ -812,19 +825,49 @@ void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *tra
                 // velocity relative to the observer.
 
       V += linecenter;
-
-      if(V<transv[0] || V>=transv[n_vel-1]+dV)
-        continue;
-
-      idV = (V - transv[0])/dV;
-
-      //trans2d[idt*n_vel + idV] += pow(1.0/r, 2.0*(1 + gam)) * weight;
-      trans2d[idt*n_vel + idV] += weight;
+      tmp_vel[i*parset.n_vel_per_cloud + j] = V;
 
       if(flag_save && thistask==roottask)
       {
         fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx, vy, vz);
       }
+    }
+  }
+
+  tau_min = tmp_tau[0];
+  tau_max = tmp_tau[0];
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    if(tau_min > tmp_tau[i])
+      tau_min = tmp_tau[i];
+    if(tau_max < tmp_tau[i])
+      tau_max = tmp_tau[i];
+  }
+
+  dTransTau = (tau_max - tau_min)/(parset.n_tau - 1);
+  for(i=0; i<parset.n_tau; i++)
+  {
+    TransTau[i] = tau_min + dTransTau * i;
+  }
+  dV =(transv[1] - transv[0]); /* velocity grid width */
+  for(i=0; i<parset.n_tau; i++)
+    for(j=0;j<n_vel;j++)
+      trans2d[i*n_vel+j]=0.0;   /* cleanup of transfer function */
+
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    dis = tmp_tau[i];
+    idt = (dis - tau_min)/dTransTau;
+
+    for(j=0; j<parset.n_vel_per_cloud; j++)
+    {
+      V = tmp_vel[i*parset.n_vel_per_cloud + j];
+      if(V<transv[0] || V>=transv[n_vel-1]+dV)
+        continue;
+      
+      idV = (V - transv[0])/dV;
+      //trans2d[idt*n_vel + idV] += pow(1.0/r, 2.0*(1 + gam)) * weight;
+      trans2d[idt*n_vel + idV] += tmp_weight[i];
     }
   }
 
@@ -849,7 +892,7 @@ void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *tra
   }
   else
   {
-    printf(" Warning, zero transfer function at task %d.\n", thistask);
+    printf(" Warning, zero 2d transfer function at task %d.\n", thistask);
     for(i=0; i<parset.n_tau; i++)
     {
       for(j=0; j<n_vel; j++)
@@ -925,12 +968,6 @@ void transfun_1d_cloud_direct_model3(const void *pm, int flag_save)
       }
     }
   }
-
-  /* reset transfer function */
-  for(i=0; i<parset.n_tau; i++)
-  {
-    Trans1D[i] = 0.0;
-  }
   
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
@@ -994,24 +1031,39 @@ void transfun_1d_cloud_direct_model3(const void *pm, int flag_save)
     z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
 
     dis = r - x;
-
-    //if(dis<parset.tau_min_set || dis>=parset.tau_max_set+dTransTau)
-    //  continue;
-    idt = (dis - parset.tau_min_set)/dTransTau;
-    if(idt < 0)
-      idt = 0;
-    if(idt >= parset.n_tau)
-      idt = parset.n_tau - 1;
-
     weight = 0.5 + k*(x/r);
-    //weight = 0.5 + k * x/sqrt(x*x+y*y);
-    //Trans1D[idt] += pow(1.0/r, 2.0*(1 + gam)) * weight;
-    Trans1D[idt] += weight;
+    tmp_tau[i] = dis;
+    tmp_weight[i] = weight;
 
     if(flag_save && thistask==roottask)
     {
       fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
     }
+  }
+
+  tau_min = tmp_tau[0];
+  tau_max = tmp_tau[0];
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    if(tau_min > tmp_tau[i])
+      tau_min = tmp_tau[i];
+    if(tau_max < tmp_tau[i])
+      tau_max = tmp_tau[i];
+  }
+
+  dTransTau = (tau_max - tau_min)/(parset.n_tau - 1);
+  for(i=0; i<parset.n_tau; i++)
+  {
+    TransTau[i] = tau_min + dTransTau * i;
+    Trans1D[i] = 0.0;
+  }
+
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    dis = tmp_tau[i];
+    idt = (dis - tau_min)/dTransTau;
+    //Trans1D[idt] += pow(1.0/r, 2.0*(1 + gam)) * weight;
+    Trans1D[idt] += tmp_weight[i];
   }
 
   /* normalize transfer function */
@@ -1082,12 +1134,6 @@ void transfun_2d_cloud_direct_model3(const void *pm, double *transv, double *tra
   {
     linecenter = pmodel[num_params_blr - num_params_linecenter - 1] * parset.linecenter_err; 
   }
-
-  dV =(transv[1] - transv[0]); // velocity grid width
-
-  for(i=0; i<parset.n_tau; i++)
-    for(j=0;j<n_vel;j++)
-      trans2d[i*n_vel+j]=0.0;   // cleanup of transfer function
 
   vcloud_max = -DBL_MAX;
   vcloud_min = DBL_MAX;
@@ -1176,17 +1222,9 @@ void transfun_2d_cloud_direct_model3(const void *pm, double *transv, double *tra
     z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
 
     dis = r - x;
-
-    //if(dis< parset.tau_min_set || dis>= parset.tau_max_set + dTransTau)
-    //  continue;
-    idt = (dis - parset.tau_min_set)/dTransTau;
-    if(idt < 0)
-      idt = 0;
-    if(idt >= parset.n_tau)
-      idt = parset.n_tau - 1;
-
     weight = 0.5 + k*(x/r);
-    //weight = 0.5 + k * x/sqrt(x*x+y*y);
+    tmp_tau[i] = dis;
+    tmp_weight[i] = weight;
     
 // velocity  
 // note that a cloud moves in its orbit plane, whose direction
@@ -1233,14 +1271,7 @@ void transfun_2d_cloud_direct_model3(const void *pm, double *transv, double *tra
                 // velocity relative to the observer.
 
       V += linecenter;
-
-      if(V<transv[0] || V>=transv[n_vel-1]+dV)
-        continue;
-
-      idV = (V - transv[0])/dV;
-
-      //trans2d[idt*n_vel + idV] += pow(1.0/r, 2.0*(1 + gam)) * weight;
-      trans2d[idt*n_vel + idV] += weight;
+      tmp_vel[i*parset.n_vel_per_cloud + j] = V;
 
       if(flag_save && thistask==roottask)
       {
@@ -1249,6 +1280,42 @@ void transfun_2d_cloud_direct_model3(const void *pm, double *transv, double *tra
     }
   }
 
+  tau_min = tmp_tau[0];
+  tau_max = tmp_tau[0];
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    if(tau_min > tmp_tau[i])
+      tau_min = tmp_tau[i];
+    if(tau_max < tmp_tau[i])
+      tau_max = tmp_tau[i];
+  }
+
+  dTransTau = (tau_max - tau_min)/(parset.n_tau - 1);
+  for(i=0; i<parset.n_tau; i++)
+  {
+    TransTau[i] = tau_min + dTransTau * i;
+  }
+  dV =(transv[1] - transv[0]); // velocity grid width
+  for(i=0; i<parset.n_tau; i++)
+    for(j=0;j<n_vel;j++)
+      trans2d[i*n_vel+j]=0.0;   // cleanup of transfer function
+
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    dis = tmp_tau[i];
+    idt = (dis - tau_min)/dTransTau;
+
+    for(j=0; j<parset.n_vel_per_cloud; j++)
+    {
+      V = tmp_vel[i*parset.n_vel_per_cloud + j];
+      if(V<transv[0] || V>=transv[n_vel-1]+dV)
+        continue;
+      
+      idV = (V - transv[0])/dV;
+      //trans2d[idt*n_vel + idV] += pow(1.0/r, 2.0*(1 + gam)) * weight;
+      trans2d[idt*n_vel + idV] += tmp_weight[i];
+    }
+  }
   /* normalize transfer function */
   Anorm = 0.0;
   for(i=0; i<parset.n_tau; i++)
@@ -1322,12 +1389,6 @@ void transfun_2d_cloud_direct_model4(const void *pm, double *transv, double *tra
   {
     linecenter = pmodel[num_params_blr - num_params_linecenter - 1] * parset.linecenter_err; 
   }
-
-  dV =(transv[1] - transv[0]); // velocity grid width
-
-  for(i=0; i<parset.n_tau; i++)
-    for(j=0;j<n_vel;j++)
-      trans2d[i*n_vel+j]=0.0;   // cleanup of transfer function
 
   vcloud_max = -DBL_MAX;
   vcloud_min = DBL_MAX;
@@ -1415,17 +1476,9 @@ void transfun_2d_cloud_direct_model4(const void *pm, double *transv, double *tra
     z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
 
     dis = r - x;
-
-    //if(dis< parset.tau_min_set || dis>= parset.tau_max_set + dTransTau)
-    //  continue;
-    idt = (dis - parset.tau_min_set)/dTransTau;
-    if(idt < 0)
-      idt = 0;
-    if(idt >= parset.n_tau)
-      idt = parset.n_tau - 1;
-
     weight = 0.5 + k*(x/r);
-    //weight = 0.5 + k * x/sqrt(x*x+y*y);
+    tmp_tau[i] = dis;
+    tmp_weight[i] = weight;
     
 // velocity  
 // note that a cloud moves in its orbit plane, whose direction
@@ -1472,14 +1525,7 @@ void transfun_2d_cloud_direct_model4(const void *pm, double *transv, double *tra
                 // velocity relative to the observer.
 
       V += linecenter;
-
-      if(V<transv[0] || V>=transv[n_vel-1]+dV)
-        continue;
-
-      idV = (V - transv[0])/dV;
- 
-      //trans2d[idt*n_vel + idV] += pow(1.0/r, 2.0*(1 + gam)) * weight;
-      trans2d[idt*n_vel + idV] += weight;
+      tmp_vel[i*parset.n_vel_per_cloud + j] = V;
 
       if(flag_save && thistask==roottask)
       {
@@ -1488,6 +1534,42 @@ void transfun_2d_cloud_direct_model4(const void *pm, double *transv, double *tra
     }
   }
 
+  tau_min = tmp_tau[0];
+  tau_max = tmp_tau[0];
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    if(tau_min > tmp_tau[i])
+      tau_min = tmp_tau[i];
+    if(tau_max < tmp_tau[i])
+      tau_max = tmp_tau[i];
+  }
+
+  dTransTau = (tau_max - tau_min)/(parset.n_tau - 1);
+  for(i=0; i<parset.n_tau; i++)
+  {
+    TransTau[i] = tau_min + dTransTau * i;
+  }
+  dV =(transv[1] - transv[0]); // velocity grid width
+  for(i=0; i<parset.n_tau; i++)
+    for(j=0;j<n_vel;j++)
+      trans2d[i*n_vel+j]=0.0;   // cleanup of transfer function
+
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    dis = tmp_tau[i];
+    idt = (dis - tau_min)/dTransTau;
+
+    for(j=0; j<parset.n_vel_per_cloud; j++)
+    {
+      V = tmp_vel[i*parset.n_vel_per_cloud + j];
+      if(V<transv[0] || V>=transv[n_vel-1]+dV)
+        continue;
+      
+      idV = (V - transv[0])/dV;
+      //trans2d[idt*n_vel + idV] += pow(1.0/r, 2.0*(1 + gam)) * weight;
+      trans2d[idt*n_vel + idV] += tmp_weight[i];
+    }
+  }
   /* normalize transfer function */
   Anorm = 0.0;
   for(i=0; i<parset.n_tau; i++)
@@ -1592,12 +1674,6 @@ void transfun_1d_cloud_direct_model5(const void *pm, int flag_save)
       }
     }
   }
-
-  /* reset transfer function */
-  for(i=0; i<parset.n_tau; i++)
-  {
-    Trans1D[i] = 0.0;
-  }
   
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
@@ -1668,25 +1744,39 @@ void transfun_1d_cloud_direct_model5(const void *pm, int flag_save)
     z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
 
     dis = r - x;
-
-    //if(dis<parset.tau_min_set || dis>=parset.tau_max_set+dTransTau)
-    //  continue;
-    idt = (dis - parset.tau_min_set)/dTransTau;
-
-    if(idt < 0)
-      idt = 0;
-    if(idt >= parset.n_tau)
-      idt = parset.n_tau - 1;
-
     weight = 0.5 + k*(x/r);
-    //weight = 0.5 + k * x/sqrt(x*x+y*y);
-    //Trans1D[idt] += pow(1.0/r, 2.0*(1 + gam)) * weight;
-    Trans1D[idt] += weight;
+    tmp_tau[i] = dis;
+    tmp_weight[i] = weight;
 
     if(flag_save && thistask==roottask)
     {
       fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
     }
+  }
+
+  tau_min = tmp_tau[0];
+  tau_max = tmp_tau[0];
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    if(tau_min > tmp_tau[i])
+      tau_min = tmp_tau[i];
+    if(tau_max < tmp_tau[i])
+      tau_max = tmp_tau[i];
+  }
+
+  dTransTau = (tau_max - tau_min)/(parset.n_tau - 1);
+  for(i=0; i<parset.n_tau; i++)
+  {
+    TransTau[i] = tau_min + dTransTau * i;
+    Trans1D[i] = 0.0;
+  }
+
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    dis = tmp_tau[i];
+    idt = (dis - tau_min)/dTransTau;
+    //Trans1D[idt] += pow(1.0/r, 2.0*(1 + gam)) * weight;
+    Trans1D[idt] += tmp_weight[i];
   }
 
   /* normalize transfer function */
@@ -1771,12 +1861,6 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
   {
     linecenter = pmodel[num_params_blr - num_params_linecenter - 1] * parset.linecenter_err; 
   }
-
-  dV =(transv[1] - transv[0]); // velocity grid width
-
-  for(i=0; i<parset.n_tau; i++)
-    for(j=0;j<n_vel;j++)
-      trans2d[i*n_vel+j]=0.0;   // cleanup of transfer function
 
   vcloud_max = -DBL_MAX;
   vcloud_min = DBL_MAX;
@@ -1878,18 +1962,9 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
     z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
 
     dis = r - x;
-
-    //if(dis<parset.tau_min_set || dis>=parset.tau_max_set+dTransTau)
-    //  continue;
-    idt = (dis - parset.tau_min_set)/dTransTau;
-    if(idt < 0)
-      idt = 0;
-    if(idt >= parset.n_tau)
-      idt = parset.n_tau - 1;
-
     weight = 0.5 + k*(x/r);
-    //weight = 0.5 + k * x/sqrt(x*x+y*y);
-    //Trans1D[idt] += pow(1.0/r, 2.0*(1 + gam)) * weight;
+    tmp_tau[i] = dis;
+    tmp_weight[i] = weight;
 
     Vkep = sqrt(mbh/r);
 
@@ -1953,19 +2028,49 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
       V = (g-1.0)*C_Unit;
 
       V += linecenter;
-
-      if(V<transv[0] || V>=transv[n_vel-1]+dV)
-        continue;
-
-      idV = (V - transv[0])/dV;
-
-      //trans2d[idt*n_vel + idV] += pow(1.0/r, 2.0*(1 + gam)) * weight;
-      trans2d[idt*n_vel + idV] += weight;
+      tmp_vel[i*parset.n_vel_per_cloud + j] = V;
 
       if(flag_save && thistask==roottask)
       {
         fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx, vy, vz);
       }
+    }
+  }
+
+  tau_min = tmp_tau[0];
+  tau_max = tmp_tau[0];
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    if(tau_min > tmp_tau[i])
+      tau_min = tmp_tau[i];
+    if(tau_max < tmp_tau[i])
+      tau_max = tmp_tau[i];
+  }
+
+  dTransTau = (tau_max - tau_min)/(parset.n_tau - 1);
+  for(i=0; i<parset.n_tau; i++)
+  {
+    TransTau[i] = tau_min + dTransTau * i;
+  }
+  dV =(transv[1] - transv[0]); // velocity grid width
+  for(i=0; i<parset.n_tau; i++)
+    for(j=0;j<n_vel;j++)
+      trans2d[i*n_vel+j]=0.0;   // cleanup of transfer function
+
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    dis = tmp_tau[i];
+    idt = (dis - tau_min)/dTransTau;
+
+    for(j=0; j<parset.n_vel_per_cloud; j++)
+    {
+      V = tmp_vel[i*parset.n_vel_per_cloud + j];
+      if(V<transv[0] || V>=transv[n_vel-1]+dV)
+        continue;
+      
+      idV = (V - transv[0])/dV;
+      //trans2d[idt*n_vel + idV] += pow(1.0/r, 2.0*(1 + gam)) * weight;
+      trans2d[idt*n_vel + idV] += tmp_weight[i];
     }
   }
 
@@ -2042,7 +2147,7 @@ void transfun_1d_cloud_direct_model6(const void *pm, int flag_save)
   s = mu/a;
   rin=mu*F;
   sig=(1.0-F)*s;
-  
+
   if(flag_save && thistask == roottask)
   {
     char fname[200];
@@ -2069,12 +2174,6 @@ void transfun_1d_cloud_direct_model6(const void *pm, int flag_save)
         break;
       }
     }
-  }
-
-  /* reset transfer function */
-  for(i=0; i<parset.n_tau; i++)
-  {
-    Trans1D[i] = 0.0;
   }
   
   for(i=0; i<parset.n_cloud_per_task; i++)
@@ -2135,24 +2234,39 @@ void transfun_1d_cloud_direct_model6(const void *pm, int flag_save)
     z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
 
     dis = r - x;
-
-    //if(dis<parset.tau_min_set || dis>=parset.tau_max_set+dTransTau)
-    //  continue;
-    idt = (dis - parset.tau_min_set)/dTransTau;
-    if(idt < 0)
-      idt = 0;
-    if(idt >= parset.n_tau)
-      idt = parset.n_tau - 1;
-
-    weight = 0.5 + k*(x/r);
-    //weight = 0.5 + k * x/sqrt(x*x+y*y);
-    //Trans1D[idt] += pow(1.0/r, 2.0*(1 + gam)) * weight;
-    Trans1D[idt] += weight;
+    weight = 0.5 + k*(x/r);    
+    tmp_tau[i] = dis;
+    tmp_weight[i] = weight;
 
     if(flag_save && thistask==roottask)
     {
       fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
     }
+  }
+
+  tau_min = tmp_tau[0];
+  tau_max = tmp_tau[0];
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    if(tau_min > tmp_tau[i])
+      tau_min = tmp_tau[i];
+    if(tau_max < tmp_tau[i])
+      tau_max = tmp_tau[i];
+  }
+
+  dTransTau = (tau_max - tau_min)/(parset.n_tau - 1);
+  for(i=0; i<parset.n_tau; i++)
+  {
+    TransTau[i] = tau_min + dTransTau * i;
+    Trans1D[i] = 0.0;
+  }
+
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    dis = tmp_tau[i];
+    idt = (dis - tau_min)/dTransTau;
+    //Trans1D[idt] += pow(1.0/r, 2.0*(1 + gam)) * weight;
+    Trans1D[idt] += tmp_weight[i];
   }
 
   /* normalize transfer function */
@@ -2172,7 +2286,7 @@ void transfun_1d_cloud_direct_model6(const void *pm, int flag_save)
   }
   else
   {
-    printf(" Warning, zero transfer function at task %d.\n", thistask);
+    printf(" Warning, zero 1d transfer function at task %d.\n", thistask);
     for(i=0; i<parset.n_tau; i++)
     {
       Trans1D[i] = 0.0;
@@ -2183,7 +2297,6 @@ void transfun_1d_cloud_direct_model6(const void *pm, int flag_save)
   {
     fclose(fcloud_out);
   }
-
   return;
 }
 
@@ -2196,7 +2309,7 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
   int i, j, idt, idV, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb, vcloud_min, vcloud_max;
-  double V, dV, rhoV, theV, Vr, Vph, Vkep, Rs, g, Vt;
+  double V, dV, rhoV, theV, Vr, Vph, Vkep, Rs, g;
   double inc, F, beta, mu, k, gam, xi, a, s, sig, rin;
   double mbh, fellip, fflow, sigr_circ, sigthe_circ, sigr_rad, sigthe_rad, theta_rot, sig_turb;
   double Lphi, Lthe, linecenter=0.0;
@@ -2234,12 +2347,6 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
   {
     linecenter = pmodel[num_params_blr - num_params_linecenter - 1] * parset.linecenter_err; 
   }
-  
-  dV =(transv[1] - transv[0]); // velocity grid width
-
-  for(i=0; i<parset.n_tau; i++)
-    for(j=0;j<n_vel;j++)
-      trans2d[i*n_vel+j]=0.0;   // cleanup of transfer function
 
   vcloud_max = -DBL_MAX;
   vcloud_min = DBL_MAX;
@@ -2289,6 +2396,7 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
         if(nc > 1000)
         {
           printf("# Error, too many tries in generating ridial location of clouds.\n");
+          printf("%f %f %f %f %f \n", F, beta, mu, rcloud_max_set, rcloud_min_set);
           exit(0);
         }
         rnd = gsl_ran_gamma(gsl_r, a, 1.0);
@@ -2333,17 +2441,9 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
     z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
 
     dis = r - x;
-
-    //if(dis<parset.tau_min_set || dis>=parset.tau_max_set+dTransTau)
-    //  continue;
-    idt = (dis - parset.tau_min_set)/dTransTau;
-    if(idt < 0)
-      idt = 0;
-    if(idt >= parset.n_tau)
-      idt = parset.n_tau - 1;
-
     weight = 0.5 + k*(x/r);
-    //weight = 0.5 + k * x/sqrt(x*x+y*y);
+    tmp_tau[i] = dis;
+    tmp_weight[i] = weight;
 
     Vkep = sqrt(mbh/r);
     
@@ -2405,17 +2505,10 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
       V = (g-1.0)*C_Unit;
 
       V += linecenter;
+      tmp_vel[i*parset.n_vel_per_cloud + j] = V;
 
       vcloud_max = fmax(V, vcloud_max);
       vcloud_min = fmin(V, vcloud_min);
-      
-      if(V<transv[0] || V>=transv[n_vel-1]+dV)
-        continue;
-
-      idV = (V - transv[0])/dV;
-
-      //trans2d[idt*n_vel + idV] += pow(1.0/r, 2.0*(1 + gam)) * weight;
-      trans2d[idt*n_vel + idV] += weight;
 
       if(flag_save && thistask==roottask)
       {
@@ -2423,6 +2516,45 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
       }
     }
   }
+
+  tau_min = tmp_tau[0];
+  tau_max = tmp_tau[0];
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    if(tau_min > tmp_tau[i])
+      tau_min = tmp_tau[i];
+    if(tau_max < tmp_tau[i])
+      tau_max = tmp_tau[i];
+  }
+
+  dTransTau = (tau_max - tau_min)/(parset.n_tau - 1);
+  for(i=0; i<parset.n_tau; i++)
+  {
+    TransTau[i] = tau_min + dTransTau * i;
+  }
+  dV =(transv[1] - transv[0]); // velocity grid width
+  for(i=0; i<parset.n_tau; i++)
+    for(j=0;j<n_vel;j++)
+      trans2d[i*n_vel+j]=0.0;   // cleanup of transfer function
+
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    dis = tmp_tau[i];
+    idt = (dis - tau_min)/dTransTau;
+
+    for(j=0; j<parset.n_vel_per_cloud; j++)
+    {
+      V = tmp_vel[i*parset.n_vel_per_cloud + j];
+      if(V<transv[0] || V>=transv[n_vel-1]+dV)
+        continue;
+
+      idV = (V - transv[0])/dV;
+      //trans2d[idt*n_vel + idV] += pow(1.0/r, 2.0*(1 + gam)) * weight;
+      trans2d[idt*n_vel + idV] += tmp_weight[i];
+    }
+    
+  }
+
   /* normalize transfer function */
   Anorm = 0.0;
   for(i=0; i<parset.n_tau; i++)
@@ -2444,7 +2576,7 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
   }
   else
   {
-    printf(" Warning, zero transfer function at task %d.\n", thistask);
+    printf(" Warning, zero 2d transfer function at task %d.\n", thistask);
     for(i=0; i<parset.n_tau; i++)
     {
       for(j=0; j<n_vel; j++)
@@ -2685,24 +2817,39 @@ void transfun_1d_cloud_direct_model7(const void *pm, int flag_save)
     z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
 
     dis = r - x;
-
-    //if(dis<parset.tau_min_set || dis>=parset.tau_max_set+dTransTau)
-    //  continue;
-    idt = (dis - parset.tau_min_set)/dTransTau;
-    if(idt < 0)
-      idt = 0;
-    if(idt >= parset.n_tau)
-      idt = parset.n_tau - 1;
-
     weight = 0.5 + k*(x/r);
-    //weight = 0.5 + k * x/sqrt(x*x+y*y);
-    //Trans1D[idt] += pow(1.0/r, 2.0*(1 + gam)) * weight;
-    Trans1D[idt] += weight;
+    tmp_tau[i] = dis;
+    tmp_weight[i] = weight;
 
     if(flag_save && thistask==roottask)
     {
       fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
     }
+  }
+
+  tau_min = tmp_tau[0];
+  tau_max = tmp_tau[0];
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    if(tau_min > tmp_tau[i])
+      tau_min = tmp_tau[i];
+    if(tau_max < tmp_tau[i])
+      tau_max = tmp_tau[i];
+  }
+
+  dTransTau = (tau_max - tau_min)/(parset.n_tau - 1);
+  for(i=0; i<parset.n_tau; i++)
+  {
+    TransTau[i] = tau_min + dTransTau * i;
+    Trans1D[i] = 0.0;
+  }
+
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    dis = tmp_tau[i];
+    idt = (dis - tau_min)/dTransTau;
+    //Trans1D[idt] += pow(1.0/r, 2.0*(1 + gam)) * weight;
+    Trans1D[idt] += tmp_weight[i];
   }
 
   /* normalize transfer function */
@@ -2722,7 +2869,7 @@ void transfun_1d_cloud_direct_model7(const void *pm, int flag_save)
   }
   else
   {
-    printf(" Warning, zero transfer function at task %d.\n", thistask);
+    printf(" Warning, zero 1d transfer function at task %d.\n", thistask);
     for(i=0; i<parset.n_tau; i++)
     {
       Trans1D[i] = 0.0;
@@ -2784,12 +2931,6 @@ void transfun_2d_cloud_direct_model7(const void *pm, double *transv, double *tra
   {
     linecenter = pmodel[num_params_blr - num_params_linecenter - 1] * parset.linecenter_err; 
   }
-
-  dV =(transv[1] - transv[0]); // velocity grid width
-
-  for(i=0; i<parset.n_tau; i++)
-    for(j=0;j<n_vel;j++)
-      trans2d[i*n_vel+j]=0.0;   // cleanup of transfer function
 
   vcloud_max = -DBL_MAX;
   vcloud_min = DBL_MAX;
@@ -2881,19 +3022,9 @@ void transfun_2d_cloud_direct_model7(const void *pm, double *transv, double *tra
     z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
 
     dis = r - x;
-
-    //if(dis<parset.tau_min_set || dis>=parset.tau_max_set+dTransTau)
-    //  continue;
-    idt = (dis - parset.tau_min_set)/dTransTau;
-    if(idt < 0)
-      idt = 0;
-    if(idt >= parset.n_tau)
-      idt = parset.n_tau - 1;
-
     weight = 0.5 + k*(x/r);
-    //weight = 0.5 + k * x/sqrt(x*x+y*y);
-    //Trans1D[idt] += pow(1.0/r, 2.0*(1 + gam)) * weight;
-
+    tmp_tau[i] = dis;
+    tmp_weight[i] = weight;
 
     Vkep = sqrt(mbh/r);
 
@@ -2957,14 +3088,7 @@ void transfun_2d_cloud_direct_model7(const void *pm, double *transv, double *tra
       V = (g-1.0)*C_Unit;
 
       V += linecenter;
-
-      if(V<transv[0] || V>=transv[n_vel-1]+dV)
-        continue;
-
-      idV = (V - transv[0])/dV;
-
-      //trans2d[idt*n_vel + idV] += pow(1.0/r, 2.0*(1 + gam)) * weight;
-      trans2d[idt*n_vel + idV] += weight;
+      tmp_vel[i*parset.n_vel_per_cloud + j] = V;
 
       if(flag_save && thistask==roottask)
       {
@@ -3045,18 +3169,9 @@ void transfun_2d_cloud_direct_model7(const void *pm, double *transv, double *tra
     z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
 
     dis = r - x;
-
-    //if(dis<parset.tau_min_set || dis>=parset.tau_max_set+dTransTau)
-    //  continue;
-    idt = (dis - parset.tau_min_set)/dTransTau;
-    if(idt < 0)
-      idt = 0;
-    if(idt >= parset.n_tau)
-      idt = parset.n_tau - 1;
-
     weight = 0.5 + k*(x/r);
-    //weight = 0.5 + k * x/sqrt(x*x+y*y);
-    //Trans1D[idt] += pow(1.0/r, 2.0*(1 + gam)) * weight;
+    tmp_tau[i] = dis;
+    tmp_weight[i] = weight;
 
 
     Vkep = sqrt(mbh/r);
@@ -3122,18 +3237,49 @@ void transfun_2d_cloud_direct_model7(const void *pm, double *transv, double *tra
 
       V += linecenter;
 
-      if(V<transv[0] || V>=transv[n_vel-1]+dV)
-        continue;
-
-      idV = (V - transv[0])/dV;
-
-      //trans2d[idt*n_vel + idV] += pow(1.0/r, 2.0*(1 + gam)) * weight;
-      trans2d[idt*n_vel + idV] += weight;
+      tmp_vel[i*parset.n_vel_per_cloud + j] = V;
 
       if(flag_save && thistask==roottask)
       {
         fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx, vy, vz);
       }
+    }
+  }
+
+  tau_min = tmp_tau[0];
+  tau_max = tmp_tau[0];
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    if(tau_min > tmp_tau[i])
+      tau_min = tmp_tau[i];
+    if(tau_max < tmp_tau[i])
+      tau_max = tmp_tau[i];
+  }
+
+  dTransTau = (tau_max - tau_min)/(parset.n_tau - 1);
+  for(i=0; i<parset.n_tau; i++)
+  {
+    TransTau[i] = tau_min + dTransTau * i;
+  }
+  dV =(transv[1] - transv[0]); // velocity grid width
+  for(i=0; i<parset.n_tau; i++)
+    for(j=0;j<n_vel;j++)
+      trans2d[i*n_vel+j]=0.0;   // cleanup of transfer function
+
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    dis = tmp_tau[i];
+    idt = (dis - tau_min)/dTransTau;
+
+    for(j=0; j<parset.n_vel_per_cloud; j++)
+    {
+      V = tmp_vel[i*parset.n_vel_per_cloud + j];
+      if(V<transv[0] || V>=transv[n_vel-1]+dV)
+        continue;
+      
+      idV = (V - transv[0])/dV;
+      //trans2d[idt*n_vel + idV] += pow(1.0/r, 2.0*(1 + gam)) * weight;
+      trans2d[idt*n_vel + idV] += tmp_weight[i];
     }
   }
 
@@ -3158,7 +3304,7 @@ void transfun_2d_cloud_direct_model7(const void *pm, double *transv, double *tra
   }
   else
   {
-    printf(" Warning, zero transfer function at task %d.\n", thistask);
+    printf(" Warning, zero 2d transfer function at task %d.\n", thistask);
     for(i=0; i<parset.n_tau; i++)
     {
       for(j=0; j<n_vel; j++)

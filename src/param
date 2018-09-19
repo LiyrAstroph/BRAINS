@@ -5,13 +5,13 @@
 FileDir                     /home/liyropt/Projects/GIT/BRAINS
 %FileDir                     /ihepbatch/mbhd01/user/liyanrong/RM/Test/mrk493
 
-FlagDim                     2                           % -1, simulation; 0, only continuum; 1, 1d line; 2, 2d line
-FlagBLRModel                6                           % 1, 2, 3, 4, BLR model type
+FlagDim                     -1                           % -1, simulation; 0, only continuum; 1, 1d line; 2, 2d line
+FlagBLRModel                1                           % 1, 2, 3, 4, BLR model type
 %===============================
 % data file
-ContinuumFile               data/arp151_con.txt          % file for contnnum data
-LineFile                    data/arp151_hb.txt           % file for line data
-Line2DFile                  data/arp151_hb2d.txt         % file for line 2d data
+ContinuumFile               data/mrk142_con.txt          % file for contnnum data
+LineFile                    data/mrk142_hb.txt           % file for line data
+Line2DFile                  data/mrk142_hb2d.txt         % file for line 2d data
 %===============================
 % reconstruction
 NConRecon                   200                         % number of points for continuum reconstruction
@@ -20,22 +20,20 @@ FlagTrendDiff               0                           % 0, no difference; 1, a
 ConConstructFileOut         data/pcon.txt               % output filename
 
 FlagFixVar                  0                           % 0, not fixed; 1, fix the parameters of variation from continuum data.
-NLineRecon                  50                          % number of points for line reconstruction along time axis
+NLineRecon                  100                          % number of points for line reconstruction along time axis
 LineConstructFileOut        data/pline.txt              % output filename
 TranFileOut                 data/tran.txt               % output filename for 1d transfer function
 
-NVelRecon                   100                          % number of points for line reconstruction along velocity axis
+NVelRecon                   42                          % number of points for line reconstruction along velocity axis
 Line2DConstructFileOut      data/pline2d.txt            % output filename  
 Line2DDataConstructFileOut  data/pline2d_data.txt       % output filename for 2d transfer function at points same with data
 Tran2DFileOut               data/tran2d.txt             % output filename for 2d transfer function
 Tran2DDataFileOut           data/tran2d_data.txt             % output filename for 2d transfer function
 
-NCloudPerCore               5000                        % number of clouds per task
+NCloudPerCore               1000                        % number of clouds per task
 NVPerCloud                  5                           % number of velocities per cloud
 
 NTau                        200                         % number of time-lag points calculated in transfer function
-TauMinSet                   0.0                         % minimum time lag calculated
-TauMaxSet                   50.0                        % maximum time lag calculated
 
 FlagCloudsOut               1                           % 1, save clouds at the last run; 0, do not save
 CloudsFileOut               data/clouds.txt             % output filename for clouds 
@@ -47,15 +45,15 @@ FlagCloudsForceUpdate       0                           % default 0; 0, not upda
 
 %===============================
 % spectral broadening
-InstRes                     -1                         % instrument resolution, in km/s
+InstRes                     220                            % instrument resolution, in km/s
                                                           % if seting to <0.0, the broadening is epoch dependent
-InstResErr                  10                            % in km/s
+InstResErr                  34.0                            % in km/s
 InstResFile                 data/arp151_broaden.txt       %
 
 %===============================
 % narrow-line component
 % use a gaussian to model the narrow-line component
-FlagNarrowLine              3                           % 0, no narrow line; 
+FlagNarrowLine              0                           % 0, no narrow line; 
                                                         % 1, add fixed narrow line; 
                                                         % 2, add Gaussian priors for narrow line; 
                                                         % 3, add logarithmic prior for narrow line
@@ -64,7 +62,7 @@ FluxNarrowLine              1.5                         % flux of narrow line
 FluxNarrowLineErr           0.50                        % flux error of narrow line
 WidthNarrowLine             94.0                        % width km/s
 WidthNarrowLineErr          4.4                         % width error
-ShiftNarrowLine             0.0                         % shift, km/s, with respect to broad line center.  
+ShiftNarrowLine             10.0                         % shift, km/s, with respect to broad line center.  
 ShiftNarrowLineErr          0.0                         % shift error
 
 %===============================
@@ -77,5 +75,5 @@ LineCenterErr               62.0                        % km/s
 % 1: fixed; 0: not fixed;
 % values are separated by ":"
 
-BLRParFix                   0100000000
+BLRParFix                   0000000000
 BLRParFixVal                0.0           

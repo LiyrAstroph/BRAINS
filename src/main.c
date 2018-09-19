@@ -48,7 +48,7 @@ int main(int argc, char **argv)
     parset.flag_restart = 0;
     parset.flag_sample_info = 0;
     parset.flag_temp = 0;
-    parset.flag_exam_prior=0;
+    parset.flag_exam_prior= 0;
 
     while( (opt = getopt(argc, argv, "pt:rceh")) != -1)
     {

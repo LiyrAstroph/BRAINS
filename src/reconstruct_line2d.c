@@ -539,12 +539,6 @@ void reconstruct_line2d_init()
     Tline[i] = Tline_min + i*dT;
   }
 
-  dTransTau = (parset.tau_max_set - parset.tau_min_set)/(parset.n_tau - 1);
-  for(i=0; i<parset.n_tau; i++)
-  {
-    TransTau[i] = parset.tau_min_set + dTransTau * i;
-  }
-
   double vel_max_set = Vline_data[n_vel_data -1], vel_min_set = Vline_data[0];
   double dVel = (vel_max_set- vel_min_set)/(parset.n_vel_recon -1.0);
 
@@ -610,6 +604,10 @@ void reconstruct_line2d_init()
     con_q_particles[i] = malloc(nq * sizeof(double));
     con_q_particles_perturb[i] = malloc(nq* sizeof(double));
   }
+
+  tmp_tau = malloc(parset.n_cloud_per_task * sizeof(double));
+  tmp_weight = malloc(parset.n_cloud_per_task * sizeof(double));
+  tmp_vel = malloc(parset.n_cloud_per_task * parset.n_vel_per_cloud * sizeof(double));
   return;
 }
 
@@ -677,6 +675,10 @@ void reconstruct_line2d_end()
   free(par_range_model);
 
   free(params_radial_samp);
+  
+  free(tmp_tau);
+  free(tmp_weight);
+  free(tmp_vel);
   
   return;
 }

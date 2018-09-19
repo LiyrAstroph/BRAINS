@@ -393,12 +393,6 @@ void reconstruct_line1d_init()
     Tline[i] = Tline_min + i*dT;
   }
 
-  dTransTau = (parset.tau_max_set - parset.tau_min_set)/(parset.n_tau - 1);
-  for(i=0; i<parset.n_tau; i++)
-  {
-    TransTau[i] = parset.tau_min_set + dTransTau * i;
-  }
-
   sprintf(dnest_options_file, "%s/%s", parset.file_dir, "src/OPTIONS1D");
   if(thistask == roottask)
   {
@@ -458,6 +452,8 @@ void reconstruct_line1d_init()
     con_q_particles_perturb[i] = malloc(nq* sizeof(double));
   }
 
+  tmp_tau = malloc(parset.n_cloud_per_task * sizeof(double));
+  tmp_weight = malloc(parset.n_cloud_per_task * sizeof(double));
   return;
 }
 
@@ -522,6 +518,9 @@ void reconstruct_line1d_end()
   free(par_range_model);
 
   free(params_radial_samp);
+
+  free(tmp_tau);
+  free(tmp_weight);
 
   if(thistask == roottask)
   {
