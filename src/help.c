@@ -58,20 +58,23 @@ void print_help()
   printf("\tFILE\n");
   printf("\t\tparameter file.\n");
 
-  printf("\t-h\n");
+  printf("\t" RED BOLD "-h\n" NONE);
   printf("\t\tprint help information.\n");
 
-  printf("\t-p\n");
+  printf("\t" RED BOLD "-p\n" NONE);
   printf("\t\tonly do posterior processing.\n");
 
-  printf("\t-r\n");
+  printf("\t" RED BOLD "-r\n" NONE);
   printf("\t\trestart from the backup.\n");
 
-  printf("\t-t\n");
+  printf("\t" RED BOLD "-t\n" NONE);
   printf("\t\tspecify tempering temperature in posterior processing.\n");
 
-  printf("\t-c\n");
+  printf("\t" RED BOLD "-c\n" NONE);
   printf("\t\tonly do posterior processing, but recalculate the posterior sample information.\n");
+
+  printf("\t" RED BOLD "-e\n" NONE);
+  printf("\t\t examine the priors.\n");
 
   printf("\n\n");
   return;
