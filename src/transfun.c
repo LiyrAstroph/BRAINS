@@ -2276,19 +2276,9 @@ void transfun_1d_cloud_direct_model7(const void *pm, int flag_save)
     z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
 
     dis = r - x;
-
-    //if(dis<parset.tau_min_set || dis>=parset.tau_max_set+dTransTau)
-    //  continue;
-    idt = (dis - parset.tau_min_set)/dTransTau;
-    if(idt < 0)
-      idt = 0;
-    if(idt >= parset.n_tau)
-      idt = parset.n_tau - 1;
-
     weight = 0.5 + k*(x/r);
-    //weight = 0.5 + k * x/sqrt(x*x+y*y);
-    //Trans1D[idt] += pow(1.0/r, 2.0*(1 + gam)) * weight;
-    Trans1D[idt] += weight;
+    tmp_tau[i] = dis;
+    tmp_weight[i] = weight;
 
     if(flag_save && thistask==roottask)
     {
