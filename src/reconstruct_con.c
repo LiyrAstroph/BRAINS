@@ -679,9 +679,18 @@ void reconstruct_con_init()
   double dT, Tspan;
 
   Tspan = Tcon_data[n_con_data -1] - Tcon_data[0];
+
   /* set time array for continuum */
-  Tcon_min = Tcon_data[0] - fmax(0.05*Tspan, 10.0);
+  if(parset.time_back > 0.0)
+    Tcon_min = Tcon_data[0] - parset.time_back; 
+  else
+    Tcon_min = Tcon_data[0] - fmax(0.05*Tspan, 10.0);
+
   Tcon_max = Tcon_data[n_con_data-1] + fmax(0.05*Tspan, 10.0);
+
+  if(thistask == 0)
+    printf("Tcon_min_max: %f %f\n", Tcon_min - Tcon_data[0], Tcon_max - Tcon_data[n_con_data-1]);
+
   dT = (Tcon_max - Tcon_min)/(parset.n_con_recon -1);
   
   for(i=0; i<parset.n_con_recon; i++)

@@ -82,7 +82,7 @@ typedef struct
   int n_con_recon, n_line_recon, n_vel_recon;
 
   int n_tau;
-  double tau_min_set, tau_max_set;
+  double rcloud_max, time_back;
 
   int flag_blrmodel;
 

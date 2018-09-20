@@ -114,13 +114,13 @@ void read_parset()
     addr[nt] = &parset.n_tau;
     id[nt++] = INT;
 
-    /*strcpy(tag[nt], "TauMinSet");
-    addr[nt] = &parset.tau_min_set;
+    strcpy(tag[nt], "RCloudMax");
+    addr[nt] = &parset.rcloud_max;
     id[nt++] = DOUBLE;
 
-    strcpy(tag[nt], "TauMaxSet");
-    addr[nt] = &parset.tau_max_set;
-    id[nt++] = DOUBLE;*/
+    strcpy(tag[nt], "TimeBack");
+    addr[nt] = &parset.time_back;
+    id[nt++] = DOUBLE;
 
     strcpy(tag[nt], "FlagCloudsOut");
     addr[nt] = &parset.flag_save_clouds;

@@ -417,7 +417,11 @@ void sim_init()
     Tspan = Tcon_data[n_con_data -1] - Tcon_data[0];
   
   /* set time array for continuum */
-    Tcon_min = Tcon_data[0] - fmax(0.05*Tspan, fmin(Tspan, parset.tau_max_set));
+    if(parset.time_back > 0.0)
+      Tcon_min = Tcon_data[0] - parset.time_back;
+    else
+      Tcon_min = Tcon_data[0] - 0.5*Tspan;
+    
     Tcon_max = Tcon_data[n_con_data-1] + fmax(0.05*Tspan, 10.0);
     dT = (Tcon_max - Tcon_min)/(parset.n_con_recon -1);
   
@@ -429,6 +433,12 @@ void sim_init()
   else
   {
     Tspan = 120.0;
+
+    rcloud_min_set = 0.0;
+    rcloud_max_set = Tspan/2.0;
+    if(parset.rcloud_max > 0.0)
+      rcloud_max_set = fmin(rcloud_max_set, parset.rcloud_max);
+    printf("rcloud_min_max_set: %f %f\n", rcloud_min_set, rcloud_max_set);
 
     Tcon_min = 0.0;
     Tcon_max = Tspan;
@@ -462,7 +472,7 @@ void sim_init()
   }
   else
   {
-    Tline_min = Tcon_min + 10.0;
+    Tline_min = Tcon_min + 30.0;
     Tline_max = Tcon_max;
 
     dT = (Tline_max - Tline_min)/(parset.n_line_recon - 1);

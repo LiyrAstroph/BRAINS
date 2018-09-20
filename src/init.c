@@ -114,9 +114,12 @@ void init()
     /* set the range of cloud radial distribution */
     rcloud_min_set = 0.0;
     rcloud_max_set = (Tline_data[n_line_data -1] - Tcon_data[0]);
+
+    if(parset.rcloud_max > 0.0)
+      rcloud_max_set = fmin(rcloud_max_set, parset.rcloud_max);
   }
 
-  if(thistask == roottask)
+  if(thistask == roottask && parset.flag_dim >=-1)
   {
     printf("rcloud_min_max_set: %f %f\n", rcloud_min_set, rcloud_max_set);
   }
