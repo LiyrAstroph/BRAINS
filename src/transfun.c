@@ -185,6 +185,138 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
   line_gaussian_smooth_2D_FFT(transv, fl2d, nl, nv, pm);
 }
 
+void transfun_1d_cal()
+{
+  int i, idt;
+  double Anorm, dis;
+
+  tau_min = tmp_tau[0];
+  tau_max = tmp_tau[0];
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    if(tau_min > tmp_tau[i])
+      tau_min = tmp_tau[i];
+    if(tau_max < tmp_tau[i])
+      tau_max = tmp_tau[i];
+  }
+
+  dTransTau = (tau_max - tau_min)/(parset.n_tau - 1);
+  for(i=0; i<parset.n_tau; i++)
+  {
+    TransTau[i] = tau_min + dTransTau * i;
+    Trans1D[i] = 0.0;
+  }
+
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    dis = tmp_tau[i];
+    idt = (dis - tau_min)/dTransTau;
+    //Trans1D[idt] += pow(1.0/r, 2.0*(1 + gam)) * weight;
+    Trans1D[idt] += tmp_weight[i];
+  }
+
+  /* normalize transfer function */
+  Anorm = 0.0;
+  for(i=0;i<parset.n_tau;i++)
+  {
+    Anorm += Trans1D[i];
+  }
+  Anorm *= dTransTau;
+  /* check if we get a zero transfer function */
+  if(Anorm > 0.0)
+  {
+    for(i=0; i<parset.n_tau; i++)
+    {
+      Trans1D[i] /= Anorm;
+    }
+  }
+  else
+  {
+    printf(" Warning, zero transfer function at task %d.\n", thistask);
+    for(i=0; i<parset.n_tau; i++)
+    {
+      Trans1D[i] = 0.0;
+    }
+  }
+
+  return;
+}
+
+void transfun_2d_cal(double *transv, double *trans2d, int n_vel)
+{
+  int i, j, idt, idV;
+  double Anorm, dis, V, dV;
+
+  tau_min = tmp_tau[0];
+  tau_max = tmp_tau[0];
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    if(tau_min > tmp_tau[i])
+      tau_min = tmp_tau[i];
+    if(tau_max < tmp_tau[i])
+      tau_max = tmp_tau[i];
+  }
+
+  dTransTau = (tau_max - tau_min)/(parset.n_tau - 1);
+  for(i=0; i<parset.n_tau; i++)
+  {
+    TransTau[i] = tau_min + dTransTau * i;
+  }
+
+  dV =(transv[1] - transv[0]); /* velocity grid width */
+  for(i=0; i<parset.n_tau; i++)
+    for(j=0;j<n_vel;j++)
+      trans2d[i*n_vel+j]=0.0;   /* cleanup of transfer function */
+
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    dis = tmp_tau[i];
+    idt = (dis - tau_min)/dTransTau;
+
+    for(j=0; j<parset.n_vel_per_cloud; j++)
+    {
+      V = tmp_vel[i*parset.n_vel_per_cloud + j];
+      if(V<transv[0] || V >= transv[n_vel-1]+dV)
+        continue;
+      idV = (V - transv[0])/dV;
+      //trans2d[idt*n_vel + idV] += pow(1.0/r, 2.0*(1 + gam)) * weight;
+      trans2d[idt*n_vel + idV] += tmp_weight[i];
+    }
+  }
+
+  /* normalize transfer function */
+  Anorm = 0.0;
+  for(i=0; i<parset.n_tau; i++)
+    for(j=0; j<n_vel; j++)
+    {
+      Anorm += trans2d[i*n_vel+j];
+    }
+  Anorm *= (dV * dTransTau);
+
+  /* check if we get a zero transfer function */
+  if(Anorm > 0.0)
+  {
+    for(i=0; i<parset.n_tau; i++)
+    {
+      for(j=0; j<n_vel; j++)
+      {
+        trans2d[i*n_vel+j] /= Anorm;
+      }
+    }
+  }
+  else
+  {
+    printf(" Warning, zero transfer function at task %d.\n", thistask);
+    for(i=0; i<parset.n_tau; i++)
+    {
+      for(j=0; j<n_vel; j++)
+      {
+        trans2d[i*n_vel+j] = 0.0;
+      }
+    }
+  }
+}
+
 /*================================================================
  * model 1
  * Brewer et al. (2011)'s model
@@ -317,61 +449,13 @@ void transfun_1d_cloud_direct_model1(const void *pm, int flag_save)
       fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
     }
   }
-
-  tau_min = tmp_tau[0];
-  tau_max = tmp_tau[0];
-  for(i=0; i<parset.n_cloud_per_task; i++)
-  {
-    if(tau_min > tmp_tau[i])
-      tau_min = tmp_tau[i];
-    if(tau_max < tmp_tau[i])
-      tau_max = tmp_tau[i];
-  }
-
-  dTransTau = (tau_max - tau_min)/(parset.n_tau - 1);
-  for(i=0; i<parset.n_tau; i++)
-  {
-    TransTau[i] = tau_min + dTransTau * i;
-    Trans1D[i] = 0.0;
-  }
-
-  for(i=0; i<parset.n_cloud_per_task; i++)
-  {
-    dis = tmp_tau[i];
-    idt = (dis - tau_min)/dTransTau;
-    //Trans1D[idt] += pow(1.0/r, 2.0*(1 + gam)) * weight;
-    Trans1D[idt] += tmp_weight[i];
-  }
-
-  /* normalize transfer function */
-  Anorm = 0.0;
-  for(i=0;i<parset.n_tau;i++)
-  {
-    Anorm += Trans1D[i];
-  }
-  Anorm *= dTransTau;
-  /* check if we get a zero transfer function */
-  if(Anorm > 0.0)
-  {
-    for(i=0; i<parset.n_tau; i++)
-    {
-      Trans1D[i] /= Anorm;
-    }
-  }
-  else
-  {
-    printf(" Warning, zero transfer function at task %d.\n", thistask);
-    for(i=0; i<parset.n_tau; i++)
-    {
-      Trans1D[i] = 0.0;
-    }
-  }
   
   if(flag_save && thistask==roottask)
   {
     fclose(fcloud_out);
   }
   
+  transfun_1d_cal();
   return;
 }
 
@@ -568,78 +652,11 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
       }
     }
   }
-
-  tau_min = tmp_tau[0];
-  tau_max = tmp_tau[0];
-  for(i=0; i<parset.n_cloud_per_task; i++)
-  {
-    if(tau_min > tmp_tau[i])
-      tau_min = tmp_tau[i];
-    if(tau_max < tmp_tau[i])
-      tau_max = tmp_tau[i];
-  }
-
-  dTransTau = (tau_max - tau_min)/(parset.n_tau - 1);
-  for(i=0; i<parset.n_tau; i++)
-  {
-    TransTau[i] = tau_min + dTransTau * i;
-  }
-
-  dV =(transv[1] - transv[0]); /* velocity grid width */
-  for(i=0; i<parset.n_tau; i++)
-    for(j=0;j<n_vel;j++)
-      trans2d[i*n_vel+j]=0.0;   /* cleanup of transfer function */
-
-  for(i=0; i<parset.n_cloud_per_task; i++)
-  {
-    dis = tmp_tau[i];
-    idt = (dis - tau_min)/dTransTau;
-
-    for(j=0; j<parset.n_vel_per_cloud; j++)
-    {
-      V = tmp_vel[i*parset.n_vel_per_cloud + j];
-      if(V<transv[0] || V >= transv[n_vel-1]+dV)
-        continue;
-      idV = (V - transv[0])/dV;
-      //trans2d[idt*n_vel + idV] += pow(1.0/r, 2.0*(1 + gam)) * weight;
-      trans2d[idt*n_vel + idV] += tmp_weight[i];
-    }
-  }
-
-  /* normalize transfer function */
-  Anorm = 0.0;
-  for(i=0; i<parset.n_tau; i++)
-    for(j=0; j<n_vel; j++)
-    {
-      Anorm += trans2d[i*n_vel+j];
-    }
-  Anorm *= (dV * dTransTau);
-
-  /* check if we get a zero transfer function */
-  if(Anorm > 0.0)
-  {
-    for(i=0; i<parset.n_tau; i++)
-    {
-      for(j=0; j<n_vel; j++)
-      {
-        trans2d[i*n_vel+j] /= Anorm;
-      }
-    }
-  }
-  else
-  {
-    printf(" Warning, zero transfer function at task %d.\n", thistask);
-    for(i=0; i<parset.n_tau; i++)
-    {
-      for(j=0; j<n_vel; j++)
-      {
-        trans2d[i*n_vel+j] = 0.0;
-      }
-    }
-  }
   
   if(flag_save && thistask == roottask)
     fclose(fcloud_out);
+
+  transfun_2d_cal(transv, trans2d, n_vel);
 
   return;
 }
@@ -834,76 +851,10 @@ void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *tra
     }
   }
 
-  tau_min = tmp_tau[0];
-  tau_max = tmp_tau[0];
-  for(i=0; i<parset.n_cloud_per_task; i++)
-  {
-    if(tau_min > tmp_tau[i])
-      tau_min = tmp_tau[i];
-    if(tau_max < tmp_tau[i])
-      tau_max = tmp_tau[i];
-  }
-
-  dTransTau = (tau_max - tau_min)/(parset.n_tau - 1);
-  for(i=0; i<parset.n_tau; i++)
-  {
-    TransTau[i] = tau_min + dTransTau * i;
-  }
-  dV =(transv[1] - transv[0]); /* velocity grid width */
-  for(i=0; i<parset.n_tau; i++)
-    for(j=0;j<n_vel;j++)
-      trans2d[i*n_vel+j]=0.0;   /* cleanup of transfer function */
-
-  for(i=0; i<parset.n_cloud_per_task; i++)
-  {
-    dis = tmp_tau[i];
-    idt = (dis - tau_min)/dTransTau;
-
-    for(j=0; j<parset.n_vel_per_cloud; j++)
-    {
-      V = tmp_vel[i*parset.n_vel_per_cloud + j];
-      if(V<transv[0] || V>=transv[n_vel-1]+dV)
-        continue;
-      
-      idV = (V - transv[0])/dV;
-      //trans2d[idt*n_vel + idV] += pow(1.0/r, 2.0*(1 + gam)) * weight;
-      trans2d[idt*n_vel + idV] += tmp_weight[i];
-    }
-  }
-
-  /* normalize transfer function */
-  Anorm = 0.0;
-  for(i=0; i<parset.n_tau; i++)
-    for(j=0; j<n_vel; j++)
-    {
-      Anorm += trans2d[i*n_vel+j];
-    }
-  Anorm *= (dV * dTransTau);
-  /* check if we get a zero transfer function */
-  if(Anorm > 0.0)
-  {
-    for(i=0; i<parset.n_tau; i++)
-    {
-      for(j=0; j<n_vel; j++)
-      {
-        trans2d[i*n_vel+j] /= Anorm;
-      }
-    }
-  }
-  else
-  {
-    printf(" Warning, zero 2d transfer function at task %d.\n", thistask);
-    for(i=0; i<parset.n_tau; i++)
-    {
-      for(j=0; j<n_vel; j++)
-      {
-        trans2d[i*n_vel+j] = 0.0;
-      }
-    }
-  }
-
   if(flag_save && thistask == roottask)
     fclose(fcloud_out);
+
+  transfun_2d_cal(transv, trans2d, n_vel);
 
   return;
 }
@@ -1040,60 +991,13 @@ void transfun_1d_cloud_direct_model3(const void *pm, int flag_save)
       fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
     }
   }
-
-  tau_min = tmp_tau[0];
-  tau_max = tmp_tau[0];
-  for(i=0; i<parset.n_cloud_per_task; i++)
-  {
-    if(tau_min > tmp_tau[i])
-      tau_min = tmp_tau[i];
-    if(tau_max < tmp_tau[i])
-      tau_max = tmp_tau[i];
-  }
-
-  dTransTau = (tau_max - tau_min)/(parset.n_tau - 1);
-  for(i=0; i<parset.n_tau; i++)
-  {
-    TransTau[i] = tau_min + dTransTau * i;
-    Trans1D[i] = 0.0;
-  }
-
-  for(i=0; i<parset.n_cloud_per_task; i++)
-  {
-    dis = tmp_tau[i];
-    idt = (dis - tau_min)/dTransTau;
-    //Trans1D[idt] += pow(1.0/r, 2.0*(1 + gam)) * weight;
-    Trans1D[idt] += tmp_weight[i];
-  }
-
-  /* normalize transfer function */
-  Anorm = 0.0;
-  for(i=0;i<parset.n_tau;i++)
-  {
-    Anorm += Trans1D[i];
-  }
-  Anorm *= dTransTau;
-  /* check if we get a zero transfer function */
-  if(Anorm > 0.0)
-  {
-    for(i=0; i<parset.n_tau; i++)
-    {
-      Trans1D[i] /= Anorm;
-    }
-  }
-  else
-  {
-    printf(" Warning, zero transfer function at task %d.\n", thistask);
-    for(i=0; i<parset.n_tau; i++)
-    {
-      Trans1D[i] = 0.0;
-    }
-  }
   
   if(flag_save && thistask==roottask)
   {
     fclose(fcloud_out);
   }
+
+  transfun_1d_cal();
 
   return;
 }
@@ -1280,75 +1184,10 @@ void transfun_2d_cloud_direct_model3(const void *pm, double *transv, double *tra
     }
   }
 
-  tau_min = tmp_tau[0];
-  tau_max = tmp_tau[0];
-  for(i=0; i<parset.n_cloud_per_task; i++)
-  {
-    if(tau_min > tmp_tau[i])
-      tau_min = tmp_tau[i];
-    if(tau_max < tmp_tau[i])
-      tau_max = tmp_tau[i];
-  }
-
-  dTransTau = (tau_max - tau_min)/(parset.n_tau - 1);
-  for(i=0; i<parset.n_tau; i++)
-  {
-    TransTau[i] = tau_min + dTransTau * i;
-  }
-  dV =(transv[1] - transv[0]); // velocity grid width
-  for(i=0; i<parset.n_tau; i++)
-    for(j=0;j<n_vel;j++)
-      trans2d[i*n_vel+j]=0.0;   // cleanup of transfer function
-
-  for(i=0; i<parset.n_cloud_per_task; i++)
-  {
-    dis = tmp_tau[i];
-    idt = (dis - tau_min)/dTransTau;
-
-    for(j=0; j<parset.n_vel_per_cloud; j++)
-    {
-      V = tmp_vel[i*parset.n_vel_per_cloud + j];
-      if(V<transv[0] || V>=transv[n_vel-1]+dV)
-        continue;
-      
-      idV = (V - transv[0])/dV;
-      //trans2d[idt*n_vel + idV] += pow(1.0/r, 2.0*(1 + gam)) * weight;
-      trans2d[idt*n_vel + idV] += tmp_weight[i];
-    }
-  }
-  /* normalize transfer function */
-  Anorm = 0.0;
-  for(i=0; i<parset.n_tau; i++)
-    for(j=0; j<n_vel; j++)
-    {
-      Anorm += trans2d[i*n_vel+j];
-    }
-  Anorm *= (dV * dTransTau);
-  /* check if we get a zero transfer function */
-  if(Anorm > 0.0)
-  {
-    for(i=0; i<parset.n_tau; i++)
-    {
-      for(j=0; j<n_vel; j++)
-      {
-        trans2d[i*n_vel+j] /= Anorm;
-      }
-    }
-  }
-  else
-  {
-    printf(" Warning, zero transfer function at task %d.\n", thistask);
-    for(i=0; i<parset.n_tau; i++)
-    {
-      for(j=0; j<n_vel; j++)
-      {
-        trans2d[i*n_vel+j] = 0.0;
-      }
-    }
-  }
-
   if(flag_save && thistask == roottask)
     fclose(fcloud_out);
+
+  transfun_2d_cal(transv, trans2d, n_vel);
 
   return;
 }
@@ -1534,75 +1373,10 @@ void transfun_2d_cloud_direct_model4(const void *pm, double *transv, double *tra
     }
   }
 
-  tau_min = tmp_tau[0];
-  tau_max = tmp_tau[0];
-  for(i=0; i<parset.n_cloud_per_task; i++)
-  {
-    if(tau_min > tmp_tau[i])
-      tau_min = tmp_tau[i];
-    if(tau_max < tmp_tau[i])
-      tau_max = tmp_tau[i];
-  }
-
-  dTransTau = (tau_max - tau_min)/(parset.n_tau - 1);
-  for(i=0; i<parset.n_tau; i++)
-  {
-    TransTau[i] = tau_min + dTransTau * i;
-  }
-  dV =(transv[1] - transv[0]); // velocity grid width
-  for(i=0; i<parset.n_tau; i++)
-    for(j=0;j<n_vel;j++)
-      trans2d[i*n_vel+j]=0.0;   // cleanup of transfer function
-
-  for(i=0; i<parset.n_cloud_per_task; i++)
-  {
-    dis = tmp_tau[i];
-    idt = (dis - tau_min)/dTransTau;
-
-    for(j=0; j<parset.n_vel_per_cloud; j++)
-    {
-      V = tmp_vel[i*parset.n_vel_per_cloud + j];
-      if(V<transv[0] || V>=transv[n_vel-1]+dV)
-        continue;
-      
-      idV = (V - transv[0])/dV;
-      //trans2d[idt*n_vel + idV] += pow(1.0/r, 2.0*(1 + gam)) * weight;
-      trans2d[idt*n_vel + idV] += tmp_weight[i];
-    }
-  }
-  /* normalize transfer function */
-  Anorm = 0.0;
-  for(i=0; i<parset.n_tau; i++)
-    for(j=0; j<n_vel; j++)
-    {
-      Anorm += trans2d[i*n_vel+j];
-    }
-  Anorm *= (dV * dTransTau);
-  /* check if we get a zero transfer function */
-  if(Anorm > 0.0)
-  {
-    for(i=0; i<parset.n_tau; i++)
-    {
-      for(j=0; j<n_vel; j++)
-      {
-        trans2d[i*n_vel+j] /= Anorm;
-      }
-    }
-  }
-  else
-  {
-    printf(" Warning, zero transfer function at task %d.\n", thistask);
-    for(i=0; i<parset.n_tau; i++)
-    {
-      for(j=0; j<n_vel; j++)
-      {
-        trans2d[i*n_vel+j] = 0.0;
-      }
-    }
-  }
-
   if(flag_save && thistask == roottask)
     fclose(fcloud_out);
+
+  transfun_2d_cal(transv, trans2d, n_vel);
 
   return;
 }
@@ -1753,60 +1527,13 @@ void transfun_1d_cloud_direct_model5(const void *pm, int flag_save)
       fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
     }
   }
-
-  tau_min = tmp_tau[0];
-  tau_max = tmp_tau[0];
-  for(i=0; i<parset.n_cloud_per_task; i++)
-  {
-    if(tau_min > tmp_tau[i])
-      tau_min = tmp_tau[i];
-    if(tau_max < tmp_tau[i])
-      tau_max = tmp_tau[i];
-  }
-
-  dTransTau = (tau_max - tau_min)/(parset.n_tau - 1);
-  for(i=0; i<parset.n_tau; i++)
-  {
-    TransTau[i] = tau_min + dTransTau * i;
-    Trans1D[i] = 0.0;
-  }
-
-  for(i=0; i<parset.n_cloud_per_task; i++)
-  {
-    dis = tmp_tau[i];
-    idt = (dis - tau_min)/dTransTau;
-    //Trans1D[idt] += pow(1.0/r, 2.0*(1 + gam)) * weight;
-    Trans1D[idt] += tmp_weight[i];
-  }
-
-  /* normalize transfer function */
-  Anorm = 0.0;
-  for(i=0;i<parset.n_tau;i++)
-  {
-    Anorm += Trans1D[i];
-  }
-  Anorm *= dTransTau;
-  /* check if we get a zero transfer function */
-  if(Anorm > 0.0)
-  {
-    for(i=0; i<parset.n_tau; i++)
-    {
-      Trans1D[i] /= Anorm;
-    }
-  }
-  else
-  {
-    printf(" Warning, zero transfer function at task %d.\n", thistask);
-    for(i=0; i<parset.n_tau; i++)
-    {
-      Trans1D[i] = 0.0;
-    }
-  }
   
   if(flag_save && thistask==roottask)
   {
     fclose(fcloud_out);
   }
+
+  transfun_1d_cal();
 
   return;
 }
@@ -2037,76 +1764,10 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
     }
   }
 
-  tau_min = tmp_tau[0];
-  tau_max = tmp_tau[0];
-  for(i=0; i<parset.n_cloud_per_task; i++)
-  {
-    if(tau_min > tmp_tau[i])
-      tau_min = tmp_tau[i];
-    if(tau_max < tmp_tau[i])
-      tau_max = tmp_tau[i];
-  }
-
-  dTransTau = (tau_max - tau_min)/(parset.n_tau - 1);
-  for(i=0; i<parset.n_tau; i++)
-  {
-    TransTau[i] = tau_min + dTransTau * i;
-  }
-  dV =(transv[1] - transv[0]); // velocity grid width
-  for(i=0; i<parset.n_tau; i++)
-    for(j=0;j<n_vel;j++)
-      trans2d[i*n_vel+j]=0.0;   // cleanup of transfer function
-
-  for(i=0; i<parset.n_cloud_per_task; i++)
-  {
-    dis = tmp_tau[i];
-    idt = (dis - tau_min)/dTransTau;
-
-    for(j=0; j<parset.n_vel_per_cloud; j++)
-    {
-      V = tmp_vel[i*parset.n_vel_per_cloud + j];
-      if(V<transv[0] || V>=transv[n_vel-1]+dV)
-        continue;
-      
-      idV = (V - transv[0])/dV;
-      //trans2d[idt*n_vel + idV] += pow(1.0/r, 2.0*(1 + gam)) * weight;
-      trans2d[idt*n_vel + idV] += tmp_weight[i];
-    }
-  }
-
-  /* normalize transfer function */
-  Anorm = 0.0;
-  for(i=0; i<parset.n_tau; i++)
-    for(j=0; j<n_vel; j++)
-    {
-      Anorm += trans2d[i*n_vel+j];
-    }
-  Anorm *= (dV * dTransTau);
-  /* check if we get a zero transfer function */
-  if(Anorm > 0.0)
-  {
-    for(i=0; i<parset.n_tau; i++)
-    {
-      for(j=0; j<n_vel; j++)
-      {
-        trans2d[i*n_vel+j] /= Anorm;
-      }
-    }
-  }
-  else
-  {
-    printf(" Warning, zero transfer function at task %d.\n", thistask);
-    for(i=0; i<parset.n_tau; i++)
-    {
-      for(j=0; j<n_vel; j++)
-      {
-        trans2d[i*n_vel+j] = 0.0;
-      }
-    }
-  }
-
   if(flag_save && thistask == roottask)
     fclose(fcloud_out);
+
+  transfun_2d_cal(transv, trans2d, n_vel);
 
   return;
 }
@@ -2244,59 +1905,13 @@ void transfun_1d_cloud_direct_model6(const void *pm, int flag_save)
     }
   }
 
-  tau_min = tmp_tau[0];
-  tau_max = tmp_tau[0];
-  for(i=0; i<parset.n_cloud_per_task; i++)
-  {
-    if(tau_min > tmp_tau[i])
-      tau_min = tmp_tau[i];
-    if(tau_max < tmp_tau[i])
-      tau_max = tmp_tau[i];
-  }
-
-  dTransTau = (tau_max - tau_min)/(parset.n_tau - 1);
-  for(i=0; i<parset.n_tau; i++)
-  {
-    TransTau[i] = tau_min + dTransTau * i;
-    Trans1D[i] = 0.0;
-  }
-
-  for(i=0; i<parset.n_cloud_per_task; i++)
-  {
-    dis = tmp_tau[i];
-    idt = (dis - tau_min)/dTransTau;
-    //Trans1D[idt] += pow(1.0/r, 2.0*(1 + gam)) * weight;
-    Trans1D[idt] += tmp_weight[i];
-  }
-
-  /* normalize transfer function */
-  Anorm = 0.0;
-  for(i=0;i<parset.n_tau;i++)
-  {
-    Anorm += Trans1D[i];
-  }
-  Anorm *= dTransTau;
-  /* check if we get a zero transfer function */
-  if(Anorm > 0.0)
-  {
-    for(i=0; i<parset.n_tau; i++)
-    {
-      Trans1D[i] /= Anorm;
-    }
-  }
-  else
-  {
-    printf(" Warning, zero 1d transfer function at task %d.\n", thistask);
-    for(i=0; i<parset.n_tau; i++)
-    {
-      Trans1D[i] = 0.0;
-    }
-  }
-  
   if(flag_save && thistask==roottask)
   {
     fclose(fcloud_out);
   }
+
+  transfun_1d_cal();
+
   return;
 }
 
@@ -2517,77 +2132,10 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
     }
   }
 
-  tau_min = tmp_tau[0];
-  tau_max = tmp_tau[0];
-  for(i=0; i<parset.n_cloud_per_task; i++)
-  {
-    if(tau_min > tmp_tau[i])
-      tau_min = tmp_tau[i];
-    if(tau_max < tmp_tau[i])
-      tau_max = tmp_tau[i];
-  }
-
-  dTransTau = (tau_max - tau_min)/(parset.n_tau - 1);
-  for(i=0; i<parset.n_tau; i++)
-  {
-    TransTau[i] = tau_min + dTransTau * i;
-  }
-  dV =(transv[1] - transv[0]); // velocity grid width
-  for(i=0; i<parset.n_tau; i++)
-    for(j=0;j<n_vel;j++)
-      trans2d[i*n_vel+j]=0.0;   // cleanup of transfer function
-
-  for(i=0; i<parset.n_cloud_per_task; i++)
-  {
-    dis = tmp_tau[i];
-    idt = (dis - tau_min)/dTransTau;
-
-    for(j=0; j<parset.n_vel_per_cloud; j++)
-    {
-      V = tmp_vel[i*parset.n_vel_per_cloud + j];
-      if(V<transv[0] || V>=transv[n_vel-1]+dV)
-        continue;
-
-      idV = (V - transv[0])/dV;
-      //trans2d[idt*n_vel + idV] += pow(1.0/r, 2.0*(1 + gam)) * weight;
-      trans2d[idt*n_vel + idV] += tmp_weight[i];
-    }
-    
-  }
-
-  /* normalize transfer function */
-  Anorm = 0.0;
-  for(i=0; i<parset.n_tau; i++)
-    for(j=0; j<n_vel; j++)
-    {
-      Anorm += trans2d[i*n_vel+j];
-    }
-  Anorm *= (dV * dTransTau);
-  /* check if we get a zero transfer function */
-  if(Anorm > 0.0)
-  {
-    for(i=0; i<parset.n_tau; i++)
-    {
-      for(j=0; j<n_vel; j++)
-      {
-        trans2d[i*n_vel+j] /= Anorm;
-      }
-    }
-  }
-  else
-  {
-    printf(" Warning, zero 2d transfer function at task %d.\n", thistask);
-    for(i=0; i<parset.n_tau; i++)
-    {
-      for(j=0; j<n_vel; j++)
-      {
-        trans2d[i*n_vel+j] = 0.0;
-      }
-    }
-  }
-
   if(flag_save && thistask == roottask)
     fclose(fcloud_out);
+
+  transfun_2d_cal(transv, trans2d, n_vel);
 
   return;
 }
@@ -2826,60 +2374,13 @@ void transfun_1d_cloud_direct_model7(const void *pm, int flag_save)
       fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
     }
   }
-
-  tau_min = tmp_tau[0];
-  tau_max = tmp_tau[0];
-  for(i=0; i<parset.n_cloud_per_task; i++)
-  {
-    if(tau_min > tmp_tau[i])
-      tau_min = tmp_tau[i];
-    if(tau_max < tmp_tau[i])
-      tau_max = tmp_tau[i];
-  }
-
-  dTransTau = (tau_max - tau_min)/(parset.n_tau - 1);
-  for(i=0; i<parset.n_tau; i++)
-  {
-    TransTau[i] = tau_min + dTransTau * i;
-    Trans1D[i] = 0.0;
-  }
-
-  for(i=0; i<parset.n_cloud_per_task; i++)
-  {
-    dis = tmp_tau[i];
-    idt = (dis - tau_min)/dTransTau;
-    //Trans1D[idt] += pow(1.0/r, 2.0*(1 + gam)) * weight;
-    Trans1D[idt] += tmp_weight[i];
-  }
-
-  /* normalize transfer function */
-  Anorm = 0.0;
-  for(i=0;i<parset.n_tau;i++)
-  {
-    Anorm += Trans1D[i];
-  }
-  Anorm *= dTransTau;
-  /* check if we get a zero transfer function */
-  if(Anorm > 0.0)
-  {
-    for(i=0; i<parset.n_tau; i++)
-    {
-      Trans1D[i] /= Anorm;
-    }
-  }
-  else
-  {
-    printf(" Warning, zero 1d transfer function at task %d.\n", thistask);
-    for(i=0; i<parset.n_tau; i++)
-    {
-      Trans1D[i] = 0.0;
-    }
-  }
   
   if(flag_save && thistask==roottask)
   {
     fclose(fcloud_out);
   }
+
+  transfun_1d_cal();
 
   return;
 }
@@ -3246,76 +2747,10 @@ void transfun_2d_cloud_direct_model7(const void *pm, double *transv, double *tra
     }
   }
 
-  tau_min = tmp_tau[0];
-  tau_max = tmp_tau[0];
-  for(i=0; i<parset.n_cloud_per_task; i++)
-  {
-    if(tau_min > tmp_tau[i])
-      tau_min = tmp_tau[i];
-    if(tau_max < tmp_tau[i])
-      tau_max = tmp_tau[i];
-  }
-
-  dTransTau = (tau_max - tau_min)/(parset.n_tau - 1);
-  for(i=0; i<parset.n_tau; i++)
-  {
-    TransTau[i] = tau_min + dTransTau * i;
-  }
-  dV =(transv[1] - transv[0]); // velocity grid width
-  for(i=0; i<parset.n_tau; i++)
-    for(j=0;j<n_vel;j++)
-      trans2d[i*n_vel+j]=0.0;   // cleanup of transfer function
-
-  for(i=0; i<parset.n_cloud_per_task; i++)
-  {
-    dis = tmp_tau[i];
-    idt = (dis - tau_min)/dTransTau;
-
-    for(j=0; j<parset.n_vel_per_cloud; j++)
-    {
-      V = tmp_vel[i*parset.n_vel_per_cloud + j];
-      if(V<transv[0] || V>=transv[n_vel-1]+dV)
-        continue;
-      
-      idV = (V - transv[0])/dV;
-      //trans2d[idt*n_vel + idV] += pow(1.0/r, 2.0*(1 + gam)) * weight;
-      trans2d[idt*n_vel + idV] += tmp_weight[i];
-    }
-  }
-
-  /* normalize transfer function */
-  Anorm = 0.0;
-  for(i=0; i<parset.n_tau; i++)
-    for(j=0; j<n_vel; j++)
-    {
-      Anorm += trans2d[i*n_vel+j];
-    }
-  Anorm *= (dV * dTransTau);
-  /* check if we get a zero transfer function */
-  if(Anorm > 0.0)
-  {
-    for(i=0; i<parset.n_tau; i++)
-    {
-      for(j=0; j<n_vel; j++)
-      {
-        trans2d[i*n_vel+j] /= Anorm;
-      }
-    }
-  }
-  else
-  {
-    printf(" Warning, zero 2d transfer function at task %d.\n", thistask);
-    for(i=0; i<parset.n_tau; i++)
-    {
-      for(j=0; j<n_vel; j++)
-      {
-        trans2d[i*n_vel+j] = 0.0;
-      }
-    }
-  }
-
   if(flag_save && thistask == roottask)
     fclose(fcloud_out);
+
+  transfun_2d_cal(transv, trans2d, n_vel);
 
   return;
 }

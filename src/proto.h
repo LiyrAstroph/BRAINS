@@ -67,6 +67,8 @@ double prob_restart_line1d(const void *model);
 void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl);
 void (*transfun_1d_cloud_direct)(const void *pm, int flag_save);
 
+void transfun_1d_cal();
+
 void transfun_1d_cloud_direct_model1(const void *pm, int flag_save);
 void transfun_1d_cloud_direct_model3(const void *pm, int flag_save);
 void transfun_1d_cloud_direct_model5(const void *pm, int flag_save);
@@ -93,6 +95,7 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
 void postprocess2d();
 void set_par_range_model2d();
 
+void transfun_2d_cal(double *transv, double *trans2d, int n_vel);
 void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save);
 void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save);
 void transfun_2d_cloud_direct_model3(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save);
