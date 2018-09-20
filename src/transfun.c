@@ -331,12 +331,12 @@ void transfun_2d_cal(double *transv, double *trans2d, int n_vel)
 void transfun_1d_cloud_direct_model1(const void *pm, int flag_save)
 {
   FILE *fcloud_out;
-  int i, idt, nc, flag_update=0;
+  int i, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0;
   double inc, F, beta, mu, k, a, s, rin, sig;
   double Lphi, Lthe;
-  double Anorm, weight, rnd;
+  double weight, rnd;
   BLRmodel1 *model = (BLRmodel1 *)pm;
 
   Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
@@ -466,12 +466,12 @@ void transfun_1d_cloud_direct_model1(const void *pm, int flag_save)
  */
 void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
-  int i, j, idV, idt, nc, flag_update=0;
+  int i, j, nc, flag_update=0;
   double r, phi, dis, Lopn_cos, u;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
   double inc, F, beta, mu, k, a, s, rin, sig;
   double Lphi, Lthe, L, E, vcloud_max, vcloud_min, linecenter = 0.0;
-  double dV, V, Anorm, weight, rnd;
+  double V, weight, rnd;
   double *pmodel = (double *)pm;
   BLRmodel1 *model = (BLRmodel1 *)pm;
   FILE *fcloud_out;
@@ -676,12 +676,12 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
  */
 void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
-  int i, j, idV, idt, nc, flag_update=0;
+  int i, j, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
   double inc, F, beta, mu, k, a, s, rin, sig;
-  double Lphi, Lthe, vcloud_max, vcloud_min, linecenter;
-  double dV, V, Anorm, weight, rnd;
+  double Lphi, Lthe, vcloud_max, vcloud_min, linecenter = 0.0;
+  double V, weight, rnd;
   double *pmodel = (double *)pm;
   BLRmodel2 *model = (BLRmodel2 *)pm;
   FILE *fcloud_out;
@@ -874,12 +874,12 @@ void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *tra
 void transfun_1d_cloud_direct_model3(const void *pm, int flag_save)
 {
   FILE *fcloud_out;
-  int i, idt, nc, flag_update=0;
+  int i, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0;
   double inc, F, alpha, Rin, k;
   double Lphi, Lthe;
-  double Anorm, weight, rnd;
+  double weight, rnd;
   BLRmodel3 *model = (BLRmodel3 *)pm;
 
   Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
@@ -1008,12 +1008,12 @@ void transfun_1d_cloud_direct_model3(const void *pm, int flag_save)
  */
 void transfun_2d_cloud_direct_model3(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
-  int i, j, idV, idt, nc, flag_update=0;
-  double r, phi, dis, Lopn_cos, u;
+  int i, j, nc, flag_update=0;
+  double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
   double inc, F, alpha, Rin, k;
   double Lphi, Lthe, L, E, vcloud_max, vcloud_min, linecenter=0.0;
-  double dV, V, Anorm, weight, rnd;
+  double V, weight, rnd;
   double *pmodel = (double *)pm;
   BLRmodel3 *model = (BLRmodel3 *)pm;
   FILE *fcloud_out;
@@ -1198,12 +1198,12 @@ void transfun_2d_cloud_direct_model3(const void *pm, double *transv, double *tra
  */
 void transfun_2d_cloud_direct_model4(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
-  int i, j, idV, idt, nc, flag_update=0;
-  double r, phi, dis, Lopn_cos, u;
+  int i, j, nc, flag_update=0;
+  double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
   double inc, F, alpha, Rin, k;
-  double Lphi, Lthe, L, E, vcloud_max, vcloud_min, linecenter;
-  double dV, V, Anorm, weight, rnd;
+  double Lphi, Lthe, L, E, vcloud_max, vcloud_min, linecenter=0.0;
+  double V, weight, rnd;
   double *pmodel = (double *)pm;
   BLRmodel4 *model = (BLRmodel4 *)pm;
   FILE *fcloud_out;
@@ -1395,12 +1395,12 @@ void transfun_2d_cloud_direct_model4(const void *pm, double *transv, double *tra
 void transfun_1d_cloud_direct_model5(const void *pm, int flag_save)
 {
   FILE *fcloud_out;
-  int i, idt, nc, flag_update=0;
+  int i, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0;
   double inc, Fin, Fout, alpha, k, gam, mu, xi;
   double Lphi, Lthe;
-  double Anorm, weight, rndr, rnd, rnd_xi, rnd_frac, frac1, frac2, ratio;
+  double weight, rndr, rnd, rnd_xi, rnd_frac, frac1, frac2, ratio;
   BLRmodel5 *model = (BLRmodel5 *)pm;
 
   Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
@@ -1544,14 +1544,14 @@ void transfun_1d_cloud_direct_model5(const void *pm, int flag_save)
 void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
   FILE *fcloud_out;
-  int i, j, idt, idV, nc, flag_update=0;
+  int i, j, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0;
   double inc, Fin, Fout, alpha, k, gam, mu, xi;
   double mbh, fellip, fflow, sigr_circ, sigthe_circ, sigr_rad, sigthe_rad, theta_rot, sig_turb;
   double Lphi, Lthe, V, Vr, Vph, Vkep, rhoV, theV, linecenter=0.0;
-  double Anorm, weight, rndr, rnd, rnd_frac, rnd_xi, frac1, frac2, ratio, fe, Rs, g;
-  double vx, vy, vz, vxb, vyb, vzb, dV, vcloud_max, vcloud_min;
+  double weight, rndr, rnd, rnd_frac, rnd_xi, frac1, frac2, ratio, Rs, g;
+  double vx, vy, vz, vxb, vyb, vzb, vcloud_max, vcloud_min;
   double *pmodel = (double *)pm;
   BLRmodel5 *model = (BLRmodel5 *)pm;
 
@@ -1787,12 +1787,12 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
 void transfun_1d_cloud_direct_model6(const void *pm, int flag_save)
 {
   FILE *fcloud_out;
-  int i, idt, nc, flag_update=0;
+  int i, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0;
   double inc, F, beta, mu, k, gam, xi, a, s, rin, sig;
   double Lphi, Lthe;
-  double Anorm, weight, rnd, rnd_xi;
+  double weight, rnd, rnd_xi;
   BLRmodel6 *model = (BLRmodel6 *)pm;
 
   Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
@@ -1921,14 +1921,14 @@ void transfun_1d_cloud_direct_model6(const void *pm, int flag_save)
 void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
   FILE *fcloud_out;
-  int i, j, idt, idV, nc, flag_update=0;
+  int i, j, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb, vcloud_min, vcloud_max;
-  double V, dV, rhoV, theV, Vr, Vph, Vkep, Rs, g;
+  double V, rhoV, theV, Vr, Vph, Vkep, Rs, g;
   double inc, F, beta, mu, k, gam, xi, a, s, sig, rin;
   double mbh, fellip, fflow, sigr_circ, sigthe_circ, sigr_rad, sigthe_rad, theta_rot, sig_turb;
   double Lphi, Lthe, linecenter=0.0;
-  double Anorm, weight, rnd, rnd_xi;
+  double weight, rnd, rnd_xi;
   double *pmodel = (double *)pm;
   BLRmodel6 *model = (BLRmodel6 *)pm;
 
@@ -2154,12 +2154,12 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
 void transfun_1d_cloud_direct_model7(const void *pm, int flag_save)
 {
   FILE *fcloud_out;
-  int i, idt, nc, flag_update=0, num_sh;
+  int i, nc, flag_update=0, num_sh;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0;
   double inc, F, beta, mu, k, gam, xi, a, s, rin, sig;
   double Lphi, Lthe;
-  double Anorm, weight, rnd, rnd_xi;
+  double weight, rnd, rnd_xi;
   BLRmodel7 *model = (BLRmodel7 *)pm;
 
   Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
@@ -2381,14 +2381,14 @@ void transfun_1d_cloud_direct_model7(const void *pm, int flag_save)
 void transfun_2d_cloud_direct_model7(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
   FILE *fcloud_out;
-  int i, j, idt, idV, nc, flag_update=0, num_sh;
+  int i, j, nc, flag_update=0, num_sh;
   double r, phi, dis, Lopn_cos;
-  double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb, vcloud_min, vcloud_max, fe, Rs, g, sig_turb;
-  double V, dV, rhoV, theV, Vr, Vph, Vkep;
+  double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb, vcloud_min, vcloud_max, Rs, g, sig_turb;
+  double V, rhoV, theV, Vr, Vph, Vkep;
   double inc, F, beta, mu, k, gam, xi, a, s, sig, rin;
   double mbh, fellip, fflow, sigr_circ, sigthe_circ, sigr_rad, sigthe_rad, theta_rot;
   double Lphi, Lthe, linecenter=0.0;
-  double Anorm, weight, rnd, rnd_xi;
+  double weight, rnd, rnd_xi;
   double *pmodel = (double *)pm;
   BLRmodel7 *model = (BLRmodel7 *)pm;
 
