@@ -113,7 +113,7 @@ void init()
   {
     /* set the range of cloud radial distribution */
     rcloud_min_set = 0.0;
-    rcloud_max_set = (Tline_data[n_line_data -1] - Tcon_data[0]);
+    rcloud_max_set = (Tline_data[n_line_data -1] - Tcon_data[0])/2.0;
 
     if(parset.rcloud_max > 0.0)
       rcloud_max_set = fmin(rcloud_max_set, parset.rcloud_max);

@@ -70,8 +70,11 @@ int dnest_con(int argc, char **argv)
     par_fix[i] = 0;
 
   /* fix systematic error of continuum */
-  par_fix[0] = 1;
-  par_fix_val[0] = log(1.0);
+  if(parset.flag_con_sys_err != 1)
+  {
+    par_fix[0] = 1;
+    par_fix_val[0] = log(1.0);
+  }
 
   strcpy(options_file, dnest_options_file);
   dnest(argc, argv);

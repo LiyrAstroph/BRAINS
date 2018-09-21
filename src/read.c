@@ -134,6 +134,14 @@ void read_parset()
     addr[nt] = &parset.flag_force_update;
     id[nt++] = INT;
 
+    strcpy(tag[nt], "FlagConSysErr");
+    addr[nt] = &parset.flag_con_sys_err;
+    id[nt++] = INT;
+
+    strcpy(tag[nt], "FlagLineSysErr");
+    addr[nt] = &parset.flag_line_sys_err;
+    id[nt++] = INT;
+
 
     strcpy(tag[nt], "InstRes");
     addr[nt] = &parset.InstRes;
@@ -214,6 +222,8 @@ void read_parset()
     parset.flag_narrowline = 0;
     parset.flag_linecenter = 0;
     parset.flag_force_update= 0;
+    parset.flag_con_sys_err = 0;
+    parset.flag_line_sys_err = 0;
 
     
     char fname[200];

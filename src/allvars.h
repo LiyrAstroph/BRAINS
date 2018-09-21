@@ -113,6 +113,8 @@ typedef struct
   int flag_fixvar;
 
   int flag_force_update;
+
+  int flag_con_sys_err, flag_line_sys_err;
   
   double temperature;
 }PARSET;
