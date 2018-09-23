@@ -117,7 +117,7 @@ void postprocess1d()
       calculate_con_from_model(post_model + num_params_blr *sizeof(double));
       gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
 
-      transfun_1d_cloud_direct(post_model, 0);
+      transfun_1d_cal(post_model, 0);
       calculate_line_from_blrmodel(post_model, Tline, Fline, parset.n_line_recon);
 
       sum1 = 0.0;
@@ -305,7 +305,7 @@ void reconstruct_line1d()
       }
       fclose(fp);
 
-      transfun_1d_cloud_direct(best_model_line1d, parset.flag_save_clouds);
+      transfun_1d_cal(best_model_line1d, parset.flag_save_clouds);
       calculate_line_from_blrmodel(best_model_line1d, Tline, Fline, parset.n_line_recon);
 
       // output reconstructed line light curve
@@ -561,7 +561,7 @@ double prob_initial_line1d(const void *model)
   Trans1D = Trans1D_particles[which_particle_update];
   Fline_at_data = Fline_at_data_particles[which_particle_update];
   which_parameter_update = -1;
-  transfun_1d_cloud_direct(model, 0);
+  transfun_1d_cal(model, 0);
   calculate_line_from_blrmodel(model, Tline_data, Fline_at_data, n_line_data);
 
   var2_se = (exp(pm[num_params_blr-1])-1.0) * (exp(pm[num_params_blr-1])-1.0) * line_error_mean*line_error_mean;
@@ -602,7 +602,7 @@ double prob_restart_line1d(const void *model)
   Trans1D = Trans1D_particles[which_particle_update];
   Fline_at_data = Fline_at_data_particles[which_particle_update];
   which_parameter_update = num_params + 1; // so as not to update clouds.
-  transfun_1d_cloud_direct(model, 0);
+  transfun_1d_cal(model, 0);
   calculate_line_from_blrmodel(model, Tline_data, Fline_at_data, n_line_data);
 
   var2_se = (exp(pm[num_params_blr-1])-1.0) * (exp(pm[num_params_blr-1])-1.0) * line_error_mean*line_error_mean;
@@ -743,7 +743,7 @@ double prob_line1d(const void *model)
   {
     /* re-point */
     Trans1D = Trans1D_particles_perturb[which_particle_update]; 
-    transfun_1d_cloud_direct(model, 0);
+    transfun_1d_cal(model, 0);
   }
   else
   {

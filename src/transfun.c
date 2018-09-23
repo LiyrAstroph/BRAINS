@@ -185,10 +185,16 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
   line_gaussian_smooth_2D_FFT(transv, fl2d, nl, nv, pm);
 }
 
-void transfun_1d_cal()
+/*!
+ * This function calculates 1d transfer function.
+ */
+void transfun_1d_cal(const void *pm, int flag_save)
 {
   int i, idt;
   double Anorm, dis;
+
+  /* generate cloud sample and calculate the corresponding time lags and weights */
+  transfun_1d_cloud_sample(pm, flag_save);
 
   tau_min = tmp_tau[0];
   tau_max = tmp_tau[0];
@@ -242,10 +248,17 @@ void transfun_1d_cal()
   return;
 }
 
-void transfun_2d_cal(double *transv, double *trans2d, int n_vel)
+
+/*!
+ * This function calculates 2d transfer function.
+ */
+void transfun_2d_cal(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
   int i, j, idt, idV;
   double Anorm, dis, V, dV;
+
+  /* generate cloud sample and calculate the corresponding time lags, LOS velocity, and weights */
+  transfun_2d_cloud_sample(pm, transv, trans2d, n_vel, flag_save);
 
   tau_min = tmp_tau[0];
   tau_max = tmp_tau[0];
@@ -328,7 +341,7 @@ void transfun_2d_cal(double *transv, double *trans2d, int n_vel)
 /* 
  * This function caclulate 1d transfer function.
  */
-void transfun_1d_cloud_direct_model1(const void *pm, int flag_save)
+void transfun_1d_cloud_sample_model1(const void *pm, int flag_save)
 {
   FILE *fcloud_out;
   int i, nc, flag_update=0;
@@ -455,7 +468,6 @@ void transfun_1d_cloud_direct_model1(const void *pm, int flag_save)
     fclose(fcloud_out);
   }
   
-  transfun_1d_cal();
   return;
 }
 
@@ -464,7 +476,7 @@ void transfun_1d_cloud_direct_model1(const void *pm, int flag_save)
  * This function calculate 2d transfer function at velocity grid "transv" and time grid "TransTau" . 
  * Note that time-lag grid is already set by parset.n_tau.
  */
-void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
+void transfun_2d_cloud_sample_model1(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
   int i, j, nc, flag_update=0;
   double r, phi, dis, Lopn_cos, u;
@@ -656,8 +668,6 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
   if(flag_save && thistask == roottask)
     fclose(fcloud_out);
 
-  transfun_2d_cal(transv, trans2d, n_vel);
-
   return;
 }
 
@@ -674,7 +684,7 @@ void transfun_2d_cloud_direct_model1(const void *pm, double *transv, double *tra
  * This function calculate 2d transfer function at velocity grid "transv" and time grid "TransTau" . 
  * Note that time-lag grid is already set by parset.n_tau.
  */
-void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
+void transfun_2d_cloud_sample_model2(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
   int i, j, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
@@ -854,8 +864,6 @@ void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *tra
   if(flag_save && thistask == roottask)
     fclose(fcloud_out);
 
-  transfun_2d_cal(transv, trans2d, n_vel);
-
   return;
 }
 
@@ -871,7 +879,7 @@ void transfun_2d_cloud_direct_model2(const void *pm, double *transv, double *tra
 /* 
  * This function caclulate 1d transfer function.
  */
-void transfun_1d_cloud_direct_model3(const void *pm, int flag_save)
+void transfun_1d_cloud_sample_model3(const void *pm, int flag_save)
 {
   FILE *fcloud_out;
   int i, nc, flag_update=0;
@@ -997,8 +1005,6 @@ void transfun_1d_cloud_direct_model3(const void *pm, int flag_save)
     fclose(fcloud_out);
   }
 
-  transfun_1d_cal();
-
   return;
 }
 
@@ -1006,7 +1012,7 @@ void transfun_1d_cloud_direct_model3(const void *pm, int flag_save)
  * This function calculate 2d transfer function at velocity grid "transv" and time grid "TransTau" . 
  * Note that time-lag grid is already set by parset.n_tau.
  */
-void transfun_2d_cloud_direct_model3(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
+void transfun_2d_cloud_sample_model3(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
   int i, j, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
@@ -1187,8 +1193,6 @@ void transfun_2d_cloud_direct_model3(const void *pm, double *transv, double *tra
   if(flag_save && thistask == roottask)
     fclose(fcloud_out);
 
-  transfun_2d_cal(transv, trans2d, n_vel);
-
   return;
 }
 
@@ -1196,7 +1200,7 @@ void transfun_2d_cloud_direct_model3(const void *pm, double *transv, double *tra
  * This function calculate 2d transfer function at velocity grid "transv" and time grid "TransTau" . 
  * Note that time-lag grid is already set by parset.n_tau.
  */
-void transfun_2d_cloud_direct_model4(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
+void transfun_2d_cloud_sample_model4(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
   int i, j, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
@@ -1376,8 +1380,6 @@ void transfun_2d_cloud_direct_model4(const void *pm, double *transv, double *tra
   if(flag_save && thistask == roottask)
     fclose(fcloud_out);
 
-  transfun_2d_cal(transv, trans2d, n_vel);
-
   return;
 }
 
@@ -1392,7 +1394,7 @@ void transfun_2d_cloud_direct_model4(const void *pm, double *transv, double *tra
 /* 
  * This function caclulate 1d transfer function.
  */
-void transfun_1d_cloud_direct_model5(const void *pm, int flag_save)
+void transfun_1d_cloud_sample_model5(const void *pm, int flag_save)
 {
   FILE *fcloud_out;
   int i, nc, flag_update=0;
@@ -1533,15 +1535,13 @@ void transfun_1d_cloud_direct_model5(const void *pm, int flag_save)
     fclose(fcloud_out);
   }
 
-  transfun_1d_cal();
-
   return;
 }
 
 /* 
  * This function caclulate 1d transfer function.
  */
-void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
+void transfun_2d_cloud_sample_model5(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
   FILE *fcloud_out;
   int i, j, nc, flag_update=0;
@@ -1767,8 +1767,6 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
   if(flag_save && thistask == roottask)
     fclose(fcloud_out);
 
-  transfun_2d_cal(transv, trans2d, n_vel);
-
   return;
 }
 
@@ -1784,7 +1782,7 @@ void transfun_2d_cloud_direct_model5(const void *pm, double *transv, double *tra
 /* 
  * This function caclulate 1d transfer function.
  */
-void transfun_1d_cloud_direct_model6(const void *pm, int flag_save)
+void transfun_1d_cloud_sample_model6(const void *pm, int flag_save)
 {
   FILE *fcloud_out;
   int i, nc, flag_update=0;
@@ -1910,15 +1908,13 @@ void transfun_1d_cloud_direct_model6(const void *pm, int flag_save)
     fclose(fcloud_out);
   }
 
-  transfun_1d_cal();
-
   return;
 }
 
 /* 
  * This function caclulate 2d transfer function.
  */
-void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
+void transfun_2d_cloud_sample_model6(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
   FILE *fcloud_out;
   int i, j, nc, flag_update=0;
@@ -2135,8 +2131,6 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
   if(flag_save && thistask == roottask)
     fclose(fcloud_out);
 
-  transfun_2d_cal(transv, trans2d, n_vel);
-
   return;
 }
 
@@ -2151,7 +2145,7 @@ void transfun_2d_cloud_direct_model6(const void *pm, double *transv, double *tra
 /* 
  * This function caclulate 1d transfer function.
  */
-void transfun_1d_cloud_direct_model7(const void *pm, int flag_save)
+void transfun_1d_cloud_sample_model7(const void *pm, int flag_save)
 {
   FILE *fcloud_out;
   int i, nc, flag_update=0, num_sh;
@@ -2370,15 +2364,13 @@ void transfun_1d_cloud_direct_model7(const void *pm, int flag_save)
     fclose(fcloud_out);
   }
 
-  transfun_1d_cal();
-
   return;
 }
 
 /* 
  * This function caclulate 2d transfer function.
  */
-void transfun_2d_cloud_direct_model7(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
+void transfun_2d_cloud_sample_model7(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
   FILE *fcloud_out;
   int i, j, nc, flag_update=0, num_sh;
@@ -2739,8 +2731,6 @@ void transfun_2d_cloud_direct_model7(const void *pm, double *transv, double *tra
 
   if(flag_save && thistask == roottask)
     fclose(fcloud_out);
-
-  transfun_2d_cal(transv, trans2d, n_vel);
 
   return;
 }

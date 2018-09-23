@@ -241,8 +241,7 @@ void sim()
   fclose(fp);
   
   
-  transfun_1d_cloud_direct(model, 0);
-
+  transfun_1d_cal(model, 0);
   calculate_line_from_blrmodel(model, Tline, Fline, parset.n_line_recon);
 
   
@@ -283,7 +282,7 @@ void sim()
   }
   fclose(fp);
 
-  transfun_2d_cloud_direct(model, TransV, Trans2D, parset.n_vel_recon, 0);
+  transfun_2d_cal(model, TransV, Trans2D, parset.n_vel_recon, 0);
   calculate_line2d_from_blrmodel(model, Tline, TransV, 
           Trans2D, Fline2d, parset.n_line_recon, parset.n_vel_recon);
 
@@ -342,46 +341,46 @@ void sim_init()
   {
     case 1:
       num_params_blr_model = sizeof(BLRmodel1)/sizeof(double);
-      transfun_1d_cloud_direct = transfun_1d_cloud_direct_model1;
-      transfun_2d_cloud_direct = transfun_2d_cloud_direct_model1;
+      transfun_1d_cloud_sample = transfun_1d_cloud_sample_model1;
+      transfun_2d_cloud_sample = transfun_2d_cloud_sample_model1;
       break;
     case 2:
       num_params_blr_model = sizeof(BLRmodel2)/sizeof(double);
-      transfun_1d_cloud_direct = transfun_1d_cloud_direct_model1;
-      transfun_2d_cloud_direct = transfun_2d_cloud_direct_model2;
+      transfun_1d_cloud_sample = transfun_1d_cloud_sample_model1;
+      transfun_2d_cloud_sample = transfun_2d_cloud_sample_model2;
       break;
     case 3:
       num_params_blr_model = sizeof(BLRmodel3)/sizeof(double);
-      transfun_1d_cloud_direct = transfun_1d_cloud_direct_model3;
-      transfun_2d_cloud_direct = transfun_2d_cloud_direct_model3;
+      transfun_1d_cloud_sample = transfun_1d_cloud_sample_model3;
+      transfun_2d_cloud_sample = transfun_2d_cloud_sample_model3;
       break;
     case 4:
       num_params_blr_model = sizeof(BLRmodel4)/sizeof(double);
-      transfun_1d_cloud_direct = transfun_1d_cloud_direct_model3;
-      transfun_2d_cloud_direct = transfun_2d_cloud_direct_model4;
+      transfun_1d_cloud_sample = transfun_1d_cloud_sample_model3;
+      transfun_2d_cloud_sample = transfun_2d_cloud_sample_model4;
       break;
     case 5:
       num_params_blr_model = sizeof(BLRmodel5)/sizeof(double);
-      transfun_1d_cloud_direct = transfun_1d_cloud_direct_model5;
-      transfun_2d_cloud_direct = transfun_2d_cloud_direct_model5;
+      transfun_1d_cloud_sample = transfun_1d_cloud_sample_model5;
+      transfun_2d_cloud_sample = transfun_2d_cloud_sample_model5;
       break;
 
     case 6:
       num_params_blr_model = sizeof(BLRmodel6)/sizeof(double);
-      transfun_1d_cloud_direct = transfun_1d_cloud_direct_model6;
-      transfun_2d_cloud_direct = transfun_2d_cloud_direct_model6;
+      transfun_1d_cloud_sample = transfun_1d_cloud_sample_model6;
+      transfun_2d_cloud_sample = transfun_2d_cloud_sample_model6;
       break;
 
     case 7:
       num_params_blr_model = sizeof(BLRmodel7)/sizeof(double);
-      transfun_1d_cloud_direct = transfun_1d_cloud_direct_model7;
-      transfun_2d_cloud_direct = transfun_2d_cloud_direct_model7;
+      transfun_1d_cloud_sample = transfun_1d_cloud_sample_model7;
+      transfun_2d_cloud_sample = transfun_2d_cloud_sample_model7;
       break;
 
     default:
       num_params_blr_model = sizeof(BLRmodel1)/sizeof(double);
-      transfun_1d_cloud_direct = transfun_1d_cloud_direct_model1;
-      transfun_2d_cloud_direct = transfun_2d_cloud_direct_model1;
+      transfun_1d_cloud_sample = transfun_1d_cloud_sample_model1;
+      transfun_2d_cloud_sample = transfun_2d_cloud_sample_model1;
       break;
   }
 

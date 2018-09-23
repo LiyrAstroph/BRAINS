@@ -38,7 +38,7 @@ int dnest_line1d(int argc, char **argv)
   {
     case 1:
       num_params_blr_model = 9;
-      transfun_1d_cloud_direct = transfun_1d_cloud_direct_model1;
+      transfun_1d_cloud_sample = transfun_1d_cloud_sample_model1;
 
       num_params_radial_samp=3;
       params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
@@ -50,7 +50,7 @@ int dnest_line1d(int argc, char **argv)
       break;
     case 2:
       num_params_blr_model = 9;
-      transfun_1d_cloud_direct = transfun_1d_cloud_direct_model1;
+      transfun_1d_cloud_sample = transfun_1d_cloud_sample_model1;
 
       num_params_radial_samp=3;
       params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
@@ -61,7 +61,7 @@ int dnest_line1d(int argc, char **argv)
       break;
     case 3:
       num_params_blr_model = 9;
-      transfun_1d_cloud_direct = transfun_1d_cloud_direct_model3;
+      transfun_1d_cloud_sample = transfun_1d_cloud_sample_model3;
 
       num_params_radial_samp=3;
       params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
@@ -72,7 +72,7 @@ int dnest_line1d(int argc, char **argv)
       break;
     case 4:
       num_params_blr_model = 9;
-      transfun_1d_cloud_direct = transfun_1d_cloud_direct_model3;
+      transfun_1d_cloud_sample = transfun_1d_cloud_sample_model3;
 
       num_params_radial_samp=3;
       params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
@@ -84,7 +84,7 @@ int dnest_line1d(int argc, char **argv)
 
     case 5:
       num_params_blr_model = 12;
-      transfun_1d_cloud_direct = transfun_1d_cloud_direct_model5;
+      transfun_1d_cloud_sample = transfun_1d_cloud_sample_model5;
 
       num_params_radial_samp=4;
       params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
@@ -96,7 +96,7 @@ int dnest_line1d(int argc, char **argv)
 
     case 6:
       num_params_blr_model = 11;
-      transfun_1d_cloud_direct = transfun_1d_cloud_direct_model6;
+      transfun_1d_cloud_sample = transfun_1d_cloud_sample_model6;
 
       num_params_radial_samp=3;
       params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
@@ -107,7 +107,7 @@ int dnest_line1d(int argc, char **argv)
 
     case 7:
       num_params_blr_model = 16;
-      transfun_1d_cloud_direct = transfun_1d_cloud_direct_model7;
+      transfun_1d_cloud_sample = transfun_1d_cloud_sample_model7;
 
       num_params_radial_samp=7;
       params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
@@ -122,7 +122,7 @@ int dnest_line1d(int argc, char **argv)
 
     default:
       num_params_blr_model = 9;
-      transfun_1d_cloud_direct = transfun_1d_cloud_direct_model1;
+      transfun_1d_cloud_sample = transfun_1d_cloud_sample_model1;
 
       num_params_radial_samp=3;
       params_radial_samp = malloc(num_params_radial_samp * sizeof(int));

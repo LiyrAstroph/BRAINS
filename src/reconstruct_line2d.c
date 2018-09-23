@@ -140,7 +140,7 @@ void postprocess2d()
       calculate_con_from_model(post_model + num_params_blr *sizeof(double));
       gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
 
-      transfun_2d_cloud_direct(post_model, Vline_data, Trans2D_at_veldata, 
+      transfun_2d_cal(post_model, Vline_data, Trans2D_at_veldata, 
                                       n_vel_data, 0);
       calculate_line2d_from_blrmodel(post_model, Tline_data, Vline_data, Trans2D_at_veldata, 
                                       Fline2d_at_data, n_line_data, n_vel_data);
@@ -370,7 +370,7 @@ void reconstruct_line2d()
 
       smooth_init(n_vel_data, Vline_data);
       // recovered line2d at data points
-      transfun_2d_cloud_direct(best_model_line2d, Vline_data, Trans2D_at_veldata, 
+      transfun_2d_cal(best_model_line2d, Vline_data, Trans2D_at_veldata, 
                                               n_vel_data, parset.flag_save_clouds);
       calculate_line2d_from_blrmodel(best_model_line2d, Tline_data, Vline_data, Trans2D_at_veldata, 
                                                        Fline2d_at_data, n_line_data, n_vel_data);
@@ -419,7 +419,7 @@ void reconstruct_line2d()
 
       which_parameter_update = -1;
       which_particle_update = 0;
-      transfun_2d_cloud_direct(best_model_line2d, TransV, Trans2D, parset.n_vel_recon, 0);
+      transfun_2d_cal(best_model_line2d, TransV, Trans2D, parset.n_vel_recon, 0);
 
       /* there is no data for spectral broadening at given specified epoch, using the mean value
        * and set InstRes_err=0.0.
@@ -712,7 +712,7 @@ double prob_initial_line2d(const void *model)
   Trans2D_at_veldata = Trans2D_at_veldata_particles[which_particle_update];
   Fline2d_at_data = Fline_at_data_particles[which_particle_update];
   which_parameter_update = -1;
-  transfun_2d_cloud_direct(model, Vline_data, Trans2D_at_veldata, n_vel_data, 0);
+  transfun_2d_cal(model, Vline_data, Trans2D_at_veldata, n_vel_data, 0);
   calculate_line2d_from_blrmodel(model, Tline_data, Vline_data, Trans2D_at_veldata, Fline2d_at_data, n_line_data, n_vel_data);
 
   var2_se = (exp(pm[num_params_blr-1])-1.0) * (exp(pm[num_params_blr-1])-1.0) * line_error_mean*line_error_mean;
@@ -751,7 +751,7 @@ double prob_restart_line2d(const void *model)
   Trans2D_at_veldata = Trans2D_at_veldata_particles[which_particle_update];
   Fline2d_at_data = Fline_at_data_particles[which_particle_update];
   which_parameter_update = num_params + 1; // so as not to update clouds.
-  transfun_2d_cloud_direct(model, Vline_data, Trans2D_at_veldata, n_vel_data, 0);
+  transfun_2d_cal(model, Vline_data, Trans2D_at_veldata, n_vel_data, 0);
   calculate_line2d_from_blrmodel(model, Tline_data, Vline_data, Trans2D_at_veldata, Fline2d_at_data, n_line_data, n_vel_data);
 
   var2_se = (exp(pm[num_params_blr-1])-1.0) * (exp(pm[num_params_blr-1])-1.0) * line_error_mean*line_error_mean;
@@ -887,7 +887,7 @@ double prob_line2d(const void *model)
   if( (which_parameter_update < num_params_blr-1) || force_update == 1)
   {
     Trans2D_at_veldata = Trans2D_at_veldata_particles_perturb[which_particle_update];
-    transfun_2d_cloud_direct(model, Vline_data, Trans2D_at_veldata, n_vel_data, 0);
+    transfun_2d_cal(model, Vline_data, Trans2D_at_veldata, n_vel_data, 0);
   }
   else
   {
