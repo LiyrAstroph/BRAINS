@@ -343,7 +343,7 @@ void transfun_2d_cal(const void *pm, double *transv, double *trans2d, int n_vel,
  */
 void transfun_1d_cloud_sample_model1(const void *pm, int flag_save)
 {
-  FILE *fcloud_out;
+  FILE *fcloud_out = NULL;
   int i, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0;
@@ -488,6 +488,7 @@ void transfun_1d_cloud_sample_model1(const void *pm, int flag_save)
  */
 void transfun_2d_cloud_sample_model1(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
+  FILE *fcloud_out = NULL;
   int i, j, nc, flag_update=0;
   double r, phi, dis, Lopn_cos, u;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
@@ -497,7 +498,6 @@ void transfun_2d_cloud_sample_model1(const void *pm, double *transv, double *tra
   double *pr;
   double *pmodel = (double *)pm;
   BLRmodel1 *model = (BLRmodel1 *)pm;
-  FILE *fcloud_out;
   double Emin, Lmax, Vr, Vr2, Vph, mbh, chi, lambda, q;
   
 
@@ -706,6 +706,7 @@ void transfun_2d_cloud_sample_model1(const void *pm, double *transv, double *tra
  */
 void transfun_2d_cloud_sample_model2(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
+  FILE *fcloud_out = NULL;
   int i, j, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
@@ -715,7 +716,6 @@ void transfun_2d_cloud_sample_model2(const void *pm, double *transv, double *tra
   double *pr;
   double *pmodel = (double *)pm;
   BLRmodel2 *model = (BLRmodel2 *)pm;
-  FILE *fcloud_out;
   double Emin, Ecirc, Lcirc, Vcirc, Vr, Vph, mbh, sigr, sigtheta, rhor, rhotheta;
   
 
@@ -911,7 +911,7 @@ void transfun_2d_cloud_sample_model2(const void *pm, double *transv, double *tra
  */
 void transfun_1d_cloud_sample_model3(const void *pm, int flag_save)
 {
-  FILE *fcloud_out;
+  FILE *fcloud_out = NULL;
   int i, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0;
@@ -1051,6 +1051,7 @@ void transfun_1d_cloud_sample_model3(const void *pm, int flag_save)
  */
 void transfun_2d_cloud_sample_model3(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
+  FILE *fcloud_out = NULL;
   int i, j, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
@@ -1060,7 +1061,6 @@ void transfun_2d_cloud_sample_model3(const void *pm, double *transv, double *tra
   double *pr;
   double *pmodel = (double *)pm;
   BLRmodel3 *model = (BLRmodel3 *)pm;
-  FILE *fcloud_out;
   double Emin, Lmax, Vr, Vph, mbh, xi, q;
   
 
@@ -1248,6 +1248,7 @@ void transfun_2d_cloud_sample_model3(const void *pm, double *transv, double *tra
  */
 void transfun_2d_cloud_sample_model4(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
+  FILE *fcloud_out = NULL;
   int i, j, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
@@ -1257,7 +1258,6 @@ void transfun_2d_cloud_sample_model4(const void *pm, double *transv, double *tra
   double *pr;
   double *pmodel = (double *)pm;
   BLRmodel4 *model = (BLRmodel4 *)pm;
-  FILE *fcloud_out;
   double Emin, Lmax, Vr, Vph, mbh, xi, q;
   
 
@@ -1452,7 +1452,7 @@ void transfun_2d_cloud_sample_model4(const void *pm, double *transv, double *tra
  */
 void transfun_1d_cloud_sample_model5(const void *pm, int flag_save)
 {
-  FILE *fcloud_out;
+  FILE *fcloud_out = NULL;
   int i, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0;
@@ -1607,7 +1607,7 @@ void transfun_1d_cloud_sample_model5(const void *pm, int flag_save)
  */
 void transfun_2d_cloud_sample_model5(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
-  FILE *fcloud_out;
+  FILE *fcloud_out = NULL;
   int i, j, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0;
@@ -1856,7 +1856,7 @@ void transfun_2d_cloud_sample_model5(const void *pm, double *transv, double *tra
  */
 void transfun_1d_cloud_sample_model6(const void *pm, int flag_save)
 {
-  FILE *fcloud_out;
+  FILE *fcloud_out = NULL;
   int i, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0;
@@ -1999,7 +1999,7 @@ void transfun_1d_cloud_sample_model6(const void *pm, int flag_save)
  */
 void transfun_2d_cloud_sample_model6(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
-  FILE *fcloud_out;
+  FILE *fcloud_out = NULL;
   int i, j, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb, vcloud_min, vcloud_max;
@@ -2237,7 +2237,7 @@ void transfun_2d_cloud_sample_model6(const void *pm, double *transv, double *tra
  */
 void transfun_1d_cloud_sample_model7(const void *pm, int flag_save)
 {
-  FILE *fcloud_out;
+  FILE *fcloud_out = NULL;
   int i, nc, flag_update=0, num_sh;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0;
@@ -2395,7 +2395,7 @@ void transfun_1d_cloud_sample_model7(const void *pm, int flag_save)
   {
     pr = clouds_particles_perturb[which_particle_update];
 
-    for(num_sh; i<parset.n_cloud_per_task; i++)
+    for(i = num_sh; i<parset.n_cloud_per_task; i++)
     {
       nc = 0;
       r = rcloud_max_set+1.0;
@@ -2479,7 +2479,7 @@ void transfun_1d_cloud_sample_model7(const void *pm, int flag_save)
  */
 void transfun_2d_cloud_sample_model7(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
-  FILE *fcloud_out;
+  FILE *fcloud_out = NULL;
   int i, j, nc, flag_update=0, num_sh;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb, vcloud_min, vcloud_max, Rs, g, sig_turb;
