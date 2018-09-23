@@ -350,6 +350,7 @@ void transfun_1d_cloud_sample_model1(const void *pm, int flag_save)
   double inc, F, beta, mu, k, a, s, rin, sig;
   double Lphi, Lthe;
   double weight, rnd;
+  double *pr;
   BLRmodel1 *model = (BLRmodel1 *)pm;
 
   Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
@@ -394,14 +395,13 @@ void transfun_1d_cloud_sample_model1(const void *pm, int flag_save)
       }
     }
   }
-  
-  for(i=0; i<parset.n_cloud_per_task; i++)
-  {
-    /* generate a direction of the angular momentum of the orbit  */
-    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
 
-    if( flag_update == 1 ) /* update radial sampling when necessary */
+  /* generate clouds' radial location */
+  if( flag_update == 1 )
+  {
+    pr = clouds_particles_perturb[which_particle_update];
+
+    for(i=0; i<parset.n_cloud_per_task; i++)
     {
       nc = 0;
       r = rcloud_max_set+1.0;
@@ -417,12 +417,22 @@ void transfun_1d_cloud_sample_model1(const void *pm, int flag_save)
         r = rin + sig * rnd;
         nc++;
       }
-      clouds_particles_perturb[which_particle_update][i] = r;
+
+      pr[i] = r;
     }
-    else
-    {
-      r = clouds_particles[which_particle_update][i];
-    }
+  }
+  else
+  {
+    pr = clouds_particles[which_particle_update];
+  }
+  
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    /* generate a direction of the angular momentum of the orbit  */
+    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
+    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
+
+    r = pr[i];
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
     /* Polar coordinates to Cartesian coordinate */
@@ -484,6 +494,7 @@ void transfun_2d_cloud_sample_model1(const void *pm, double *transv, double *tra
   double inc, F, beta, mu, k, a, s, rin, sig;
   double Lphi, Lthe, L, E, vcloud_max, vcloud_min, linecenter = 0.0;
   double V, weight, rnd;
+  double *pr;
   double *pmodel = (double *)pm;
   BLRmodel1 *model = (BLRmodel1 *)pm;
   FILE *fcloud_out;
@@ -542,13 +553,12 @@ void transfun_2d_cloud_sample_model1(const void *pm, double *transv, double *tra
     }
   }
 
-  for(i=0; i<parset.n_cloud_per_task; i++)
+  /* generate clouds' radial location */
+  if( flag_update == 1 )
   {
-// generate a direction of the angular momentum     
-    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
+    pr = clouds_particles_perturb[which_particle_update];
 
-    if( flag_update == 1 )
+    for(i=0; i<parset.n_cloud_per_task; i++)
     {
       nc = 0;
       r = rcloud_max_set+1.0;
@@ -564,12 +574,22 @@ void transfun_2d_cloud_sample_model1(const void *pm, double *transv, double *tra
         r = rin + sig * rnd;
         nc++;
       }
-      clouds_particles_perturb[which_particle_update][i] = r;
+
+      pr[i] = r;
     }
-    else
-    {
-      r = clouds_particles[which_particle_update][i];
-    }
+  }
+  else
+  {
+    pr = clouds_particles[which_particle_update];
+  }
+
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+// generate a direction of the angular momentum     
+    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
+    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
+
+    r = pr[i];
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
     x = r * cos(phi); 
@@ -692,6 +712,7 @@ void transfun_2d_cloud_sample_model2(const void *pm, double *transv, double *tra
   double inc, F, beta, mu, k, a, s, rin, sig;
   double Lphi, Lthe, vcloud_max, vcloud_min, linecenter = 0.0;
   double V, weight, rnd;
+  double *pr;
   double *pmodel = (double *)pm;
   BLRmodel2 *model = (BLRmodel2 *)pm;
   FILE *fcloud_out;
@@ -750,14 +771,12 @@ void transfun_2d_cloud_sample_model2(const void *pm, double *transv, double *tra
     }
   }
 
-  for(i=0; i<parset.n_cloud_per_task; i++)
+  /* generate clouds' radial location */
+  if( flag_update == 1 )
   {
-    /* generate a direction of the angular momentum */    
-    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
+    pr = clouds_particles_perturb[which_particle_update];
 
-    // which_parameter_update == 1 ==> beta is being updated.
-    if( flag_update == 1 )
+    for(i=0; i<parset.n_cloud_per_task; i++)
     {
       nc = 0;
       r = rcloud_max_set+1.0;
@@ -773,12 +792,23 @@ void transfun_2d_cloud_sample_model2(const void *pm, double *transv, double *tra
         r = rin + sig * rnd;
         nc++;
       }
-      clouds_particles_perturb[which_particle_update][i] = r;
+
+      pr[i] = r;
     }
-    else
-    {
-      r = clouds_particles[which_particle_update][i];
-    }
+  }
+  else
+  {
+    pr = clouds_particles[which_particle_update];
+  }
+
+
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    /* generate a direction of the angular momentum */    
+    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
+    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
+
+    r = pr[i];
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
     x = r * cos(phi); 
@@ -888,6 +918,7 @@ void transfun_1d_cloud_sample_model3(const void *pm, int flag_save)
   double inc, F, alpha, Rin, k;
   double Lphi, Lthe;
   double weight, rnd;
+  double *pr;
   BLRmodel3 *model = (BLRmodel3 *)pm;
 
   Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
@@ -928,16 +959,12 @@ void transfun_1d_cloud_sample_model3(const void *pm, int flag_save)
     }
   }
   
-  for(i=0; i<parset.n_cloud_per_task; i++)
+  /* generate clouds' radial location */
+  if( flag_update == 1 )
   {
-    /* generate a direction of the angular momentum of the orbit */
-    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
-    
-    /* "which_parameter_update = -1" means that all parameters are updated, 
-     * usually occurs at the initial step.
-     */
-    if( flag_update == 1 ) /* update radial sampling when necessary */
+    pr = clouds_particles_perturb[which_particle_update];
+
+    for(i=0; i<parset.n_cloud_per_task; i++)
     {
       nc = 0;
       r = rcloud_max_set+1.0;
@@ -955,12 +982,22 @@ void transfun_1d_cloud_sample_model3(const void *pm, int flag_save)
         r = Rin * rnd ;
         nc++;
       }
-      clouds_particles_perturb[which_particle_update][i] = r;
+
+      pr[i] = r;
     }
-    else
-    {
-      r = clouds_particles[which_particle_update][i];
-    }
+  }
+  else
+  {
+    pr = clouds_particles[which_particle_update];
+  }
+
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    /* generate a direction of the angular momentum of the orbit */
+    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
+    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
+    
+    r = pr[i];
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
     /* Polar coordinates to Cartesian coordinate */
@@ -1020,6 +1057,7 @@ void transfun_2d_cloud_sample_model3(const void *pm, double *transv, double *tra
   double inc, F, alpha, Rin, k;
   double Lphi, Lthe, L, E, vcloud_max, vcloud_min, linecenter=0.0;
   double V, weight, rnd;
+  double *pr;
   double *pmodel = (double *)pm;
   BLRmodel3 *model = (BLRmodel3 *)pm;
   FILE *fcloud_out;
@@ -1076,14 +1114,12 @@ void transfun_2d_cloud_sample_model3(const void *pm, double *transv, double *tra
     }
   }
 
-  for(i=0; i<parset.n_cloud_per_task; i++)
+  /* generate clouds' radial location */
+  if( flag_update == 1 )
   {
-// generate a direction of the angular momentum     
-    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
+    pr = clouds_particles_perturb[which_particle_update];
 
-    // which_parameter_update == 1 ==> beta is being updated.
-    if( flag_update == 1 ) //
+    for(i=0; i<parset.n_cloud_per_task; i++)
     {
       nc = 0;
       r = rcloud_max_set+1.0;
@@ -1101,12 +1137,22 @@ void transfun_2d_cloud_sample_model3(const void *pm, double *transv, double *tra
         r = Rin * rnd ;
         nc++;
       }
-      clouds_particles_perturb[which_particle_update][i] = r;
+
+      pr[i] = r;
     }
-    else
-    {
-      r = clouds_particles[which_particle_update][i];
-    }
+  }
+  else
+  {
+    pr = clouds_particles[which_particle_update];
+  }
+
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+// generate a direction of the angular momentum     
+    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
+    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
+
+    r = pr[i];
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
     x = r * cos(phi); 
@@ -1208,6 +1254,7 @@ void transfun_2d_cloud_sample_model4(const void *pm, double *transv, double *tra
   double inc, F, alpha, Rin, k;
   double Lphi, Lthe, L, E, vcloud_max, vcloud_min, linecenter=0.0;
   double V, weight, rnd;
+  double *pr;
   double *pmodel = (double *)pm;
   BLRmodel4 *model = (BLRmodel4 *)pm;
   FILE *fcloud_out;
@@ -1264,13 +1311,12 @@ void transfun_2d_cloud_sample_model4(const void *pm, double *transv, double *tra
     }
   }
 
-  for(i=0; i<parset.n_cloud_per_task; i++)
+  /* generate clouds' radial location */
+  if( flag_update == 1 )
   {
-    /* generate a direction of the angular momentum   */ 
-    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
+    pr = clouds_particles_perturb[which_particle_update];
 
-    if( flag_update == 1 ) //
+    for(i=0; i<parset.n_cloud_per_task; i++)
     {
       nc = 0;
       r = rcloud_max_set+1.0;
@@ -1288,12 +1334,22 @@ void transfun_2d_cloud_sample_model4(const void *pm, double *transv, double *tra
         r = Rin * rnd ;
         nc++;
       }
-      clouds_particles_perturb[which_particle_update][i] = r;
+
+      pr[i] = r;
     }
-    else
-    {
-      r = clouds_particles[which_particle_update][i];
-    }
+  }
+  else
+  {
+    pr = clouds_particles[which_particle_update];
+  }
+
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    /* generate a direction of the angular momentum   */ 
+    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
+    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
+
+    r = pr[i];
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
     x = r * cos(phi); 
@@ -1403,6 +1459,7 @@ void transfun_1d_cloud_sample_model5(const void *pm, int flag_save)
   double inc, Fin, Fout, alpha, k, gam, mu, xi;
   double Lphi, Lthe;
   double weight, rndr, rnd, rnd_xi, rnd_frac, frac1, frac2, ratio;
+  double *pr;
   BLRmodel5 *model = (BLRmodel5 *)pm;
 
   Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
@@ -1450,16 +1507,13 @@ void transfun_1d_cloud_sample_model5(const void *pm, int flag_save)
       }
     }
   }
-  
-  for(i=0; i<parset.n_cloud_per_task; i++)
+
+  /* generate clouds' radial location */
+  if( flag_update == 1 )
   {
-// generate a direction of the angular momentum of the orbit   
-    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_r), gam));
-    
-    // "which_parameter_update = -1" means that all parameters are updated, usually occurs at the 
-    // initial step.
-    if( flag_update == 1 ) //
+    pr = clouds_particles_perturb[which_particle_update];
+
+    for(i=0; i<parset.n_cloud_per_task; i++)
     {
       nc = 0;
       r = rcloud_max_set+1.0;
@@ -1484,12 +1538,22 @@ void transfun_1d_cloud_sample_model5(const void *pm, int flag_save)
         r = rndr*mu;
         nc++;
       }
-      clouds_particles_perturb[which_particle_update][i] = r;
+
+      pr[i] = r;
     }
-    else
-    {
-      r = clouds_particles[which_particle_update][i];
-    }
+  }
+  else
+  {
+    pr = clouds_particles[which_particle_update];
+  }
+  
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+// generate a direction of the angular momentum of the orbit   
+    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
+    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_r), gam));
+    
+    r = pr[i];
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
     /* Polar coordinates to Cartesian coordinate */
@@ -1552,6 +1616,7 @@ void transfun_2d_cloud_sample_model5(const void *pm, double *transv, double *tra
   double Lphi, Lthe, V, Vr, Vph, Vkep, rhoV, theV, linecenter=0.0;
   double weight, rndr, rnd, rnd_frac, rnd_xi, frac1, frac2, ratio, Rs, g;
   double vx, vy, vz, vxb, vyb, vzb, vcloud_max, vcloud_min;
+  double *pr;
   double *pmodel = (double *)pm;
   BLRmodel5 *model = (BLRmodel5 *)pm;
 
@@ -1620,15 +1685,12 @@ void transfun_2d_cloud_sample_model5(const void *pm, double *transv, double *tra
     }
   }
   
-  for(i=0; i<parset.n_cloud_per_task; i++)
+  /* generate clouds' radial location */
+  if( flag_update == 1 )
   {
-    /* generate a direction of the angular momentum of the orbit  */ 
-    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_r), gam));
-    
-    // "which_parameter_update = -1" means that all parameters are updated, usually occurs at the 
-    // initial step.
-    if( flag_update == 1 ) //
+    pr = clouds_particles_perturb[which_particle_update];
+
+    for(i=0; i<parset.n_cloud_per_task; i++)
     {
       nc = 0;
       r = rcloud_max_set+1.0;
@@ -1650,15 +1712,25 @@ void transfun_2d_cloud_sample_model5(const void *pm, double *transv, double *tra
         {
           rndr = pow( 1.0 - rnd * (1.0 - pow(Fout, -alpha+1.0)), 1.0/(1.0-alpha));
         }
-        r = Rs + rndr*mu;
+        r = rndr*mu;
         nc++;
       }
-      clouds_particles_perturb[which_particle_update][i] = r;
+
+      pr[i] = r;
     }
-    else
-    {
-      r = clouds_particles[which_particle_update][i];
-    }
+  }
+  else
+  {
+    pr = clouds_particles[which_particle_update];
+  }
+  
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    /* generate a direction of the angular momentum of the orbit  */ 
+    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
+    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_r), gam));
+    
+    r = pr[i];
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
     /* Polar coordinates to Cartesian coordinate */
@@ -1791,6 +1863,7 @@ void transfun_1d_cloud_sample_model6(const void *pm, int flag_save)
   double inc, F, beta, mu, k, gam, xi, a, s, rin, sig;
   double Lphi, Lthe;
   double weight, rnd, rnd_xi;
+  double *pr;
   BLRmodel6 *model = (BLRmodel6 *)pm;
 
   Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
@@ -1835,13 +1908,13 @@ void transfun_1d_cloud_sample_model6(const void *pm, int flag_save)
     }
   }
   
-  for(i=0; i<parset.n_cloud_per_task; i++)
-  {
-// generate a direction of the angular momentum of the orbit   
-    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_r), gam));
 
-    if( flag_update == 1 ) //
+  /* generate clouds' radial location */
+  if( flag_update == 1 )
+  {
+    pr = clouds_particles_perturb[which_particle_update];
+
+    for(i=0; i<parset.n_cloud_per_task; i++)
     {
       nc = 0;
       r = rcloud_max_set+1.0;
@@ -1857,12 +1930,22 @@ void transfun_1d_cloud_sample_model6(const void *pm, int flag_save)
         r = rin + sig * rnd;
         nc++;
       }
-      clouds_particles_perturb[which_particle_update][i] = r;
+      pr[i] = r;
     }
-    else
-    {
-      r = clouds_particles[which_particle_update][i];
-    }
+  }
+  else
+  {
+    pr = clouds_particles[which_particle_update];
+  }
+  
+
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+// generate a direction of the angular momentum of the orbit   
+    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
+    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_r), gam));
+
+    r = pr[i];
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
     /* Polar coordinates to Cartesian coordinates */
@@ -1925,6 +2008,7 @@ void transfun_2d_cloud_sample_model6(const void *pm, double *transv, double *tra
   double mbh, fellip, fflow, sigr_circ, sigthe_circ, sigr_rad, sigthe_rad, theta_rot, sig_turb;
   double Lphi, Lthe, linecenter=0.0;
   double weight, rnd, rnd_xi;
+  double *pr;
   double *pmodel = (double *)pm;
   BLRmodel6 *model = (BLRmodel6 *)pm;
 
@@ -1992,13 +2076,12 @@ void transfun_2d_cloud_sample_model6(const void *pm, double *transv, double *tra
     }
   }
   
-  for(i=0; i<parset.n_cloud_per_task; i++)
+  /* generate clouds' radial location */
+  if( flag_update == 1 )
   {
-// generate a direction of the angular momentum of the orbit   
-    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_r), gam));
+    pr = clouds_particles_perturb[which_particle_update];
 
-    if( flag_update == 1 ) //
+    for(i=0; i<parset.n_cloud_per_task; i++)
     {
       nc = 0;
       r = rcloud_max_set+1.0;
@@ -2007,7 +2090,6 @@ void transfun_2d_cloud_sample_model6(const void *pm, double *transv, double *tra
         if(nc > 1000)
         {
           printf("# Error, too many tries in generating ridial location of clouds.\n");
-          printf("%f %f %f %f %f \n", F, beta, mu, rcloud_max_set, rcloud_min_set);
           exit(0);
         }
         rnd = gsl_ran_gamma(gsl_r, a, 1.0);
@@ -2015,13 +2097,21 @@ void transfun_2d_cloud_sample_model6(const void *pm, double *transv, double *tra
         r = rin + sig * rnd;
         nc++;
       }
-      clouds_particles_perturb[which_particle_update][i] = r;
+      pr[i] = r;
     }
-    else
-    {
-      r = clouds_particles[which_particle_update][i];
-    }
+  }
+  else
+  {
+    pr = clouds_particles[which_particle_update];
+  }
 
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+// generate a direction of the angular momentum of the orbit   
+    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
+    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_r), gam));
+
+    r = pr[i];
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
     /* Polar coordinates to Cartesian coordinate */
@@ -2154,6 +2244,7 @@ void transfun_1d_cloud_sample_model7(const void *pm, int flag_save)
   double inc, F, beta, mu, k, gam, xi, a, s, rin, sig;
   double Lphi, Lthe;
   double weight, rnd, rnd_xi;
+  double *pr;
   BLRmodel7 *model = (BLRmodel7 *)pm;
 
   Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
@@ -2212,13 +2303,12 @@ void transfun_1d_cloud_sample_model7(const void *pm, int flag_save)
   
   num_sh = (int)(parset.n_cloud_per_task * model->fsh);
 
-  for(i=0; i<num_sh; i++)
+  /* generate clouds' radial location */
+  if( flag_update == 1 )
   {
-    /* generate a direction of the angular momentum of the orbit */ 
-    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_r), gam));
+    pr = clouds_particles_perturb[which_particle_update];
 
-    if( flag_update == 1 ) //
+    for(i=0; i<num_sh; i++)
     {
       nc = 0;
       r = rcloud_max_set+1.0;
@@ -2234,12 +2324,21 @@ void transfun_1d_cloud_sample_model7(const void *pm, int flag_save)
         r = rin + sig * rnd;
         nc++;
       }
-      clouds_particles_perturb[which_particle_update][i] = r;
+      pr[i] = r;
     }
-    else
-    {
-      r = clouds_particles[which_particle_update][i];
-    }
+  }
+  else
+  {
+    pr = clouds_particles[which_particle_update];
+  }
+
+  for(i=0; i<num_sh; i++)
+  {
+    /* generate a direction of the angular momentum of the orbit */ 
+    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
+    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_r), gam));
+
+    r = pr[i];
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
     /* Polar coordinates to Cartesian coordinates */
@@ -2291,13 +2390,12 @@ void transfun_1d_cloud_sample_model7(const void *pm, int flag_save)
   else
     Lopn_cos_un2 = 0.0;
 
-  for(i=num_sh; i<parset.n_cloud_per_task; i++)
+  /* generate clouds' radial location */
+  if( flag_update == 1 )
   {
-    /* generate a direction of the angular momentum of the orbit  */ 
-    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    Lthe = acos(Lopn_cos_un2 + (Lopn_cos_un1-Lopn_cos_un2) * pow(gsl_rng_uniform(gsl_r), gam));
+    pr = clouds_particles_perturb[which_particle_update];
 
-    if( flag_update == 1 ) //
+    for(num_sh; i<parset.n_cloud_per_task; i++)
     {
       nc = 0;
       r = rcloud_max_set+1.0;
@@ -2313,12 +2411,21 @@ void transfun_1d_cloud_sample_model7(const void *pm, int flag_save)
         r = rin + sig * rnd;
         nc++;
       }
-      clouds_particles_perturb[which_particle_update][i] = r;
+      pr[i] = r;
     }
-    else
-    {
-      r = clouds_particles[which_particle_update][i];
-    }
+  }
+  else
+  {
+    pr = clouds_particles[which_particle_update];
+  }
+
+  for(i=num_sh; i<parset.n_cloud_per_task; i++)
+  {
+    /* generate a direction of the angular momentum of the orbit  */ 
+    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
+    Lthe = acos(Lopn_cos_un2 + (Lopn_cos_un1-Lopn_cos_un2) * pow(gsl_rng_uniform(gsl_r), gam));
+
+    r = pr[i];
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
     /* Polar coordinates to Cartesian coordinates */
@@ -2381,6 +2488,7 @@ void transfun_2d_cloud_sample_model7(const void *pm, double *transv, double *tra
   double mbh, fellip, fflow, sigr_circ, sigthe_circ, sigr_rad, sigthe_rad, theta_rot;
   double Lphi, Lthe, linecenter=0.0;
   double weight, rnd, rnd_xi;
+  double *pr;
   double *pmodel = (double *)pm;
   BLRmodel7 *model = (BLRmodel7 *)pm;
 
@@ -2447,13 +2555,13 @@ void transfun_2d_cloud_sample_model7(const void *pm, double *transv, double *tra
   }
   
   num_sh = (int)(parset.n_cloud_per_task * model->fsh);
-  for(i=0; i<num_sh; i++)
-  {
-// generate a direction of the angular momentum of the orbit   
-    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_r), gam));
 
-    if( flag_update == 1 ) //
+  /* generate clouds' radial location */
+  if( flag_update == 1 )
+  {
+    pr = clouds_particles_perturb[which_particle_update];
+
+    for(i=0; i<num_sh; i++)
     {
       nc = 0;
       r = rcloud_max_set+1.0;
@@ -2469,12 +2577,21 @@ void transfun_2d_cloud_sample_model7(const void *pm, double *transv, double *tra
         r = rin + sig * rnd;
         nc++;
       }
-      clouds_particles_perturb[which_particle_update][i] = r;
+      pr[i] = r;
     }
-    else
-    {
-      r = clouds_particles[which_particle_update][i];
-    }
+  }
+  else
+  {
+    pr = clouds_particles[which_particle_update];
+  }
+
+  for(i=0; i<num_sh; i++)
+  {
+// generate a direction of the angular momentum of the orbit   
+    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
+    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_r), gam));
+
+    r = pr[i];
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
     /* Polar coordinates to Cartesian coordinate */
@@ -2593,14 +2710,12 @@ void transfun_2d_cloud_sample_model7(const void *pm, double *transv, double *tra
   else
     Lopn_cos_un2 = 0.0;
 
-  for(i=num_sh; i<parset.n_cloud_per_task; i++)
+  /* generate clouds' radial location */
+  if( flag_update == 1 )
   {
-// generate a direction of the angular momentum of the orbit   
-    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    Lthe = acos(Lopn_cos_un2 + (Lopn_cos_un1-Lopn_cos_un2) * pow(gsl_rng_uniform(gsl_r), gam));
-    //Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_r), gam));
+    pr = clouds_particles_perturb[which_particle_update];
 
-    if( flag_update == 1 ) //
+    for(i=num_sh; i<parset.n_cloud_per_task; i++)
     {
       nc = 0;
       r = rcloud_max_set+1.0;
@@ -2616,12 +2731,22 @@ void transfun_2d_cloud_sample_model7(const void *pm, double *transv, double *tra
         r = rin + sig * rnd;
         nc++;
       }
-      clouds_particles_perturb[which_particle_update][i] = r;
+      pr[i] = r;
     }
-    else
-    {
-      r = clouds_particles[which_particle_update][i];
-    }
+  }
+  else
+  {
+    pr = clouds_particles[which_particle_update];
+  }
+
+  for(i=num_sh; i<parset.n_cloud_per_task; i++)
+  {
+// generate a direction of the angular momentum of the orbit   
+    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
+    Lthe = acos(Lopn_cos_un2 + (Lopn_cos_un1-Lopn_cos_un2) * pow(gsl_rng_uniform(gsl_r), gam));
+    //Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_r), gam));
+
+    r = pr[i];
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
     /* Polar coordinates to Cartesian coordinate */
