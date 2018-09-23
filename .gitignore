@@ -9,9 +9,9 @@ analysis/*
 !src/*.[ch]
 !src/param
 !src/doxyfile
-!data/arp151_con.txt
-!data/arp151_hb.txt
-!data/arp151_hb2d.txt
+data/arp151_con.txt
+data/arp151_hb.txt
+data/arp151_hb2d.txt
 !doc/*.tex
 !data/lcplot*.py
 brains
