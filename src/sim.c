@@ -387,13 +387,19 @@ void sim_init()
   if(parset.InstRes <= 0.0)
   {
     num_params_res = 1;
-    parset.InstRes = 220.0;
+    parset.InstRes = 220.0/VelUnit;
+    parset.InstRes_err = 0.0;
   }
 
   if(parset.flag_narrowline > 1)
   {
     printf("# set flag_narrowline to 1.\n");
     parset.flag_narrowline = 1;
+  }
+
+  if(parset.flag_narrowline == 0)
+  {
+    parset.width_narrowline = 0.0;
   }
 
   parset.flag_linecenter = 0;
