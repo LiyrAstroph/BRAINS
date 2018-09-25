@@ -333,6 +333,9 @@ extern double *prob_line_particles, *prob_line_particles_perturb;
 extern double tau_max, tau_min;
 extern double *tmp_tau, *tmp_weight, *tmp_vel;
 
+extern FILE *fcloud_out;
+extern int icr_cloud_save;
+
 extern int postprc;
 
 /* GSL */

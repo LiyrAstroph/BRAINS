@@ -130,12 +130,12 @@ void sim()
       pm[0] = log(1.0);   // A
       pm[1] = 0.0;        // Ag
       pm[2] = log(4.0);   // mu
-      pm[3] = 0.8;        // beta
-      pm[4] = 0.1;        // F
+      pm[3] = 1.0;        // beta
+      pm[4] = 0.25;        // F
       pm[5] = cos(20.0/180.0*PI); // inc
       pm[6] = 40.0;       // opn
-      pm[7] = 0.5;        // kappa
-      pm[8] = 1.0;        // gamma
+      pm[7] = -0.4;        // kappa
+      pm[8] = 5.0;        // gamma
       pm[9] = 0.5;        // obscuration
       pm[10] = log(2.0);  //mbh
       pm[11] = 0.5;       //fellip
@@ -282,7 +282,7 @@ void sim()
   }
   fclose(fp);
 
-  transfun_2d_cal(model, TransV, Trans2D, parset.n_vel_recon, 0);
+  transfun_2d_cal(model, TransV, Trans2D, parset.n_vel_recon, 1);
   calculate_line2d_from_blrmodel(model, Tline, TransV, 
           Trans2D, Fline2d, parset.n_line_recon, parset.n_vel_recon);
 
@@ -513,6 +513,24 @@ void sim_init()
   tmp_weight = malloc(parset.n_cloud_per_task * sizeof(double));
   tmp_vel = malloc(parset.n_cloud_per_task * parset.n_vel_per_cloud * sizeof(double));
 
+
+  if(parset.flag_save_clouds && thistask == roottask)
+  {
+    if(parset.n_cloud_per_task <= 1000)
+      icr_cloud_save = 1;
+    else
+      icr_cloud_save = parset.n_cloud_per_task/1000;
+
+    char fname[200];
+    sprintf(fname, "%s/%s", parset.file_dir, parset.cloud_out_file);
+    fcloud_out = fopen(fname, "w");
+    if(fcloud_out == NULL)
+    {
+      fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+      exit(-1);
+    }
+  }
+
   return;
 }
 
@@ -542,4 +560,9 @@ void sim_end()
   free(tmp_tau);
   free(tmp_weight);
   free(tmp_vel);
+
+  if(parset.flag_save_clouds && thistask == roottask)
+  {
+    fclose(fcloud_out);
+  }
 }

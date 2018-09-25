@@ -465,6 +465,24 @@ void reconstruct_line1d_init()
 
   tmp_tau = malloc(parset.n_cloud_per_task * sizeof(double));
   tmp_weight = malloc(parset.n_cloud_per_task * sizeof(double));
+
+  if(parset.flag_save_clouds && thistask == roottask)
+  {
+    if(parset.n_cloud_per_task <= 1000)
+      icr_cloud_save = 1;
+    else
+      icr_cloud_save = parset.n_cloud_per_task/1000;
+
+    char fname[200];
+    sprintf(fname, "%s/%s", parset.file_dir, parset.cloud_out_file);
+    fcloud_out = fopen(fname, "w");
+    if(fcloud_out == NULL)
+    {
+      fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+      exit(-1);
+    }
+  }
+
   return;
 }
 
@@ -532,6 +550,11 @@ void reconstruct_line1d_end()
 
   free(tmp_tau);
   free(tmp_weight);
+
+  if(parset.flag_save_clouds && thistask==roottask)
+  {
+    fclose(fcloud_out);
+  }
 
   if(thistask == roottask)
   {

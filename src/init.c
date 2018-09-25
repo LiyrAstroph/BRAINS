@@ -725,7 +725,7 @@ void set_blr_range_model6()
   blr_range_model[i][0] = 0.0;
   blr_range_model[i++][1] = 90.0;
   //sig_turb
-  blr_range_model[i][0] = log(0.001);
+  blr_range_model[i][0] = log(0.0001);
   blr_range_model[i++][1] = log(0.1);
   //logse
   blr_range_model[i][0] = log(1.0);

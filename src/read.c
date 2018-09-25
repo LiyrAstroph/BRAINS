@@ -303,7 +303,13 @@ void read_parset()
 
     if(parset.flag_narrowline >= 0 && parset.flag_narrowline <= 3)
     {
-      if(parset.flag_narrowline == 1)
+      if(parset.flag_narrowline == 0)
+      {
+        printf("# No arrow-line.\n");
+        parset.width_narrowline = 0.0;
+        
+      }
+      else if(parset.flag_narrowline == 1)
       {
         printf("# add fixed narrow-line: flux=%e, width=%fkm/s, shift=%fkm/s.\n", parset.flux_narrowline, 
            parset.width_narrowline, parset.shift_narrowline);
@@ -363,6 +369,8 @@ void read_parset()
       parset.n_cloud_per_task = fmax(2.0e5, parset.n_cloud_per_task);
       parset.n_vel_per_cloud = fmax(10.0, parset.n_vel_per_cloud);
       printf("# set NCloudPerCore and NVPerCloud: %d %d\n", parset.n_cloud_per_task, parset.n_vel_per_cloud);
+
+      parset.flag_save_clouds = 1;
     }
 
 

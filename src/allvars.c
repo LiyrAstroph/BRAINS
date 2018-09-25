@@ -106,6 +106,9 @@ double *prob_line_particles, *prob_line_particles_perturb;
 double tau_max, tau_min;
 double *tmp_tau, *tmp_weight, *tmp_vel;
 
+FILE *fcloud_out = NULL;
+int icr_cloud_save = 1;
+
 int postprc;
 
 /* GSL */

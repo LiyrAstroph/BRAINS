@@ -238,7 +238,7 @@ void transfun_1d_cal(const void *pm, int flag_save)
   }
   else
   {
-    printf(" Warning, zero transfer function at task %d.\n", thistask);
+    printf(" Warning, zero 1d transfer function at task %d.\n", thistask);
     for(i=0; i<parset.n_tau; i++)
     {
       Trans1D[i] = 0.0;
@@ -319,7 +319,7 @@ void transfun_2d_cal(const void *pm, double *transv, double *trans2d, int n_vel,
   }
   else
   {
-    printf(" Warning, zero transfer function at task %d.\n", thistask);
+    printf(" Warning, zero 2d transfer function at task %d.\n", thistask);
     for(i=0; i<parset.n_tau; i++)
     {
       for(j=0; j<n_vel; j++)
@@ -343,7 +343,6 @@ void transfun_2d_cal(const void *pm, double *transv, double *trans2d, int n_vel,
  */
 void transfun_1d_cloud_sample_model1(const void *pm, int flag_save)
 {
-  FILE *fcloud_out = NULL;
   int i, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0;
@@ -364,18 +363,6 @@ void transfun_1d_cloud_sample_model1(const void *pm, int flag_save)
   s = mu/a;
   rin=mu*F;
   sig=(1.0-F)*s;
-  
-  if(flag_save && thistask == roottask)
-  {
-    char fname[200];
-    sprintf(fname, "%s/%s", parset.file_dir, parset.cloud_out_file);
-    fcloud_out = fopen(fname, "w");
-    if(fcloud_out == NULL)
-    {
-      fprintf(stderr, "# Error: Cannot open file %s\n", fname);
-      exit(-1);
-    }
-  }
 
   /* "which_parameter_update = -1" means that all parameters are updated, 
    * usually occurs at the initial step.
@@ -469,13 +456,9 @@ void transfun_1d_cloud_sample_model1(const void *pm, int flag_save)
 
     if(flag_save && thistask==roottask)
     {
-      fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+      if(i%(icr_cloud_save) == 0)
+        fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
     }
-  }
-  
-  if(flag_save && thistask==roottask)
-  {
-    fclose(fcloud_out);
   }
   
   return;
@@ -488,7 +471,6 @@ void transfun_1d_cloud_sample_model1(const void *pm, int flag_save)
  */
 void transfun_2d_cloud_sample_model1(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
-  FILE *fcloud_out = NULL;
   int i, j, nc, flag_update=0;
   double r, phi, dis, Lopn_cos, u;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
@@ -524,18 +506,6 @@ void transfun_2d_cloud_sample_model1(const void *pm, double *transv, double *tra
 
   vcloud_max = -DBL_MAX;
   vcloud_min = DBL_MAX;
-
-  if(flag_save && thistask == roottask)
-  {
-    char fname[200];
-    sprintf(fname, "%s/%s", parset.file_dir, parset.cloud_out_file);
-    fcloud_out = fopen(fname, "w");
-    if(fcloud_out == NULL)
-    {
-      fprintf(stderr, "# Error: Cannot open file %s\n", fname);
-      exit(-1);
-    }
-  }
 
   if(force_update == 1 || which_parameter_update == -1 )
   {
@@ -680,13 +650,11 @@ void transfun_2d_cloud_sample_model1(const void *pm, double *transv, double *tra
 
       if(flag_save && thistask==roottask)
       {
-        fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx, vy, vz);
+        if(i%(icr_cloud_save) == 0)
+          fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx, vy, vz);
       }
     }
   }
-  
-  if(flag_save && thistask == roottask)
-    fclose(fcloud_out);
 
   return;
 }
@@ -706,7 +674,6 @@ void transfun_2d_cloud_sample_model1(const void *pm, double *transv, double *tra
  */
 void transfun_2d_cloud_sample_model2(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
-  FILE *fcloud_out = NULL;
   int i, j, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
@@ -742,18 +709,6 @@ void transfun_2d_cloud_sample_model2(const void *pm, double *transv, double *tra
 
   vcloud_max = -DBL_MAX;
   vcloud_min = DBL_MAX;
-
-  if(flag_save && thistask == roottask)
-  {
-    char fname[200];
-    sprintf(fname, "%s/%s", parset.file_dir, parset.cloud_out_file);
-    fcloud_out = fopen(fname, "w");
-    if(fcloud_out == NULL)
-    {
-      fprintf(stderr, "# Error: Cannot open file %s\n", fname);
-      exit(-1);
-    }
-  }
 
   if(force_update == 1 || which_parameter_update == -1 )
   {
@@ -886,13 +841,11 @@ void transfun_2d_cloud_sample_model2(const void *pm, double *transv, double *tra
 
       if(flag_save && thistask==roottask)
       {
-        fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx, vy, vz);
+        if(i%(icr_cloud_save) == 0)
+          fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx, vy, vz);
       }
     }
   }
-
-  if(flag_save && thistask == roottask)
-    fclose(fcloud_out);
 
   return;
 }
@@ -911,7 +864,6 @@ void transfun_2d_cloud_sample_model2(const void *pm, double *transv, double *tra
  */
 void transfun_1d_cloud_sample_model3(const void *pm, int flag_save)
 {
-  FILE *fcloud_out = NULL;
   int i, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0;
@@ -930,18 +882,6 @@ void transfun_1d_cloud_sample_model3(const void *pm, int flag_save)
   
   if(F*Rin > rcloud_max_set)
     F = rcloud_max_set/Rin;
-
-  if(flag_save && thistask == roottask)
-  {
-    char fname[200];
-    sprintf(fname, "%s/%s", parset.file_dir, parset.cloud_out_file);
-    fcloud_out = fopen(fname, "w");
-    if(fcloud_out == NULL)
-    {
-      fprintf(stderr, "# Error: Cannot open file %s\n", fname);
-      exit(-1);
-    }
-  }
 
   if(force_update == 1 || which_parameter_update == -1 )
   {
@@ -1033,13 +973,9 @@ void transfun_1d_cloud_sample_model3(const void *pm, int flag_save)
 
     if(flag_save && thistask==roottask)
     {
-      fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+      if(i%(icr_cloud_save) == 0)
+        fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
     }
-  }
-  
-  if(flag_save && thistask==roottask)
-  {
-    fclose(fcloud_out);
   }
 
   return;
@@ -1051,7 +987,6 @@ void transfun_1d_cloud_sample_model3(const void *pm, int flag_save)
  */
 void transfun_2d_cloud_sample_model3(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
-  FILE *fcloud_out = NULL;
   int i, j, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
@@ -1085,18 +1020,6 @@ void transfun_2d_cloud_sample_model3(const void *pm, double *transv, double *tra
 
   vcloud_max = -DBL_MAX;
   vcloud_min = DBL_MAX;
-
-  if(flag_save && thistask == roottask)
-  {
-    char fname[200];
-    sprintf(fname, "%s/%s", parset.file_dir, parset.cloud_out_file);
-    fcloud_out = fopen(fname, "w");
-    if(fcloud_out == NULL)
-    {
-      fprintf(stderr, "# Error: Cannot open file %s\n", fname);
-      exit(-1);
-    }
-  }
 
   if(force_update == 1 || which_parameter_update == -1 )
   {
@@ -1231,13 +1154,11 @@ void transfun_2d_cloud_sample_model3(const void *pm, double *transv, double *tra
 
       if(flag_save && thistask==roottask)
       {
-        fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx, vy, vz);
+        if(i%(icr_cloud_save) == 0)
+          fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx, vy, vz);
       }
     }
   }
-
-  if(flag_save && thistask == roottask)
-    fclose(fcloud_out);
 
   return;
 }
@@ -1248,7 +1169,6 @@ void transfun_2d_cloud_sample_model3(const void *pm, double *transv, double *tra
  */
 void transfun_2d_cloud_sample_model4(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
-  FILE *fcloud_out = NULL;
   int i, j, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
@@ -1282,18 +1202,6 @@ void transfun_2d_cloud_sample_model4(const void *pm, double *transv, double *tra
 
   vcloud_max = -DBL_MAX;
   vcloud_min = DBL_MAX;
-
-  if(flag_save && thistask == roottask)
-  {
-    char fname[200];
-    sprintf(fname, "%s/%s", parset.file_dir, parset.cloud_out_file);
-    fcloud_out = fopen(fname, "w");
-    if(fcloud_out == NULL)
-    {
-      fprintf(stderr, "# Error: Cannot open file %s\n", fname);
-      exit(-1);
-    }
-  }
   
   if(force_update == 1 || which_parameter_update == -1 )
   {
@@ -1428,13 +1336,11 @@ void transfun_2d_cloud_sample_model4(const void *pm, double *transv, double *tra
 
       if(flag_save && thistask==roottask)
       {
-        fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx, vy, vz);
+        if(i%(icr_cloud_save) == 0)
+          fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx, vy, vz);
       }
     }
   }
-
-  if(flag_save && thistask == roottask)
-    fclose(fcloud_out);
 
   return;
 }
@@ -1452,7 +1358,6 @@ void transfun_2d_cloud_sample_model4(const void *pm, double *transv, double *tra
  */
 void transfun_1d_cloud_sample_model5(const void *pm, int flag_save)
 {
-  FILE *fcloud_out = NULL;
   int i, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0;
@@ -1479,18 +1384,6 @@ void transfun_1d_cloud_sample_model5(const void *pm, int flag_save)
   frac1 = 1.0/(alpha+1.0) * (1.0 - pow(Fin, alpha+1.0));
   frac2 = 1.0/(alpha-1.0) * (1.0 - pow(Fout, -alpha+1.0));
   ratio = frac1/(frac1 + frac2);
-
-  if(flag_save && thistask == roottask)
-  {
-    char fname[200];
-    sprintf(fname, "%s/%s", parset.file_dir, parset.cloud_out_file);
-    fcloud_out = fopen(fname, "w");
-    if(fcloud_out == NULL)
-    {
-      fprintf(stderr, "# Error: Cannot open file %s\n", fname);
-      exit(-1);
-    }
-  }
 
   if(force_update == 1 || which_parameter_update == -1 )
   {
@@ -1590,13 +1483,9 @@ void transfun_1d_cloud_sample_model5(const void *pm, int flag_save)
 
     if(flag_save && thistask==roottask)
     {
-      fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+      if(i%(icr_cloud_save) == 0)
+        fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
     }
-  }
-  
-  if(flag_save && thistask==roottask)
-  {
-    fclose(fcloud_out);
   }
 
   return;
@@ -1607,7 +1496,6 @@ void transfun_1d_cloud_sample_model5(const void *pm, int flag_save)
  */
 void transfun_2d_cloud_sample_model5(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
-  FILE *fcloud_out = NULL;
   int i, j, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0;
@@ -1656,18 +1544,6 @@ void transfun_2d_cloud_sample_model5(const void *pm, double *transv, double *tra
 
   vcloud_max = -DBL_MAX;
   vcloud_min = DBL_MAX;
-
-  if(flag_save && thistask == roottask)
-  {
-    char fname[200];
-    sprintf(fname, "%s/%s", parset.file_dir, parset.cloud_out_file);
-    fcloud_out = fopen(fname, "w");
-    if(fcloud_out == NULL)
-    {
-      fprintf(stderr, "# Error: Cannot open file %s\n", fname);
-      exit(-1);
-    }
-  }
 
   if(force_update == 1 || which_parameter_update == -1 )
   {
@@ -1831,13 +1707,11 @@ void transfun_2d_cloud_sample_model5(const void *pm, double *transv, double *tra
 
       if(flag_save && thistask==roottask)
       {
-        fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx, vy, vz);
+        if(i%(icr_cloud_save) == 0)
+          fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx, vy, vz);
       }
     }
   }
-
-  if(flag_save && thistask == roottask)
-    fclose(fcloud_out);
 
   return;
 }
@@ -1856,7 +1730,6 @@ void transfun_2d_cloud_sample_model5(const void *pm, double *transv, double *tra
  */
 void transfun_1d_cloud_sample_model6(const void *pm, int flag_save)
 {
-  FILE *fcloud_out = NULL;
   int i, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0;
@@ -1879,18 +1752,6 @@ void transfun_1d_cloud_sample_model6(const void *pm, int flag_save)
   s = mu/a;
   rin=mu*F;
   sig=(1.0-F)*s;
-
-  if(flag_save && thistask == roottask)
-  {
-    char fname[200];
-    sprintf(fname, "%s/%s", parset.file_dir, parset.cloud_out_file);
-    fcloud_out = fopen(fname, "w");
-    if(fcloud_out == NULL)
-    {
-      fprintf(stderr, "# Error: Cannot open file %s\n", fname);
-      exit(-1);
-    }
-  }
 
   if(force_update == 1 || which_parameter_update == -1 )
   {
@@ -1937,7 +1798,6 @@ void transfun_1d_cloud_sample_model6(const void *pm, int flag_save)
   {
     pr = clouds_particles[which_particle_update];
   }
-  
 
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
@@ -1982,13 +1842,9 @@ void transfun_1d_cloud_sample_model6(const void *pm, int flag_save)
 
     if(flag_save && thistask==roottask)
     {
-      fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+      if(i%(icr_cloud_save) == 0)
+        fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
     }
-  }
-
-  if(flag_save && thistask==roottask)
-  {
-    fclose(fcloud_out);
   }
 
   return;
@@ -1999,7 +1855,6 @@ void transfun_1d_cloud_sample_model6(const void *pm, int flag_save)
  */
 void transfun_2d_cloud_sample_model6(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
-  FILE *fcloud_out = NULL;
   int i, j, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb, vcloud_min, vcloud_max;
@@ -2045,18 +1900,6 @@ void transfun_2d_cloud_sample_model6(const void *pm, double *transv, double *tra
 
   vcloud_max = -DBL_MAX;
   vcloud_min = DBL_MAX;
-
-  if(flag_save && thistask == roottask)
-  {
-    char fname[200];
-    sprintf(fname, "%s/%s", parset.file_dir, parset.cloud_out_file);
-    fcloud_out = fopen(fname, "w");
-    if(fcloud_out == NULL)
-    {
-      fprintf(stderr, "# Error: Cannot open file %s\n", fname);
-      exit(-1);
-    }
-  }
 
   // "which_parameter_update = -1" means that all parameters are updated, usually occurs at the 
   // initial step.
@@ -2105,6 +1948,7 @@ void transfun_2d_cloud_sample_model6(const void *pm, double *transv, double *tra
     pr = clouds_particles[which_particle_update];
   }
 
+  
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
 // generate a direction of the angular momentum of the orbit   
@@ -2213,13 +2057,11 @@ void transfun_2d_cloud_sample_model6(const void *pm, double *transv, double *tra
 
       if(flag_save && thistask==roottask)
       {
-        fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx, vy, vz);
+        if(i%(icr_cloud_save) == 0)
+          fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx, vy, vz);
       }
     }
   }
-
-  if(flag_save && thistask == roottask)
-    fclose(fcloud_out);
 
   return;
 }
@@ -2237,7 +2079,6 @@ void transfun_2d_cloud_sample_model6(const void *pm, double *transv, double *tra
  */
 void transfun_1d_cloud_sample_model7(const void *pm, int flag_save)
 {
-  FILE *fcloud_out = NULL;
   int i, nc, flag_update=0, num_sh;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0;
@@ -2260,18 +2101,6 @@ void transfun_1d_cloud_sample_model7(const void *pm, int flag_save)
   s = mu/a;
   rin=mu*F;
   sig=(1.0-F)*s;
-  
-  if(flag_save && thistask == roottask)
-  {
-    char fname[200];
-    sprintf(fname, "%s/%s", parset.file_dir, parset.cloud_out_file);
-    fcloud_out = fopen(fname, "w");
-    if(fcloud_out == NULL)
-    {
-      fprintf(stderr, "# Error: Cannot open file %s\n", fname);
-      exit(-1);
-    }
-  }
 
   for(i=0; i<num_params_radial_samp;i++)
   {
@@ -2375,7 +2204,8 @@ void transfun_1d_cloud_sample_model7(const void *pm, int flag_save)
 
     if(flag_save && thistask==roottask)
     {
-      fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+      if(i%(icr_cloud_save) == 0)
+        fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
     }
   }
 
@@ -2462,13 +2292,9 @@ void transfun_1d_cloud_sample_model7(const void *pm, int flag_save)
 
     if(flag_save && thistask==roottask)
     {
-      fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+      if(i%(icr_cloud_save) == 0)
+        fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
     }
-  }
-  
-  if(flag_save && thistask==roottask)
-  {
-    fclose(fcloud_out);
   }
 
   return;
@@ -2479,7 +2305,6 @@ void transfun_1d_cloud_sample_model7(const void *pm, int flag_save)
  */
 void transfun_2d_cloud_sample_model7(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
-  FILE *fcloud_out = NULL;
   int i, j, nc, flag_update=0, num_sh;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb, vcloud_min, vcloud_max, Rs, g, sig_turb;
@@ -2525,18 +2350,6 @@ void transfun_2d_cloud_sample_model7(const void *pm, double *transv, double *tra
 
   vcloud_max = -DBL_MAX;
   vcloud_min = DBL_MAX;
-
-  if(flag_save && thistask == roottask)
-  {
-    char fname[200];
-    sprintf(fname, "%s/%s", parset.file_dir, parset.cloud_out_file);
-    fcloud_out = fopen(fname, "w");
-    if(fcloud_out == NULL)
-    {
-      fprintf(stderr, "# Error: Cannot open file %s\n", fname);
-      exit(-1);
-    }
-  }
 
   if(force_update == 1 || which_parameter_update == -1 )
   {
@@ -2692,7 +2505,8 @@ void transfun_2d_cloud_sample_model7(const void *pm, double *transv, double *tra
 
       if(flag_save && thistask==roottask)
       {
-        fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx, vy, vz);
+        if(i%(icr_cloud_save) == 0)
+          fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx, vy, vz);
       }
     }
   }
@@ -2849,13 +2663,11 @@ void transfun_2d_cloud_sample_model7(const void *pm, double *transv, double *tra
 
       if(flag_save && thistask==roottask)
       {
-        fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx, vy, vz);
+        if(i%(icr_cloud_save) == 0)
+          fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx, vy, vz);
       }
     }
   }
-
-  if(flag_save && thistask == roottask)
-    fclose(fcloud_out);
 
   return;
 }
