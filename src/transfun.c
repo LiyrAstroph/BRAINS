@@ -645,7 +645,7 @@ void transfun_2d_cloud_sample_model1(const void *pm, double *transv, double *tra
       if(flag_save && thistask==roottask)
       {
         if(i%(icr_cloud_save) == 0)
-          fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx, vy, vz);
+          fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx*VelUnit, vy*VelUnit, vz*VelUnit, weight);
       }
     }
   }
@@ -831,7 +831,7 @@ void transfun_2d_cloud_sample_model2(const void *pm, double *transv, double *tra
       if(flag_save && thistask==roottask)
       {
         if(i%(icr_cloud_save) == 0)
-          fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx, vy, vz);
+          fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx*VelUnit, vy*VelUnit, vz*VelUnit, weight);
       }
     }
   }
@@ -1138,7 +1138,7 @@ void transfun_2d_cloud_sample_model3(const void *pm, double *transv, double *tra
       if(flag_save && thistask==roottask)
       {
         if(i%(icr_cloud_save) == 0)
-          fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx, vy, vz);
+          fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx*VelUnit, vy*VelUnit, vz*VelUnit, weight);
       }
     }
   }
@@ -1314,7 +1314,7 @@ void transfun_2d_cloud_sample_model4(const void *pm, double *transv, double *tra
       if(flag_save && thistask==roottask)
       {
         if(i%(icr_cloud_save) == 0)
-          fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx, vy, vz);
+          fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx*VelUnit, vy*VelUnit, vz*VelUnit, weight);
       }
     }
   }
@@ -1679,7 +1679,7 @@ void transfun_2d_cloud_sample_model5(const void *pm, double *transv, double *tra
       if(flag_save && thistask==roottask)
       {
         if(i%(icr_cloud_save) == 0)
-          fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx, vy, vz);
+          fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx*VelUnit, vy*VelUnit, vz*VelUnit, weight);
       }
     }
   }
@@ -2023,7 +2023,7 @@ void transfun_2d_cloud_sample_model6(const void *pm, double *transv, double *tra
       if(flag_save && thistask==roottask)
       {
         if(i%(icr_cloud_save) == 0)
-          fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx, vy, vz);
+          fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx*VelUnit, vy*VelUnit, vz*VelUnit, weight);
       }
     }
   }
@@ -2465,7 +2465,7 @@ void transfun_2d_cloud_sample_model7(const void *pm, double *transv, double *tra
       if(flag_save && thistask==roottask)
       {
         if(i%(icr_cloud_save) == 0)
-          fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx, vy, vz);
+          fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx*VelUnit, vy*VelUnit, vz*VelUnit, weight);
       }
     }
   }
@@ -2620,7 +2620,7 @@ void transfun_2d_cloud_sample_model7(const void *pm, double *transv, double *tra
       if(flag_save && thistask==roottask)
       {
         if(i%(icr_cloud_save) == 0)
-          fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx, vy, vz);
+          fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx*VelUnit, vy*VelUnit, vz*VelUnit, weight);
       }
     }
   }
