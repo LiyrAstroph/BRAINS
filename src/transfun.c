@@ -475,7 +475,7 @@ void transfun_2d_cloud_sample_model1(const void *pm, double *transv, double *tra
   double r, phi, dis, Lopn_cos, u;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
   double inc, F, beta, mu, k, a, s, rin, sig;
-  double Lphi, Lthe, L, E, vcloud_max, vcloud_min, linecenter = 0.0;
+  double Lphi, Lthe, L, E, linecenter = 0.0;
   double V, weight, rnd;
   double *pr;
   double *pmodel = (double *)pm;
@@ -503,9 +503,6 @@ void transfun_2d_cloud_sample_model1(const void *pm, double *transv, double *tra
   {
     linecenter = pmodel[num_params_blr - num_params_linecenter - 1] * parset.linecenter_err; 
   }
-
-  vcloud_max = -DBL_MAX;
-  vcloud_min = DBL_MAX;
 
   if(force_update == 1 || which_parameter_update == -1 )
   {
@@ -639,9 +636,6 @@ void transfun_2d_cloud_sample_model1(const void *pm, double *transv, double *tra
       vy = vyb;
       vz =-vxb * sin(PI/2.0-inc) + vzb * cos(PI/2.0-inc);
 
-      vcloud_max = fmax(vx, vcloud_max);
-      vcloud_min = fmin(vx, vcloud_min);
-
       V = -vx;  //note the definition of the line-of-sight velocity. postive means a receding 
                 // velocity relative to the observer.
       
@@ -678,7 +672,7 @@ void transfun_2d_cloud_sample_model2(const void *pm, double *transv, double *tra
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
   double inc, F, beta, mu, k, a, s, rin, sig;
-  double Lphi, Lthe, vcloud_max, vcloud_min, linecenter = 0.0;
+  double Lphi, Lthe, linecenter = 0.0;
   double V, weight, rnd;
   double *pr;
   double *pmodel = (double *)pm;
@@ -706,9 +700,6 @@ void transfun_2d_cloud_sample_model2(const void *pm, double *transv, double *tra
   {
     linecenter = pmodel[num_params_blr - num_params_linecenter - 1] * parset.linecenter_err; 
   }
-
-  vcloud_max = -DBL_MAX;
-  vcloud_min = DBL_MAX;
 
   if(force_update == 1 || which_parameter_update == -1 )
   {
@@ -830,8 +821,6 @@ void transfun_2d_cloud_sample_model2(const void *pm, double *transv, double *tra
       vy = vyb;
       vz =-vxb * sin(PI/2.0-inc) + vzb * cos(PI/2.0-inc);
 
-      vcloud_max = fmax(vx, vcloud_max);
-      vcloud_min = fmin(vx, vcloud_min);
 
       V = -vx;  //note the definition of the line-of-sight velocity. postive means a receding 
                 // velocity relative to the observer.
@@ -991,7 +980,7 @@ void transfun_2d_cloud_sample_model3(const void *pm, double *transv, double *tra
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
   double inc, F, alpha, Rin, k;
-  double Lphi, Lthe, L, E, vcloud_max, vcloud_min, linecenter=0.0;
+  double Lphi, Lthe, L, E, linecenter=0.0;
   double V, weight, rnd;
   double *pr;
   double *pmodel = (double *)pm;
@@ -1017,9 +1006,6 @@ void transfun_2d_cloud_sample_model3(const void *pm, double *transv, double *tra
   {
     linecenter = pmodel[num_params_blr - num_params_linecenter - 1] * parset.linecenter_err; 
   }
-
-  vcloud_max = -DBL_MAX;
-  vcloud_min = DBL_MAX;
 
   if(force_update == 1 || which_parameter_update == -1 )
   {
@@ -1143,9 +1129,6 @@ void transfun_2d_cloud_sample_model3(const void *pm, double *transv, double *tra
       vy = vyb;
       vz =-vxb * sin(PI/2.0-inc) + vzb * cos(PI/2.0-inc);
 
-      vcloud_max = fmax(vx, vcloud_max);
-      vcloud_min = fmin(vx, vcloud_min);
-
       V = -vx;  //note the definition of the line-of-sight velocity. postive means a receding 
                 // velocity relative to the observer.
 
@@ -1173,7 +1156,7 @@ void transfun_2d_cloud_sample_model4(const void *pm, double *transv, double *tra
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
   double inc, F, alpha, Rin, k;
-  double Lphi, Lthe, L, E, vcloud_max, vcloud_min, linecenter=0.0;
+  double Lphi, Lthe, L, E, linecenter=0.0;
   double V, weight, rnd;
   double *pr;
   double *pmodel = (double *)pm;
@@ -1199,9 +1182,6 @@ void transfun_2d_cloud_sample_model4(const void *pm, double *transv, double *tra
   {
     linecenter = pmodel[num_params_blr - num_params_linecenter - 1] * parset.linecenter_err; 
   }
-
-  vcloud_max = -DBL_MAX;
-  vcloud_min = DBL_MAX;
   
   if(force_update == 1 || which_parameter_update == -1 )
   {
@@ -1324,9 +1304,6 @@ void transfun_2d_cloud_sample_model4(const void *pm, double *transv, double *tra
       vx = vxb * cos(PI/2.0-inc) + vzb * sin(PI/2.0-inc);
       vy = vyb;
       vz =-vxb * sin(PI/2.0-inc) + vzb * cos(PI/2.0-inc);
-
-      vcloud_max = fmax(vx, vcloud_max);
-      vcloud_min = fmin(vx, vcloud_min);
 
       V = -vx;  //note the definition of the line-of-sight velocity. postive means a receding 
                 // velocity relative to the observer.
@@ -1503,7 +1480,7 @@ void transfun_2d_cloud_sample_model5(const void *pm, double *transv, double *tra
   double mbh, fellip, fflow, sigr_circ, sigthe_circ, sigr_rad, sigthe_rad, theta_rot, sig_turb;
   double Lphi, Lthe, V, Vr, Vph, Vkep, rhoV, theV, linecenter=0.0;
   double weight, rndr, rnd, rnd_frac, rnd_xi, frac1, frac2, ratio, Rs, g;
-  double vx, vy, vz, vxb, vyb, vzb, vcloud_max, vcloud_min;
+  double vx, vy, vz, vxb, vyb, vzb;
   double *pr;
   double *pmodel = (double *)pm;
   BLRmodel5 *model = (BLRmodel5 *)pm;
@@ -1541,9 +1518,6 @@ void transfun_2d_cloud_sample_model5(const void *pm, double *transv, double *tra
   {
     linecenter = pmodel[num_params_blr - num_params_linecenter - 1] * parset.linecenter_err; 
   }
-
-  vcloud_max = -DBL_MAX;
-  vcloud_min = DBL_MAX;
 
   if(force_update == 1 || which_parameter_update == -1 )
   {
@@ -1687,9 +1661,6 @@ void transfun_2d_cloud_sample_model5(const void *pm, double *transv, double *tra
       vx = vxb * cos(PI/2.0-inc) + vzb * sin(PI/2.0-inc);
       vy = vyb;
       vz =-vxb * sin(PI/2.0-inc) + vzb * cos(PI/2.0-inc);
-
-      vcloud_max = fmax(vx, vcloud_max);
-      vcloud_min = fmin(vx, vcloud_min);
 
       V = -vx;  //note the definition of the line-of-sight velocity. postive means a receding 
                 // velocity relative to the observer.
@@ -1857,7 +1828,7 @@ void transfun_2d_cloud_sample_model6(const void *pm, double *transv, double *tra
 {
   int i, j, nc, flag_update=0;
   double r, phi, dis, Lopn_cos;
-  double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb, vcloud_min, vcloud_max;
+  double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
   double V, rhoV, theV, Vr, Vph, Vkep, Rs, g;
   double inc, F, beta, mu, k, gam, xi, a, s, sig, rin;
   double mbh, fellip, fflow, sigr_circ, sigthe_circ, sigr_rad, sigthe_rad, theta_rot, sig_turb;
@@ -1897,9 +1868,6 @@ void transfun_2d_cloud_sample_model6(const void *pm, double *transv, double *tra
   {
     linecenter = pmodel[num_params_blr - num_params_linecenter - 1] * parset.linecenter_err; 
   }
-
-  vcloud_max = -DBL_MAX;
-  vcloud_min = DBL_MAX;
 
   // "which_parameter_update = -1" means that all parameters are updated, usually occurs at the 
   // initial step.
@@ -2051,9 +2019,6 @@ void transfun_2d_cloud_sample_model6(const void *pm, double *transv, double *tra
 
       V += linecenter;
       tmp_vel[i*parset.n_vel_per_cloud + j] = V;
-
-      vcloud_max = fmax(V, vcloud_max);
-      vcloud_min = fmin(V, vcloud_min);
 
       if(flag_save && thistask==roottask)
       {
@@ -2307,7 +2272,7 @@ void transfun_2d_cloud_sample_model7(const void *pm, double *transv, double *tra
 {
   int i, j, nc, flag_update=0, num_sh;
   double r, phi, dis, Lopn_cos;
-  double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb, vcloud_min, vcloud_max, Rs, g, sig_turb;
+  double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb, Rs, g, sig_turb;
   double V, rhoV, theV, Vr, Vph, Vkep;
   double inc, F, beta, mu, k, gam, xi, a, s, sig, rin;
   double mbh, fellip, fflow, sigr_circ, sigthe_circ, sigr_rad, sigthe_rad, theta_rot;
@@ -2347,9 +2312,6 @@ void transfun_2d_cloud_sample_model7(const void *pm, double *transv, double *tra
   {
     linecenter = pmodel[num_params_blr - num_params_linecenter - 1] * parset.linecenter_err; 
   }
-
-  vcloud_max = -DBL_MAX;
-  vcloud_min = DBL_MAX;
 
   if(force_update == 1 || which_parameter_update == -1 )
   {
@@ -2485,9 +2447,6 @@ void transfun_2d_cloud_sample_model7(const void *pm, double *transv, double *tra
       vx = vxb * cos(PI/2.0-inc) + vzb * sin(PI/2.0-inc);
       vy = vyb;
       vz =-vxb * sin(PI/2.0-inc) + vzb * cos(PI/2.0-inc);
-
-      vcloud_max = fmax(vx, vcloud_max);
-      vcloud_min = fmin(vx, vcloud_min);
 
       V = -vx;  //note the definition of the line-of-sight velocity. postive means a receding 
                 // velocity relative to the observer.
@@ -2642,9 +2601,6 @@ void transfun_2d_cloud_sample_model7(const void *pm, double *transv, double *tra
       vx = vxb * cos(PI/2.0-inc) + vzb * sin(PI/2.0-inc);
       vy = vyb;
       vz =-vxb * sin(PI/2.0-inc) + vzb * cos(PI/2.0-inc);
-
-      vcloud_max = fmax(vx, vcloud_max);
-      vcloud_min = fmin(vx, vcloud_min);
 
       V = -vx;  //note the definition of the line-of-sight velocity. postive means a receding 
                 // velocity relative to the observer.
