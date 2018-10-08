@@ -204,7 +204,7 @@ int dnest_line2d(int argc, char **argv)
   strcpy(options_file, dnest_options_file);
 
   force_update = parset.flag_force_update;
-  dnest(argc, argv);
+  logz_line2d = dnest(argc, argv);
   
   return 0;
 }

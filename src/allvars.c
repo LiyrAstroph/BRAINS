@@ -57,16 +57,19 @@ double *PCmat_data, *IPCmat_data, *PQmat, *PEmat1, *PEmat2;
 double *workspace;
 double *var_param, *var_param_std;
 double *con_q;
+double logz_con;
 
 
 /* line reconstruction */
 double *Fline_at_data;
 double *Tline, *Fline, *Flerrs;
 double Tline_min, Tline_max;
+double logz_line;
 
-/* line reconstruction */
+/* line 2d reconstruction */
 double *Fline2d_at_data;
 double *Fline2d, *Flerrs2d;
+double logz_line2d;
 
 int num_params_radial_samp;
 int *params_radial_samp;

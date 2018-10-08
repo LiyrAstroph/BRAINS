@@ -623,10 +623,10 @@ void reconstruct_line2d_init()
 
   if(parset.flag_save_clouds && thistask == roottask)
   {
-    if(parset.n_cloud_per_task <= 1000)
+    if(parset.n_cloud_per_task <= 10000)
       icr_cloud_save = 1;
     else
-      icr_cloud_save = parset.n_cloud_per_task/1000;
+      icr_cloud_save = parset.n_cloud_per_task/10000;
 
     char fname[200];
     sprintf(fname, "%s/%s", parset.file_dir, parset.cloud_out_file);

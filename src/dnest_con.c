@@ -77,7 +77,7 @@ int dnest_con(int argc, char **argv)
   }
 
   strcpy(options_file, dnest_options_file);
-  dnest(argc, argv);
+  logz_con = dnest(argc, argv);
   
   return 0;
 }

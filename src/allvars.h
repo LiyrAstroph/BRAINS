@@ -148,15 +148,18 @@ extern double *PCmat_data, *IPCmat_data, *PQmat, *PEmat1, *PEmat2;
 extern double *workspace;
 extern double *var_param, *var_param_std;
 extern double *con_q;
+extern double logz_con;
 
 /* line reconstruction */
 extern double *Fline_at_data;
 extern double *Tline, *Fline, *Flerrs;
 extern double Tline_min, Tline_max;
+extern double logz_line;
 
-/* line reconstruction */
+/* line 2d reconstruction */
 extern double *Fline2d_at_data;
 extern double *Fline2d, *Flerrs2d;
+extern double logz_line2d;
 
 extern int num_params_radial_samp;
 extern int *params_radial_samp;

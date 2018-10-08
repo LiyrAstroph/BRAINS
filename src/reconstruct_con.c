@@ -197,7 +197,7 @@ void reconstruct_con()
   }
 
   reconstruct_con_init();
-  dnest_con(argc, argv);
+  logz_con = dnest_con(argc, argv);
 
   if(parset.flag_exam_prior != 1)
   {
