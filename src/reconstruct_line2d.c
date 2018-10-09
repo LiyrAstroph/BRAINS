@@ -37,7 +37,8 @@ void postprocess2d()
   double *lag;
   void *posterior_sample, *post_model;
   double mean_lag, mean_lag_std, sum1, sum2;
-
+  int size_of_modeltype = num_params * sizeof(double);
+  
   best_model_line2d = malloc(size_of_modeltype);
   best_model_std_line2d = malloc(size_of_modeltype);
 

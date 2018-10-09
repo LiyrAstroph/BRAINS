@@ -28,6 +28,9 @@
 #include "dnest_line2d.h"
 #include "proto.h"
 
+
+DNestFptrSet *fptrset_line2d;
+
 /*!
  * this function does dnest samling.
  */
@@ -146,23 +149,24 @@ int dnest_line2d(int argc, char **argv)
   for(i=0; i<num_params; i++)
     par_range_model[i] = malloc(2*sizeof(double));
 
+  fptrset_line2d = dnest_malloc_fptrset();
   /* setup functions used for dnest*/
-  from_prior = from_prior_line2d;
-  print_particle = print_particle_line2d;
-  restart_action = restart_action_2d;
-  perturb = perturb_line2d;
+  fptrset_line2d->from_prior = from_prior_line2d;
+  fptrset_line2d->print_particle = print_particle_line2d;
+  fptrset_line2d->restart_action = restart_action_2d;
+  fptrset_line2d->perturb = perturb_line2d;
   
   if(parset.flag_exam_prior != 1)
   {
-    log_likelihoods_cal_initial = log_likelihoods_cal_initial_line2d;
-    log_likelihoods_cal_restart = log_likelihoods_cal_restart_line2d;
-    log_likelihoods_cal = log_likelihoods_cal_line2d;
+    fptrset_line2d->log_likelihoods_cal_initial = log_likelihoods_cal_initial_line2d;
+    fptrset_line2d->log_likelihoods_cal_restart = log_likelihoods_cal_restart_line2d;
+    fptrset_line2d->log_likelihoods_cal = log_likelihoods_cal_line2d;
   }
   else
   {
-    log_likelihoods_cal_initial = log_likelihoods_cal_line2d_exam;
-    log_likelihoods_cal_restart = log_likelihoods_cal_line2d_exam;
-    log_likelihoods_cal = log_likelihoods_cal_line2d_exam;
+    fptrset_line2d->log_likelihoods_cal_initial = log_likelihoods_cal_line2d_exam;
+    fptrset_line2d->log_likelihoods_cal_restart = log_likelihoods_cal_line2d_exam;
+    fptrset_line2d->log_likelihoods_cal = log_likelihoods_cal_line2d_exam;
   }
   
   set_par_range_model2d();
@@ -202,8 +206,9 @@ int dnest_line2d(int argc, char **argv)
   strcpy(options_file, dnest_options_file);
 
   force_update = parset.flag_force_update;
-  logz_line2d = dnest(argc, argv, num_params);
+  logz_line2d = dnest(argc, argv, fptrset_line2d, num_params);
   
+  dnest_free_fptrset(fptrset_line2d);
   return 0;
 }
 

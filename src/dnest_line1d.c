@@ -27,6 +27,8 @@
 #include "dnest_line1d.h"
 #include "proto.h"
 
+DNestFptrSet *fptrset_line1d;
+
 /*!
  * This function setup functions for dnest and run dnest.
  */
@@ -142,23 +144,25 @@ int dnest_line1d(int argc, char **argv)
   for(i=0; i<num_params; i++)
     par_range_model[i] = malloc(2*sizeof(double));
 
+  fptrset_line1d = dnest_malloc_fptrset();
+
   /* setup functions used for dnest */
-  from_prior = from_prior_line1d;
-  print_particle = print_particle_line1d;
-  restart_action = restart_action_1d;
-  perturb = perturb_line1d;
+  fptrset_line1d->from_prior = from_prior_line1d;
+  fptrset_line1d->print_particle = print_particle_line1d;
+  fptrset_line1d->restart_action = restart_action_1d;
+  fptrset_line1d->perturb = perturb_line1d;
 
   if(parset.flag_exam_prior != 1)
   {
-    log_likelihoods_cal_initial = log_likelihoods_cal_initial_line1d;
-    log_likelihoods_cal_restart = log_likelihoods_cal_restart_line1d;
-    log_likelihoods_cal = log_likelihoods_cal_line1d;
+    fptrset_line1d->log_likelihoods_cal_initial = log_likelihoods_cal_initial_line1d;
+    fptrset_line1d->log_likelihoods_cal_restart = log_likelihoods_cal_restart_line1d;
+    fptrset_line1d->log_likelihoods_cal = log_likelihoods_cal_line1d;
   }
   else
   {
-    log_likelihoods_cal_initial = log_likelihoods_cal_line1d_exam;
-    log_likelihoods_cal_restart = log_likelihoods_cal_line1d_exam;
-    log_likelihoods_cal = log_likelihoods_cal_line1d_exam;
+    fptrset_line1d->log_likelihoods_cal_initial = log_likelihoods_cal_line1d_exam;
+    fptrset_line1d->log_likelihoods_cal_restart = log_likelihoods_cal_line1d_exam;
+    fptrset_line1d->log_likelihoods_cal = log_likelihoods_cal_line1d_exam;
   }
   
   set_par_range_model1d();
@@ -193,8 +197,9 @@ int dnest_line1d(int argc, char **argv)
   strcpy(options_file, dnest_options_file);
   
   force_update = parset.flag_force_update;
-  logz_line = dnest(argc, argv, num_params);
+  logz_line = dnest(argc, argv, fptrset_line1d, num_params);
 
+  dnest_free_fptrset(fptrset_line1d);
   return 0;
 }
 

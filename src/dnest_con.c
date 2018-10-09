@@ -26,6 +26,8 @@
 #include "dnest_con.h"
 #include "proto.h"
 
+DNestFptrSet *fptrset_con;
+
 /*!
  *  This function run denst sampling for continuum.
  */
@@ -42,23 +44,25 @@ int dnest_con(int argc, char **argv)
   par_fix = (int *) malloc(num_params * sizeof(int));
   par_fix_val = (double *) malloc(num_params * sizeof(double));
   
+  fptrset_con = dnest_malloc_fptrset();
+
   /* setup functions used for dnest*/
-  from_prior = from_prior_con;
-  perturb = perturb_con;
-  print_particle = print_particle_con;
-  restart_action = restart_action_con;
+  fptrset_con->from_prior = from_prior_con;
+  fptrset_con->perturb = perturb_con;
+  fptrset_con->print_particle = print_particle_con;
+  fptrset_con->restart_action = restart_action_con;
   
   if(parset.flag_exam_prior != 1)
   {
-    log_likelihoods_cal = log_likelihoods_cal_con;
-    log_likelihoods_cal_initial = log_likelihoods_cal_initial_con;
-    log_likelihoods_cal_restart = log_likelihoods_cal_restart_con;
+    fptrset_con->log_likelihoods_cal = log_likelihoods_cal_con;
+    fptrset_con->log_likelihoods_cal_initial = log_likelihoods_cal_initial_con;
+    fptrset_con->log_likelihoods_cal_restart = log_likelihoods_cal_restart_con;
   }
   else
   {
-    log_likelihoods_cal = log_likelihoods_cal_con_exam;
-    log_likelihoods_cal_initial = log_likelihoods_cal_con_exam;
-    log_likelihoods_cal_restart = log_likelihoods_cal_con_exam;
+    fptrset_con->log_likelihoods_cal = log_likelihoods_cal_con_exam;
+    fptrset_con->log_likelihoods_cal_initial = log_likelihoods_cal_con_exam;
+    fptrset_con->log_likelihoods_cal_restart = log_likelihoods_cal_con_exam;
   }
   
   set_par_range_con();
@@ -75,8 +79,9 @@ int dnest_con(int argc, char **argv)
   }
 
   strcpy(options_file, dnest_options_file);
-  logz_con = dnest(argc, argv, num_params);
+  logz_con = dnest(argc, argv, fptrset_con, num_params);
   
+  dnest_free_fptrset(fptrset_con);
   return 0;
 }
 

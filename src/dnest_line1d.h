@@ -21,19 +21,7 @@ void print_particle_line1d(FILE *fp, const void *model);
 double log_likelihoods_cal_line1d(const void *model);
 double log_likelihoods_cal_initial_line1d(const void *model);
 double log_likelihoods_cal_restart_line1d(const void *model);
-//double perturb_line1d(void *model);
-int get_num_params_line1d();
-
 double perturb_line1d(void *model);
-
 double log_likelihoods_cal_line1d_exam(const void *model);
 
-
-void (*print_particle)(FILE *fp, const void *model);
-void (*from_prior)(void *model);
-double (*log_likelihoods_cal)(const void *model);
-double (*log_likelihoods_cal_initial)(const void *model);
-double (*log_likelihoods_cal_restart)(const void *model);
-double (*perturb)(void *model);
-void (*restart_action)(int iflag);
 #endif
