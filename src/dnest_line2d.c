@@ -140,7 +140,6 @@ int dnest_line2d(int argc, char **argv)
   
   num_params_blr = num_params_blr_model + num_params_nlr + num_params_res + num_params_linecenter;
   num_params = parset.n_con_recon + num_params_blr + num_params_var;
-  size_of_modeltype = num_params * sizeof(double);
   par_fix = (int *) malloc(num_params * sizeof(int));
   par_fix_val = (double *) malloc(num_params * sizeof(double));
   par_range_model = malloc( num_params * sizeof(double *));
@@ -150,7 +149,6 @@ int dnest_line2d(int argc, char **argv)
   /* setup functions used for dnest*/
   from_prior = from_prior_line2d;
   print_particle = print_particle_line2d;
-  get_num_params = get_num_params_line2d;
   restart_action = restart_action_2d;
   perturb = perturb_line2d;
   
@@ -204,7 +202,7 @@ int dnest_line2d(int argc, char **argv)
   strcpy(options_file, dnest_options_file);
 
   force_update = parset.flag_force_update;
-  logz_line2d = dnest(argc, argv);
+  logz_line2d = dnest(argc, argv, num_params);
   
   return 0;
 }
@@ -426,14 +424,6 @@ void print_particle_line2d(FILE *fp, const void *model)
   }
   fprintf(fp, "\n");
   return;
-}
-
-/*!
- * this function returns number of parameters.
- */
-int get_num_params_line2d()
-{
-  return num_params;
 }
 
 /*!

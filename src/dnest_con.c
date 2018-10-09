@@ -34,7 +34,6 @@ int dnest_con(int argc, char **argv)
   int i;
 
   num_params = parset.n_con_recon + num_params_var;
-  size_of_modeltype = num_params * sizeof(double);
 
   par_range_model = malloc( num_params * sizeof(double *));
   for(i=0; i<num_params; i++)
@@ -47,7 +46,6 @@ int dnest_con(int argc, char **argv)
   from_prior = from_prior_con;
   perturb = perturb_con;
   print_particle = print_particle_con;
-  get_num_params = get_num_params_con;
   restart_action = restart_action_con;
   
   if(parset.flag_exam_prior != 1)
@@ -77,7 +75,7 @@ int dnest_con(int argc, char **argv)
   }
 
   strcpy(options_file, dnest_options_file);
-  logz_con = dnest(argc, argv);
+  logz_con = dnest(argc, argv, num_params);
   
   return 0;
 }
@@ -260,14 +258,6 @@ void print_particle_con(FILE *fp, const void *model)
     fprintf(fp, "%f ", pm[i] );
   }
   fprintf(fp, "\n");
-}
-
-/*!
- * This function return the number of parameters.
- */
-int get_num_params_con()
-{
-  return num_params;
 }
 
 void restart_action_con(int iflag)

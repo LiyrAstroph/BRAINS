@@ -15,10 +15,6 @@
 
 #include <stdbool.h>
 
-
-/* size of model type, defined in dnest */
-extern int size_of_modeltype;
-
 /* functions */
 void from_prior_line1d(void *model);
 void print_particle_line1d(FILE *fp, const void *model);
@@ -39,6 +35,5 @@ double (*log_likelihoods_cal)(const void *model);
 double (*log_likelihoods_cal_initial)(const void *model);
 double (*log_likelihoods_cal_restart)(const void *model);
 double (*perturb)(void *model);
-int (*get_num_params)();
 void (*restart_action)(int iflag);
 #endif
