@@ -458,7 +458,8 @@ double prob_con_variability(const void *model)
   double tau, sigma, alpha, lndet, syserr;
   double *Larr, *ybuf, *y, *yq, *Cq;
   
-  if(perturb_accept[which_particle_update] == 1)
+  which_particle_update = dnest_get_which_particle_update();
+  if(dnest_perturb_accept[which_particle_update] == 1)
   {
     param = which_parameter_update_prev[which_particle_update];
     /* only update prob when variability parameters are updated. */
@@ -531,6 +532,7 @@ double prob_con_variability(const void *model)
   }
   /* record the parameter being updated */
   which_parameter_update_prev[which_particle_update] = which_parameter_update;
+
   return prob;
 }
 
@@ -705,11 +707,9 @@ void reconstruct_con_init()
   }
   MPI_Bcast(&parset.num_particles, 1, MPI_INT, roottask, MPI_COMM_WORLD);
 
-  perturb_accept = malloc(parset.num_particles * sizeof(int));
   which_parameter_update_prev = malloc(parset.num_particles * sizeof(int));
   for(i=0; i<parset.num_particles; i++)
   {
-    perturb_accept[i] = 0;
     which_parameter_update_prev[i] = -1;
   }
 
@@ -745,7 +745,6 @@ void reconstruct_con_end()
   free(prob_con_particles);
   free(prob_con_particles_perturb);
 
-  free(perturb_accept);
   free(which_parameter_update_prev);
   free(best_model_con);
   free(best_model_std_con);

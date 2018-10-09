@@ -134,8 +134,7 @@ extern char dnest_options_file[BRAINS_MAX_STR_LENGTH];
 
 extern int which_parameter_update, which_particle_update;  // which parameter and particle to be updated
 extern int which_level_update;
-extern unsigned long long int which_mcmc_steps;//mcmc steps 
-extern int *perturb_accept, *which_parameter_update_prev;
+extern int *which_parameter_update_prev;
 extern double *limits;  // external from dnest
 
 /* continuum reconstruction */

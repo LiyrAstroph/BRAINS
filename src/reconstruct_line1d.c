@@ -421,11 +421,9 @@ void reconstruct_line1d_init()
   }
 
   // acceptance and updated parameter of the previous MCMC move
-  perturb_accept = malloc(parset.num_particles * sizeof(int));
   which_parameter_update_prev = malloc(parset.num_particles * sizeof(int));
   for(i=0; i<parset.num_particles; i++)
   {
-    perturb_accept[i] = 0;
     which_parameter_update_prev[i] = -1;
   }
 
@@ -508,7 +506,6 @@ void reconstruct_line1d_end()
   free(Fcon_particles);
   free(Fcon_particles_perturb);
 
-  free(perturb_accept);
   free(which_parameter_update_prev);
 
   free(par_fix);
@@ -574,6 +571,8 @@ double prob_initial_line1d(const void *model)
   int i;
   double *pm = (double *)model;
   
+  which_particle_update = dnest_get_which_particle_update();
+
   con_q = con_q_particles[which_particle_update];
 
   Fcon = Fcon_particles[which_particle_update];
@@ -615,6 +614,8 @@ double prob_restart_line1d(const void *model)
   int i;
   double *pm = (double *)model;
   
+  which_particle_update = dnest_get_which_particle_update();
+
   con_q = con_q_particles[which_particle_update];
 
   Fcon = Fcon_particles[which_particle_update];
@@ -656,8 +657,9 @@ double prob_line1d(const void *model)
   int i, param, flag_cpy=0;
   double *pm = (double *)model, *ptemp;
   
+  which_particle_update = dnest_get_which_particle_update();
   // if the previous perturb is accepted, store the previous perturb values, otherwise, no changes;
-  if(perturb_accept[which_particle_update] == 1)
+  if(dnest_perturb_accept[which_particle_update] == 1)
   { 
     // the parameter previously updated
     param = which_parameter_update_prev[which_particle_update];
