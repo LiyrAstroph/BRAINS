@@ -78,8 +78,7 @@ int dnest_con(int argc, char **argv)
     par_fix_val[0] = log(1.0);
   }
 
-  strcpy(options_file, dnest_options_file);
-  logz_con = dnest(argc, argv, fptrset_con, num_params);
+  logz_con = dnest(argc, argv, fptrset_con, num_params, dnest_options_file);
   
   dnest_free_fptrset(fptrset_con);
   return 0;
@@ -137,7 +136,7 @@ void from_prior_con(void *model)
   for(i=3; i<4 + parset.flag_trend; i++)
   {
     pm[i] = dnest_randn();
-    wrap(&pm[i], par_range_model[i][0], par_range_model[i][1]);
+    dnest_wrap(&pm[i], par_range_model[i][0], par_range_model[i][1]);
   }
   for(i=4+parset.flag_trend; i<num_params_var; i++)
   {
@@ -147,7 +146,7 @@ void from_prior_con(void *model)
   for(i=0; i<parset.n_con_recon; i++)
   {
     pm[i+num_params_var] = dnest_randn();
-    wrap(&pm[i], par_range_model[i][0], par_range_model[i][1]);
+    dnest_wrap(&pm[i], par_range_model[i][0], par_range_model[i][1]);
   }
 
   for(i=0; i<num_params_var; i++)
@@ -226,25 +225,25 @@ double perturb_con(void *model)
   if(which < 3)
   {
     pm[which] += dnest_randh() * width;
-    wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
+    dnest_wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
   }
   else if(which < 4 + parset.flag_trend)
   {
     logH -= (-0.5*pow(pm[which], 2.0) );
     pm[which] += dnest_randh() * width;
-    wrap(&pm[which], par_range_model[which][0], par_range_model[which][1]);
+    dnest_wrap(&pm[which], par_range_model[which][0], par_range_model[which][1]);
     logH += (-0.5*pow(pm[which], 2.0) );
   }
   else if(which < num_params_var)
   {
     pm[which] += dnest_randh() * width;
-    wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
+    dnest_wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
   }
   else
   {
     logH -= (-0.5*pow(pm[which], 2.0) );
     pm[which] += dnest_randh() * width;
-    wrap(&pm[which], par_range_model[which][0], par_range_model[which][1]);
+    dnest_wrap(&pm[which], par_range_model[which][0], par_range_model[which][1]);
     logH += (-0.5*pow(pm[which], 2.0) );
   }
   return logH;

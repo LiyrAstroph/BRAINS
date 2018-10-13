@@ -12,6 +12,8 @@
 
 #ifndef _DNEST_CON_H
 
+#define _DNEST_CON_H
+
 #include <stdbool.h>
 
 /* functions */
