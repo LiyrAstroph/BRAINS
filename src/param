@@ -4,7 +4,7 @@
 
 FileDir                     /home/liyropt/Projects/GIT/BRAINS      % directory for where all the output files are stored
 
-FlagDim                     1                           % -2, generate fully random lc; -1, mock lc based on input data; 
+FlagDim                     2                           % -2, generate fully random lc; -1, mock lc based on input data; 
                                                         % 0, only continuum modeling; 1, 1d line RM; 2, 2d line RM
 
 FlagBLRModel                6                           % 1, 2, 3, 4, 5, 6, 7; BLR model type
@@ -56,12 +56,12 @@ FlagLineSysErr              0                           % 0, not include systema
 % spectral broadening
 
 InstRes                     220                           % instrument broadening (modeled by a Gaussian), in km/s
-                                                          % if seting to <0.0, the broadening is epoch dependent
+                                                          % if seting to <0.0, the broadening is epoch dependent, stored in "InstResFile"
 
 InstResErr                  34.0                          % instrument broadening error, in km/s
 
 InstResFile                 data/arp151_broaden.txt       % file for storing epoch-dependent instrument broadening
-                                                          % two columns: broadening width and error (km/s), in the order as the 2d line data
+                                                          % two columns: broadening width and error (km/s), in the order of time as the 2d line data
 
 %========================================================================
 % narrow-line component
