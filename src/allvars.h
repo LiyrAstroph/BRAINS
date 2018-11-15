@@ -109,7 +109,7 @@ typedef struct
   int flag_sample_info;
   int flag_temp;
   int flag_exam_prior;
-
+  int flag_rng_seed, rng_seed;
   int flag_fixvar;
 
   int flag_force_update;

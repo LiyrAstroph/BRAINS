@@ -100,10 +100,24 @@ void init()
   gsl_r = gsl_rng_alloc (gsl_T);
 
 #ifndef Debug 
-  gsl_rng_set(gsl_r, time(NULL)+thistask+1350); 
+  if(parset.flag_rng_seed != 1)
+  {
+    gsl_rng_set(gsl_r, time(NULL)+thistask+1350); 
+  }
+  else
+  {
+    gsl_rng_set(gsl_r, parset.rng_seed+thistask+1350); 
+  }
 #else
-  gsl_rng_set(gsl_r, 6666+thistask+1350); 
-  printf("# debugging, task %d brains random seed %d.\n", thistask, 6666+thistask+1350);
+  if(parset.flag_rng_seed != 1)
+  {
+    gsl_rng_set(gsl_r, 6666+thistask+1350); 
+    printf("# debugging, task %d brains random seed %d.\n", thistask, 6666+thistask+1350);
+  }
+  else
+  {
+    gsl_rng_set(gsl_r, parset.rng_seed+thistask+1350); 
+  }
 #endif
 
   gsl_acc = gsl_interp_accel_alloc();

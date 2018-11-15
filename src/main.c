@@ -49,8 +49,9 @@ int main(int argc, char **argv)
     parset.flag_sample_info = 0;
     parset.flag_temp = 0;
     parset.flag_exam_prior= 0;
+    parset.flag_rng_seed = 0;
 
-    while( (opt = getopt(argc, argv, "pt:rceh")) != -1)
+    while( (opt = getopt(argc, argv, "pt:rcs:eh")) != -1)
     {
       switch(opt)
       {
@@ -83,6 +84,12 @@ int main(int argc, char **argv)
         case 'c':  /* calculate sample information */
           printf("# Recalculate the sample info.\n");
           parset.flag_sample_info = 1;
+          break;
+
+        case 's':  /* set random number generator seed */
+          parset.flag_rng_seed = 1;
+          parset.rng_seed = atoi(optarg);
+          printf("# Set random seed %d.\n", parset.rng_seed);
           break;
 
         case 'e':  /* examine the priors assigned */
