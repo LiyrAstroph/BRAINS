@@ -3,7 +3,7 @@ Bayesian Reverberation-mapping Analysis Integrated with Nested Sampling
 
 A package for dynamically modeling broad-line regions and analyzing reverberation mapping data, and measuring the black hole mass.
 
-reference: Li, Y.-R., Songshen, Y.-Y., Qiu, J., et al. 2018, ApJ in press
+reference: Li, Y.-R., Songshen, Y.-Y., Qiu, J., et al. 2018, ApJ in press ([arxiv:1811.06302](https://arxiv.org/abs/1811.06302))
 
 # Compiling
 To compile ``RECON``, the following third-party packages are required:
@@ -58,7 +58,7 @@ The output Markov chain is stored in ``data/posterior_sample.txt`` for continuum
 One need to tune the corresponding option files ``OPTIONSCON``, ``OPTIONS1d``, and ``OPTIONS2D`` accordingly, which specify configurations for nested sampling.s
 
 # An Exemplary Test
-Application to a mock reverberation mapping dataset, see Li, Y.-R., Songshen, Y.-Y., Qiu, J., et al. 2018, ApJ in press.
+Application to a mock reverberation mapping dataset, see Li, Y.-R., Songshen, Y.-Y., Qiu, J., et al. 2018, ApJ in press ([arxiv:1811.06302](https://arxiv.org/abs/1811.06302)).
 ![Application to a mock reverberation mapping dataset](https://github.com/liyropt/MyGithubPic/blob/master/fig_sim_brains.jpg)
 
 **Contact the author Li, Yan-Rong (liyanrong@mail.ihep.ac.cn) for any problem.**
