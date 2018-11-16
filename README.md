@@ -32,10 +32,30 @@ sim_broadening.txt          # spectral broadening data
 
 One can try to run the above command to test ``brains`` with the provided dataset.
 
-# MCMC Samping
-The output Markov chain is stored in ``data/posterior_sample.txt`` for continuum reconstuction, ``data/posterior_sample1d.txt`` for 1d reverberation mapping analysis, and `data/posterior_sample2d.txt`` for 2d reverberation mapping analysis.
+# Command-line Options
+``brains`` also adimits several simple command-line options:
+```bash
+    -h
+        print help information.
+    -p
+        only do posterior processing.
+    -r
+        restart from the backup.
+    -t
+        specify tempering temperature in posterior processing.
+    -s 
+        set a seed for the random number generator.
+    -c
+        only do posterior processing, but recalculate the posterior sample information.
+    -e
+         examine the priors.
+```
 
-One need to tune the corresponding option files ``OPTIONSCON``, ``OPTIONS1d``, and ``OPTIONS2D`` accordingly, which specify configurations for nested sampling.
+
+# MCMC Samping
+The output Markov chain is stored in ``data/posterior_sample.txt`` for continuum reconstuction, in ``data/posterior_sample1d.txt`` for 1d reverberation mapping analysis, and in ``data/posterior_sample2d.txt`` for 2d reverberation mapping analysis.
+
+One need to tune the corresponding option files ``OPTIONSCON``, ``OPTIONS1d``, and ``OPTIONS2D`` accordingly, which specify configurations for nested sampling.s
 
 # An Exemplary Test
 Application to a mock reverberation mapping dataset, see Li, Y.-R., Songshen, Y.-Y., Qiu, J., et al. 2018, ApJ in press.

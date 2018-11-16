@@ -70,6 +70,9 @@ void print_help()
   printf("\t" RED BOLD "-t\n" NONE);
   printf("\t\tspecify tempering temperature in posterior processing.\n");
 
+  printf("\t" RED BOLD "-s\n" NONE);
+  printf("\t\tset a seed for the random number generator.\n");
+
   printf("\t" RED BOLD "-c\n" NONE);
   printf("\t\tonly do posterior processing, but recalculate the posterior sample information.\n");
 

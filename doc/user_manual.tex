@@ -83,14 +83,58 @@ Institute of High Energy Physics}
  
  \item {\bf DNest}. DNest is a library to implement diffusive nested sampling. DNest is available at \url{https://github.com/LiyrAstroph/DNest_C}.
 \end{itemize}
-In popular Linux distributions, one can use the system package manager to install the above packages. For example, in Fedora distribution, 
+In popular Linux distributions, one can use the system package manager to install the above packages, except for DNest. For example, in Fedora distribution, 
 the corresponding terminal commands are 
 \begin{verbatim}
  sudo dnf install gsl fftw3 lapack mpich
 \end{verbatim} 
 
 \section{Configure the \texttt{Makefile}}
-To compile {\brains}, one needs first to proporiately configure the \texttt{Makefile}.
+To compile {\brains}, one needs first to proporiately configure the \texttt{Makefile}. In Linux systems, typical configurations look like
+\begin{verbatim}
+ifeq ($(SYSTEM), "Linux")
+GSL_INCL    = $(shell pkg-config --cflags gsl)
+GSL_LIBS    = $(shell pkg-config --libs gsl) 
+
+LAPACK_INCL = -I/usr/include/lapacke
+LAPACK_LIBS = -L/usr/lib64 -llapacke -llapack -lblas
+
+DNEST_INCL  = -I /home/liyropt/Projects/GIT/DNest/
+DNEST_LIBS  = -L /home/liyropt/Projects/GIT/DNest -ldnest
+
+FFTW_INCL   = $(shell pkg-config --cflags fftw3) 
+FFTW_LIBS   = $(shell pkg-config --libs fftw3) 
+
+MPICHINCL     = $(shell pkg-config --cflags mpich) 
+MPICHLIB    = $(shell pkg-config --libs mpich) 
+endif
+\end{verbatim}
+Change the values of the variables in line with your system's configurations.
+
+\section{Compiling}
+The command for compiling is 
+\begin{verbatim}
+ make
+\end{verbatim}
+This will create an executable file `` \texttt{brains}'' in the local directory.
+
+{\bf waiting for update...}
+
+\chapter{Running}
+
+\section{Running Commands}
+To run \texttt{brains}, one can use command
+\begin{verbatim}
+brains [FILE] [OPTION]
+\end{verbatim}
+or
+\begin{verbatim}
+mpiexec [MPI_OPTION] brains [FILE] [OPTION]
+\end{verbatim}
+
+\section{Parameter File}
+
+{\bf waiting for update...}
 
 \clearpage
 \newpage
@@ -198,6 +242,6 @@ The angle between the line of sight and the line of cloud is
  \cos \varphi = \frac{D\cdot x}{D\cdot r} = \frac{x}{r}.
 \end{equation}
 
-
+{\bf waiting for update...}
 \end{document}
 
