@@ -14,5 +14,5 @@ analysis/*
 !src/param
 !src/doxyfile
 !doc/*.tex
-!data/lcplot*.py
+!data/lcplot_v3.py
 brains
