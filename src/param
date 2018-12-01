@@ -8,7 +8,7 @@ FlagDim                     2                           % -2, generate fully ran
                                                         % 0, only continuum modeling; 1, 1d line RM; 2, 2d line RM
 
 FlagBLRModel                6                           % 1, 2, 3, 4, 5, 6, 7; BLR model type
-                                                        % 6 is Pancoast's model; 7 is two-zone model
+                                                        % 5 is double power-law model; 6 is Pancoast's model; 7 is two-zone model
 
 %========================================================================
 % data file
