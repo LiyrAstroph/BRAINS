@@ -154,6 +154,8 @@ int dnest_line2d(int argc, char **argv)
   fptrset_line2d->from_prior = from_prior_line2d;
   fptrset_line2d->print_particle = print_particle_line2d;
   fptrset_line2d->restart_action = restart_action_2d;
+  fptrset_line2d->accept_action = accept_action_2d;
+  fptrset_line2d->kill_action = kill_action_2d;
   fptrset_line2d->perturb = perturb_line2d;
   
   if(parset.flag_exam_prior != 1)
@@ -544,4 +546,19 @@ double perturb_line2d(void *model)
 double log_likelihoods_cal_line2d_exam(const void *model)
 {
   return 0.0;
+}
+
+void accept_action_2d()
+{
+  return;
+}
+
+void kill_action_2d(int i, int i_copy)
+{
+  memcpy(Fcon_particles[i], Fcon_particles[i_copy], parset.n_con_recon * sizeof(double));
+  memcpy(Fline_at_data_particles[i], Fline_at_data_particles[i_copy], n_line_data * sizeof(double));
+  memcpy(con_q_particles[i], con_q_particles[i_copy], nq * sizeof(double));
+  memcpy(Trans2D_at_veldata_particles[i], Trans2D_at_veldata_particles[i_copy], parset.n_tau * n_vel_data * sizeof(double));
+  memcpy(clouds_particles[i], clouds_particles[i_copy], parset.n_cloud_per_task * sizeof(double)) ;
+  return;
 }

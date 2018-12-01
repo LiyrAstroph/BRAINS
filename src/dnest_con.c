@@ -51,6 +51,8 @@ int dnest_con(int argc, char **argv)
   fptrset_con->perturb = perturb_con;
   fptrset_con->print_particle = print_particle_con;
   fptrset_con->restart_action = restart_action_con;
+  fptrset_con->accept_action = accept_action_con;
+  fptrset_con->kill_action = kill_action_con;
   
   if(parset.flag_exam_prior != 1)
   {
@@ -266,6 +268,26 @@ void print_particle_con(FILE *fp, const void *model)
 
 void restart_action_con(int iflag)
 {
+
+  return;
+}
+
+void accept_action_con()
+{
+  int param;
+
+  param = which_parameter_update;
+  /* only update prob when variability parameters are updated. */
+  if(param < num_params_var)
+  {
+    prob_con_particles[which_particle_update] = prob_con_particles_perturb[which_particle_update];
+  }
+  return;
+}
+
+void kill_action_con(int i, int i_copy)
+{
+  prob_con_particles[i] = prob_con_particles[i_copy];
   return;
 }
 

@@ -460,16 +460,7 @@ double prob_con_variability(const void *model)
   double *Larr, *ybuf, *y, *yq, *Cq;
   
   which_particle_update = dnest_get_which_particle_update();
-  if(dnest_perturb_accept[which_particle_update] == 1)
-  {
-    param = which_parameter_update_prev[which_particle_update];
-    /* only update prob when variability parameters are updated. */
-    if(param < num_params_var)
-    {
-      prob_con_particles[which_particle_update] = prob_con_particles_perturb[which_particle_update];
-    }
-  }
-
+  
   if( which_parameter_update < num_params_var)
   {
 
@@ -531,8 +522,6 @@ double prob_con_variability(const void *model)
   {
     prob = prob_con_particles[which_particle_update];
   }
-  /* record the parameter being updated */
-  which_parameter_update_prev[which_particle_update] = which_parameter_update;
 
   return prob;
 }

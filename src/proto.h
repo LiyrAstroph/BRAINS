@@ -54,6 +54,9 @@ void reconstruct_con_from_varmodel(double sigma_hat, double tau, double alpha, d
 void create_con_from_random(double sigma_hat, double tau, double alpha, double syserr);
 void postprocess_con();
 void set_par_range_con();
+void restart_action_con();
+void accept_action_con();
+void kill_action_con(int i, int i_copy);
 
 /* 1d line reconstruction */
 int dnest_line1d(int argc, char **argv);
@@ -79,6 +82,8 @@ void postprocess1d();
 void set_par_range_model1d();
 
 void restart_action_1d(int iflag);
+void accept_action_1d();
+void kill_action_1d(int i, int i_copy);
 
 /* 2d line reconstruction */
 int dnest_line2d(int argc, char **argv);
@@ -110,7 +115,8 @@ void smooth_end();
 void smooth_test();
 
 void restart_action_2d(int iflag);
-
+void accept_action_2d();
+void kill_action_2d(int i, int i_copy);
 /* sim */
 void sim();
 void sim_init();
