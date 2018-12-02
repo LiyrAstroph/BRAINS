@@ -697,12 +697,6 @@ void reconstruct_con_init()
   }
   MPI_Bcast(&parset.num_particles, 1, MPI_INT, roottask, MPI_COMM_WORLD);
 
-  which_parameter_update_prev = malloc(parset.num_particles * sizeof(int));
-  for(i=0; i<parset.num_particles; i++)
-  {
-    which_parameter_update_prev[i] = -1;
-  }
-
   Fcon_particles = malloc(parset.num_particles * sizeof(double *));
   Fcon_particles_perturb = malloc(parset.num_particles * sizeof(double *));
   for(i=0; i<parset.num_particles; i++)
@@ -735,7 +729,6 @@ void reconstruct_con_end()
   free(prob_con_particles);
   free(prob_con_particles_perturb);
 
-  free(which_parameter_update_prev);
   free(best_model_con);
   free(best_model_std_con);
 

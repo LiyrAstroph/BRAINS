@@ -576,12 +576,6 @@ void reconstruct_line2d_init()
     Fcon_particles_perturb[i] = malloc(parset.n_con_recon * sizeof(double));
   }
 
-  which_parameter_update_prev = malloc(parset.num_particles * sizeof(int));
-  for(i=0; i<parset.num_particles; i++)
-  {
-    which_parameter_update_prev[i] = -1;
-  }
-
   clouds_particles = malloc(parset.num_particles * sizeof(double *));
   clouds_particles_perturb = malloc(parset.num_particles * sizeof(double *));
   for(i=0; i<parset.num_particles; i++)
@@ -605,8 +599,6 @@ void reconstruct_line2d_init()
     Fline_at_data_particles[i] = malloc(n_line_data * n_vel_data * sizeof(double));
     Fline_at_data_particles_perturb[i] = malloc(n_line_data * n_vel_data * sizeof(double));
   }
-  prob_line_particles = malloc(parset.num_particles * sizeof(double));
-  prob_line_particles_perturb = malloc(parset.num_particles * sizeof(double));
 
   con_q_particles = malloc(parset.num_particles * sizeof(double *));
   con_q_particles_perturb = malloc(parset.num_particles * sizeof(double *));
@@ -661,8 +653,6 @@ void reconstruct_line2d_end()
   free(Fcon_particles);
   free(Fcon_particles_perturb);
   
-  free(which_parameter_update_prev);
-
   free(Fline_at_data);
 
   free(par_fix);
@@ -689,8 +679,6 @@ void reconstruct_line2d_end()
   free(Trans2D_at_veldata_particles_perturb);
   free(Fline_at_data_particles);
   free(Fline_at_data_particles_perturb);
-  free(prob_line_particles);
-  free(prob_line_particles_perturb);
 
   free(con_q_particles);
   free(con_q_particles_perturb);
@@ -752,7 +740,6 @@ double prob_initial_line2d(const void *model)
       prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
     }
   }
-  prob_line_particles[which_particle_update] = prob_line;
 
   memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
           parset.n_cloud_per_task * sizeof(double));
@@ -792,7 +779,6 @@ double prob_restart_line2d(const void *model)
       prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
     }
   }
-  prob_line_particles[which_particle_update] = prob_line;
 
   return prob_line;
 }
@@ -805,95 +791,10 @@ double prob_restart_line2d(const void *model)
 double prob_line2d(const void *model)
 {
   double prob_line = 0.0, var2, dy, var2_se;
-  int i, param, flag_cpy=0;
-  double *pm = (double *)model, *ptemp;
+  int i;
+  double *pm = (double *)model;
   
   which_particle_update = dnest_get_which_particle_update();
-  // if the previous perturb is accepted, store the previous perturb values, otherwise, no changes;
-  if(dnest_perturb_accept[which_particle_update] == 1)
-  {
-    // the parameter previously updated
-    param = which_parameter_update_prev[which_particle_update];
-    // continuum parameter is updated
-    if(param >= num_params_blr)
-    {
-      /* 
-       *note that (response) Fline is also changed as long as Fcon is changed.
-       *num_params_blr-the parameter is the systematic error of continuum.
-       *the change of this parameter also changes continuum reconstruction.
-       */
-
-      /*memcpy(Fcon_particles[which_particle_update], Fcon_particles_perturb[which_particle_update], 
-        parset.n_con_recon*sizeof(double));
-
-      memcpy(Fline_at_data_particles[which_particle_update], Fline_at_data_particles_perturb[which_particle_update],
-        n_line_data * n_vel_data * sizeof(double));
-
-      memcpy(con_q_particles[which_particle_update], con_q_particles_perturb[which_particle_update],
-        nq*sizeof(double));*/
-
-      ptemp = Fcon_particles[which_particle_update];
-      Fcon_particles[which_particle_update] = Fcon_particles_perturb[which_particle_update];
-      Fcon_particles_perturb[which_particle_update] = ptemp;
-
-      ptemp = Fline_at_data_particles[which_particle_update];
-      Fline_at_data_particles[which_particle_update] = Fline_at_data_particles_perturb[which_particle_update];
-      Fline_at_data_particles_perturb[which_particle_update] = ptemp;
-
-      ptemp = con_q_particles[which_particle_update];
-      con_q_particles[which_particle_update] = con_q_particles_perturb[which_particle_update];
-      con_q_particles_perturb[which_particle_update] = ptemp;
-    }
-    else
-    {
-      /* BLR parameter is updated 
-       * Note a) that the (num_par_blr-1)-th parameter is systematic error of line.
-       * when this parameter is updated, Trans2D and Fline are unchanged.
-       *      b) Fline is always changed, except for param = num_params_blr-1 or num_params_blr.
-       */
-      if(param < num_params_blr -1 )
-      {
-        /*memcpy(Trans2D_at_veldata_particles[which_particle_update], Trans2D_at_veldata_particles_perturb[which_particle_update], 
-            parset.n_tau * n_vel_data * sizeof(double));
-
-        memcpy(Fline_at_data_particles[which_particle_update], Fline_at_data_particles_perturb[which_particle_update],
-            n_line_data * n_vel_data * sizeof(double));*/
-
-        ptemp = Trans2D_at_veldata_particles[which_particle_update];
-        Trans2D_at_veldata_particles[which_particle_update] = Trans2D_at_veldata_particles_perturb[which_particle_update];
-        Trans2D_at_veldata_particles_perturb[which_particle_update] = ptemp;
-
-        ptemp = Fline_at_data_particles[which_particle_update];
-        Fline_at_data_particles[which_particle_update] = Fline_at_data_particles_perturb[which_particle_update];
-        Fline_at_data_particles_perturb[which_particle_update] = ptemp;
-
-        /* when force_update is true, no need to store the perturbed value */
-        if(force_update == 0)
-        {
-          for(i=0; i<num_params_radial_samp; i++)
-          {
-            if(param == params_radial_samp[i])
-            {
-              flag_cpy = 1;
-              break;
-            }
-          }
-          if(flag_cpy == 1)
-          {
-            /*memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
-              parset.n_cloud_per_task * sizeof(double));*/
-
-            ptemp = clouds_particles[which_particle_update];
-            clouds_particles[which_particle_update] = clouds_particles_perturb[which_particle_update];
-            clouds_particles_perturb[which_particle_update] = ptemp;
-          }
-        }
-      }
-    } 
-    
-    // line probability is always changed.
-    prob_line_particles[which_particle_update] = prob_line_particles_perturb[which_particle_update];
-  }
 
   // only update continuum reconstruction when the corresponding parameters are updated
   if(which_parameter_update >= num_params_blr)
@@ -941,7 +842,6 @@ double prob_line2d(const void *model)
         prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
       }
     }
-    prob_line_particles_perturb[which_particle_update] = prob_line;
   }
   else
   {
@@ -958,11 +858,7 @@ double prob_line2d(const void *model)
         prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
       }
     }
-      /* backup prob_line */
-    prob_line_particles_perturb[which_particle_update] = prob_line;
   }
-
-  which_parameter_update_prev[which_particle_update] = which_parameter_update;
 
   return prob_line;
 }

@@ -134,7 +134,6 @@ extern char dnest_options_file[BRAINS_MAX_STR_LENGTH];
 
 extern int which_parameter_update, which_particle_update;  // which parameter and particle to be updated
 extern int which_level_update;
-extern int *which_parameter_update_prev;
 extern double *limits;  // external from dnest
 
 /* continuum reconstruction */
@@ -330,7 +329,6 @@ extern double **clouds_particles_perturb, **clouds_particles;
 extern double **Trans1D_particles, **Trans1D_particles_perturb;
 extern double **Trans2D_at_veldata_particles, **Trans2D_at_veldata_particles_perturb;
 extern double **Fline_at_data_particles, **Fline_at_data_particles_perturb;
-extern double *prob_line_particles, *prob_line_particles_perturb;
 
 extern double tau_max, tau_min;
 extern double *tmp_tau, *tmp_weight, *tmp_vel;

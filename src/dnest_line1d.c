@@ -442,6 +442,72 @@ double log_likelihoods_cal_line1d_exam(const void *model)
 
 void accept_action_1d()
 {
+  int param, i, flag_cpy=0;
+  double *ptemp;
+
+  // the parameter previously updated
+  param = which_parameter_update;
+  /* continuum parameter is updated */
+  if( param >= num_params_blr )
+  {
+    /* 
+     *note that (response) Fline is also changed as long as Fcon is changed.
+     *num_params_blr-the parameter is the systematic error of continuum.
+     *the change of this parameter also changes continuum reconstruction.
+     */
+
+    ptemp = Fcon_particles[which_particle_update];
+    Fcon_particles[which_particle_update] = Fcon_particles_perturb[which_particle_update];
+    Fcon_particles_perturb[which_particle_update] = ptemp;
+
+    ptemp = Fline_at_data_particles[which_particle_update];
+    Fline_at_data_particles[which_particle_update] = Fline_at_data_particles_perturb[which_particle_update];
+    Fline_at_data_particles_perturb[which_particle_update] = ptemp;
+
+    ptemp = con_q_particles[which_particle_update];
+    con_q_particles[which_particle_update] = con_q_particles_perturb[which_particle_update];
+    con_q_particles_perturb[which_particle_update] = ptemp;
+  }
+  else 
+  {
+    /* BLR parameter is updated 
+     * Note a) that the (num_par_blr-1)-th parameter is systematic error of line.
+     * when this parameter is updated, Trans1D and Fline are unchanged.
+     *      b) Fline is always changed, except param = num_params_blr-1 or num_params_blr.
+     */
+    if( param < num_params_blr-1 )
+    {
+
+      ptemp = Trans1D_particles[which_particle_update];
+      Trans1D_particles[which_particle_update] = Trans1D_particles_perturb[which_particle_update];
+      Trans1D_particles_perturb[which_particle_update] = ptemp;
+
+      ptemp = Fline_at_data_particles[which_particle_update];
+      Fline_at_data_particles[which_particle_update] = Fline_at_data_particles_perturb[which_particle_update];
+      Fline_at_data_particles_perturb[which_particle_update] = ptemp;
+
+      /* when force_update is true, no need to store the perturbed value */
+      if(force_update == 0)
+      {
+        for(i=0; i<num_params_radial_samp; i++)
+        {
+          if(param == params_radial_samp[i])
+          {
+            flag_cpy = 1;
+            break;
+          }
+        }
+
+        if(flag_cpy == 1)
+        {
+          ptemp = clouds_particles[which_particle_update];
+          clouds_particles[which_particle_update] = clouds_particles_perturb[which_particle_update];
+          clouds_particles_perturb[which_particle_update] = ptemp;
+        }
+      }
+    }
+  }  
+  
   return;
 }
 

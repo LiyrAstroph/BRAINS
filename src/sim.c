@@ -308,6 +308,20 @@ void sim()
   }
   fclose(fp);
   
+  sprintf(fname, "%s/%s", parset.file_dir, "/data/sim_broadening.txt");
+  fp = fopen(fname, "w");
+  if(fp == NULL)
+  {
+    fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+    exit(-1);
+  }
+
+  for(i=0; i<parset.n_line_recon; i++)
+  {
+    fprintf(fp, "%f %f\n", parset.InstRes * VelUnit, parset.InstRes_err * VelUnit);
+  }
+  fclose(fp);
+
   // output 2d transfer function
   sprintf(fname, "%s/%s", parset.file_dir, parset.tran2d_out_file);
   fp = fopen(fname, "w");
