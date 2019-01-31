@@ -19,6 +19,9 @@ Documentation
    :maxdepth: 2
    
    getting_started.rst
+   param.rst
+   mcmc.rst
+   model.rst
 
 
 Attribution
