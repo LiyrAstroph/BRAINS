@@ -15,7 +15,7 @@ def set_cov_Pmat(sigma, tau, alpha, Tcon):
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif', size=15)
 
-obj = "irasf"
+obj = "sim"
 
 fp=open(obj + "_hb2d.txt", "r")
 line=fp.readline()
@@ -41,6 +41,8 @@ for j in range(0, nt):
 fp.close()
 grid_wave = grid_vel / 3e5 * 4861.0 + 4861.0
 dV = (grid_vel[1]-grid_vel[0]) / VelUnit
+
+line_mean_err = np.mean(prof_err)
 
 # read sim
 fp=open("pline2d_data.txt", "r")
@@ -85,15 +87,11 @@ hd=np.loadtxt("sample2d.txt", skiprows=1)
 phd = np.loadtxt("posterior_sample2d.txt")
 hd_info = np.loadtxt("sample_info2d.txt", skiprows=1)
 level = np.loadtxt("levels2d.txt", skiprows=1)
-idx_mbh = np.where(hd_info[:, 0]>level.shape[0] - 40)
-hd_sort=np.sort(hd[idx_mbh[0], 8]/np.log(10.0)+6.0)
-mbh1=hd_sort[len(hd_sort)*0.1585]
-mbh2=hd_sort[len(hd_sort)*(1.0-0.1585)]
-print(mbh1, mbh2)
+idx_mbh = np.where(hd_info[:, 0]>level.shape[0] - 60)
+hd_sort=np.sort(hd[idx_mbh[0], 11]/np.log(10.0)+6.0)
 
-syserr_con = np.exp(np.mean(phd[:, 12]))/con_scale
 syserr_con = 0.0
-syserr = np.exp(np.mean(phd[:, 11]))/line_scale
+syserr =0.0 #(np.exp(np.mean(phd[:, 19])) - 1.0)/line_scale * line_mean_err
 
 print("scale:", con_scale, line_scale)
 print("syserr:", syserr_con, syserr)
@@ -107,6 +105,8 @@ fig=plt.figure(1, figsize=(9, 8))
 cmap=plt.get_cmap('jet')
 
 
+plt.rcParams['xtick.direction'] = 'in'
+plt.rcParams['ytick.direction'] = 'in'
 #========================================================================
 # subfig 5
 ax5=fig.add_axes([0.1, 0.2, 0.52, 0.15])
@@ -124,15 +124,17 @@ for i in range(len(logP)):
     prof_rec[j, :]=line.split()
     
   line_rec = np.sum(prof_rec, axis=1) * dV
-  chi[i] = np.sum( (line_rec - hblc[:, 1]) * (line_rec - hblc[:, 1]))
-  #chi[i] = np.sum( (prof_rec - prof) * (prof_rec - prof))
+  #chi[i] = np.sum( (line_rec - hblc[:, 1]) * (line_rec - hblc[:, 1]))
+  chi[i] = np.sum( (prof_rec - prof) * (prof_rec - prof)/prof_err/prof_err)
   fp.readline()
   
 fp.close()
 
+np.savetxt("chi.txt", chi)
+
 fp = open("line2d_rec.txt", "r")
 ichimin = np.argmin(chi)
-ichimin = nmax
+#ichimin = nmax
 print(ichimin, chi[ichimin])
 print(ichimin, logP[ichimin])
 print(nmax, phd[nmax, 11])
@@ -162,8 +164,8 @@ fp.close()
 plt.errorbar(hblc[:, 0], hblc[:, 1] * 4861*VelUnit/3e5, yerr=np.sqrt(hblc[:, 2]*hblc[:, 2] + syserr * syserr * dV*dV)* 4861*VelUnit/3e5, marker='None', markersize=3, ls='none', lw=1.0, capsize=0.7, markeredgewidth=0.5, zorder=32)
 plt.plot(date_hb, line_rec_max* 4861*VelUnit/3e5, color='red')
 
-ax5.set_xlabel(r'$\rm HJD\ (+2\ 450\ 500)$')
-ax5.set_ylabel(r'$F_{\rm H\beta}$')
+ax5.set_xlabel(r'$\rm Time\ (day)$')
+ax5.set_ylabel(r'$F_{\rm H\beta}$', labelpad=21)
 
 ymax = np.max(hblc[:, 1]* 4861*VelUnit/3e5)
 ymin = np.min(hblc[:, 1]* 4861*VelUnit/3e5)
@@ -171,11 +173,19 @@ ax5.set_ylim(ymin - 0.2*(ymax-ymin), ymax + 0.2*(ymax- ymin))
 
 xmax = hblc[-1, 0]
 xmin = hblc[0, 0]
-ax5.set_xlim(xmin - 0.2*(xmax-xmin), xmax + 0.1*(xmax- xmin))
+ax5.set_xlim(xmin - 0.2*(xmax-xmin), xmax + 0.2*(xmax- xmin))
 
 #ax5.xaxis.set_minor_locator(MultipleLocator(4.0))
 #ax5.yaxis.set_major_locator(MultipleLocator(0.5))
 #ax5.yaxis.set_minor_locator(MultipleLocator(0.1))
+
+ax5.yaxis.set_ticks_position("both")
+ax5.xaxis.set_ticks_position("both")
+
+xlim = ax5.get_xlim()
+ylim = ax5.get_ylim()
+
+ax5.text(xlim[0]+0.02*(xlim[1]-xlim[0]), ylim[1]-0.22*(ylim[1]-ylim[0]), r'$\rm Mrk\ 142$')
 
 #========================================================================
 # subfig 4
@@ -222,51 +232,59 @@ plt.plot(date-date0, con, color='red')
 ax4.set_xlim(conlc_sim[0, 0], conlc_sim[-1, 0])
 ymax = np.max(conlc[:, 1])
 ymin = np.min(conlc[:, 1])
-ax4.set_ylim(ymin - 0.2*(ymax-ymin), ymax + 0.2*(ymax- ymin))
+ax4.set_ylim(ymin - 0.4*(ymax-ymin), ymax + 0.4*(ymax- ymin))
 ax4.set_ylabel(r'$F_{\rm 5100}$')
 #ax4.set_ylim([30, 95])
 
 #ax4.xaxis.set_minor_locator(MultipleLocator(4.0))
-#ax4.yaxis.set_major_locator(MultipleLocator(40.0))
-#ax4.yaxis.set_minor_locator(MultipleLocator(8.0))
+#ax4.yaxis.set_major_locator(MultipleLocator(0.04))
+#ax4.yaxis.set_minor_locator(MultipleLocator(0.02))
 
+ax4.yaxis.set_ticks_position("both")
+ax4.xaxis.set_ticks_position("both")
 
 [i.set_visible(False) for i in ax4.get_xticklabels()]
 
 xlim=ax5.get_xlim()
-ax4.set_xlim([xlim[0], xlim[1]])
+ax5.set_xlim([xlim[0], 170])
+ax4.set_xlim([xlim[0], 170])
 
+plt.rcParams['xtick.direction'] = 'out'
+plt.rcParams['ytick.direction'] = 'out'
 #========================================================================
 # subfig 1
 ax1 = fig.add_axes([0.1, 0.6, 0.25, 0.3])
 
-plt.imshow(prof, cmap=cmap, interpolation=None, aspect='auto', extent=[grid_vel[0], grid_vel[nv-1], date_hb[-1], date_hb[0]], vmax = np.amax(prof), vmin=np.amin(prof))
+plt.imshow(prof, cmap=cmap, interpolation='gaussian', aspect='auto', extent=[grid_vel[0], grid_vel[nv-1], date_hb[-1], date_hb[0]], vmax = np.amax(prof), vmin=np.amin(prof))
 ax1.set_xlabel(r'$\rm Velocity\ (10^3km\ s^{-1})$')
-ax1.set_ylabel(r'$\rm Time\ (+2\ 450\ 500)$')
+ax1.set_ylabel(r'$\rm Time\ (day)$')
 
 xlim=ax1.get_xlim()
 ylim=ax1.get_ylim()
 plt.text(xlim[0]+0.08*(xlim[1]-xlim[0]), ylim[1]-0.1*(ylim[1]-ylim[0]), r'$\rm Data$', color='white')
 
-#ax1.xaxis.set_major_locator(MultipleLocator(2000))
-#ax1.xaxis.set_minor_locator(MultipleLocator(400))
+#ax1.xaxis.set_major_locator(MultipleLocator(1.0))
+#ax1.xaxis.set_minor_locator(MultipleLocator(0.5))
 
 #========================================================================
 # subfig 2
 ax2=fig.add_axes([0.37, 0.6, 0.25, 0.3])
 
-plt.imshow(prof_rec_max, cmap=cmap, interpolation=None,  aspect='auto', extent=[grid_vel[0], grid_vel[nv-1], date_hb[-1], date_hb[0]], vmax = np.amax(prof_rec_max), vmin=np.amin(prof_rec_max))
+plt.imshow(prof_rec_max, cmap=cmap, interpolation='gaussian',  aspect='auto', extent=[grid_vel[0], grid_vel[nv-1], date_hb[-1], date_hb[0]], vmax = np.amax(prof)/1.07, vmin=np.amin(prof)*1.07)
 ax2.set_xlabel(r'$\rm Velocity\ (10^3km\ s^{-1})$')
 #ax2.set_ylabel('Time (+2 450 000)')
 xlim=ax2.get_xlim()
 ylim=ax2.get_ylim()
 plt.text(xlim[0]+0.08*(xlim[1]-xlim[0]), ylim[1]-0.1*(ylim[1]-ylim[0]), r'$\rm Model$', color='white')
 
+prof_diff = prof - prof_rec_max
 
 [i.set_visible(False) for i in ax2.get_yticklabels()]
-#ax2.xaxis.set_major_locator(MultipleLocator(2000))
-#ax2.xaxis.set_minor_locator(MultipleLocator(400))
+#ax2.xaxis.set_major_locator(MultipleLocator(1.0))
+#ax2.xaxis.set_minor_locator(MultipleLocator(0.5))
 
+plt.rcParams['xtick.direction'] = 'in'
+plt.rcParams['ytick.direction'] = 'in'
 #========================================================================
 # subfig 3
 ax3=fig.add_axes([0.7, 0.6, 0.25, 0.3])
@@ -277,7 +295,7 @@ for i in range(nt):
 
 chifit_sort = np.sort(chifit)
 
-offset = np.max(prof.flatten()) * 0.3
+offset = np.max(prof.flatten()) * 0.2
 
 idx = np.where(chifit == chifit_sort[0])
 i = idx[0][0]
@@ -300,22 +318,58 @@ xlim=ax3.get_xlim()
 ylim=ax3.get_ylim()
 plt.text(xlim[0]+0.08*(xlim[1]-xlim[0]), ylim[1]-0.1*(ylim[1]-ylim[0]), r'$\rm Profile$', color='black')
 
-#ax3.xaxis.set_major_locator(MultipleLocator(2000))
-#ax3.xaxis.set_minor_locator(MultipleLocator(400))
+#ax3.xaxis.set_major_locator(MultipleLocator(1.0))
+#ax3.xaxis.set_minor_locator(MultipleLocator(0.5))
+[yt.set_visible(False) for yt in ax3.get_yticklabels()]
+
+ax3.yaxis.set_ticks_position("both")
+ax3.xaxis.set_ticks_position("both")
 
 #========================================================================
 # subfig 6
 ax6=fig.add_axes([0.7, 0.2, 0.25, 0.3])
 
-hp, bins, patches=plt.hist(hd[idx_mbh[0], 8]/np.log(10.0)+6.0, bins=10, normed=1)
+hp, bins, patches=plt.hist(phd[:, 10]/np.log(10.0)+6.0, bins=10, normed=1)
+
+#hp, bins, patches=plt.hist(hd[idx_mbh[0], 8]/np.log(10.0)+6.0, bins=10, normed=1)
 ax6.set_xlabel(r'$\log(M_\bullet/M_\odot)$')
 ax6.set_ylabel(r'$\rm Hist$')
 ylim=ax6.get_ylim()
 
 ax6.set_ylim(ylim)
-#ax6.set_xlim((6.0, 8.5))
+ax6.set_xlim((5.0, 7.5))
 #ax6.xaxis.set_major_locator(MultipleLocator(1.0))
 
+#ax6.fill_between([6.14-0.11, 6.14+0.04], [ylim[0], ylim[0]], [ylim[1], ylim[1]], zorder=32, alpha=0.5, color='red')
+ax6.axvline(x=6.0+np.log10(2.0), ls="--", linewidth=2, color='r',zorder=50)
+#ax6.axvline(x=6.14-0.11, ls="--", linewidth=3, color='r')
+#ax6.axvline(x=6.14+0.04, ls="--", linewidth=3, color='r')
+
+yt = ax6.get_yticklabels()
+yt[0].set_visible(False)
+#ax6.yaxis.set_major_locator(MultipleLocator(0.2))
+#ax6.yaxis.set_minor_locator(MultipleLocator(0.1))
+#ax6.xaxis.set_major_locator(MultipleLocator(0.5))
+#ax6.xaxis.set_minor_locator(MultipleLocator(0.25))
+
+ax6.yaxis.set_ticks_position("both")
+ax6.xaxis.set_ticks_position("both")
 
 plt.savefig('lc.pdf', bbox_inches='tight')
-#plt.show()
+
+fig = plt.figure(figsize=(6, 10))
+ax = fig.add_subplot(211)
+ax.yaxis.set_major_locator(MultipleLocator(50))
+cmap=ax.imshow(prof_diff/np.sqrt(prof_err**2 + syserr**2),  aspect='auto', extent=[grid_vel[0], grid_vel[nv-1], date_hb[-1], date_hb[0]], vmax=2.5, vmin=-2.5)
+
+plt.colorbar(cmap)
+
+#ax = fig.add_subplot(212)
+
+#res = prof_diff**2/(prof_err**2 + syserr**2)
+#print np.sum(res)/(res.shape[0]*res.shape[1] - 20)
+#ax.hist(res.flatten(), bins=50)
+
+fig.savefig("profdiff.pdf", bbox_inches='tight')
+
+plt.show()
