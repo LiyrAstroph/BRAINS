@@ -192,14 +192,14 @@ int dnest_line2d(int argc, char **argv)
   }
 
   /* fix systematic error of line */
-  if(parset.flag_con_sys_err != 1)
+  if(parset.flag_line_sys_err != 1)
   {
     par_fix[num_params_blr-1] = 1;
     par_fix_val[num_params_blr-1] = log(1.0);
   }
   
   /* fix systematic error of continuum */
-  if(parset.flag_line_sys_err != 1)
+  if(parset.flag_con_sys_err != 1)
   {
     par_fix[num_params_blr] = 1;
     par_fix_val[num_params_blr] = log(1.0);
