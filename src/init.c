@@ -28,6 +28,7 @@
  */
 void init()
 {
+  int i;
 
   nq = 1 + parset.flag_trend;
   
@@ -123,11 +124,46 @@ void init()
   gsl_acc = gsl_interp_accel_alloc();
   gsl_linear = gsl_interp_alloc(gsl_interp_linear, parset.n_con_recon);
 
+  /* default BH mass range */
+  mass_range[0] = 0.1;
+  mass_range[1] = 1.0e3;
+
+  /* default rcloud_max_set */
+  rcloud_max_set = 1.0e3;
+
+  Tcad_data = 1.0;
+  Tspan_data = 1.0e4;
+  if(parset.flag_dim == 0)
+  {
+    /* set cadence and time span of data */
+    Tspan_data = (Tcon_data[n_con_data -1] - Tcon_data[0]);
+    Tcad_data = Tspan_data;
+    for(i=1; i< n_con_data; i++)
+    {
+      if(Tcad_data > Tcon_data[i] - Tcon_data[i-1])
+        Tcad_data = Tcon_data[i] - Tcon_data[i-1];
+    }
+  }
+
   if(parset.flag_dim > 0 || parset.flag_dim == -1)
   {
+    /* set cadence and time span of data */
+    Tspan_data = (Tline_data[n_line_data -1] - Tcon_data[0]);
+    Tcad_data = Tspan_data;
+    for(i=1; i< n_con_data; i++)
+    {
+      if(Tcad_data > Tcon_data[i] - Tcon_data[i-1])
+        Tcad_data = Tcon_data[i] - Tcon_data[i-1];
+    }
+    for(i=1; i< n_line_data; i++)
+    {
+      if(Tcad_data > Tline_data[i] - Tline_data[i-1])
+        Tcad_data = Tline_data[i] - Tline_data[i-1];
+    }
+
     /* set the range of cloud radial distribution */
     rcloud_min_set = 0.0;
-    rcloud_max_set = (Tline_data[n_line_data -1] - Tcon_data[0])/2.0;
+    rcloud_max_set = Tspan_data/2.0;
 
     if(parset.rcloud_max > 0.0)
       rcloud_max_set = fmin(rcloud_max_set, parset.rcloud_max);
@@ -145,8 +181,8 @@ void init()
   var_range_model[1][0] = -15.0; /* log(sigma) */
   var_range_model[1][1] = -1.0; 
 
-  var_range_model[2][0] = log(1.0); /* log(tau) */
-  var_range_model[2][1] = log(1.0e4); 
+  var_range_model[2][0] = log(Tcad_data); /* log(tau) */
+  var_range_model[2][1] = log(Tspan_data); 
 
   var_range_model[3][0] = -10.0; /* mean value or trend parameter values */
   var_range_model[3][1] =  10.0; 
@@ -177,9 +213,6 @@ void init()
     nlr_range_model[2][0] = -10.0;
     nlr_range_model[2][1] =  10.0;
   }
-
-  mass_range[0] = 0.1;
-  mass_range[1] = 1.0e3;
 
   set_blr_range_model();
 }
