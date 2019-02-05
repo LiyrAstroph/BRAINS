@@ -178,6 +178,9 @@ void init()
     nlr_range_model[2][1] =  10.0;
   }
 
+  mass_range[0] = 0.1;
+  mass_range[1] = 1.0e3;
+
   set_blr_range_model();
 }
 
@@ -446,8 +449,8 @@ void set_blr_range_model1()
   blr_range_model[i][0] = -0.5;
   blr_range_model[i++][1] = 0.5;
   //mbh
-  blr_range_model[i][0] = log(0.1);
-  blr_range_model[i++][1] = log(1000.0);
+  blr_range_model[i][0] = log(mass_range[0]);
+  blr_range_model[i++][1] = log(mass_range[1]);
   //lambda
   blr_range_model[i][0] = 0.0;
   blr_range_model[i++][1] = 1.5;
@@ -493,8 +496,8 @@ void set_blr_range_model2()
   blr_range_model[i][0] = -0.5;
   blr_range_model[i++][1] = 0.5;
   //mbh
-  blr_range_model[i][0] = log(0.1);
-  blr_range_model[i++][1] = log(1000.0);
+  blr_range_model[i][0] = log(mass_range[0]);
+  blr_range_model[i++][1] = log(mass_range[1]);
   //sigr
   blr_range_model[i][0] = 0.0;
   blr_range_model[i++][1] = 1.0;
@@ -539,8 +542,8 @@ void set_blr_range_model3()
   blr_range_model[i][0] = -0.5;
   blr_range_model[i++][1] = 0.5;
   //mbh
-  blr_range_model[i][0] = log(0.1);
-  blr_range_model[i++][1] = log(1000.0);
+  blr_range_model[i][0] = log(mass_range[0]);
+  blr_range_model[i++][1] = log(mass_range[1]);
   //xi
   blr_range_model[i][0] = 0.0;
   blr_range_model[i++][1] = 1.0;
@@ -586,8 +589,8 @@ void set_blr_range_model4()
   blr_range_model[i][0] = -0.5;
   blr_range_model[i++][1] = 0.5;
   //mbh
-  blr_range_model[i][0] = log(0.1);
-  blr_range_model[i++][1] = log(1000.0);
+  blr_range_model[i][0] = log(mass_range[0]);
+  blr_range_model[i++][1] = log(mass_range[1]);
   //xi
   blr_range_model[i][0] = 0.0;
   blr_range_model[i++][1] = sqrt(2.0)/2.0;
@@ -642,8 +645,8 @@ void set_blr_range_model5()
   blr_range_model[i][0] = 0.0;
   blr_range_model[i++][1] = 1.0;
   //mbh
-  blr_range_model[i][0] = log(0.1);
-  blr_range_model[i++][1] = log(1000.0);
+  blr_range_model[i][0] = log(mass_range[0]);
+  blr_range_model[i++][1] = log(mass_range[1]);
   //fellip
   blr_range_model[i][0] = 0.0;
   blr_range_model[i++][1] = 1.0;
@@ -715,8 +718,8 @@ void set_blr_range_model6()
   blr_range_model[i][0] = 0.0;
   blr_range_model[i++][1] = 1.0;
   //mbh
-  blr_range_model[i][0] = log(0.1);
-  blr_range_model[i++][1] = log(1000.0);
+  blr_range_model[i][0] = log(mass_range[0]);
+  blr_range_model[i++][1] = log(mass_range[1]);
   //fellip
   blr_range_model[i][0] = 0.0;
   blr_range_model[i++][1] = 1.0;
@@ -805,8 +808,8 @@ void set_blr_range_model7()
   blr_range_model[i++][1] = 90.0;
 
   //mbh
-  blr_range_model[i][0] = log(0.1);
-  blr_range_model[i++][1] = log(1000.0);
+  blr_range_model[i][0] = log(mass_range[0]);
+  blr_range_model[i++][1] = log(mass_range[1]);
   //fellip
   blr_range_model[i][0] = 0.0;
   blr_range_model[i++][1] = 1.0;

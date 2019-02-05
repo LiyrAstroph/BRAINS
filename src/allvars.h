@@ -312,6 +312,7 @@ extern int num_params_linecenter;
 extern double **blr_range_model, **par_range_model;
 extern double var_range_model[7][2];
 extern double nlr_range_model[3][2];
+extern double mass_range[2];
 
 extern double *instres_epoch, *instres_err_epoch;
 
