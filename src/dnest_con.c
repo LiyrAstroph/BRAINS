@@ -53,6 +53,7 @@ int dnest_con(int argc, char **argv)
   fptrset_con->restart_action = restart_action_con;
   fptrset_con->accept_action = accept_action_con;
   fptrset_con->kill_action = kill_action_con;
+  fptrset_con->read_particle = read_particle_con;
   
   if(parset.flag_exam_prior != 1)
   {
@@ -264,6 +265,26 @@ void print_particle_con(FILE *fp, const void *model)
     fprintf(fp, "%f ", pm[i] );
   }
   fprintf(fp, "\n");
+}
+
+/*!
+ * This function read the particle from the file.
+ */
+void read_particle_con(FILE *fp, void *model)
+{
+  int j;
+  double *psample = (double *)model;
+
+  for(j=0; j < dnest_num_params; j++)
+  {
+    if(fscanf(fp, "%lf", psample+j) < 1)
+    {
+      printf("%f\n", *psample);
+      fprintf(stderr, "#Error: Cannot read file %s.\n", options.sample_file);
+      exit(0);
+    }
+  }
+  return;
 }
 
 void restart_action_con(int iflag)

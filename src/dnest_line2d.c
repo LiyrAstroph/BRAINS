@@ -157,6 +157,7 @@ int dnest_line2d(int argc, char **argv)
   fptrset_line2d->accept_action = accept_action_2d;
   fptrset_line2d->kill_action = kill_action_2d;
   fptrset_line2d->perturb = perturb_line2d;
+  fptrset_line2d->read_particle = read_particle_line2d;
   
   if(parset.flag_exam_prior != 1)
   {
@@ -428,6 +429,26 @@ void print_particle_line2d(FILE *fp, const void *model)
     fprintf(fp, "%f ", pm[i] );
   }
   fprintf(fp, "\n");
+  return;
+}
+
+/*!
+ * This function read the particle from the file.
+ */
+void read_particle_line2d(FILE *fp, void *model)
+{
+  int j;
+  double *psample = (double *)model;
+
+  for(j=0; j < dnest_num_params; j++)
+  {
+    if(fscanf(fp, "%lf", psample+j) < 1)
+    {
+      printf("%f\n", *psample);
+      fprintf(stderr, "#Error: Cannot read file %s.\n", options.sample_file);
+      exit(0);
+    }
+  }
   return;
 }
 

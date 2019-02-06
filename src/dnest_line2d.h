@@ -18,6 +18,10 @@
 /* functions */
 void from_prior_line2d(void *model);
 void print_particle_line2d(FILE *fp, const void *model);
+void read_particle_line2d(FILE *fp, void *model);
+void restart_action_2d(int iflag);
+void accept_action_2d();
+void kill_action_2d(int i, int i_copy);
 double log_likelihoods_cal_line2d(const void *model);
 double log_likelihoods_cal_initial_line2d(const void *model);
 double log_likelihoods_cal_restart_line2d(const void *model);
