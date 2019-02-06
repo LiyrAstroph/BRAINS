@@ -47,7 +47,9 @@ CloudsFileOut               data/clouds.txt             % output filename for cl
 
 %========================================================================
 %
-FlagCloudsForceUpdate       1                           % default 0; 0, not update; 1, update whenever BLR parameters are changed
+FlagCloudsForceUpdate       1                           % default 0; 
+                                                        % 0, only update when BLR parameters are updated 
+                                                        % 1, update every MCMC perturb (continuum + BLR)
 
 FlagConSysErr               0                           % 0, not include systematic error of contininuum; 1, include
 FlagLineSysErr              0                           % 0, not include systematic error of line; 1, include
