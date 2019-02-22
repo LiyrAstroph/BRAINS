@@ -71,7 +71,7 @@ void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl
       /* add different trend in continuum and emission */
       if(parset.flag_trend_diff)
       {
-        ftrend = pmodel[num_params_blr + 4 + parset.flag_trend] * (tc - 0.5*(Tcon_data[0] + Tcon_data[n_con_data-1]));
+        ftrend = pmodel[num_params_blr + 4 + parset.flag_trend] * (tc - Tmed_data);
         fcon += ftrend;
       }
 

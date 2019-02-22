@@ -161,6 +161,9 @@ void init()
         Tcad_data = Tline_data[i] - Tline_data[i-1];
     }
 
+    /* set mediate time of continuum data */
+    Tmed_data = 0.5*(Tcon_data[0] + Tcon_data[n_con_data-1]);
+
     /* set the range of cloud radial distribution */
     rcloud_min_set = 0.0;
     rcloud_max_set = Tspan_data/2.0;
