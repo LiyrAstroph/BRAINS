@@ -293,8 +293,8 @@ void set_par_range_model2d()
   /* continuum ligth curve values */
   for(i=num_params_blr+num_params_var; i<num_params; i++)
   {
-    par_range_model[i][0] = var_range_model[5][0];
-    par_range_model[i][1] = var_range_model[5][1];
+    par_range_model[i][0] = var_range_model[4+num_params_difftrend][0];
+    par_range_model[i][1] = var_range_model[4+num_params_difftrend][1];
   }
 
   return;
@@ -426,7 +426,7 @@ void print_particle_line2d(FILE *fp, const void *model)
 
   for(i=0; i<num_params; i++)
   {
-    fprintf(fp, "%f ", pm[i] );
+    fprintf(fp, "%e ", pm[i] );
   }
   fprintf(fp, "\n");
   return;

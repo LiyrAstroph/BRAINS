@@ -32,9 +32,9 @@ void init()
 
   nq = 1 + parset.flag_trend;
   
-  if(parset.flag_trend_diff)
+  if(parset.flag_trend_diff > 0)
   {
-    num_params_difftrend = 1; /* differences of the trends between continuum and line */
+    num_params_difftrend = parset.flag_trend_diff; /* differences of the trends between continuum and line */
   }
   else
   {
@@ -190,11 +190,14 @@ void init()
   var_range_model[3][0] = -10.0; /* mean value or trend parameter values */
   var_range_model[3][1] =  10.0; 
 
-  var_range_model[4][0] = -0.1; /* slope of the trend in the differences between contiuum and line */
-  var_range_model[4][1] =  0.1; 
+  for(i=0; i<num_params_difftrend; i++)
+  {
+    var_range_model[4+i][0] = -1.0/pow(Tspan_data, i+1); /* slope of the trend in the differences between contiuum and line */
+    var_range_model[4+i][1] =  1.0/pow(Tspan_data, i+1); 
+  }
 
-  var_range_model[5][0] = -10.0; /* light curve values */
-  var_range_model[5][1] =  10.0; 
+  var_range_model[4+num_params_difftrend][0] = -10.0; /* light curve values */
+  var_range_model[4+num_params_difftrend][1] =  10.0; 
 
   
   if(num_params_nlr > 1)

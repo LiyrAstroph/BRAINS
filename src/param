@@ -4,7 +4,7 @@
 
 FileDir                     /home/liyropt/Projects/GIT/BRAINS      % directory for where all the output files are stored
 
-FlagDim                     2                           % -2, generate fully random lc; -1, mock lc based on input data; 
+FlagDim                     1                           % -2, generate fully random lc; -1, mock lc based on input data; 
                                                         % 0, only continuum modeling; 1, 1d line RM; 2, 2d line RM
 
 FlagBLRModel                6                           % 1, 2, 3, 4, 5, 6, 7; BLR model type
@@ -21,7 +21,9 @@ Line2DFile                  data/sim_hb2d.txt         % file for line 2d data
 % reconstruction
 NConRecon                   200                         % number of points for continuum reconstruction
 FlagTrend                   0                           % 0, mean; 1, first-order trend
-FlagTrendDiff               0                           % 0, no difference; 1, add difference in the long-term trends between continuum and line. 
+FlagTrendDiff               1                           % 0, no difference; 1 or larger, add difference in the long-term trends between continuum and line
+                                                        % the different trend is modelled by a polynomical with the order set by the value of FlagTrendDiff.
+
 ConConstructFileOut         data/pcon.txt               % output filename for continuum reconstruction
 
 FlagFixVar                  0                           % 0, not fixed; 1, fix the parameters of variation from continuum data.
@@ -52,7 +54,7 @@ FlagCloudsForceUpdate       1                           % default 0;
                                                         % 1, update every MCMC perturb (continuum + BLR)
 
 FlagConSysErr               0                           % 0, not include systematic error of contininuum; 1, include
-FlagLineSysErr              0                           % 0, not include systematic error of line; 1, include
+FlagLineSysErr              1                           % 0, not include systematic error of line; 1, include
 
 %========================================================================
 % spectral broadening

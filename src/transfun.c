@@ -39,13 +39,23 @@
 void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl)
 {
   int i, j, k;
-  double fline, fcon, tl, tc, tau, A, Ag, ftrend;
+  double fline, fcon, tl, tc, tau, A, Ag, ftrend, a0, tmp;
   double *pmodel = (double *)pm;
 
   A=exp(pmodel[0]); /*  response coefficient */
   Ag=pmodel[1];     /*  no-linearity of response */
 
-  
+  if(parset.flag_trend_diff > 0)
+  {
+    tmp = 0.0;
+    for(k=1; k<num_params_difftrend+1; k++)
+    {
+      tmp += 1.0/(k+1) * pmodel[num_params_blr + 4 + parset.flag_trend + k-1] 
+                           * (pow(Tcon_data[n_con_data-1] - Tmed_data, k+1) - pow(Tcon_data[0] - Tmed_data, k+1));
+    }
+    a0 = -tmp/(Tcon_data[n_con_data-1] - Tcon_data[0]);
+  }
+
   for(i=0;i<nl;i++)
   {
     tl = Tl[i];
@@ -69,9 +79,13 @@ void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl
       }
       
       /* add different trend in continuum and emission */
-      if(parset.flag_trend_diff)
+      if(parset.flag_trend_diff > 0)
       {
-        ftrend = pmodel[num_params_blr + 4 + parset.flag_trend] * (tc - Tmed_data);
+        ftrend = a0;
+        for(k=1; k<num_params_difftrend+1; k++)
+        {
+          ftrend += pmodel[num_params_blr + 4 + parset.flag_trend + k-1] * pow(tc - Tmed_data, k);
+        }
         fcon += ftrend;
       }
 
@@ -94,11 +108,22 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
                                               double *fl2d, int nl, int nv)
 {
   int i, j, k, m;
-  double tau, tl, tc, fcon, A, Ag, ftrend, fnarrow;
+  double tau, tl, tc, fcon, A, Ag, ftrend, fnarrow, a0, tmp;
   double *pmodel = (double *)pm;
 
   A=exp(pmodel[0]);
   Ag=pmodel[1];
+
+  if(parset.flag_trend_diff > 0)
+  {
+    tmp = 0.0;
+    for(k=1; k<num_params_difftrend+1; k++)
+    {
+      tmp += 1.0/(k+1) * pmodel[num_params_blr + 4 + parset.flag_trend + k-1]
+                           * (pow(Tcon_data[n_con_data-1] - Tmed_data, k+1) - pow(Tcon_data[0] - Tmed_data, k+1));
+    }
+    a0 = -tmp/(Tcon_data[n_con_data-1] - Tcon_data[0]);
+  }
 
   for(j=0;j<nl; j++)
   {
@@ -125,9 +150,13 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
       }
 
       /* add different trend in continuum and emission line */
-      if(parset.flag_trend_diff)
+      if(parset.flag_trend_diff > 0)
       {
-        ftrend = pmodel[num_params_blr + 4 + parset.flag_trend] * (tc - 0.5*(Tcon_data[0] + Tcon_data[n_con_data-1]));
+        ftrend = a0;
+        for(k=1; k<num_params_difftrend+1; k++)
+        {
+          ftrend += pmodel[num_params_blr + 4 + parset.flag_trend + k-1] * pow(tc - Tmed_data, k);
+        }
         fcon += ftrend;
       }
 
