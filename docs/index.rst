@@ -10,7 +10,10 @@ Bayesian Reverberation-mapping Analysis Integrated with Nested Sampling
 
 A package for dynamically modeling broad-line regions and analyzing reverberation mapping data, and measuring the black hole mass.
 
-Reference: `Li, Y.-R., Songshen, Y.-Y., Qiu, J., et al. 2018, ApJ, 869, 137 <http://adsabs.harvard.edu/abs/2018ApJ...869..137L>`_.
+References: 
+   * `Li, Y.-R., Songshen, Y.-Y., Qiu, J., et al. 2018, ApJ, 869, 137 <http://adsabs.harvard.edu/abs/2018ApJ...869..137L>`_.
+
+   * `Li, Y.-R., Wang, J.-M., Ho, L. C. et al. 2013, ApJ, 779, 110 <http://adsabs.harvard.edu/abs/2013ApJ...779..110L>`_.
 
 Documentation
 -------------
@@ -27,26 +30,8 @@ Documentation
 Attribution
 -----------
 
-If you make use of this code, please cite it as:
+If you make use of this code, please cite the references: `Li, Y.-R., Songshen, Y.-Y., Qiu, J., et al. 2018, ApJ, 869, 137 <http://adsabs.harvard.edu/abs/2018ApJ...869..137L>`_ and `Li, Y.-R., Wang, J.-M., Ho, L. C. et al. 2013, ApJ, 779, 110 <http://adsabs.harvard.edu/abs/2013ApJ...779..110L>`_.
 
-.. code-block:: tex
-
-  @ARTICLE{2018ApJ...869..137L,
-   author = {{Li}, Y.-R. and {Songsheng}, Y.-Y. and {Qiu}, J. and {Hu}, C. and {Du}, P. and {Lu}, K.-X. and {Huang}, Y.-K. and {Bai}, J.-M. and {Bian}, W.-H. and {Yuan}, Y.-F. and {Ho}, L.~C. and {Wang}, J.-M.},
-   title = "{Supermassive Black Holes with High Accretion Rates in Active Galactic Nuclei. VIII. Structure of the Broad-line Region and Mass of the Central Black Hole in Mrk 142}",
-   journal = {ApJ},
-   archivePrefix = "arXiv",
-   eprint = {1811.06302},
-   keywords = {black hole physics, galaxies: active, galaxies: individual: Mrk 142, quasars: general },
-   year = 2018,
-   month = dec,
-   volume = 869,
-   eid = {137},
-   pages = {137},
-   doi = {10.3847/1538-4357/aaee6b},
-   adsurl = {http://adsabs.harvard.edu/abs/2018ApJ...869..137L},
-   adsnote = {Provided by the SAO/NASA Astrophysics Data System}
-  }
 
 
 
