@@ -250,7 +250,7 @@ void allocate_memory()
     blr_range_model[i] = malloc(2*sizeof(double));
   }
 
-  workspace = malloc((10*n_con_data + 5*parset.n_con_recon)*sizeof(double));
+  workspace = malloc((10*n_con_data + 10*parset.n_con_recon)*sizeof(double));
 
   var_param = malloc(num_params_var * sizeof(double));
   var_param_std = malloc(num_params_var * sizeof(double));

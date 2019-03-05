@@ -167,7 +167,7 @@ void from_prior_con(void *model)
 double log_likelihoods_cal_con(const void *model)
 {
   double logL;
-  logL = prob_con_variability(model);
+  logL = prob_con_variability_semiseparable(model);
   return logL;
 }
 
@@ -177,7 +177,7 @@ double log_likelihoods_cal_con(const void *model)
 double log_likelihoods_cal_initial_con(const void *model)
 {
   double logL;
-  logL = prob_con_variability_initial(model);
+  logL = prob_con_variability_initial_semiseparable(model);
   return logL;
 }
 
@@ -187,7 +187,7 @@ double log_likelihoods_cal_initial_con(const void *model)
 double log_likelihoods_cal_restart_con(const void *model)
 {
   double logL;
-  logL = prob_con_variability_initial(model);
+  logL = prob_con_variability_initial_semiseparable(model);
   return logL;
 }
 /*!

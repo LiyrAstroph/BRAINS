@@ -138,7 +138,7 @@ void postprocess2d()
       //store model
       memcpy(posterior_sample+i*size_of_modeltype, post_model, size_of_modeltype);
     
-      calculate_con_from_model(post_model + num_params_blr *sizeof(double));
+      calculate_con_from_model_semiseparable(post_model + num_params_blr *sizeof(double));
       gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
 
       transfun_2d_cal(post_model, Vline_data, Trans2D_at_veldata, 
@@ -348,7 +348,7 @@ void reconstruct_line2d()
       Trans2D_at_veldata = Trans2D_at_veldata_particles[which_particle_update];
       Fline2d_at_data = Fline_at_data_particles[which_particle_update];
     
-      calculate_con_from_model(best_model_line2d + num_params_blr *sizeof(double));
+      calculate_con_from_model_semiseparable(best_model_line2d + num_params_blr *sizeof(double));
       gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
 
       FILE *fp;
@@ -720,7 +720,7 @@ double prob_initial_line2d(const void *model)
 
   con_q = con_q_particles[which_particle_update];
   Fcon = Fcon_particles[which_particle_update];
-  calculate_con_from_model(model + num_params_blr*sizeof(double));
+  calculate_con_from_model_semiseparable(model + num_params_blr*sizeof(double));
   gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
 
   Trans2D_at_veldata = Trans2D_at_veldata_particles[which_particle_update];
@@ -759,7 +759,7 @@ double prob_restart_line2d(const void *model)
   which_particle_update = dnest_get_which_particle_update();
   con_q = con_q_particles[which_particle_update];
   Fcon = Fcon_particles[which_particle_update];
-  calculate_con_from_model(model + num_params_blr*sizeof(double));
+  calculate_con_from_model_semiseparable(model + num_params_blr*sizeof(double));
   gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
 
   Trans2D_at_veldata = Trans2D_at_veldata_particles[which_particle_update];
@@ -801,7 +801,7 @@ double prob_line2d(const void *model)
   {
     con_q = con_q_particles_perturb[which_particle_update];
     Fcon = Fcon_particles_perturb[which_particle_update];
-    calculate_con_from_model(model + num_params_blr*sizeof(double));
+    calculate_con_from_model_semiseparable(model + num_params_blr*sizeof(double));
     gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
   }
   else /* continuum has no change, use the previous values */

@@ -96,7 +96,7 @@ void postprocess_con()
 
       memcpy(posterior_sample+i*size_of_modeltype, post_model, size_of_modeltype);
 
-      calculate_con_from_model(post_model);
+      calculate_con_from_model_semiseparable(post_model);
 
       if(gsl_rng_uniform(gsl_r) < 1.0)
       {
@@ -210,7 +210,7 @@ void reconstruct_con()
       which_particle_update = 0;
       Fcon = Fcon_particles[which_particle_update];
 
-      calculate_con_from_model(best_model_con);
+      calculate_con_from_model_semiseparable(best_model_con);
  
       FILE *fp;
       char fname[200];
@@ -364,18 +364,137 @@ void calculate_con_from_model(const void *model)
 }
 
 /*!
+ *  this function calculates continuum light curves form model parameters 
+ *  and stores it into Fcon.
+ *  
+ *  using fast algorithm for semiseparable matrices
+ */
+void calculate_con_from_model_semiseparable(const void *model)
+{
+  double *Larr, *Lbuf, *ybuf, *y, *yu, *Cq, *yq, *yuq, *Larr_rec, *W, *D, *phi;
+  double syserr;
+
+  double *pm = (double *)model;
+  double sigma, sigma2, tau, alpha;
+  int i, j, info;
+
+  syserr = (exp(pm[0]) - 1.0) * con_error_mean;  // systematic error 
+  tau = exp(pm[2]);
+  sigma = exp(pm[1]) * sqrt(tau);
+  sigma2 = sigma*sigma;
+  alpha = 1.0;
+  
+  Larr = workspace; 
+  Lbuf = Larr + n_con_data*nq;
+  ybuf = Lbuf + n_con_data*nq; 
+  y = ybuf + n_con_data;
+  Cq = y + n_con_data;
+  yq = Cq + nq*nq;
+  yu = yq + nq; 
+  yuq = yu + parset.n_con_recon;
+  Larr_rec = yuq + parset.n_con_recon;
+  W = Larr_rec + parset.n_con_recon*nq;
+  D = W + parset.n_con_recon;
+  phi = D + parset.n_con_recon;
+
+  for(i=0;i<n_con_data;i++)
+  {
+    Larr[i*nq + 0]=1.0;
+    for(j=1; j<nq; j++)
+      Larr[i*nq + j] = pow(Tcon_data[i], j);
+  }
+ 
+  set_covar_Umat(sigma, tau, alpha);
+
+  compute_semiseparable_drw(Tcon_data, n_con_data, sigma2, 1.0/tau, Fcerrs_data, syserr, W, D, phi);
+  // Cq^-1 = L^TxC^-1xL
+  multiply_mat_semiseparable_drw(Larr, W, D, phi, n_con_data, nq, sigma2, Lbuf);
+  multiply_mat_MN_transposeA(Larr, Lbuf, Cq, nq, nq, n_con_data);
+
+  // L^TxC^-1xy
+  multiply_matvec_semiseparable_drw(Fcon_data, W, D, phi, n_con_data, sigma2, ybuf);
+  multiply_mat_MN_transposeA(Larr, ybuf, yq, nq, 1, n_con_data);
+
+  // (hat q) = Cqx(L^TxC^-1xy)
+  inverse_mat(Cq, nq, &info);
+  multiply_mat_MN(Cq, yq, ybuf, nq, 1, nq);
+
+  // q = uq + (hat q)
+  Chol_decomp_L(Cq, nq, &info);
+  multiply_matvec(Cq, &pm[3], nq, yq);
+  for(i=0; i<nq; i++)
+    yq[i] += ybuf[i];
+
+  memcpy(con_q, yq, nq*sizeof(double)); //back up long-term trend
+  
+  // y = yc - Lxq
+  multiply_matvec_MN(Larr, n_con_data, nq, yq, ybuf);
+  for(i=0; i<n_con_data; i++)
+  {
+    y[i] = Fcon_data[i] - ybuf[i];
+  }
+
+  // (hat s) = SxC^-1xy
+  multiply_matvec_semiseparable_drw(y, W, D, phi, n_con_data, sigma2, ybuf);
+  multiply_matvec_MN(USmat, parset.n_con_recon, n_con_data, ybuf, Fcon);
+
+  // SxC^-1xS^T
+  multiply_mat_transposeB_semiseparable_drw(USmat, W, D, phi, n_con_data, parset.n_con_recon, sigma2, PEmat1);
+  multiply_mat_MN(USmat, PEmat1, PEmat2, parset.n_con_recon, parset.n_con_recon, n_con_data);
+
+  set_covar_Pmat(sigma, tau, alpha);
+
+  for(i=0; i<parset.n_con_recon; i++)
+  {
+    Fcerrs[i] = sqrt(sigma*sigma + syserr*syserr - PEmat2[i*parset.n_con_recon + i]);
+  }
+  compute_semiseparable_drw(Tcon, parset.n_con_recon, sigma2, 1.0/tau, Fcerrs, 0.0, W, D, phi);
+
+  // Q = [S^-1 + N^-1]^-1 = N x [S+N]^-1 x S
+  multiply_mat_semiseparable_drw(PSmat, W, D, phi, parset.n_con_recon, parset.n_con_recon, sigma2, PEmat2);
+  for(i=0; i<parset.n_con_recon; i++)
+  {
+    for(j=0; j<=i; j++)
+    {
+      PQmat[i*parset.n_con_recon + j] = PQmat[j*parset.n_con_recon + i] = Fcerrs[i] * Fcerrs[i] * PEmat2[i*parset.n_con_recon+j];
+    }
+  }  
+
+  Chol_decomp_L(PQmat, parset.n_con_recon, &info);
+  multiply_matvec(PQmat, &pm[num_params_var], parset.n_con_recon, yu);
+
+  // add back long-term trend of continuum
+  for(i=0;i<parset.n_con_recon;i++)
+  {
+    Larr_rec[i*nq + 0]=1.0;
+    for(j=1; j<nq; j++)
+      Larr_rec[i*nq + j] = pow(Tcon[i], j);
+  }
+  multiply_matvec_MN(Larr_rec, parset.n_con_recon, nq, yq, yuq);
+
+  for(i=0; i<parset.n_con_recon; i++)
+  {
+    Fcon[i] += yu[i] + yuq[i];
+  }
+
+  return;
+}
+
+
+/*!
  * This function calculate continuum ligth curves from varibility parameters.
  */
 void reconstruct_con_from_varmodel(double sigma_hat, double tau, double alpha, double syserr)
 {
-  double *Larr, *ybuf, *y, *Larr_rec, *yq, *yuq, *Cq, sigma;
+  double *Larr, *Lbuf, *ybuf, *y, *Larr_rec, *yq, *yuq, *Cq, sigma;
   int i, j, info;
   double *PEmat3, *PEmat4;
 
   sigma = sigma_hat * sqrt(tau);
 
   Larr = workspace;
-  ybuf = Larr + n_con_data * nq;
+  Lbuf = Larr + n_con_data * nq;
+  ybuf = Lbuf + n_con_data * nq;
   y = ybuf + n_con_data;
   Cq = y + n_con_data;
   yq = Cq + nq*nq;
@@ -397,8 +516,8 @@ void reconstruct_con_from_varmodel(double sigma_hat, double tau, double alpha, d
       Larr[i*nq + j] = pow(Tcon_data[i], j);
   }
 
-  multiply_mat_MN(PCmat_data, Larr, ybuf, n_con_data, nq, n_con_data);
-  multiply_mat_MN_transposeA(Larr, ybuf, Cq, nq, nq, n_con_data);
+  multiply_mat_MN(PCmat_data, Larr, Lbuf, n_con_data, nq, n_con_data);
+  multiply_mat_MN_transposeA(Larr, Lbuf, Cq, nq, nq, n_con_data);
 
   multiply_matvec(PCmat_data, Fcon_data, n_con_data, ybuf);
   multiply_mat_MN_transposeA(Larr, ybuf, yq, nq, 1, n_con_data);
@@ -463,7 +582,6 @@ double prob_con_variability(const void *model)
   
   if( which_parameter_update < num_params_var)
   {
-
     syserr = (exp(pm[0])-1.0)*con_error_mean;
     tau = exp(pm[2]);
     sigma = exp(pm[1]) * sqrt(tau);
@@ -514,6 +632,89 @@ double prob_con_variability(const void *model)
     }
   
     multiply_matvec(IPCmat_data, y, n_con_data, ybuf);
+    prob = -0.5 * cblas_ddot(n_con_data, y, 1, ybuf, 1);
+    prob += -0.5*lndet;
+
+    prob_con_particles_perturb[which_particle_update] = prob;
+  }
+  else
+  {
+    prob = prob_con_particles[which_particle_update];
+  }
+
+  return prob;
+}
+
+/*!
+ * this function calculates likelihood 
+ *  
+ * using fast algorithm for semiseparable matrices
+ */
+double prob_con_variability_semiseparable(const void *model)
+{
+  double prob = 0.0;
+  int i, j, param, info;
+  double *pm = (double *)model;
+  double tau, sigma2, alpha, lndet, syserr;
+  double *Larr, *Lbuf, *ybuf, *y, *yq, *Cq, *W, *D, *phi;
+  
+  which_particle_update = dnest_get_which_particle_update();
+  
+  if( which_parameter_update < num_params_var)
+  {
+
+    syserr = (exp(pm[0])-1.0)*con_error_mean;
+    tau = exp(pm[2]);
+    sigma2 = exp(2.0*pm[1]) * tau;
+    alpha = 1.0;
+  
+    Larr = workspace;
+    Lbuf = Larr + n_con_data*nq;
+    ybuf = Lbuf + n_con_data*nq;
+    y = ybuf + n_con_data;
+    yq = y + n_con_data;
+    Cq = yq + nq;
+    W = Cq + nq*nq;
+    D = W + n_con_data;
+    phi = D + n_con_data;
+
+    for(i=0;i<n_con_data;i++)
+    {
+      Larr[i*nq + 0]=1.0;
+      for(j=1; j<nq; j++)
+        Larr[i*nq + j] = pow(Tcon_data[i], j);
+    }
+ 
+    compute_semiseparable_drw(Tcon_data, n_con_data, sigma2, 1.0/tau, Fcerrs_data, syserr, W, D, phi);
+    lndet = 0.0;
+    for(i=0; i<n_con_data; i++)
+      lndet += log(D[i]);
+
+    /* calculate L^T*C^-1*L */
+    multiply_mat_semiseparable_drw(Larr, W, D, phi, n_con_data, nq, sigma2, Lbuf);
+    multiply_mat_MN_transposeA(Larr, Lbuf, Cq, nq, nq, n_con_data);
+
+    /* calculate L^T*C^-1*y */
+    multiply_matvec_semiseparable_drw(Fcon_data, W, D, phi, n_con_data, sigma2, ybuf);
+    multiply_mat_MN_transposeA(Larr, ybuf, yq, nq, 1, n_con_data);
+
+    /* calculate (L^T*C^-1*L)^-1 * L^T*C^-1*y */
+    inverse_mat(Cq, nq, &info);
+    multiply_mat_MN(Cq, yq, ybuf, nq, 1, nq);
+
+    Chol_decomp_L(Cq, nq, &info);
+    multiply_matvec(Cq, &pm[3], nq, yq);
+    for(i=0; i<nq; i++)
+      yq[i] += ybuf[i];
+  
+    multiply_matvec_MN(Larr, n_con_data, nq, yq, ybuf);
+    for(i=0; i<n_con_data; i++)
+    {
+      y[i] = Fcon_data[i] - ybuf[i];
+    }
+  
+    /* y^T x C^-1 x y*/
+    multiply_matvec_semiseparable_drw(y, W, D, phi, n_con_data, sigma2, ybuf);
     prob = -0.5 * cblas_ddot(n_con_data, y, 1, ybuf, 1);
     prob += -0.5*lndet;
 
@@ -585,6 +786,77 @@ double prob_con_variability_initial(const void *model)
   }
   
   multiply_matvec(IPCmat_data, y, n_con_data, ybuf);
+  prob = -0.5 * cblas_ddot(n_con_data, y, 1, ybuf, 1);
+  prob += -0.5*lndet;
+
+  prob_con_particles[which_particle_update] = prob;
+  return prob;
+}
+
+/*!
+ * this function calculates likelihood at initital step.
+ *  
+ * using fast algorithm for semiseparable matrices
+ */
+double prob_con_variability_initial_semiseparable(const void *model)
+{
+  double prob = 0.0;
+  int i, j, info;
+  double *pm = (double *)model;
+  double tau, sigma2, alpha, lndet, syserr;
+  double *Larr, *Lbuf, *ybuf, *y, *yq, *Cq, *W, *D, *phi;
+
+  syserr = (exp(pm[0])-1.0)*con_error_mean;
+  tau = exp(pm[2]);
+  sigma2 = exp(2.0*pm[1]) * tau;
+  alpha = 1.0;
+  
+  Larr = workspace;
+  Lbuf = Larr + n_con_data*nq;
+  ybuf = Lbuf + n_con_data*nq;
+  y = ybuf + n_con_data;
+  yq = y + n_con_data;
+  Cq = yq + nq;
+  W = Cq + nq*nq;
+  D = W + n_con_data;
+  phi = D + n_con_data;
+
+  for(i=0;i<n_con_data;i++)
+  {
+    Larr[i*nq + 0]=1.0;
+    for(j=1; j<nq; j++)
+      Larr[i*nq + j] = pow(Tcon_data[i], j);
+  }
+
+  compute_semiseparable_drw(Tcon_data, n_con_data, sigma2, 1.0/tau, Fcerrs_data, syserr, W, D, phi);
+  lndet = 0.0;
+  for(i=0; i<n_con_data; i++)
+  lndet += log(D[i]);
+ 
+  /* calculate L^T*C^-1*L */
+  multiply_mat_semiseparable_drw(Larr, W, D, phi, n_con_data, nq, sigma2, Lbuf);
+  multiply_mat_MN_transposeA(Larr, Lbuf, Cq, nq, nq, n_con_data);
+
+  /* calculate L^T*C^-1*y */
+  multiply_matvec_semiseparable_drw(Fcon_data, W, D, phi, n_con_data, sigma2, ybuf);
+  multiply_mat_MN_transposeA(Larr, ybuf, yq, nq, 1, n_con_data);
+
+  inverse_mat(Cq, nq, &info);
+  multiply_mat_MN(Cq, yq, ybuf, nq, 1, nq);
+
+  Chol_decomp_L(Cq, nq, &info);
+  multiply_matvec(Cq, &pm[3], nq, yq);
+  for(i=0; i<nq; i++)
+    yq[i] += ybuf[i];
+  
+  multiply_matvec_MN(Larr, n_con_data, nq, yq, ybuf);
+  for(i=0; i<n_con_data; i++)
+  {
+    y[i] = Fcon_data[i] - ybuf[i];
+  }
+  
+  /* y^T x C^-1 x y*/
+  multiply_matvec_semiseparable_drw(y, W, D, phi, n_con_data, sigma2, ybuf);
   prob = -0.5 * cblas_ddot(n_con_data, y, 1, ybuf, 1);
   prob += -0.5*lndet;
 
