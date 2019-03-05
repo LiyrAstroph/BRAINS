@@ -457,7 +457,7 @@ double prob_con_variability(const void *model)
   int i, j, param, info;
   double *pm = (double *)model;
   double tau, sigma, alpha, lndet, syserr;
-  double *Larr, *ybuf, *y, *yq, *Cq;
+  double *Larr, *Lbuf, *ybuf, *y, *yq, *Cq;
   
   which_particle_update = dnest_get_which_particle_update();
   
@@ -470,7 +470,8 @@ double prob_con_variability(const void *model)
     alpha = 1.0;
   
     Larr = workspace;
-    ybuf = Larr + n_con_data;
+    Lbuf = Larr + n_con_data*nq;
+    ybuf = Lbuf + n_con_data*nq;
     y = ybuf + n_con_data;
     yq = y + n_con_data;
     Cq = yq + nq;
@@ -490,8 +491,8 @@ double prob_con_variability(const void *model)
     }
  
     /* calculate L^T*C^-1*L */
-    multiply_mat_MN(IPCmat_data, Larr, ybuf, n_con_data, nq, n_con_data);
-    multiply_mat_MN_transposeA(Larr, ybuf, Cq, nq, nq, n_con_data);
+    multiply_mat_MN(IPCmat_data, Larr, Lbuf, n_con_data, nq, n_con_data);
+    multiply_mat_MN_transposeA(Larr, Lbuf, Cq, nq, nq, n_con_data);
 
     /* calculate L^T*C^-1*y */
     multiply_matvec(IPCmat_data, Fcon_data, n_con_data, ybuf);
@@ -535,7 +536,7 @@ double prob_con_variability_initial(const void *model)
   int i, j, info;
   double *pm = (double *)model;
   double tau, sigma, alpha, lndet, syserr;
-  double *Larr, *ybuf, *y, *yq, *Cq;
+  double *Larr, *Lbuf, *ybuf, *y, *yq, *Cq;
 
   syserr = (exp(pm[0])-1.0)*con_error_mean;
   tau = exp(pm[2]);
@@ -543,7 +544,8 @@ double prob_con_variability_initial(const void *model)
   alpha = 1.0;
   
   Larr = workspace;
-  ybuf = Larr + n_con_data;
+  Lbuf = Larr + n_con_data*nq;
+  ybuf = Lbuf + n_con_data*nq;
   y = ybuf + n_con_data;
   yq = y + n_con_data;
   Cq = yq + nq;
@@ -562,8 +564,8 @@ double prob_con_variability_initial(const void *model)
       Larr[i*nq + j] = pow(Tcon_data[i], j);
   }
  
-  multiply_mat_MN(IPCmat_data, Larr, ybuf, n_con_data, nq, n_con_data);
-  multiply_mat_MN_transposeA(Larr, ybuf, Cq, nq, nq, n_con_data);
+  multiply_mat_MN(IPCmat_data, Larr, Lbuf, n_con_data, nq, n_con_data);
+  multiply_mat_MN_transposeA(Larr, Lbuf, Cq, nq, nq, n_con_data);
 
   multiply_matvec(IPCmat_data, Fcon_data, n_con_data, ybuf);
   multiply_mat_MN_transposeA(Larr, ybuf, yq, nq, 1, n_con_data);
