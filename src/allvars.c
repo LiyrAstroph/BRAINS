@@ -32,6 +32,7 @@ double VelUnit, C_Unit;    /*!< Velocity unit = \f$\sqrt{\frac{G\cdot 10^6M_\odo
 int n_con_data;    /*!< number of continuum data points */
 int n_line_data;   /*!< number of emission data points along time axis */
 int n_vel_data;    /*!< number of emission data points along velocity axis */
+int n_con_max;
 double *Tcon_data, *Fcon_data,  *Fcerrs_data;
 double *Tline_data, *Fline_data, *Flerrs_data;
 double *Vline_data, *Fline2d_data, *Flerrs2d_data;

@@ -131,6 +131,14 @@ void init()
   /* default rcloud_max_set */
   rcloud_max_set = 1.0e3;
 
+  /* set maximum continuum point */
+  n_con_max = parset.n_con_recon;
+  if(parset.flag_dim >=0)
+  {
+    if(n_con_data > n_con_max)
+      n_con_max = n_con_data;
+  }
+
   Tcad_data = 1.0;
   Tspan_data = 1.0e4;
   if(parset.flag_dim == 0)
@@ -146,7 +154,7 @@ void init()
   }
 
   if(parset.flag_dim > 0 || parset.flag_dim == -1)
-  {
+  {   
     /* set cadence and time span of data */
     Tspan_data = (Tline_data[n_line_data -1] - Tcon_data[0]);
     Tcad_data = Tspan_data;

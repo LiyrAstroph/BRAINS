@@ -96,7 +96,7 @@ void postprocess_con()
 
       memcpy(posterior_sample+i*size_of_modeltype, post_model, size_of_modeltype);
 
-      calculate_con_from_model(post_model);
+      calculate_con_from_model_semiseparable(post_model);
 
       if(gsl_rng_uniform(gsl_r) < 1.0)
       {
@@ -210,7 +210,7 @@ void reconstruct_con()
       which_particle_update = 0;
       Fcon = Fcon_particles[which_particle_update];
 
-      calculate_con_from_model(best_model_con);
+      calculate_con_from_model_semiseparable(best_model_con);
  
       FILE *fp;
       char fname[200];
@@ -394,8 +394,8 @@ void calculate_con_from_model_semiseparable(const void *model)
   yuq = yu + parset.n_con_recon;
   Larr_rec = yuq + parset.n_con_recon;
   W = Larr_rec + parset.n_con_recon*nq;
-  D = W + parset.n_con_recon;
-  phi = D + parset.n_con_recon;
+  D = W + n_con_max;
+  phi = D + n_con_max;
 
   for(i=0;i<n_con_data;i++)
   {
