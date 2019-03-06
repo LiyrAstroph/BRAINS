@@ -189,7 +189,8 @@ void sim()
   if(parset.flag_dim == -1)
   {
     //note that here use sigma_hat = sigma/sqrt(tau).
-    reconstruct_con_from_varmodel(exp(-3.714542), exp(3.104897), 1.0, 0.0); 
+    printf("sim with ln(sigma) = %f and  ln(taud) = %f.\n", var_param[1], var_param[2]);
+    reconstruct_con_from_varmodel(exp(var_param[1]), exp(var_param[2]), 1.0, 0.0); 
   }
   else
   {

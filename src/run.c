@@ -50,6 +50,10 @@ void begin_run()
 
   if(parset.flag_dim == -1 || parset.flag_dim == -2) /* only simulation */
   {
+    /* first determine the best variability parameters in continnum */
+    if(parset.flag_dim == -1)
+      reconstruct_con();
+    
     sim();
   }
 
