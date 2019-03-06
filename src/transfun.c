@@ -1734,7 +1734,7 @@ void transfun_1d_cloud_sample_model6(const void *pm, int flag_save)
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0;
   double inc, F, beta, mu, k, gam, xi, a, s, rin, sig;
-  double Lphi, Lthe;
+  double Lphi, Lthe, sin_Lphi, cos_Lphi, sin_Lthe, cos_Lthe, sin_inc_cmp, cos_inc_cmp;
   double weight, rnd, rnd_xi;
   double *pr;
   BLRmodel6 *model = (BLRmodel6 *)pm;
@@ -1752,6 +1752,9 @@ void transfun_1d_cloud_sample_model6(const void *pm, int flag_save)
   s = mu/a;
   rin=mu*F;
   sig=(1.0-F)*s;
+
+  sin_inc_cmp = cos(inc);//sin(PI/2.0 - inc);
+  cos_inc_cmp = sin(inc);//cos(PI/2.0 - inc);
 
   if(force_update == 1 || which_parameter_update == -1 )
   {
@@ -1804,6 +1807,10 @@ void transfun_1d_cloud_sample_model6(const void *pm, int flag_save)
 // generate a direction of the angular momentum of the orbit   
     Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
     Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_r), gam));
+    sin_Lphi = sin(Lphi);
+    cos_Lphi = cos(Lphi);
+    sin_Lthe = sin(Lthe);
+    cos_Lthe = cos(Lthe);
 
     r = pr[i];
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
@@ -1821,9 +1828,9 @@ void transfun_1d_cloud_sample_model6(const void *pm, int flag_save)
     yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
     zb = sin(Lthe) * x + cos(Lthe) * z; */
     
-    xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y;
-    yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y;
-    zb = sin(Lthe) * x;
+    xb = cos_Lthe*cos_Lphi * x + sin_Lphi * y;
+    yb =-cos_Lthe*sin_Lphi * x + cos_Lphi * y;
+    zb = sin_Lthe * x;
 
     zb0 = zb;
     rnd_xi = gsl_rng_uniform(gsl_r);
@@ -1831,9 +1838,13 @@ void transfun_1d_cloud_sample_model6(const void *pm, int flag_save)
       zb = -zb;
 
 // conter-rotate around y, LOS is x-axis 
-    x = xb * cos(PI/2.0-inc) + zb * sin(PI/2.0-inc);
+    /*x = xb * cos(PI/2.0-inc) + zb * sin(PI/2.0-inc);
     y = yb;
-    z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
+    z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc); */
+
+    x = xb * cos_inc_cmp + zb * sin_inc_cmp;
+    y = yb;
+    z =-xb * sin_inc_cmp + zb * cos_inc_cmp;
 
     dis = r - x;
     weight = 0.5 + k*(x/r);    
@@ -1861,7 +1872,7 @@ void transfun_2d_cloud_sample_model6(const void *pm, double *transv, double *tra
   double V, rhoV, theV, Vr, Vph, Vkep, Rs, g;
   double inc, F, beta, mu, k, gam, xi, a, s, sig, rin;
   double mbh, fellip, fflow, sigr_circ, sigthe_circ, sigr_rad, sigthe_rad, theta_rot, sig_turb;
-  double Lphi, Lthe, linecenter=0.0;
+  double Lphi, Lthe, sin_Lphi, cos_Lphi, sin_Lthe, cos_Lthe, sin_inc_cmp, cos_inc_cmp, linecenter=0.0;
   double weight, rnd, rnd_xi;
   double *pr;
   double *pmodel = (double *)pm;
@@ -1893,6 +1904,9 @@ void transfun_2d_cloud_sample_model6(const void *pm, double *transv, double *tra
   rin=mu*F + Rs;  // include Scharzschild radius
   sig=(1.0-F)*s;
   
+  sin_inc_cmp = cos(inc); //sin(PI/2.0 - inc);
+  cos_inc_cmp = sin(inc); //cos(PI/2.0 - inc);
+
   if(parset.flag_linecenter !=0)
   {
     linecenter = pmodel[num_params_blr - num_params_linecenter - 1] * parset.linecenter_err; 
@@ -1951,6 +1965,10 @@ void transfun_2d_cloud_sample_model6(const void *pm, double *transv, double *tra
 // generate a direction of the angular momentum of the orbit   
     Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
     Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_r), gam));
+    sin_Lphi = sin(Lphi);
+    cos_Lphi = cos(Lphi);
+    sin_Lthe = sin(Lthe);
+    cos_Lthe = cos(Lthe);
 
     r = pr[i];
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
@@ -1968,9 +1986,9 @@ void transfun_2d_cloud_sample_model6(const void *pm, double *transv, double *tra
     yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
     zb = sin(Lthe) * x + cos(Lthe) * z; */
     
-    xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y;
-    yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y;
-    zb = sin(Lthe) * x;
+    xb = cos_Lthe*cos_Lphi * x + sin_Lphi * y;
+    yb =-cos_Lthe*sin_Lphi * x + cos_Lphi * y;
+    zb = sin_Lthe * x;
 
     zb0 = zb;
     rnd_xi = gsl_rng_uniform(gsl_r);
@@ -1978,9 +1996,13 @@ void transfun_2d_cloud_sample_model6(const void *pm, double *transv, double *tra
       zb = -zb;
 
 // conter-rotate around y, LOS is x-axis 
-    x = xb * cos(PI/2.0-inc) + zb * sin(PI/2.0-inc);
+    /* x = xb * cos(PI/2.0-inc) + zb * sin(PI/2.0-inc);
+       y = yb;
+       z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc); */
+    
+    x = xb * cos_inc_cmp + zb * sin_inc_cmp;
     y = yb;
-    z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
+    z =-xb * sin_inc_cmp + zb * cos_inc_cmp;
 
     dis = r - x;
     weight = 0.5 + k*(x/r);
@@ -2023,17 +2045,21 @@ void transfun_2d_cloud_sample_model6(const void *pm, double *transv, double *tra
       vyb =-cos(Lthe)*sin(Lphi) * vx + cos(Lphi) * vy + sin(Lthe)*sin(Lphi) * vz;
       vzb = sin(Lthe) * vx + cos(Lthe) * vz;*/
 
-      vxb = cos(Lthe)*cos(Lphi) * vx + sin(Lphi) * vy;
-      vyb =-cos(Lthe)*sin(Lphi) * vx + cos(Lphi) * vy;
-      vzb = sin(Lthe) * vx;
+      vxb = cos_Lthe*cos_Lphi * vx + sin_Lphi * vy;
+      vyb =-cos_Lthe*sin_Lphi * vx + cos_Lphi * vy;
+      vzb = sin_Lthe * vx;
 
 
       if((rnd_xi < 1.0-xi) && zb0 < 0.0)
         vzb = -vzb;
     
-      vx = vxb * cos(PI/2.0-inc) + vzb * sin(PI/2.0-inc);
+      /*vx = vxb * cos(PI/2.0-inc) + vzb * sin(PI/2.0-inc);
       vy = vyb;
-      vz =-vxb * sin(PI/2.0-inc) + vzb * cos(PI/2.0-inc);
+      vz =-vxb * sin(PI/2.0-inc) + vzb * cos(PI/2.0-inc);*/
+
+      vx = vxb * cos_inc_cmp + vzb * sin_inc_cmp;
+      vy = vyb;
+      vz =-vxb * sin_inc_cmp + vzb * cos_inc_cmp;
 
       V = -vx;  //note the definition of the line-of-sight velocity. postive means a receding 
                 // velocity relative to the observer.
