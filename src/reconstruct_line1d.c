@@ -115,8 +115,8 @@ void postprocess1d()
 
       memcpy(posterior_sample+i*size_of_modeltype, post_model, size_of_modeltype);
      
-      //calculate_con_from_model(post_model + num_params_blr *sizeof(double));
-      calculate_con_from_model_semiseparable(post_model + num_params_blr *sizeof(double));
+      calculate_con_from_model(post_model + num_params_blr *sizeof(double));
+      //calculate_con_from_model_semiseparable(post_model + num_params_blr *sizeof(double));
       gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
 
       transfun_1d_cal(post_model, 0);
@@ -288,8 +288,8 @@ void reconstruct_line1d()
       Fcon = Fcon_particles[which_particle_update];
       Trans1D = Trans1D_particles[which_particle_update];
 
-      //calculate_con_from_model(best_model_line1d + num_params_blr *sizeof(double));
-      calculate_con_from_model_semiseparable(best_model_line1d + num_params_blr *sizeof(double));
+      calculate_con_from_model(best_model_line1d + num_params_blr *sizeof(double));
+      //calculate_con_from_model_semiseparable(best_model_line1d + num_params_blr *sizeof(double));
       gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
     
     
@@ -566,8 +566,8 @@ double prob_initial_line1d(const void *model)
   con_q = con_q_particles[which_particle_update];
 
   Fcon = Fcon_particles[which_particle_update];
-  //calculate_con_from_model(model + num_params_blr*sizeof(double));
-  calculate_con_from_model_semiseparable(model + num_params_blr*sizeof(double));
+  calculate_con_from_model(model + num_params_blr*sizeof(double));
+  //calculate_con_from_model_semiseparable(model + num_params_blr*sizeof(double));
   gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
 
   
@@ -609,8 +609,8 @@ double prob_restart_line1d(const void *model)
   con_q = con_q_particles[which_particle_update];
 
   Fcon = Fcon_particles[which_particle_update];
-  //calculate_con_from_model(model + num_params_blr*sizeof(double));
-  calculate_con_from_model_semiseparable(model + num_params_blr*sizeof(double));
+  calculate_con_from_model(model + num_params_blr*sizeof(double));
+  //calculate_con_from_model_semiseparable(model + num_params_blr*sizeof(double));
   gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
 
   
@@ -654,8 +654,8 @@ double prob_line1d(const void *model)
   {
     con_q = con_q_particles_perturb[which_particle_update];
     Fcon = Fcon_particles_perturb[which_particle_update];
-    //calculate_con_from_model(model + num_params_blr*sizeof(double));
-    calculate_con_from_model_semiseparable(model + num_params_blr*sizeof(double));
+    calculate_con_from_model(model + num_params_blr*sizeof(double));
+    //calculate_con_from_model_semiseparable(model + num_params_blr*sizeof(double));
 
     gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
   }
