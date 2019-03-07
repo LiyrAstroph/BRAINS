@@ -50,9 +50,9 @@ void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl
     tmp = 0.0;
     for(k=1; k<num_params_difftrend+1; k++)
     {
-      tmp += 1.0/(k+1) * pmodel[num_params_blr + 4 + parset.flag_trend + k-1] * pow_Tcon_data[k-1];
+      tmp += pmodel[num_params_blr + 4 + parset.flag_trend + k-1] * pow_Tcon_data[k-1];
     }
-    a0 = -tmp/Tspan_data_con;
+    a0 = -tmp;
   }
 
   for(i=0;i<nl;i++)
@@ -71,9 +71,11 @@ void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl
       {
         /* fcon = mean */ 
         fcon = con_q[0];
+        tmp = 1.0;
         for(k=1; k < nq; k++)/*  beyond the range, set to be the long-term trend */
         {
-          fcon += con_q[k] * pow(tc, k);
+          tmp *= tc;
+          fcon += con_q[k] * tmp;
         }
       }
       
@@ -81,9 +83,11 @@ void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl
       if(parset.flag_trend_diff > 0)
       {
         ftrend = a0;
+        tmp = 1.0;
         for(k=1; k<num_params_difftrend+1; k++)
         {
-          ftrend += pmodel[num_params_blr + 4 + parset.flag_trend + k-1] * pow(tc - Tmed_data, k);
+          tmp *= (tc - Tmed_data);
+          ftrend += pmodel[num_params_blr + 4 + parset.flag_trend + k-1] * tmp;
         }
         fcon += ftrend;
       }
@@ -118,9 +122,9 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
     tmp = 0.0;
     for(k=1; k<num_params_difftrend+1; k++)
     {
-      tmp += 1.0/(k+1) * pmodel[num_params_blr + 4 + parset.flag_trend + k-1] * pow_Tcon_data[k-1];
+      tmp += pmodel[num_params_blr + 4 + parset.flag_trend + k-1] * pow_Tcon_data[k-1];
     }
-    a0 = -tmp/Tspan_data_con;
+    a0 = -tmp;
   }
 
   for(j=0;j<nl; j++)
@@ -141,9 +145,11 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
       {
         /* fcon = mean */ 
         fcon = con_q[0];
+        tmp = 1.0;
         for(m=1; m < nq; m++)/*  beyond the range, set to be the long-term trend */
         {
-            fcon += con_q[m] * pow(tc, m);
+          tmp *= tc;
+          fcon += con_q[m] * tmp;
         }
       }
 
@@ -151,9 +157,11 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
       if(parset.flag_trend_diff > 0)
       {
         ftrend = a0;
+        tmp = 1.0;
         for(k=1; k<num_params_difftrend+1; k++)
         {
-          ftrend += pmodel[num_params_blr + 4 + parset.flag_trend + k-1] * pow(tc - Tmed_data, k);
+          tmp *= (tc - Tmed_data);
+          ftrend += pmodel[num_params_blr + 4 + parset.flag_trend + k-1] * tmp;
         }
         fcon += ftrend;
       }
