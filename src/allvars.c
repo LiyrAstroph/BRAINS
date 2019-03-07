@@ -57,6 +57,7 @@ double *workspace;
 double *var_param, *var_param_std;
 double *con_q;
 double logz_con;
+double *Larr_data, *Larr_rec;
 
 double Tspan_data, Tcad_data, Tmed_data;
 

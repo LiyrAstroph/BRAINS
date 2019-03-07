@@ -501,7 +501,7 @@ void reconstruct_line2d()
  */
 void reconstruct_line2d_init()
 {
-  int i;
+  int i, j;
   double dT, Tspan;
 
   Tspan = Tcon_data[n_con_data -1] - Tcon_data[0];
@@ -523,6 +523,14 @@ void reconstruct_line2d_init()
   for(i=0; i<parset.n_con_recon; i++)
   {
     Tcon[i] = Tcon_min + i*dT;
+  }
+
+  /* set Larr_rec */
+  for(i=0;i<parset.n_con_recon;i++)
+  {
+    Larr_rec[i*nq + 0]=1.0;
+    for(j=1; j<nq; j++)
+      Larr_rec[i*nq + j] = pow(Tcon[i], j);
   }
 
   TransTau = malloc(parset.n_tau * sizeof(double));

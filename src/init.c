@@ -28,7 +28,7 @@
  */
 void init()
 {
-  int i;
+  int i, j;
 
   nq = 1 + parset.flag_trend;
   
@@ -133,10 +133,17 @@ void init()
 
   /* set maximum continuum point */
   n_con_max = parset.n_con_recon;
-  if(parset.flag_dim >=0)
+  if(parset.flag_dim >=-1)
   {
     if(n_con_data > n_con_max)
       n_con_max = n_con_data;
+
+    for(i=0;i<n_con_data;i++)
+    {
+      Larr_data[i*nq + 0]=1.0;
+      for(j=1; j<nq; j++)
+        Larr_data[i*nq + j] = pow(Tcon_data[i], j);
+    }
   }
 
   Tcad_data = 1.0;
@@ -145,6 +152,14 @@ void init()
   {
     /* set cadence and time span of data */
     Tspan_data = (Tcon_data[n_con_data -1] - Tcon_data[0]);
+    if(Tspan_data < 0.0)
+    {
+      if(thistask == roottask)
+      {
+        printf("# Incorrect epochs in continuum, please check the input data.\n");
+        exit(0);
+      }
+    }
     Tcad_data = Tspan_data;
     for(i=1; i< n_con_data; i++)
     {
@@ -157,6 +172,14 @@ void init()
   {   
     /* set cadence and time span of data */
     Tspan_data = (Tline_data[n_line_data -1] - Tcon_data[0]);
+    if(Tspan_data < 0.0)
+    {
+      if(thistask == roottask)
+      {
+        printf("# Incorrect epochs in continuum and line, please check the input data.\n");
+        exit(0);
+      }
+    }
     Tcad_data = Tspan_data;
     for(i=1; i< n_con_data; i++)
     {
@@ -258,7 +281,9 @@ void allocate_memory()
     blr_range_model[i] = malloc(2*sizeof(double));
   }
 
-  workspace = malloc((10*n_con_data + 10*parset.n_con_recon)*sizeof(double));
+  workspace = malloc((6*n_con_data + n_con_data*nq + 5*parset.n_con_recon)*sizeof(double));
+  Larr_data = malloc(n_con_data*nq*sizeof(double));
+  Larr_rec = malloc(parset.n_con_recon*nq*sizeof(double));
 
   var_param = malloc(num_params_var * sizeof(double));
   var_param_std = malloc(num_params_var * sizeof(double));
@@ -299,6 +324,8 @@ void free_memory()
   free(blr_range_model);
 
   free(workspace);
+  free(Larr_data);
+  free(Larr_rec);
 
   free(var_param);
   free(var_param_std);

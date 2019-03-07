@@ -349,7 +349,7 @@ void sim()
 
 void sim_init()
 {
-  int i;
+  int i, j;
   double dT, Tspan;
 
   switch(parset.flag_blrmodel)
@@ -469,6 +469,14 @@ void sim_init()
     {
       Tcon[i] = Tcon_min + i*dT;
     } 
+  }
+
+  /* set Larr_rec */
+  for(i=0;i<parset.n_con_recon;i++)
+  {
+    Larr_rec[i*nq + 0]=1.0;
+    for(j=1; j<nq; j++)
+      Larr_rec[i*nq + j] = pow(Tcon[i], j);
   }
 
   if(parset.flag_dim == -1)
