@@ -50,10 +50,9 @@ void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl
     tmp = 0.0;
     for(k=1; k<num_params_difftrend+1; k++)
     {
-      tmp += 1.0/(k+1) * pmodel[num_params_blr + 4 + parset.flag_trend + k-1] 
-                           * (pow(Tcon_data[n_con_data-1] - Tmed_data, k+1) - pow(Tcon_data[0] - Tmed_data, k+1));
+      tmp += 1.0/(k+1) * pmodel[num_params_blr + 4 + parset.flag_trend + k-1] * pow_Tcon_data[k-1];
     }
-    a0 = -tmp/(Tcon_data[n_con_data-1] - Tcon_data[0]);
+    a0 = -tmp/Tspan_data_con;
   }
 
   for(i=0;i<nl;i++)
@@ -119,10 +118,9 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
     tmp = 0.0;
     for(k=1; k<num_params_difftrend+1; k++)
     {
-      tmp += 1.0/(k+1) * pmodel[num_params_blr + 4 + parset.flag_trend + k-1]
-                           * (pow(Tcon_data[n_con_data-1] - Tmed_data, k+1) - pow(Tcon_data[0] - Tmed_data, k+1));
+      tmp += 1.0/(k+1) * pmodel[num_params_blr + 4 + parset.flag_trend + k-1] * pow_Tcon_data[k-1];
     }
-    a0 = -tmp/(Tcon_data[n_con_data-1] - Tcon_data[0]);
+    a0 = -tmp/Tspan_data_con;
   }
 
   for(j=0;j<nl; j++)

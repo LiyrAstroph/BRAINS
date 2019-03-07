@@ -58,8 +58,9 @@ double *var_param, *var_param_std;
 double *con_q;
 double logz_con;
 double *Larr_data, *Larr_rec;
+double *pow_Tcon_data;
 
-double Tspan_data, Tcad_data, Tmed_data;
+double Tspan_data, Tspan_data_con, Tcad_data, Tmed_data;
 
 /* line reconstruction */
 double *Fline_at_data;

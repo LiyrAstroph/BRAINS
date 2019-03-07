@@ -148,8 +148,9 @@ extern double *var_param, *var_param_std;
 extern double *con_q;
 extern double logz_con;
 extern double *Larr_data, *Larr_rec;
+extern double *pow_Tcon_data;
 
-extern double Tspan_data, Tcad_data, Tmed_data;
+extern double Tspan_data, Tspan_data_con, Tcad_data, Tmed_data;
 
 /* line reconstruction */
 extern double *Fline_at_data;

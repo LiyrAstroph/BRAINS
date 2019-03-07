@@ -138,6 +138,7 @@ void init()
     if(n_con_data > n_con_max)
       n_con_max = n_con_data;
 
+    /* set Larr_data */
     for(i=0;i<n_con_data;i++)
     {
       Larr_data[i*nq + 0]=1.0;
@@ -152,6 +153,7 @@ void init()
   {
     /* set cadence and time span of data */
     Tspan_data = (Tcon_data[n_con_data -1] - Tcon_data[0]);
+    Tspan_data_con = Tspan_data;
     if(Tspan_data < 0.0)
     {
       if(thistask == roottask)
@@ -171,6 +173,7 @@ void init()
   if(parset.flag_dim > 0 || parset.flag_dim == -1)
   {   
     /* set cadence and time span of data */
+    Tspan_data_con = (Tcon_data[n_con_data -1] - Tcon_data[0]);
     Tspan_data = (Tline_data[n_line_data -1] - Tcon_data[0]);
     if(Tspan_data < 0.0)
     {
@@ -194,6 +197,11 @@ void init()
 
     /* set mediate time of continuum data */
     Tmed_data = 0.5*(Tcon_data[0] + Tcon_data[n_con_data-1]);
+
+    for(i=0; i<num_params_difftrend; i++)
+    {
+      pow_Tcon_data[i] = pow(Tcon_data[n_con_data-1]-Tmed_data, i+2) - pow(Tcon_data[0]-Tmed_data, i+2);
+    }
 
     /* set the range of cloud radial distribution */
     rcloud_min_set = 0.0;
@@ -284,7 +292,8 @@ void allocate_memory()
   workspace = malloc((6*n_con_data + n_con_data*nq + 5*parset.n_con_recon)*sizeof(double));
   Larr_data = malloc(n_con_data*nq*sizeof(double));
   Larr_rec = malloc(parset.n_con_recon*nq*sizeof(double));
-
+  pow_Tcon_data = malloc(num_params_difftrend*sizeof(double));
+  
   var_param = malloc(num_params_var * sizeof(double));
   var_param_std = malloc(num_params_var * sizeof(double));
 
@@ -326,6 +335,7 @@ void free_memory()
   free(workspace);
   free(Larr_data);
   free(Larr_rec);
+  free(pow_Tcon_data);
 
   free(var_param);
   free(var_param_std);
