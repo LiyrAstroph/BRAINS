@@ -182,6 +182,25 @@ void sim()
       pm[26] = 0.0;      // parameter for spectral broadening 
       pm[27] = log(1.0); //systematic error
       break;
+  case 8:
+      pm[0] = log(1.0);  //A
+      pm[1] = 0.0;       //Ag
+      pm[2] = 0.7;       //f1
+      pm[3] = 0.7;       //mu1
+      pm[4] = log(1.5);  //log_rLR
+      pm[5] = 0;        //phi0
+      pm[6] = cos(45*PI/180.0);//cos_inc
+      pm[7] = log(10);    //log_Rin_1
+      pm[8] = log(2);    //log_roi_1
+      pm[9] = 10.0;       //Theta_disk_1
+      pm[10] = -2.0;     //gamma_1
+      pm[11] = log(5);    //log_Rin_2
+      pm[12] = log(2);    //log_roi_2
+      pm[13] = 10.0;       //Theta_disk_2
+      pm[14] = -2.0;     //gamma_2
+      pm[15] = log(10.0); //mbh
+      pm[16] = log(1.0); //systematic error
+      break;
   }
 
   smooth_init(parset.n_vel_recon, TransV);
@@ -390,6 +409,12 @@ void sim_init()
       num_params_blr_model = sizeof(BLRmodel7)/sizeof(double);
       transfun_1d_cloud_sample = transfun_1d_cloud_sample_model7;
       transfun_2d_cloud_sample = transfun_2d_cloud_sample_model7;
+      break;
+    
+    case 8:
+      num_params_blr_model = sizeof(BLRmodel8)/sizeof(double);
+      transfun_1d_cloud_sample = transfun_1d_cloud_sample_model8;
+      transfun_2d_cloud_sample = transfun_2d_cloud_sample_model8;
       break;
 
     default:

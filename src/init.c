@@ -88,6 +88,10 @@ void init()
       BLRmodel_size = sizeof(BLRmodel7);
       set_blr_range_model = set_blr_range_model7;
       break;
+    case 8:
+      BLRmodel_size = sizeof(BLRmodel8);
+      set_blr_range_model = set_blr_range_model8;
+      break;
     default:
       BLRmodel_size = sizeof(BLRmodel1);
       set_blr_range_model = set_blr_range_model1;
@@ -200,8 +204,8 @@ void init()
 
     for(i=0; i<num_params_difftrend; i++)
     {
-      pow_Tcon_data[i] = pow(Tcon_data[n_con_data-1]-Tmed_data, i+2) - pow(Tcon_data[0]-Tmed_data, i+2);
-    }
+      pow_Tcon_data[i] = (pow(Tcon_data[n_con_data-1]-Tmed_data, i+2) - pow(Tcon_data[0]-Tmed_data, i+2)) / (i+2) / Tspan_data_con;
+	}
 
     /* set the range of cloud radial distribution */
     rcloud_min_set = 0.0;
@@ -927,6 +931,65 @@ void set_blr_range_model7()
   blr_range_model[i][0] = log(0.001);
   blr_range_model[i++][1] = log(0.1);
 
+  //logse
+  blr_range_model[i][0] = log(1.0);
+  blr_range_model[i++][1] = log(1.0+10.0);
+
+  return;
+}
+void set_blr_range_model8()
+{
+  int i;
+
+  i = 0;
+  //A
+  blr_range_model[i][0] = log(0.01);
+  blr_range_model[i++][1] = log(10.0);
+  //Ag
+  blr_range_model[i][0] = -1.0;
+  blr_range_model[i++][1] = 3.0;
+  //f1
+  blr_range_model[i][0] = 0.0;
+  blr_range_model[i++][1] = 1.0;
+  //mu1
+  blr_range_model[i][0] = 0.5;
+  blr_range_model[i++][1] = 1.0;
+  //log_rLR
+  blr_range_model[i][0] = 0.0;
+  blr_range_model[i++][1] = 3;
+  //phi0
+  blr_range_model[i][0] = -180.0;
+  blr_range_model[i++][1] = 180.0;
+  //cos_inc
+  blr_range_model[i][0] = 0.0;
+  blr_range_model[i++][1] = 1;
+  //log_Rin_1
+  blr_range_model[i][0] = log(0.1);
+  blr_range_model[i++][1] = log(1000);
+  //log_roi_1
+  blr_range_model[i][0] = 0.0;
+  blr_range_model[i++][1] = 2.5;
+  //Theta_disk_1
+  blr_range_model[i][0] = 0.0;
+  blr_range_model[i++][1] = 90.0;
+  //gamma_1
+  blr_range_model[i][0] = -3.0;
+  blr_range_model[i++][1] = 0.0;
+  //log_Rin_2
+  blr_range_model[i][0] = log(0.1);
+  blr_range_model[i++][1] = log(1000);
+  //log_roi_2
+  blr_range_model[i][0] = 0;
+  blr_range_model[i++][1] = 2.5;
+  //Theta_disk_2
+  blr_range_model[i][0] = 0.0;
+  blr_range_model[i++][1] = 90.0;
+  //gamma_2
+  blr_range_model[i][0] = -3.0;
+  blr_range_model[i++][1] = 0.0;
+  //log_mbh
+  blr_range_model[i][0] = log(mass_range[0]);
+  blr_range_model[i++][1] = log(mass_range[1]);
   //logse
   blr_range_model[i][0] = log(1.0);
   blr_range_model[i++][1] = log(1.0+10.0);

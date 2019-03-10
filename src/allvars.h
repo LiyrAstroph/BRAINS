@@ -306,6 +306,28 @@ typedef struct
   double logse;         /*!< \brief 27. */
 }BLRmodel7;
 
+typedef struct
+{
+  double A;
+  double Ag;
+ 
+  double f1;
+  double mu1;
+  double log_rLR;
+  double phi0;
+  double cos_inc;
+  double log_Rin_1;
+  double log_roi_1;
+  double Theta_disk_1;
+  double gamma_1;
+  double log_Rin_2;
+  double log_roi_2;
+  double Theta_disk_2;
+  double gamma_2;  
+ 
+  double log_mbh;
+  double logse;
+}BLRmodel8;
 extern int BLRmodel_size;
 extern int *par_fix, npar_fix;
 extern double *par_fix_val;

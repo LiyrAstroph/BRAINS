@@ -2734,6 +2734,378 @@ void transfun_2d_cloud_sample_model7(const void *pm, double *transv, double *tra
   return;
 }
 
+/*================================================================
+ * model 8
+ * binary model
+ *================================================================
+ */
+/* 
+ * This function caclulate 1d transfer function.
+ */
+
+void transfun_1d_cloud_sample_model8(const void *pm, int flag_save)
+{
+  int i, flag_update = 0, num_sh;
+  double *pr;
+  BLRmodel8 *model = (BLRmodel8 *)pm;
+
+  double L0, phi0, inc;
+  L0 = exp(model->log_rLR) * (exp(model->log_Rin_1 + model->log_roi_1) + exp(model->log_Rin_2 + model->log_roi_2));
+  phi0 = model->phi0 * PI / 180.0;
+  inc = acos(model->cos_inc);
+
+  /* BLR1*/
+  double Rin, Rout, disp, cos_Theta_disk, gamma;
+  Rin = exp(model->log_Rin_1);
+  Rout = Rin * exp(model->log_roi_1);
+  cos_Theta_disk = cos(model->Theta_disk_1 * PI / 180.0);
+  gamma = model->gamma_1;
+  disp = L0 * (1 - model->mu1);
+
+  for (i = 0; i < num_params_radial_samp; i++)
+  {
+    if (which_parameter_update == params_radial_samp[i])
+    {
+      flag_update = 1;
+      break;
+    }
+  }
+  // "which_parameter_update = -1" means that all parameters are updated, usually occurs at the
+  // initial step.
+  if (force_update == 1 || which_parameter_update == -1)
+  {
+    flag_update = 1;
+  }
+  else
+  {
+    for (i = 0; i < num_params_radial_samp; i++)
+    {
+      if (which_parameter_update == params_radial_samp[i])
+      {
+        flag_update = 1;
+        break;
+      }
+    }
+  }
+
+  /* number of particles in first region */
+
+  num_sh = (int)(parset.n_cloud_per_task * model->f1);
+
+  /* generate clouds' radial location */
+  if (flag_update == 1)
+  {
+    pr = clouds_particles_perturb[which_particle_update];
+    for (i = 0; i < num_sh; i++)
+    {
+      pr[i] = Rin  + (Rout - Rin) * gsl_rng_uniform(gsl_r);
+    }
+  }
+  else
+  {
+    pr = clouds_particles[which_particle_update];
+  }
+
+  double r, phi, Lphi, Lthe, x, y, z, xb, yb, zb, dis;
+  for (i = 0; i < num_sh; i++)
+  {
+    /* generate a direction of the angular momentum of the orbit */
+    Lphi = 2.0 * PI * gsl_rng_uniform(gsl_r);
+    Lthe = acos(cos_Theta_disk + (1.0 - cos_Theta_disk) * gsl_rng_uniform(gsl_r));
+
+    r = pr[i];
+    phi = 2.0 * PI * gsl_rng_uniform(gsl_r);
+
+    x = r * cos(phi);
+    y = r * sin(phi);
+    z = 0.0;
+
+    xb = cos(Lthe) * cos(Lphi) * x + sin(Lphi) * y;
+    yb = -cos(Lthe) * sin(Lphi) * x + cos(Lphi) * y;
+    zb = sin(Lthe) * x;
+
+    x = -cos(phi0) * (xb - disp) + sin(phi0) * yb;
+    y = -sin(phi0) * (xb - disp) - cos(phi0) * yb;
+    z = zb;
+
+    dis = r + xb * sin(phi0) * sin(inc) + yb * cos(phi0) * sin(inc) - zb * cos(inc);
+    tmp_tau[i] = dis;
+    tmp_weight[i] = pow(r / Rin, gamma);
+
+    if (flag_save && thistask == roottask)
+    {
+      if (i % (icr_cloud_save) == 0)
+        fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+    }
+  }
+
+  /* BLR2 */
+  Rin = exp(model->log_Rin_2);
+  Rout = Rin * exp(model->log_roi_2);
+  cos_Theta_disk = cos(model->Theta_disk_2 * PI / 180.0);
+  gamma = model->gamma_2;
+  disp = L0 * model->mu1;
+  phi0 = PI + phi0;
+
+  /* generate clouds' radial location */
+  if (flag_update == 1)
+  {
+    pr = clouds_particles_perturb[which_particle_update];
+    for (i = num_sh; i < parset.n_cloud_per_task; i++)
+    {
+      pr[i] = Rin + (Rout - Rin) * gsl_rng_uniform(gsl_r);
+    }
+  }
+  else
+  {
+    pr = clouds_particles[which_particle_update];
+  }
+
+  for (i = 0; i < num_sh; i++)
+  {
+    /* generate a direction of the angular momentum of the orbit */
+    Lphi = 2.0 * PI * gsl_rng_uniform(gsl_r);
+    Lthe = acos(cos_Theta_disk + (1.0 - cos_Theta_disk) * gsl_rng_uniform(gsl_r));
+
+    r = pr[i];
+    phi = 2.0 * PI * gsl_rng_uniform(gsl_r);
+
+    x = r * cos(phi);
+    y = r * sin(phi);
+    z = 0.0;
+
+    xb = cos(Lthe) * cos(Lphi) * x + sin(Lphi) * y;
+    yb = -cos(Lthe) * sin(Lphi) * x + cos(Lphi) * y;
+    zb = sin(Lthe) * x;
+
+    x = -cos(phi0) * (xb - disp) + sin(phi0) * yb;
+    y = -sin(phi0) * (xb - disp) - cos(phi0) * yb;
+    z = zb;
+
+    dis = r + xb * sin(phi0) * sin(inc) + yb * cos(phi0) * sin(inc) - zb * cos(inc);
+    tmp_tau[i] = dis;
+    tmp_weight[i] = pow(r / Rin, gamma);
+
+    if (flag_save && thistask == roottask)
+    {
+      if (i % (icr_cloud_save) == 0)
+        fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+    }
+  }
+  return;
+}
+
+/* 
+ * This function caclulate 2d transfer function.
+ */
+void transfun_2d_cloud_sample_model8(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
+{
+  int i, j, flag_update = 0, num_sh, linecenter = 0.0;
+  double *pr;
+  double *pmodel = (double *)pm;
+  BLRmodel8 *model = (BLRmodel8 *)pm;
+
+  double L0, phi0, inc, Omega;
+  L0 = exp(model->log_rLR) * (exp(model->log_Rin_1 + model->log_roi_1) + exp(model->log_Rin_2 + model->log_roi_2));
+  phi0 = model->phi0 * PI / 180.0;
+  inc = acos(model->cos_inc);
+  Omega = sqrt(exp(model->log_mbh) / L0) / L0;
+
+  /* BLR1*/
+  double mbh, Rin, Rout, disp, cos_Theta_disk, gamma, Rs;
+  mbh = exp(model->log_mbh) * model->mu1;
+  Rin = exp(model->log_Rin_1);
+  Rout = Rin * exp(model->log_roi_1);
+  cos_Theta_disk = cos(model->Theta_disk_1 * PI / 180.0);
+  gamma = model->gamma_1;
+  disp = (1 - model->mu1) * L0;
+  Rs = 3.0e11 * mbh / CM_PER_LD;
+
+  if (parset.flag_linecenter != 0)
+  {
+    linecenter = pmodel[num_params_blr - num_params_linecenter - 1] * parset.linecenter_err;
+  }
+
+  if (force_update == 1 || which_parameter_update == -1)
+  {
+    flag_update = 1;
+  }
+  else
+  {
+    for (i = 0; i < num_params_radial_samp; i++)
+    {
+      if (which_parameter_update == params_radial_samp[i])
+      {
+        flag_update = 1;
+        break;
+      }
+    }
+  }
+
+  num_sh = (int)(parset.n_cloud_per_task * model->f1);
+
+  /* generate clouds' radial location */
+  if (flag_update == 1)
+  {
+    pr = clouds_particles_perturb[which_particle_update];
+    for (i = 0; i < num_sh; i++)
+    {
+      pr[i] = 1.5 * Rs + Rin + (Rout - Rin) * gsl_rng_uniform(gsl_r);
+    }
+  }
+  else
+  {
+    pr = clouds_particles[which_particle_update];
+  }
+
+  double r, phi, Lphi, Lthe, x, y, z, xb, yb, zb, dis;
+  double Vkep, vx, vy, vz, vxb, vyb, vzb, V;
+  double weight, g;
+  for (i = 0; i < num_sh; i++)
+  {
+    /* generate a direction of the angular momentum of the orbit */
+    Lphi = 2.0 * PI * gsl_rng_uniform(gsl_r);
+    Lthe = acos(cos_Theta_disk + (1.0 - cos_Theta_disk) * gsl_rng_uniform(gsl_r));
+
+    r = pr[i];
+    phi = 2.0 * PI * gsl_rng_uniform(gsl_r);
+
+    x = r * cos(phi);
+    y = r * sin(phi);
+    z = 0.0;
+
+    xb = cos(Lthe) * cos(Lphi) * x + sin(Lphi) * y;
+    yb = -cos(Lthe) * sin(Lphi) * x + cos(Lphi) * y;
+    zb = sin(Lthe) * x;
+
+    x = -cos(phi0) * (xb - disp) + sin(phi0) * yb;
+    y = -sin(phi0) * (xb - disp) - cos(phi0) * yb;
+    z = zb;
+
+    dis = r + xb * sin(phi0) * sin(inc) + yb * cos(phi0) * sin(inc) - zb * cos(inc);
+    weight = pow(r / Rin, gamma);
+    tmp_tau[i] = dis;
+    tmp_weight[i] = weight;
+
+    Vkep = sqrt(mbh / ( r - Rs));
+
+    for (j = 0; j < parset.n_vel_per_cloud; j++)
+    {
+      vx = -Vkep * sin(phi);
+      vy = Vkep * cos(phi);
+      vz = 0.0;
+
+      vxb = cos(Lthe) * cos(Lphi) * vx + sin(Lphi) * vy;
+      vyb = -cos(Lthe) * sin(Lphi) * vx + cos(Lphi) * vy;
+      vzb = sin(Lthe) * vx;
+
+      vx = -cos(phi0) * vxb + sin(phi0) * vyb - Omega * y;
+      vy = -sin(phi0) * vxb - cos(phi0) * vyb + Omega * x;
+      vz = vzb;
+
+      V = -vy * sin(inc) - vz * cos(inc);
+      if (fabs(V) >= C_Unit) // make sure that the velocity is smaller than speed of light
+        V = 0.9999 * C_Unit * (V > 0.0 ? 1.0 : -1.0);
+
+      g = sqrt((1.0 + V / C_Unit) / (1.0 - V / C_Unit)) / sqrt(1.0 - Rs / r); //relativistic effects
+      V = (g - 1.0) * C_Unit;
+
+      V += linecenter;
+      tmp_vel[i * parset.n_vel_per_cloud + j] = V;
+
+      if (flag_save && thistask == roottask)
+      {
+        if (i % (icr_cloud_save) == 0)
+          fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx * VelUnit, vy * VelUnit, vz * VelUnit, weight);
+      }
+    }
+  }
+
+  /* BLR2*/
+  mbh = exp(model->log_mbh) * (1 - model->mu1);
+  Rin = exp(model->log_Rin_2);
+  Rout = Rin * exp(model->log_roi_2);
+  cos_Theta_disk = cos(model->Theta_disk_2 * PI / 180.0);
+  gamma = model->gamma_2;
+  disp = model->mu1 * L0;
+  Rs = 3.0e11 * mbh / CM_PER_LD;
+  phi0 = PI + phi0;
+
+  /* generate clouds' radial location */
+  if (flag_update == 1)
+  {
+    pr = clouds_particles_perturb[which_particle_update];
+    for (i = num_sh; i < parset.n_cloud_per_task; i++)
+    {
+      pr[i] = 1.5 * Rs + Rin + (Rout - Rin) * gsl_rng_uniform(gsl_r);
+    }
+  }
+  else
+  {
+    pr = clouds_particles[which_particle_update];
+  }
+
+  for (i = num_sh; i < parset.n_cloud_per_task; i++)
+  {
+    /* generate a direction of the angular momentum of the orbit */
+    Lphi = 2.0 * PI * gsl_rng_uniform(gsl_r);
+    Lthe = acos(cos_Theta_disk + (1.0 - cos_Theta_disk) * gsl_rng_uniform(gsl_r));
+
+    r = pr[i];
+    phi = 2.0 * PI * gsl_rng_uniform(gsl_r);
+
+    x = r * cos(phi);
+    y = r * sin(phi);
+    z = 0.0;
+
+    xb = cos(Lthe) * cos(Lphi) * x + sin(Lphi) * y;
+    yb = -cos(Lthe) * sin(Lphi) * x + cos(Lphi) * y;
+    zb = sin(Lthe) * x;
+
+    x = -cos(phi0) * (xb - disp) + sin(phi0) * yb;
+    y = -sin(phi0) * (xb - disp) - cos(phi0) * yb;
+    z = zb;
+
+    dis = r + xb * sin(phi0) * sin(inc) + yb * cos(phi0) * sin(inc) - zb * cos(inc);
+    weight = pow(r / Rin, gamma);
+    tmp_tau[i] = dis;
+    tmp_weight[i] = weight;
+
+    Vkep = sqrt(mbh / ( r - Rs));
+
+    for (j = 0; j < parset.n_vel_per_cloud; j++)
+    {
+      vx = -Vkep * sin(phi);
+      vy = Vkep * cos(phi);
+      vz = 0.0;
+
+      vxb = cos(Lthe) * cos(Lphi) * vx + sin(Lphi) * vy;
+      vyb = -cos(Lthe) * sin(Lphi) * vx + cos(Lphi) * vy;
+      vzb = sin(Lthe) * vx;
+
+      vx = -cos(phi0) * vxb + sin(phi0) * vyb - Omega * y;
+      vy = -sin(phi0) * vxb - cos(phi0) * vyb + Omega * x;
+      vz = vzb;
+
+      V = -vy * sin(inc) - vz * cos(inc);
+      if (fabs(V) >= C_Unit) // make sure that the velocity is smaller than speed of light
+        V = 0.9999 * C_Unit * (V > 0.0 ? 1.0 : -1.0);
+
+      g = sqrt((1.0 + V / C_Unit) / (1.0 - V / C_Unit)) / sqrt(1.0 - Rs / r); //relativistic effects
+      V = (g - 1.0) * C_Unit;
+
+      V += linecenter;
+      tmp_vel[i * parset.n_vel_per_cloud + j] = V;
+
+      if (flag_save && thistask == roottask)
+      {
+        if (i % (icr_cloud_save) == 0)
+          fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx * VelUnit, vy * VelUnit, vz * VelUnit, weight);
+      }
+    }
+  }
+  return;
+}
 
 void restart_action_1d(int iflag)
 {

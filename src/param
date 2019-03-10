@@ -7,8 +7,8 @@ FileDir                     /home/liyropt/Projects/GIT/BRAINS      % directory f
 FlagDim                     1                           % -2, generate fully random lc; -1, mock lc based on input data; 
                                                         % 0, only continuum modeling; 1, 1d line RM; 2, 2d line RM
 
-FlagBLRModel                6                           % 1, 2, 3, 4, 5, 6, 7; BLR model type
-                                                        % 5 is double power-law model; 6 is Pancoast's model; 7 is two-zone model
+FlagBLRModel                6                           % 1, 2, 3, 4, 5, 6, 7, 8; BLR model type
+                                                        % 5 is double power-law model; 6 is Pancoast's model; 7 is two-zone model; 8 is binary model
 
 %========================================================================
 % data file
