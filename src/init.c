@@ -204,8 +204,9 @@ void init()
 
     for(i=0; i<num_params_difftrend; i++)
     {
-      pow_Tcon_data[i] = (pow(Tcon_data[n_con_data-1]-Tmed_data, i+2) - pow(Tcon_data[0]-Tmed_data, i+2)) / (i+2) / Tspan_data_con;
-	}
+      pow_Tcon_data[i] = (pow(Tcon_data[n_con_data-1]-Tmed_data, i+2) 
+                        - pow(Tcon_data[0]-Tmed_data, i+2)) / (i+2) / Tspan_data_con;
+    }
 
     /* set the range of cloud radial distribution */
     rcloud_min_set = 0.0;
