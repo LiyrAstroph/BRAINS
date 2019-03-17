@@ -45,8 +45,17 @@ void init()
 
   /* number of parameters for narrow line, only valid for 2d RM. */
   num_params_nlr = 0;
+  num_params_nlr_oiii = 0;
   if(parset.flag_narrowline >= 2)
+  {
     num_params_nlr = 3;
+    
+    /* [OIII] doublet */
+    if(parset.flag_narrowline_oiii == 1)
+    {
+      num_params_nlr_oiii = 1;
+    }
+  }
 
   /* number of parameters for spectral broadening, only valid for 2d RM */
   num_params_res = 1;
@@ -127,6 +136,10 @@ void init()
 
   gsl_acc = gsl_interp_accel_alloc();
   gsl_linear = gsl_interp_alloc(gsl_interp_linear, parset.n_con_recon);
+
+  /* OIII velocity center */
+  OIII4959_vel = (OIII4959 - HB)/HB * C /1.0e5 / VelUnit;
+  OIII5007_vel = (OIII5007 - HB)/HB * C /1.0e5 / VelUnit;
 
   /* default BH mass range */
   mass_range[0] = 0.1;
@@ -476,24 +489,34 @@ void set_par_fix(int num_params_blr)
     }
 
     // cope with narrow line
-    if(parset.flag_narrowline >= 2)
+    if(parset.flag_narrowline == 2)
     {
-      if(parset.flux_narrowline_err == 0.0)
+      /* OIII doublet flux */
+      if(parset.flux_narrowline_oiii_err == 0.0)
       {
         par_fix[num_params_blr_model - 1] = 1.0;
         par_fix_val[num_params_blr_model -1] = 0.0;
       }
-
+      
+      /* narrow line flux */
+      if(parset.flux_narrowline_err == 0.0)
+      {
+        par_fix[num_params_blr_model + num_params_nlr_oiii - 1 + 0] = 1.0;
+        par_fix_val[num_params_blr_model + num_params_nlr_oiii-1 + 0] = 0.0;
+      }
+    }
+    if(parset.flag_narrowline >= 2)
+    {
       if(parset.width_narrowline_err == 0.0)
       {
-        par_fix[num_params_blr_model-1+1] = 1.0;
-        par_fix_val[num_params_blr_model-1+1] = 0.0;
+        par_fix[num_params_blr_model+num_params_nlr_oiii-1+1] = 1.0;
+        par_fix_val[num_params_blr_model+num_params_nlr_oiii-1+1] = 0.0;
       } 
 
       if(parset.shift_narrowline_err == 0.0)
       {
-        par_fix[num_params_blr_model-1+2] = 1.0;
-        par_fix_val[num_params_blr_model-1+2] = 0.0;
+        par_fix[num_params_blr_model+num_params_nlr_oiii-1+2] = 1.0;
+        par_fix_val[num_params_blr_model+num_params_nlr_oiii-1+2] = 0.0;
       }
     }
   }

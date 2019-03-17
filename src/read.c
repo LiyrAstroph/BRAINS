@@ -183,6 +183,18 @@ void read_parset()
     addr[nt] = &parset.shift_narrowline_err;
     id[nt++] = DOUBLE;
 
+    strcpy(tag[nt], "FlagNarrowLineOIII");
+    addr[nt] = &parset.flag_narrowline_oiii;
+    id[nt++] = INT;
+
+    strcpy(tag[nt], "FluxNarrowLineOIII");
+    addr[nt] = &parset.flux_narrowline_oiii;
+    id[nt++] = DOUBLE;
+
+    strcpy(tag[nt], "FluxNarrowLineOIIIErr");
+    addr[nt] = &parset.flux_narrowline_oiii_err;
+    id[nt++] = DOUBLE;
+
     strcpy(tag[nt], "BLRParFix");
     addr[nt] = &parset.str_par_fix;
     id[nt++] = STRING;
@@ -216,6 +228,7 @@ void read_parset()
     parset.flag_dim = 0;
     parset.flag_trend = 0;
     parset.flag_narrowline = 0;
+    parset.flag_narrowline_oiii = 0;
     parset.flag_fixvar = 0;
     parset.flag_blrmodel = 1;
     parset.flag_trend_diff = 0;
@@ -307,7 +320,8 @@ void read_parset()
       {
         printf("# No narrow-line.\n");
         parset.width_narrowline = 0.0;
-        
+
+        parset.flag_narrowline_oiii = 0;
       }
       else if(parset.flag_narrowline == 1)
       {
@@ -351,6 +365,13 @@ void read_parset()
     {
       parset.InstRes /= VelUnit;
       parset.InstRes_err /= VelUnit;
+
+      if(parset.width_narrowline > parset.InstRes)
+      {
+        printf("# Error narrow line width %f should be smaller than InstRes %f. \n", 
+                parset.width_narrowline*VelUnit, parset.InstRes*VelUnit);
+        exit(0);
+      }
     }
     
     if(parset.flag_blrmodel == 3 || parset.flag_blrmodel == 4)
@@ -649,6 +670,13 @@ void read_data()
         //printf("%d %f %f\n", i, instres_epoch[i], instres_err_epoch[i]);
         instres_epoch[i] /= VelUnit;
         instres_err_epoch[i] /= VelUnit;
+
+        if(instres_epoch[i] < parset.width_narrowline)
+        {
+          printf("# Error narrow line width %f should be smaller than InstRes %f at %d epoch.\n",
+            parset.width_narrowline*VelUnit, parset.InstRes*VelUnit, i);    
+          exit(0);      
+        }
       }
       fclose(fp);
     }

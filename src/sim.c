@@ -33,11 +33,17 @@ void sim()
   FILE *fp;
   char fname[200];
   int i, j;
+  double mass_sim;
 
   sim_init();
   
   double *pm = (double *)model, error, fcon;
   
+  if(parset.flag_narrowline_oiii == 1)
+    mass_sim = 50.0;
+  else
+    mass_sim = 2.0;
+
   switch(parset.flag_blrmodel)
   {
     case 1:
@@ -49,7 +55,7 @@ void sim()
       pm[5] = cos(20.0/180.0*PI);
       pm[6] = 40.0;
       pm[7] = 0.0;
-      pm[8] = log(3.0);
+      pm[8] = log(mass_sim);
       pm[9] = 0.1;
       pm[10] = 0.5;
       pm[11] = log(1.0);
@@ -64,7 +70,7 @@ void sim()
       pm[5] = cos(20.0/180.0*PI);
       pm[6] = 40.0;
       pm[7] = 0.0;
-      pm[8] = log(3.0);
+      pm[8] = log(mass_sim);
       pm[9] = log(0.01);
       pm[10] = log(0.1);
       pm[11] = log(1.0);
@@ -79,7 +85,7 @@ void sim()
       pm[5] = cos(20.0/180.0*PI);
       pm[6] = 40.0;
       pm[7] = 0.0;
-      pm[8] = log(3.0);
+      pm[8] = log(mass_sim);
       pm[9] = 0.5;
       pm[10] = 0.5;
       pm[11] = log(1.0);
@@ -95,7 +101,7 @@ void sim()
       pm[5] = cos(20.0/180.0*PI);
       pm[6] = 40.0;
       pm[7] = 0.0;
-      pm[8] = log(3.0);
+      pm[8] = log(mass_sim);
       pm[9] = 0.5;
       pm[10] = 0.5;
       pm[11] = log(1.0);
@@ -113,7 +119,7 @@ void sim()
       pm[8] = 0.5;       //k
       pm[9] = 2.0;       //gam
       pm[10] = 0.5;      //xi
-      pm[11] = log(2.0); //mbh
+      pm[11] = log(mass_sim); //mbh
       pm[12] = 0.5;      //fellip
       pm[13] = 0.5;      //fflow
       pm[14] = log(0.01);
@@ -137,7 +143,7 @@ void sim()
       pm[7] = -0.4;        // kappa
       pm[8] = 5.0;        // gamma
       pm[9] = 0.5;        // obscuration
-      pm[10] = log(2.0);  //mbh
+      pm[10] = log(mass_sim);  //mbh
       pm[11] = 0.5;       //fellip
       pm[12] = 0.4;       //fflow
       pm[13] = log(0.01); //
@@ -168,7 +174,7 @@ void sim()
       pm[13] = 0.1;      //F_un
       pm[14] = 20.0;     //opn_un
 
-      pm[15] = log(2.0); //mbh
+      pm[15] = log(mass_sim); //mbh
       pm[16] = 0.5;      //fellip
       pm[17] = 0.4;      //fflow
       pm[18] = log(0.01); 
@@ -198,7 +204,7 @@ void sim()
       pm[12] = log(2);    //log_roi_2
       pm[13] = 10.0;       //Theta_disk_2
       pm[14] = -2.0;     //gamma_2
-      pm[15] = log(10.0); //mbh
+      pm[15] = log(mass_sim); //mbh
       pm[16] = log(1.0); //systematic error
       break;
   }
@@ -537,7 +543,10 @@ void sim_init()
     Tline[parset.n_line_recon - 1] = Tline_max-1.0e-10;
 
     double vel_max_set, vel_min_set;
-    vel_max_set = 3000.0/VelUnit;
+    if(parset.flag_narrowline_oiii == 1)
+      vel_max_set = 12000.0/VelUnit;
+    else
+      vel_max_set = 3000.0/VelUnit;
     vel_min_set = - vel_max_set;
     double dVel = (vel_max_set- vel_min_set)/(parset.n_vel_recon -1.0);
 

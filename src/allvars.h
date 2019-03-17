@@ -50,6 +50,10 @@
 #define PI            M_PI
 #define BRAINS_MAX_STR_LENGTH  (100)
 
+#define HB          (4861.0)
+#define OIII4959    (4959.0)
+#define OIII5007    (5007.0)
+
 /* variables for MPICH */
 extern int thistask, totaltask, namelen;
 extern int roottask;
@@ -97,9 +101,10 @@ typedef struct
 
   char str_par_fix[BRAINS_MAX_STR_LENGTH], str_par_fix_val[BRAINS_MAX_STR_LENGTH];
 
-  int flag_narrowline;
+  int flag_narrowline, flag_narrowline_oiii;
   double flux_narrowline, width_narrowline, shift_narrowline;
   double flux_narrowline_err, width_narrowline_err, shift_narrowline_err;
+  double flux_narrowline_oiii, flux_narrowline_oiii_err;
   
   int flag_linecenter;
   double linecenter_err;
@@ -165,6 +170,8 @@ extern double logz_line2d;
 
 extern int num_params_radial_samp;
 extern int *params_radial_samp;
+
+extern double OIII4959_vel, OIII5007_vel;
 
 /*!
  *  \struct BLRmodel1
@@ -332,7 +339,8 @@ extern int BLRmodel_size;
 extern int *par_fix, npar_fix;
 extern double *par_fix_val;
 
-extern int num_params, num_params_blr, num_params_blr_model, num_params_var, num_params_difftrend, num_params_nlr, num_params_res;
+extern int num_params, num_params_blr, num_params_blr_model, num_params_var, num_params_difftrend
+         , num_params_nlr, num_params_nlr_oiii, num_params_res;
 extern int num_params_linecenter;
 
 extern double **blr_range_model, **par_range_model;

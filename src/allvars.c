@@ -76,6 +76,8 @@ double logz_line2d;
 int num_params_radial_samp;
 int *params_radial_samp;
 
+double OIII4959_vel, OIII5007_vel;
+
 // BLR
 int BLRmodel_size;
 int *par_fix, npar_fix;
@@ -84,7 +86,8 @@ double **blr_range_model, **par_range_model;
 double nlr_range_model[3][2];
 double mass_range[2];
 
-int num_params, num_params_blr, num_params_blr_model, num_params_var, num_params_difftrend, num_params_nlr, num_params_res;
+int num_params, num_params_blr, num_params_blr_model, num_params_var, num_params_difftrend
+  , num_params_nlr, num_params_nlr_oiii, num_params_res;
 int num_params_linecenter;
 
 // continuum variation

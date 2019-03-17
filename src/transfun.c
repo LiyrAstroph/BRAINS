@@ -184,24 +184,40 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
   /* add intrinsic narrow line */
   if(parset.flag_narrowline != 0)
   {
-    double flux, width, shift;
+    double flux, width, shift, flux_oiii=0.0;
     if(parset.flag_narrowline == 1)  /* fixed narrow line */
     {
       flux = parset.flux_narrowline;
       width = parset.width_narrowline;
       shift = parset.shift_narrowline;
+
+      if(parset.flag_narrowline_oiii == 1)
+      {
+        flux_oiii = parset.flux_narrowline_oiii;
+      }
     }
     else if(parset.flag_narrowline == 2) /* narrow line with Gaussian priors */
     {
       flux =  parset.flux_narrowline  + pmodel[num_params_blr-num_params_res-num_params_linecenter-1-3] * parset.flux_narrowline_err;
       width = parset.width_narrowline + pmodel[num_params_blr-num_params_res-num_params_linecenter-1-2] * parset.width_narrowline_err;
       shift = parset.shift_narrowline + pmodel[num_params_blr-num_params_res-num_params_linecenter-1-1] * parset.shift_narrowline_err;
+
+      if(parset.flag_narrowline_oiii == 1)
+      {
+        flux_oiii = parset.flux_narrowline_oiii  
+                  + pmodel[num_params_blr-num_params_nlr-num_params_res-num_params_linecenter-1-1] * parset.flux_narrowline_oiii_err;
+      }
     }
     else  /* narrow line with logrithmic prior of flux */
     {
       flux =  exp(pmodel[num_params_blr-num_params_res-num_params_linecenter-1-3]);
       width = parset.width_narrowline + pmodel[num_params_blr-num_params_res-num_params_linecenter-1-2] * parset.width_narrowline_err;
       shift = parset.shift_narrowline + pmodel[num_params_blr-num_params_res-num_params_linecenter-1-1] * parset.shift_narrowline_err;
+
+      if(parset.flag_narrowline_oiii == 1)
+      {
+        flux_oiii = exp(pmodel[num_params_blr-num_params_nlr-num_params_res-num_params_linecenter-1-1]);
+      }
     }
 
     width = fmax(1.0e-10, width); /* make sure thant width is not zero */
@@ -209,10 +225,19 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
     for(i=0; i<nv; i++)
     {
       fnarrow = flux * exp( -0.5 * pow( (transv[i] - shift)/(width), 2.0) );
+
+      /* [OIII] 4959, 5007 */
+      if(parset.flag_narrowline_oiii == 1)
+      {
+        fnarrow +=  flux_oiii * ( exp( -0.5 * pow( (transv[i] - OIII4959_vel - shift)/(width), 2.0) )
+                       + 3.0 * exp( -0.5 * pow( (transv[i] - OIII5007_vel - shift)/(width), 2.0) ) );
+      }
+
       for(j = 0; j<nl; j++)
       {
         fl2d[j*nv + i] += fnarrow;
       }
+
     } 
   }
 

@@ -155,7 +155,7 @@ int dnest_line2d(int argc, char **argv)
       break;
   }
   
-  num_params_blr = num_params_blr_model + num_params_nlr + num_params_res + num_params_linecenter;
+  num_params_blr = num_params_blr_model + num_params_nlr_oiii + num_params_nlr + num_params_res + num_params_linecenter;
   num_params = parset.n_con_recon + num_params_blr + num_params_var;
   par_fix = (int *) malloc(num_params * sizeof(int));
   par_fix_val = (double *) malloc(num_params * sizeof(double));
@@ -251,11 +251,17 @@ void set_par_range_model2d()
     par_range_model[i][0] = blr_range_model[i][0];
     par_range_model[i][1] = blr_range_model[i][1];
   }
-  /* cope with narrow line */
-  for(i=num_params_blr_model-1; i<num_params_blr-num_params_res-num_params_linecenter-1; i++)
+  /* cope with narrow line of [OIII] doublet */
+  for(i=num_params_blr_model-1; i<num_params_blr_model-1+num_params_nlr_oiii; i++)
   {
     par_range_model[i][0] = nlr_range_model[i - (num_params_blr_model-1)][0];
     par_range_model[i][1] = nlr_range_model[i - (num_params_blr_model-1)][1];
+  }
+  /* cope with narrow line */
+  for(i=num_params_blr_model-1+num_params_nlr_oiii; i<num_params_blr-num_params_res-num_params_linecenter-1; i++)
+  {
+    par_range_model[i][0] = nlr_range_model[i - (num_params_blr_model+num_params_nlr_oiii-1)][0];
+    par_range_model[i][1] = nlr_range_model[i - (num_params_blr_model+num_params_nlr_oiii-1)][1];
   }
   /* cope with spectral broadening */
   for(i=num_params_blr-num_params_res-num_params_linecenter-1; i<num_params_blr-num_params_linecenter-1; i++)
@@ -326,8 +332,8 @@ void from_prior_line2d(void *model)
   {
     pm[i] = par_range_model[i][0] + dnest_rand() * ( par_range_model[i][1] - par_range_model[i][0]  );
   }
-  /* cope with flux of narrow line */
-  for(i=num_params_blr_model-1; i<num_params_blr-num_params_res-num_params_linecenter-1-2; i++)
+  /* cope with flux of narrow line and [OIII] doublet */
+  for(i=num_params_blr_model-1; i<num_params_blr_model -1 + num_params_nlr_oiii + 1; i++)
   {
     if(parset.flag_narrowline == 2) // Gaussian prior
     {
@@ -340,7 +346,7 @@ void from_prior_line2d(void *model)
     }
   }
   /* cope with width and shift of narrow line */
-  for(i=num_params_blr_model; i<num_params_blr-num_params_res-num_params_linecenter-1; i++)
+  for(i=num_params_blr_model + num_params_nlr_oiii; i<num_params_blr-num_params_res-num_params_linecenter-1; i++)
   {
     pm[i] = dnest_randn();
     dnest_wrap(&pm[i], par_range_model[i][0], par_range_model[i][1]);
