@@ -346,7 +346,7 @@ void from_prior_line2d(void *model)
     }
   }
   /* cope with width and shift of narrow line */
-  for(i=num_params_blr-num_params_res-num_params_linecenter-1-2; i<num_params_blr-num_params_res-num_params_linecenter-1; i++)
+  for(i=num_params_blr_model-1+num_params_nlr_oiii+1; i<num_params_blr-num_params_res-num_params_linecenter-1; i++)
   {
     pm[i] = dnest_randn();
     dnest_wrap(&pm[i], par_range_model[i][0], par_range_model[i][1]);
