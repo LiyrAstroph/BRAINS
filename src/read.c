@@ -301,6 +301,12 @@ void read_parset()
       exit(0);
     }
 
+    if(parset.flag_trend_diff <= 0 || parset.flag_trend_diff > 10)
+    {
+      fprintf(stderr, "# Error in FlagTrendDiff: value %d is not allowed.\n# Please specify a value in [0-10].\n", parset.flag_trend_diff);
+      exit(0);
+    }
+
     if(parset.flag_narrowline >= 0 && parset.flag_narrowline <= 3)
     {
       if(parset.flag_narrowline == 0)
