@@ -91,7 +91,7 @@ int num_params, num_params_blr, num_params_blr_model, num_params_var, num_params
 int num_params_linecenter;
 
 // continuum variation
-double var_range_model[7][2]; /*!< define the range of variability parameters */
+double var_range_model[15][2]; /*!< define the range of variability parameters */
 
 // epoch dependent spectral broadening
 double *instres_epoch, *instres_err_epoch;

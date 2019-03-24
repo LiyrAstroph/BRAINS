@@ -344,7 +344,7 @@ extern int num_params, num_params_blr, num_params_blr_model, num_params_var, num
 extern int num_params_linecenter;
 
 extern double **blr_range_model, **par_range_model;
-extern double var_range_model[7][2];
+extern double var_range_model[15][2];
 extern double nlr_range_model[3][2];
 extern double mass_range[2];
 
