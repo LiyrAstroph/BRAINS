@@ -320,7 +320,12 @@ void read_parset()
       exit(0);
     }
 
-    if(parset.flag_narrowline >= 0 && parset.flag_narrowline <= 3)
+    /* narrow line only applies in 2D RM */
+    if(parset.flag_dim < 2)
+    {
+      parset.flag_narrowline = 0;
+    }
+    if(parset.flag_dim ==2 && parset.flag_narrowline >= 0 && parset.flag_narrowline <= 3)
     {
       if(parset.flag_narrowline == 0)
       {
