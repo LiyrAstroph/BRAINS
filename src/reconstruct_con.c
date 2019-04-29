@@ -924,6 +924,12 @@ void reconstruct_con_end()
 {
   int i;
 
+  for(i=0; i<num_params; i++)
+  {
+    free(par_range_model[i]);
+  }
+  free(par_range_model);
+  
   for(i=0; i<parset.num_particles; i++)
   {
     free(Fcon_particles[i]);
