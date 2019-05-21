@@ -399,10 +399,12 @@ void reconstruct_line1d_init()
   Fline = malloc(parset.n_line_recon * sizeof(double));
   Flerrs = malloc(parset.n_line_recon * sizeof(double));
 
-  Tline_min = Tline_data[0] - fmin(0.1*(Tline_data[n_line_data - 1] - Tline_data[0]), 10.0);
-  Tline_min = fmax(Tline_min, Tcon_min + Tspan/2.0 - 10.0);
+  Tline_min = Tline_data[0] - fmin(0.05*(Tline_data[n_line_data - 1] - Tline_data[0]), 10.0);
+  if(parset.time_back <= 0.0)
+    Tline_min = fmax(Tline_min, Tcon_min + Tspan/2.0 - 10.0);
+  
 
-  Tline_max = Tline_data[n_line_data -1] + fmin(0.1*(Tline_data[n_line_data - 1] - Tline_data[0]), 10);
+  Tline_max = Tline_data[n_line_data -1] + fmin(0.05*(Tline_data[n_line_data - 1] - Tline_data[0]), 10);
   Tline_max = fmin(Tline_max, Tcon_max);  /* The time span should be smaller than that of the continuum */
   
   if(thistask == 0)
