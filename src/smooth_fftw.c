@@ -135,11 +135,11 @@ void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int
       }
       fftw_execute(pback);
 
-      for(i=0; i<nv; i++)
-      {
+      //for(i=0; i<nv; i++)
+      //{
       //fl2d[j*nv + i] = real_conv[i] * dV / nd_fft;
-        memcpy(&fl2d[j*nv], real_conv+npad/2, nv*sizeof(double));
-      }
+      //}
+      memcpy(&fl2d[j*nv], real_conv+npad/2, nv*sizeof(double));
     }
 
   }
@@ -176,11 +176,11 @@ void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int
       }
       fftw_execute(pback);
 
-      for(i=0; i<nv; i++)
-      {
+      //for(i=0; i<nv; i++)
+      //{
         //fl2d[j*nv + i] = real_conv[i] * dV / nd_fft;
-        memcpy(&fl2d[j*nv], real_conv+npad/2, nv*sizeof(double));
-      }
+      //}
+      memcpy(&fl2d[j*nv], real_conv+npad/2, nv*sizeof(double));
     }
   }
   return;
