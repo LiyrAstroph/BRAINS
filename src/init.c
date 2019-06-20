@@ -394,8 +394,8 @@ void scale_con_line()
 
   for(i=0; i<n_line_data; i++)
   {
-    // note mask with error >= 1.0e100
-    if(Flerrs_data[i] < 0.99e100)
+    // note mask with error < 0.0
+    if(Flerrs_data[i] > 0.0)
     {
       Fline_data[i] *= line_scale;
       Flerrs_data[i] *= line_scale;
@@ -404,8 +404,8 @@ void scale_con_line()
     if(parset.flag_dim==2 || parset.flag_dim == -1)
       for(j=0; j<n_vel_data; j++)
       {
-        // note mask with error >= 1.0e100
-        if(Flerrs2d_data[i*n_vel_data + j] < 0.99e100)
+        // note mask with error < 0.0
+        if(Flerrs2d_data[i*n_vel_data + j] > 0.0)
         {
           Fline2d_data[i*n_vel_data + j] *= line_scale;
           Flerrs2d_data[i*n_vel_data + j] *= line_scale;

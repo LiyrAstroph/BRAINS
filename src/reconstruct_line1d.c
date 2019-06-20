@@ -590,8 +590,8 @@ double prob_initial_line1d(const void *model)
   var2_se = (exp(pm[num_params_blr-1])-1.0) * (exp(pm[num_params_blr-1])-1.0) * line_error_mean*line_error_mean;
   for(i=0; i<n_line_data; i++)
   {
-    // note mask with error >= 1.0e100
-    if(Flerrs_data[i] < 0.99e100)
+    // note mask with error < 0.0
+    if(Flerrs_data[i] > 0.0)
     {
       dy = Fline_data[i] - Fline_at_data[i] ;
       var2 = Flerrs_data[i]*Flerrs_data[i] + var2_se;
@@ -633,8 +633,8 @@ double prob_restart_line1d(const void *model)
   var2_se = (exp(pm[num_params_blr-1])-1.0) * (exp(pm[num_params_blr-1])-1.0) * line_error_mean*line_error_mean;
   for(i=0; i<n_line_data; i++)
   {
-    // note mask with error >= 1.0e100
-    if(Flerrs_data[i] < 0.99e100)
+    // note mask with error < 0.0
+    if(Flerrs_data[i] > 0.0)
     {
       dy = Fline_data[i] - Fline_at_data[i] ;
       var2 = Flerrs_data[i]*Flerrs_data[i] + var2_se;
@@ -704,8 +704,8 @@ double prob_line1d(const void *model)
     var2_se = (exp(pm[num_params_blr-1])-1.0) * (exp(pm[num_params_blr-1])-1.0) * line_error_mean*line_error_mean;
     for(i=0; i<n_line_data; i++)
     {
-      //note mask with error >= 1.0e100
-      if(Flerrs_data[i] < 0.99e100)
+      //note mask with error < 0.0
+      if(Flerrs_data[i] > 0.0)
       {
         dy = Fline_data[i] - Fline_at_data[i] ;
         var2 = Flerrs_data[i]*Flerrs_data[i] + var2_se;
@@ -720,8 +720,8 @@ double prob_line1d(const void *model)
     var2_se = (exp(pm[num_params_blr-1])-1.0) * (exp(pm[num_params_blr-1])-1.0) * line_error_mean*line_error_mean;
     for(i=0; i<n_line_data; i++)
     {
-      //note mask with error >= 1.0e100
-      if(Flerrs_data[i] < 0.99e100)
+      //note mask with error < 0.0
+      if(Flerrs_data[i] > 0.0)
       {
         dy = Fline_data[i] - Fline_at_data[i] ;
         var2 = Flerrs_data[i]*Flerrs_data[i] + var2_se;
