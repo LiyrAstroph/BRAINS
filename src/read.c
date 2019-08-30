@@ -347,21 +347,28 @@ void read_parset()
 
       parset.shift_narrowline /= VelUnit;
       parset.shift_narrowline_err /= VelUnit;
-    }
 
-    if(parset.InstRes < 0.0) // epoch-dependent spectral broadening
-    {
-      if(strlen(parset.file_instres) == 0)
+      if(parset.InstRes < 0.0) // epoch-dependent spectral broadening
       {
-        printf("# Error in file_instres, not specified.\n");
-        exit(0);
+        if(strlen(parset.file_instres) == 0)
+        {
+          printf("# Error in file_instres, not specified.\n");
+          exit(0);
+        }
+        printf("# use epoch dependent spectral resolution, stored at %s.\n", parset.file_instres);
       }
-      printf("# use epoch dependent spectral resolution, stored at %s.\n", parset.file_instres);
-    }
-    else
-    {
-      parset.InstRes /= VelUnit;
-      parset.InstRes_err /= VelUnit;
+      else
+      {
+        parset.InstRes /= VelUnit;
+        parset.InstRes_err /= VelUnit;
+
+        if(parset.width_narrowline > parset.InstRes)
+        {
+          printf("# Error narrow line width %f should be smaller than InstRes %f. \n", 
+                  parset.width_narrowline*VelUnit, parset.InstRes*VelUnit);
+          exit(0);
+        }
+      }
     }
     
     if(parset.flag_blrmodel == 3 || parset.flag_blrmodel == 4)
@@ -660,6 +667,13 @@ void read_data()
         //printf("%d %f %f\n", i, instres_epoch[i], instres_err_epoch[i]);
         instres_epoch[i] /= VelUnit;
         instres_err_epoch[i] /= VelUnit;
+
+        if(instres_epoch[i] < parset.width_narrowline)
+        {
+          printf("# Error narrow line width %f should be smaller than InstRes %f at %d epoch.\n",
+            parset.width_narrowline*VelUnit, parset.InstRes*VelUnit, i);    
+          exit(0);      
+        }
       }
       fclose(fp);
     }
