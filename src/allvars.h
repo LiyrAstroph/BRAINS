@@ -331,6 +331,7 @@ extern double **con_q_particles, **con_q_particles_perturb;
 
 extern int force_update;
 extern double **clouds_particles_perturb, **clouds_particles;
+extern double **TransTau_particles, **TransTau_particles_perturb;
 extern double **Trans1D_particles, **Trans1D_particles_perturb;
 extern double **Trans2D_at_veldata_particles, **Trans2D_at_veldata_particles_perturb;
 extern double **Fline_at_data_particles, **Fline_at_data_particles_perturb;

@@ -99,6 +99,7 @@ void postprocess1d()
     which_particle_update = 0;
     con_q = con_q_particles[which_particle_update];
     Fcon = Fcon_particles[which_particle_update];
+    TransTau = TransTau_particles[which_particle_update];
     Trans1D = Trans1D_particles[which_particle_update];
 
     for(i=0; i<num_ps; i++)
@@ -286,6 +287,7 @@ void reconstruct_line1d()
 
       con_q = con_q_particles[which_particle_update];
       Fcon = Fcon_particles[which_particle_update];
+      TransTau = TransTau_particles[which_particle_update];
       Trans1D = Trans1D_particles[which_particle_update];
 
       //calculate_con_from_model(best_model_line1d + num_params_blr *sizeof(double));
@@ -390,7 +392,7 @@ void reconstruct_line1d_init()
       Larr_rec[i*nq + j] = pow(Tcon[i], j);
   }
 
-  TransTau = malloc(parset.n_tau * sizeof(double));
+  //TransTau = malloc(parset.n_tau * sizeof(double));
   //Trans1D = malloc(parset.n_tau * sizeof(double));
   //Fline_at_data = malloc(n_line_data * sizeof(double));
 
@@ -439,6 +441,14 @@ void reconstruct_line1d_init()
   {
     clouds_particles[i] = malloc(parset.n_cloud_per_task * sizeof(double));
     clouds_particles_perturb[i] = malloc(parset.n_cloud_per_task * sizeof(double));
+  }
+
+  TransTau_particles = malloc(parset.num_particles * sizeof(double *));
+  TransTau_particles_perturb = malloc(parset.num_particles * sizeof(double *));
+  for(i=0; i<parset.num_particles; i++)
+  {
+    TransTau_particles[i] = malloc(parset.n_tau * sizeof(double));
+    TransTau_particles_perturb[i] = malloc(parset.n_tau * sizeof(double));
   }
 
   Trans1D_particles = malloc(parset.num_particles * sizeof(double *));
@@ -493,7 +503,7 @@ void reconstruct_line1d_init()
  */
 void reconstruct_line1d_end()
 {
-  free(TransTau);
+  //free(TransTau);
   //free(Trans1D);
   //free(Fline_at_data);
 
@@ -521,6 +531,8 @@ void reconstruct_line1d_end()
     free(clouds_particles_perturb[i]);
     free(Trans1D_particles[i]);
     free(Trans1D_particles_perturb[i]);
+    free(TransTau_particles[i]);
+    free(TransTau_particles_perturb[i]);
     free(Fline_at_data_particles[i]);
     free(Fline_at_data_particles_perturb[i]);
 
@@ -531,6 +543,8 @@ void reconstruct_line1d_end()
   free(clouds_particles_perturb);
   free(Trans1D_particles);
   free(Trans1D_particles_perturb);
+  free(TransTau_particles);
+  free(TransTau_particles_perturb);
   free(Fline_at_data_particles);
   free(Fline_at_data_particles_perturb);
 
@@ -581,6 +595,7 @@ double prob_initial_line1d(const void *model)
   gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
 
   
+  TransTau = TransTau_particles[which_particle_update];
   Trans1D = Trans1D_particles[which_particle_update];
   Fline_at_data = Fline_at_data_particles[which_particle_update];
   which_parameter_update = -1;
@@ -624,6 +639,7 @@ double prob_restart_line1d(const void *model)
   gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
 
   
+  TransTau = TransTau_particles[which_particle_update];
   Trans1D = Trans1D_particles[which_particle_update];
   Fline_at_data = Fline_at_data_particles[which_particle_update];
   which_parameter_update = num_params + 1; // so as not to update clouds.
@@ -683,12 +699,14 @@ double prob_line1d(const void *model)
   if( (which_parameter_update < num_params_blr-1) || force_update == 1)
   {
     /* re-point */
+    TransTau = TransTau_particles_perturb[which_particle_update];
     Trans1D = Trans1D_particles_perturb[which_particle_update]; 
     transfun_1d_cal(model, 0);
   }
   else
   {
     /* re-point */
+    TransTau = TransTau_particles[which_particle_update];
     Trans1D = Trans1D_particles[which_particle_update];
   }
 

@@ -104,6 +104,7 @@ double **con_q_particles, **con_q_particles_perturb;
 
 int force_update;
 double **clouds_particles_perturb, **clouds_particles;
+double **TransTau_particles, **TransTau_particles_perturb;
 double **Trans1D_particles, **Trans1D_particles_perturb;
 double **Trans2D_at_veldata_particles, **Trans2D_at_veldata_particles_perturb;
 double **Fline_at_data_particles, **Fline_at_data_particles_perturb;

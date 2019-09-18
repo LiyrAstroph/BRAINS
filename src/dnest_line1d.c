@@ -498,6 +498,10 @@ void accept_action_1d()
     if( param < num_params_blr-1 )
     {
 
+      ptemp = TransTau_particles[which_particle_update];
+      TransTau_particles[which_particle_update] = TransTau_particles_perturb[which_particle_update];
+      TransTau_particles_perturb[which_particle_update] = ptemp;
+
       ptemp = Trans1D_particles[which_particle_update];
       Trans1D_particles[which_particle_update] = Trans1D_particles_perturb[which_particle_update];
       Trans1D_particles_perturb[which_particle_update] = ptemp;
@@ -536,6 +540,7 @@ void kill_action_1d(int i, int i_copy)
   memcpy(Fcon_particles[i], Fcon_particles[i_copy], parset.n_con_recon * sizeof(double));
   memcpy(Fline_at_data_particles[i], Fline_at_data_particles[i_copy], n_line_data * sizeof(double));
   memcpy(con_q_particles[i], con_q_particles[i_copy], nq * sizeof(double));
+  memcpy(TransTau_particles[i], TransTau_particles[i_copy], parset.n_tau*sizeof(double));
   memcpy(Trans1D_particles[i], Trans1D_particles[i_copy], parset.n_tau * sizeof(double));
   memcpy(clouds_particles[i], clouds_particles[i_copy], parset.n_cloud_per_task * sizeof(double)) ;
   return;

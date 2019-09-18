@@ -606,6 +606,10 @@ void accept_action_2d()
      */
     if(param < num_params_blr -1 )
     {
+      ptemp = TransTau_particles[which_particle_update];
+      TransTau_particles[which_particle_update] = TransTau_particles_perturb[which_particle_update];
+      TransTau_particles_perturb[which_particle_update] = ptemp;
+
       ptemp = Trans2D_at_veldata_particles[which_particle_update];
       Trans2D_at_veldata_particles[which_particle_update] = Trans2D_at_veldata_particles_perturb[which_particle_update];
       Trans2D_at_veldata_particles_perturb[which_particle_update] = ptemp;
@@ -643,6 +647,7 @@ void kill_action_2d(int i, int i_copy)
   memcpy(Fcon_particles[i], Fcon_particles[i_copy], parset.n_con_recon * sizeof(double));
   memcpy(Fline_at_data_particles[i], Fline_at_data_particles[i_copy], n_line_data * sizeof(double));
   memcpy(con_q_particles[i], con_q_particles[i_copy], nq * sizeof(double));
+  memcpy(TransTau_particles[i], TransTau_particles[i_copy], parset.n_tau*sizeof(double));
   memcpy(Trans2D_at_veldata_particles[i], Trans2D_at_veldata_particles[i_copy], parset.n_tau * n_vel_data * sizeof(double));
   memcpy(clouds_particles[i], clouds_particles[i_copy], parset.n_cloud_per_task * sizeof(double)) ;
   return;
