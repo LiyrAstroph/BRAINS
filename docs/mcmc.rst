@@ -16,7 +16,7 @@ The format of option file for DNest looks like as follows::
   40    # maximum number of levels
   10    # Backtracking scale length (lambda in the paper)
   100   # Strength of effect to force histogram to equal push. 0-10 is best. (beta in the paper)
-  200   # Maximum number of saves (0 = infinite)
+  200   # Maximum number of saves
   data/sample2d.txt                 # sample file
   data/sample_info2d.txt            # sample_info file
   data/levels2d.txt                 # level file
@@ -27,7 +27,7 @@ The format of option file for DNest looks like as follows::
 
 
 The option file for continuum reconstruction is ``OPTIONSCON``, for 1d RM is ``OPTIONS1D``, and 
-for 2d RM is ``OPTIONS2D``. \texttt{brains} will automatically read these options appropriately. 
+for 2d RM is ``OPTIONS2D``. ``brains`` will automatically reads these options appropriately. 
 
 One should not change the orders of lines. Lines beginning with '\#' are regarded as comments. 
 There is not a general rule to set the values of options. The most important options are the options 

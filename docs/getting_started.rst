@@ -73,12 +73,20 @@ Command-line Options
     -e
          examine the priors.
 
+For example, if one want to redo posterior processing with a different temperature, say 10 (the default is 1), one may use the command
+
+.. code:: bash
+
+   mpiexec -n np ./brains src/param -pt10
+
+
+
 MCMC Samping
 ============
 
 The output Markov chain is stored in ``data/posterior_sample.txt`` for continuum reconstuction, in ``data/posterior_sample1d.txt`` for 1d reverberation mapping analysis, and in ``data/posterior_sample2d.txt`` for 2d reverberation mapping analysis.
 
-One need to tune the corresponding option files ``OPTIONSCON``, ``OPTIONS1d``, and ``OPTIONS2D`` accordingly, which specify configurations for nested sampling.s
+One need to tune the corresponding option files ``OPTIONSCON``, ``OPTIONS1D``, and ``OPTIONS2D`` accordingly, which specify configurations for nested sampling.
 
 An Exemplary Test
 =================
