@@ -878,7 +878,7 @@ void reconstruct_con_init()
 
   Tcon_max = Tcon_data[n_con_data-1] + fmax(0.05*Tspan, 10.0);
 
-  if(thistask == 0)
+  if(thistask == roottask)
     printf("Tcon_min_max: %f %f\n", Tcon_min - Tcon_data[0], Tcon_max - Tcon_data[n_con_data-1]);
 
   dT = (Tcon_max - Tcon_min)/(parset.n_con_recon -1);
