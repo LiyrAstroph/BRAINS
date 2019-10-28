@@ -440,7 +440,7 @@ void set_par_fix(int num_params_blr)
     for(i=strlen(parset.str_par_fix); i<num_params_blr; i++)
       parset.str_par_fix[i] = '0';
 
-    for(i=0; i<num_params_blr_model; i++)
+    for(i=0; i<num_params_blr_model-1; i++)
     {
       if(parset.str_par_fix[i] == '0')
       {
