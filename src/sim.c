@@ -405,6 +405,11 @@ void sim_init()
     parset.InstRes = 220.0/VelUnit;
     parset.InstRes_err = 0.0;
   }
+  else
+  {
+    parset.InstRes /= VelUnit;
+    parset.InstRes_err = 0.0;
+  }
 
   if(parset.flag_narrowline > 1)
   {

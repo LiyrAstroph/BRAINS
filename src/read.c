@@ -277,6 +277,7 @@ void read_parset()
     }
     fclose(fparam);
 
+    /* check input options */
     if(parset.flag_dim > 2 || parset.flag_dim < -2)
     {
       fprintf(stderr, "# Error in FlagDim: value %d is not allowed.\n# Please specify a value in [-2-2].\n", parset.flag_dim);
@@ -312,11 +313,11 @@ void read_parset()
     {
       parset.flag_narrowline = 0;
     }
-    if(parset.flag_dim ==2 && parset.flag_narrowline >= 0 && parset.flag_narrowline <= 3)
+    if(parset.flag_dim ==2)
     {
       if(parset.flag_narrowline == 0)
       {
-        printf("# No arrow-line.\n");
+        printf("# No narrow-line.\n");
         parset.width_narrowline = 0.0;
         
       }
@@ -370,11 +371,6 @@ void read_parset()
         }
       }
     }
-    
-    if(parset.flag_blrmodel == 3 || parset.flag_blrmodel == 4)
-    {
-      parset.n_vel_per_cloud = 1;
-    }
 
     if(parset.flag_dim < 1)
     {
@@ -394,6 +390,11 @@ void read_parset()
       parset.flag_save_clouds = 1;
     }
 
+    
+    if(parset.flag_blrmodel == 3 || parset.flag_blrmodel == 4)
+    {
+      parset.n_vel_per_cloud = 1;
+    }
 
     if(parset.flag_linecenter != 0)
     {
@@ -695,7 +696,7 @@ void allocate_memory_data()
     Fcerrs_data = malloc(n_con_data * sizeof(double));
   }
 
-  if(parset.flag_dim == 1 || parset.flag_dim == -1)
+  if(parset.flag_dim == 1)
   {
     Tline_data = malloc(n_line_data * sizeof(double));
     Fline_data = malloc(n_line_data * sizeof(double));
@@ -725,9 +726,12 @@ void allocate_memory_data()
  */
 void free_memory_data()
 {
-  free(Tcon_data);
-  free(Fcon_data);
-  free(Fcerrs_data);
+  if(parset.flag_dim >=-1)
+  {
+    free(Tcon_data);
+    free(Fcon_data);
+    free(Fcerrs_data);
+  }
 
   if(parset.flag_dim == 1)
   {
@@ -736,7 +740,7 @@ void free_memory_data()
     free(Flerrs_data);
   }
 
-  if(parset.flag_dim == 2)
+  if(parset.flag_dim == 2 || parset.flag_dim == -1)
   {
     free(Vline_data);
     free(Tline_data);
