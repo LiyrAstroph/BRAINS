@@ -12,6 +12,7 @@
 
 #include "allvars.h"
 #include "proto.h"
+#include "version.h"
 
 /*! \file main.c
  *  \brief start of the program
@@ -51,7 +52,7 @@ int main(int argc, char **argv)
     parset.flag_exam_prior= 0;
     parset.flag_rng_seed = 0;
 
-    while( (opt = getopt(argc, argv, "pt:rcs:eh")) != -1)
+    while( (opt = getopt(argc, argv, "pt:rcs:ehv")) != -1)
     {
       switch(opt)
       {
@@ -102,6 +103,11 @@ int main(int argc, char **argv)
           print_help();
           break;
 
+        case 'v': /* */
+          flag_help = 1;
+          print_version();
+          break;
+          
         case '?':
           printf("# Incorrect option -%c %s.\n", optopt, optarg);
           exit(0);

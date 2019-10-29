@@ -77,7 +77,10 @@ void print_help()
   printf("\t\tonly do posterior processing, but recalculate the posterior sample information.\n");
 
   printf("\t" RED BOLD "-e\n" NONE);
-  printf("\t\t examine the priors.\n");
+  printf("\t\texamine the priors.\n");
+
+  printf("\t" RED BOLD "-v\n" NONE);
+  printf("\t\tprint version.\n");
 
   printf("\n\n");
   return;
