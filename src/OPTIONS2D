@@ -4,13 +4,13 @@
 # Lines beginning with '#' are regarded as comments.
 
 2	    # Number of particles
-2000	# new level interval
-2000	# save interval
+800	# new level interval
+800	# save interval
 200	  # threadSteps - how many steps each thread should do independently before communication
 120	  # maximum number of levels
-10	  # Backtracking scale length (lambda in the paper)
-100	  # Strength of effect to force histogram to equal push. 0-10 is best. (beta in the paper)
-10	  # Maximum number of saves (0 = infinite)
+10	  # Backtracking scale length (lambda in the paper Brewer et al. 2011)
+100	  # Strength of effect to force histogram to equal push. 0-10 is best. (beta in the paper Brewer et al. 2011)
+100	  # Maximum number of saves 
 data/sample2d.txt                 # sample file
 data/sample_info2d.txt            # sample_info file
 data/levels2d.txt                 # level file
