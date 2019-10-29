@@ -39,7 +39,7 @@
 void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl)
 {
   int i, j, m;
-  double fline, fcon, tl, tc, tau, A, Ag, ftrend, a0, tmp;
+  double fline, fcon, tl, tc, tau, A, Ag, ftrend, a0=0.0, tmp;
   double *pmodel = (double *)pm;
 
   A=exp(pmodel[0]); /*  response coefficient */
@@ -111,7 +111,7 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
                                               double *fl2d, int nl, int nv)
 {
   int i, j, k, m;
-  double tau, tl, tc, fcon, A, Ag, ftrend, fnarrow, a0, tmp;
+  double tau, tl, tc, fcon, A, Ag, ftrend, fnarrow, a0=0.0, tmp;
   double *pmodel = (double *)pm;
 
   A=exp(pmodel[0]);

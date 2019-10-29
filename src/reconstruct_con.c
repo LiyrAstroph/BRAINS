@@ -270,7 +270,7 @@ void calculate_con_from_model(const void *model)
 
   double *pm = (double *)model;
   double sigma, tau, alpha;
-  int i, j, info;
+  int i, info;
 
   syserr = (exp(pm[0]) - 1.0) * con_error_mean;  // systematic error 
   tau = exp(pm[2]);
@@ -457,7 +457,7 @@ void calculate_con_from_model_semiseparable(const void *model)
 void reconstruct_con_from_varmodel(double sigma_hat, double tau, double alpha, double syserr)
 {
   double *Lbuf, *ybuf, *y, *yq, *yuq, *Cq, sigma;
-  int i, j, info;
+  int i, info;
   double *PEmat3, *PEmat4;
 
   sigma = sigma_hat * sqrt(tau);
@@ -529,7 +529,7 @@ void reconstruct_con_from_varmodel(double sigma_hat, double tau, double alpha, d
 double prob_con_variability(const void *model)
 {
   double prob = 0.0;
-  int i, j, param, info;
+  int i, info;
   double *pm = (double *)model;
   double tau, sigma, alpha, lndet, syserr;
   double *Lbuf, *ybuf, *y, *yq, *Cq;
@@ -601,9 +601,9 @@ double prob_con_variability(const void *model)
 double prob_con_variability_semiseparable(const void *model)
 {
   double prob = 0.0;
-  int i, j, param, info;
+  int i, info;
   double *pm = (double *)model;
-  double tau, sigma2, alpha, lndet, syserr;
+  double tau, sigma2, lndet, syserr;
   double *Lbuf, *ybuf, *y, *yq, *Cq, *W, *D, *phi;
   
   which_particle_update = dnest_get_which_particle_update();
@@ -614,7 +614,6 @@ double prob_con_variability_semiseparable(const void *model)
     syserr = (exp(pm[0])-1.0)*con_error_mean;
     tau = exp(pm[2]);
     sigma2 = exp(2.0*pm[1]) * tau;
-    alpha = 1.0;
   
     Lbuf = workspace;
     ybuf = Lbuf + n_con_data*nq;
@@ -674,10 +673,10 @@ double prob_con_variability_semiseparable(const void *model)
 double prob_con_variability_initial(const void *model)
 {
   double prob = 0.0;
-  int i, j, info;
+  int i, info;
   double *pm = (double *)model;
   double tau, sigma, alpha, lndet, syserr;
-  double *Larr, *Lbuf, *ybuf, *y, *yq, *Cq;
+  double *Lbuf, *ybuf, *y, *yq, *Cq;
 
   syserr = (exp(pm[0])-1.0)*con_error_mean;
   tau = exp(pm[2]);
@@ -733,15 +732,14 @@ double prob_con_variability_initial(const void *model)
 double prob_con_variability_initial_semiseparable(const void *model)
 {
   double prob = 0.0;
-  int i, j, info;
+  int i, info;
   double *pm = (double *)model;
-  double tau, sigma2, alpha, lndet, syserr;
-  double *Larr, *Lbuf, *ybuf, *y, *yq, *Cq, *W, *D, *phi;
+  double tau, sigma2, lndet, syserr;
+  double *Lbuf, *ybuf, *y, *yq, *Cq, *W, *D, *phi;
 
   syserr = (exp(pm[0])-1.0)*con_error_mean;
   tau = exp(pm[2]);
   sigma2 = exp(2.0*pm[1]) * tau;
-  alpha = 1.0;
 
   Lbuf = workspace;
   ybuf = Lbuf + n_con_data*nq;

@@ -22,7 +22,7 @@
  */ 
 int main(int argc, char **argv)
 {
-  double t0, t1, dt;
+  double t0=0.0, t1, dt;
   int opt, flag_help=0, flag_end=0;
   /* initialize MPI */
   MPI_Init(&argc, &argv);
