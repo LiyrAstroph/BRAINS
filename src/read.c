@@ -446,7 +446,7 @@ void read_data()
       printf("continuum data points: %d\n", n_con_data);
     }
 
-    if(parset.flag_dim == 1 || parset.flag_dim == -1)
+    if(parset.flag_dim == 1)
     {
       sprintf(fname, "%s/%s", parset.file_dir, parset.line_file);
     // emission flux line
@@ -491,7 +491,7 @@ void read_data()
     MPI_Bcast(&n_con_data, 1, MPI_INT, roottask, MPI_COMM_WORLD);
   }
 
-  if(parset.flag_dim == 1 || parset.flag_dim == -1)
+  if(parset.flag_dim == 1 )
     MPI_Bcast(&n_line_data, 1, MPI_INT, roottask, MPI_COMM_WORLD);
 
   if(parset.flag_dim == 2 || parset.flag_dim == -1)
@@ -539,7 +539,7 @@ void read_data()
   }
 
   // read line
-  if(parset.flag_dim == 1||parset.flag_dim == -1)
+  if(parset.flag_dim == 1)
   {
     if(thistask == roottask)
     {

@@ -48,7 +48,7 @@
 #define CM_PER_LD    (C*8.64e4)
 
 #define PI            M_PI
-#define BRAINS_MAX_STR_LENGTH  (100)
+#define BRAINS_MAX_STR_LENGTH  (256)
 
 /* variables for MPICH */
 extern int thistask, totaltask, namelen;
