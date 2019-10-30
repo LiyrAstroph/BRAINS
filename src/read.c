@@ -498,6 +498,8 @@ void read_data()
   {
     MPI_Bcast(&n_line_data, 1, MPI_INT, roottask, MPI_COMM_WORLD);
     MPI_Bcast(&n_vel_data, 1, MPI_INT, roottask, MPI_COMM_WORLD);
+
+    n_vel_data_ext = n_vel_data + 2 * n_vel_data_incr;
   }
 
   // now allocate memory for data
@@ -644,6 +646,17 @@ void read_data()
     MPI_Bcast(&line_error_mean, 1, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
     // each task calculates line fluxes
     cal_emission_flux();
+
+    /* extend velocity grid */
+    double dVel = Vline_data[1] - Vline_data[0];
+    for(i=n_vel_data_incr-1; i>=0; i--)
+    {
+      /* left-hand side */
+      Vline_data_ext[i] = Vline_data_ext[i+1] - dVel;  
+      /* right-hand side */
+      Vline_data_ext[n_vel_data_ext - 1 - i] = Vline_data_ext[n_vel_data_ext - 1 - i - 1] + dVel;
+    }
+
   }
 
   /* read instrument broadening data */
@@ -705,7 +718,8 @@ void allocate_memory_data()
 
   if(parset.flag_dim == 2 || parset.flag_dim == -1)
   {
-    Vline_data = malloc(n_vel_data * sizeof(double));
+    Vline_data_ext = malloc(n_vel_data_ext * sizeof(double));
+    Vline_data = Vline_data_ext + n_vel_data_incr;
     Tline_data = malloc(n_line_data * sizeof(double));
     Fline_data = malloc(n_line_data * sizeof(double));
     Flerrs_data = malloc(n_line_data * sizeof(double));
@@ -742,7 +756,7 @@ void free_memory_data()
 
   if(parset.flag_dim == 2 || parset.flag_dim == -1)
   {
-    free(Vline_data);
+    free(Vline_data_ext);
     free(Tline_data);
     free(Fline_data);
     free(Flerrs_data);

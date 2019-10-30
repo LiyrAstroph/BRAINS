@@ -45,7 +45,7 @@ void postprocess2d()
   if(thistask == roottask)
   {
     // initialize smoothing workspace
-    smooth_init(n_vel_data, Vline_data);
+    smooth_init(n_vel_data_ext, Vline_data_ext);
     char fname[200];
     FILE *fp, *fcon, *fline, *ftran, *fline1d;
     double *Fline1d, dV;
@@ -143,10 +143,10 @@ void postprocess2d()
       calculate_con_from_model_semiseparable(post_model + num_params_blr *sizeof(double));
       gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
 
-      transfun_2d_cal(post_model, Vline_data, Trans2D_at_veldata, 
-                                      n_vel_data, 0);
-      calculate_line2d_from_blrmodel(post_model, Tline_data, Vline_data, Trans2D_at_veldata, 
-                                      Fline2d_at_data, n_line_data, n_vel_data);
+      transfun_2d_cal(post_model, Vline_data_ext, Trans2D_at_veldata, 
+                                      n_vel_data_ext, 0);
+      calculate_line2d_from_blrmodel(post_model, Tline_data, Vline_data_ext, Trans2D_at_veldata, 
+                                      Fline2d_at_data, n_line_data, n_vel_data_ext);
       
       // calculate integrated line fluxes
       for(j = 0; j < n_line_data; j++)
@@ -154,7 +154,7 @@ void postprocess2d()
         Fline1d[j] = 0.0;
         for(k=0; k<n_vel_data; k++)
         {
-          Fline1d[j] += Fline2d_at_data[j * n_vel_data + k] * dV /line_scale;
+          Fline1d[j] += Fline2d_at_data[j * n_vel_data_ext + (k+n_vel_data_incr)] * dV /line_scale;
         }
       }
 
@@ -163,10 +163,10 @@ void postprocess2d()
       sum2 = 0.0;
       for(j=0; j<parset.n_tau; j++)
       {
-        for(k=0; k<n_vel_data; k++)
+        for(k=0; k<n_vel_data_ext; k++)
         {
-          sum1 += Trans2D_at_veldata[j * n_vel_data + k] * TransTau[j];
-          sum2 += Trans2D_at_veldata[j * n_vel_data + k];
+          sum1 += Trans2D_at_veldata[j * n_vel_data_ext + k] * TransTau[j];
+          sum2 += Trans2D_at_veldata[j * n_vel_data_ext + k];
         }
       }
       // take care of zero transfer function
@@ -195,7 +195,7 @@ void postprocess2d()
         {
           for(k=0; k<n_vel_data; k++)
           {
-            fprintf(fline, "%f ", Fline2d_at_data[j * n_vel_data + k]/line_scale);
+            fprintf(fline, "%f ", Fline2d_at_data[j * n_vel_data_ext + (k+n_vel_data_incr)]/line_scale);
           }
           fprintf(fline, "\n");
         }
@@ -208,7 +208,7 @@ void postprocess2d()
           
           for(k=0; k<n_vel_data; k++)
           {
-            fprintf(ftran, "%f ", Trans2D_at_veldata[j * n_vel_data + k]);
+            fprintf(ftran, "%f ", Trans2D_at_veldata[j * n_vel_data_ext + (k+n_vel_data_incr)]);
           }
           fprintf(ftran, "\n");
         }
@@ -333,7 +333,7 @@ void reconstruct_line2d()
   
   reconstruct_line2d_init();
   
-  smooth_init(n_vel_data, Vline_data);
+  smooth_init(n_vel_data_ext, Vline_data_ext);
   dnest_line2d(argc, argv);
   smooth_end();
 
@@ -375,12 +375,12 @@ void reconstruct_line2d()
       }
       fclose(fp);
 
-      smooth_init(n_vel_data, Vline_data);
+      smooth_init(n_vel_data_ext, Vline_data_ext);
       // recovered line2d at data points
-      transfun_2d_cal(best_model_line2d, Vline_data, Trans2D_at_veldata, 
-                                              n_vel_data, parset.flag_save_clouds);
-      calculate_line2d_from_blrmodel(best_model_line2d, Tline_data, Vline_data, Trans2D_at_veldata, 
-                                                       Fline2d_at_data, n_line_data, n_vel_data);
+      transfun_2d_cal(best_model_line2d, Vline_data_ext, Trans2D_at_veldata, 
+                                              n_vel_data_ext, parset.flag_save_clouds);
+      calculate_line2d_from_blrmodel(best_model_line2d, Tline_data, Vline_data_ext, Trans2D_at_veldata, 
+                                                       Fline2d_at_data, n_line_data, n_vel_data_ext);
     
       sprintf(fname, "%s/%s", parset.file_dir, parset.pline2d_data_out_file);
       fp = fopen(fname, "w");
@@ -394,7 +394,7 @@ void reconstruct_line2d()
       {
         for(j=0; j<n_vel_data; j++)
         {
-          fprintf(fp, "%f %f %f\n", Vline_data[j]*VelUnit, Tline_data[i],  Fline2d_at_data[i*n_vel_data + j] / line_scale);
+          fprintf(fp, "%f %f %f\n", Vline_data[j]*VelUnit, Tline_data[i],  Fline2d_at_data[i*n_vel_data_ext + (j+n_vel_data_incr)] / line_scale);
         }
         fprintf(fp, "\n");
       }
@@ -413,7 +413,7 @@ void reconstruct_line2d()
       {
         for(j=0; j<n_vel_data; j++)
         {
-          fprintf(fp, "%f %f %f\n", Vline_data[j]*VelUnit, TransTau[i],  Trans2D_at_veldata[i*n_vel_data + j]);
+          fprintf(fp, "%f %f %f\n", Vline_data[j]*VelUnit, TransTau[i],  Trans2D_at_veldata[i*n_vel_data_ext + (j+n_vel_data_incr)]);
         }
         fprintf(fp, "\n");
       }
@@ -567,7 +567,7 @@ void reconstruct_line2d_init()
     Tline[i] = Tline_min + i*dT;
   }
 
-  double vel_max_set = Vline_data[n_vel_data -1], vel_min_set = Vline_data[0];
+  double vel_max_set = Vline_data_ext[n_vel_data_ext -1], vel_min_set = Vline_data_ext[0];
   double dVel = (vel_max_set- vel_min_set)/(parset.n_vel_recon -1.0);
 
   for(i=0; i<parset.n_vel_recon; i++)
@@ -611,16 +611,16 @@ void reconstruct_line2d_init()
   Trans2D_at_veldata_particles_perturb = malloc(parset.num_particles * sizeof(double *));
   for(i=0; i<parset.num_particles; i++)
   {
-    Trans2D_at_veldata_particles[i] = malloc(parset.n_tau * n_vel_data * sizeof(double));
-    Trans2D_at_veldata_particles_perturb[i] = malloc(parset.n_tau * n_vel_data * sizeof(double));
+    Trans2D_at_veldata_particles[i] = malloc(parset.n_tau * n_vel_data_ext * sizeof(double));
+    Trans2D_at_veldata_particles_perturb[i] = malloc(parset.n_tau * n_vel_data_ext * sizeof(double));
   }
 
   Fline_at_data_particles = malloc(parset.num_particles * sizeof(double *));
   Fline_at_data_particles_perturb = malloc(parset.num_particles * sizeof(double *));
   for(i=0; i<parset.num_particles; i++)
   {
-    Fline_at_data_particles[i] = malloc(n_line_data * n_vel_data * sizeof(double));
-    Fline_at_data_particles_perturb[i] = malloc(n_line_data * n_vel_data * sizeof(double));
+    Fline_at_data_particles[i] = malloc(n_line_data * n_vel_data_ext * sizeof(double));
+    Fline_at_data_particles_perturb[i] = malloc(n_line_data * n_vel_data_ext * sizeof(double));
   }
 
   con_q_particles = malloc(parset.num_particles * sizeof(double *));
@@ -740,7 +740,7 @@ void reconstruct_line2d_end()
 double prob_initial_line2d(const void *model)
 {
   double prob_line = 0.0, var2, dy, var2_se;
-  int i;
+  int i, j;
   double *pm = (double *)model;
   
   which_particle_update = dnest_get_which_particle_update();
@@ -755,18 +755,21 @@ double prob_initial_line2d(const void *model)
   Trans2D_at_veldata = Trans2D_at_veldata_particles[which_particle_update];
   Fline2d_at_data = Fline_at_data_particles[which_particle_update];
   which_parameter_update = -1;
-  transfun_2d_cal(model, Vline_data, Trans2D_at_veldata, n_vel_data, 0);
-  calculate_line2d_from_blrmodel(model, Tline_data, Vline_data, Trans2D_at_veldata, Fline2d_at_data, n_line_data, n_vel_data);
+  transfun_2d_cal(model, Vline_data_ext, Trans2D_at_veldata, n_vel_data_ext, 0);
+  calculate_line2d_from_blrmodel(model, Tline_data, Vline_data_ext, Trans2D_at_veldata, Fline2d_at_data, n_line_data, n_vel_data_ext);
 
   var2_se = (exp(pm[num_params_blr-1])-1.0) * (exp(pm[num_params_blr-1])-1.0) * line_error_mean*line_error_mean;
-  for(i=0; i<n_line_data*n_vel_data; i++)
+  for(i=0; i<n_line_data; i++)
   {
-    //note mask with error < 0.0
-    if(Flerrs2d_data[i] > 0.0)
+    for(j=0; j<n_vel_data; j++)
     {
-      dy = Fline2d_data[i] - Fline2d_at_data[i];
-      var2 = Flerrs2d_data[i]*Flerrs2d_data[i] + var2_se;
-      prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
+      //note mask with error < 0.0
+      if(Flerrs2d_data[i] > 0.0)
+      {
+        dy = Fline2d_data[i*n_vel_data + j] - Fline2d_at_data[i * n_vel_data_ext + (j+n_vel_data_incr)];
+        var2 = Flerrs2d_data[i]*Flerrs2d_data[i] + var2_se;
+        prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
+      }
     }
   }
 
@@ -782,7 +785,7 @@ double prob_initial_line2d(const void *model)
 double prob_restart_line2d(const void *model)
 {
   double prob_line = 0.0, var2, dy, var2_se;
-  int i;
+  int i, j;
   double *pm = (double *)model;
   
   which_particle_update = dnest_get_which_particle_update();
@@ -796,18 +799,21 @@ double prob_restart_line2d(const void *model)
   Trans2D_at_veldata = Trans2D_at_veldata_particles[which_particle_update];
   Fline2d_at_data = Fline_at_data_particles[which_particle_update];
   which_parameter_update = num_params + 1; // so as not to update clouds.
-  transfun_2d_cal(model, Vline_data, Trans2D_at_veldata, n_vel_data, 0);
-  calculate_line2d_from_blrmodel(model, Tline_data, Vline_data, Trans2D_at_veldata, Fline2d_at_data, n_line_data, n_vel_data);
+  transfun_2d_cal(model, Vline_data_ext, Trans2D_at_veldata, n_vel_data_ext, 0);
+  calculate_line2d_from_blrmodel(model, Tline_data, Vline_data_ext, Trans2D_at_veldata, Fline2d_at_data, n_line_data, n_vel_data_ext);
 
   var2_se = (exp(pm[num_params_blr-1])-1.0) * (exp(pm[num_params_blr-1])-1.0) * line_error_mean*line_error_mean;
-  for(i=0; i<n_line_data*n_vel_data; i++)
+  for(i=0; i<n_line_data; i++)
   {
-    //note mask with error < 0.0
-    if(Flerrs2d_data[i] > 0.0)
+    for(j=0; j<n_vel_data; j++)
     {
-      dy = Fline2d_data[i] - Fline2d_at_data[i];
-      var2 = Flerrs2d_data[i]*Flerrs2d_data[i] + var2_se;
-      prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
+      //note mask with error < 0.0
+      if(Flerrs2d_data[i] > 0.0)
+      {
+        dy = Fline2d_data[i*n_vel_data + j] - Fline2d_at_data[i * n_vel_data_ext + (j+n_vel_data_incr)];
+        var2 = Flerrs2d_data[i]*Flerrs2d_data[i] + var2_se;
+        prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
+      }
     }
   }
 
@@ -822,7 +828,7 @@ double prob_restart_line2d(const void *model)
 double prob_line2d(const void *model)
 {
   double prob_line = 0.0, var2, dy, var2_se;
-  int i;
+  int i, j;
   double *pm = (double *)model;
   
   which_particle_update = dnest_get_which_particle_update();
@@ -849,7 +855,7 @@ double prob_line2d(const void *model)
   {
     TransTau = TransTau_particles_perturb[which_particle_update];
     Trans2D_at_veldata = Trans2D_at_veldata_particles_perturb[which_particle_update];
-    transfun_2d_cal(model, Vline_data, Trans2D_at_veldata, n_vel_data, 0);
+    transfun_2d_cal(model, Vline_data_ext, Trans2D_at_veldata, n_vel_data_ext, 0);
   }
   else
   {
@@ -863,17 +869,20 @@ double prob_line2d(const void *model)
   if( which_parameter_update != num_params_blr-1 || force_update == 1 )
   {
     Fline2d_at_data = Fline_at_data_particles_perturb[which_particle_update];
-    calculate_line2d_from_blrmodel(model, Tline_data, Vline_data, Trans2D_at_veldata, Fline2d_at_data, n_line_data, n_vel_data);
+    calculate_line2d_from_blrmodel(model, Tline_data, Vline_data_ext, Trans2D_at_veldata, Fline2d_at_data, n_line_data, n_vel_data_ext);
 
     var2_se = (exp(pm[num_params_blr-1])-1.0) * (exp(pm[num_params_blr-1])-1.0) * line_error_mean*line_error_mean;
-    for(i=0; i<n_line_data*n_vel_data; i++)
+    for(i=0; i<n_line_data; i++)
     {
-      //note mask with error < 0.0
-      if(Flerrs2d_data[i] > 0.0)
+      for(j=0; j<n_vel_data; j++)
       {
-        dy = Fline2d_data[i] - Fline2d_at_data[i];
-        var2 = Flerrs2d_data[i]*Flerrs2d_data[i] + var2_se;
-        prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
+        //note mask with error < 0.0
+        if(Flerrs2d_data[i] > 0.0)
+        {
+          dy = Fline2d_data[i*n_vel_data + j] - Fline2d_at_data[i * n_vel_data_ext + (j+n_vel_data_incr)];
+          var2 = Flerrs2d_data[i]*Flerrs2d_data[i] + var2_se;
+          prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
+        }
       }
     }
   }
@@ -882,14 +891,17 @@ double prob_line2d(const void *model)
     /* re-point */
     Fline2d_at_data = Fline_at_data_particles[which_particle_update];
     var2_se = (exp(pm[num_params_blr-1])-1.0) * (exp(pm[num_params_blr-1])-1.0) * line_error_mean*line_error_mean;
-    for(i=0; i<n_line_data * n_vel_data; i++)
+    for(i=0; i<n_line_data; i++)
     {
-      //note mask with error < 0.0
-      if(Flerrs2d_data[i] > 0.0)
+      for(j=0; j<n_vel_data; j++)
       {
-        dy = Fline2d_data[i] - Fline2d_at_data[i] ;
-        var2 = Flerrs2d_data[i]*Flerrs2d_data[i] + var2_se;
-        prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
+        //note mask with error < 0.0
+        if(Flerrs2d_data[i] > 0.0)
+        {
+          dy = Fline2d_data[i*n_vel_data + j] - Fline2d_at_data[i * n_vel_data_ext + (j+n_vel_data_incr)];
+          var2 = Flerrs2d_data[i]*Flerrs2d_data[i] + var2_se;
+          prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
+        }
       }
     }
   }
