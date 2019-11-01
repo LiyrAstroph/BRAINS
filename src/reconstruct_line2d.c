@@ -767,7 +767,7 @@ double prob_initial_line2d(const void *model)
       if(Flerrs2d_data[i] > 0.0)
       {
         dy = Fline2d_data[i*n_vel_data + j] - Fline2d_at_data[i * n_vel_data_ext + (j+n_vel_data_incr)];
-        var2 = Flerrs2d_data[i]*Flerrs2d_data[i] + var2_se;
+        var2 = Flerrs2d_data[i*n_vel_data+j]*Flerrs2d_data[i*n_vel_data+j] + var2_se;
         prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
       }
     }
@@ -811,7 +811,7 @@ double prob_restart_line2d(const void *model)
       if(Flerrs2d_data[i] > 0.0)
       {
         dy = Fline2d_data[i*n_vel_data + j] - Fline2d_at_data[i * n_vel_data_ext + (j+n_vel_data_incr)];
-        var2 = Flerrs2d_data[i]*Flerrs2d_data[i] + var2_se;
+        var2 = Flerrs2d_data[i*n_vel_data+j]*Flerrs2d_data[i*n_vel_data+j] + var2_se;
         prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
       }
     }
@@ -880,7 +880,7 @@ double prob_line2d(const void *model)
         if(Flerrs2d_data[i] > 0.0)
         {
           dy = Fline2d_data[i*n_vel_data + j] - Fline2d_at_data[i * n_vel_data_ext + (j+n_vel_data_incr)];
-          var2 = Flerrs2d_data[i]*Flerrs2d_data[i] + var2_se;
+          var2 = Flerrs2d_data[i*n_vel_data+j]*Flerrs2d_data[i*n_vel_data+j] + var2_se;
           prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
         }
       }
@@ -899,7 +899,7 @@ double prob_line2d(const void *model)
         if(Flerrs2d_data[i] > 0.0)
         {
           dy = Fline2d_data[i*n_vel_data + j] - Fline2d_at_data[i * n_vel_data_ext + (j+n_vel_data_incr)];
-          var2 = Flerrs2d_data[i]*Flerrs2d_data[i] + var2_se;
+          var2 = Flerrs2d_data[i*n_vel_data+j]*Flerrs2d_data[i*n_vel_data+j] + var2_se;
           prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
         }
       }
