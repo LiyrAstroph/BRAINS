@@ -50,7 +50,7 @@ void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl
     tmp = 0.0;
     for(m=1; m<num_params_difftrend+1; m++)
     {
-      tmp += pmodel[num_params_blr + 4 + parset.flag_trend + m-1] * pow_Tcon_data[m-1];
+      tmp += pmodel[num_params_blr + num_params_drw + num_params_trend + m-1] * pow_Tcon_data[m-1];
     }
     a0 = -tmp;
   }
@@ -87,7 +87,7 @@ void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl
         for(m=1; m<num_params_difftrend+1; m++)
         {
           tmp *= (tc - Tmed_data);
-          ftrend += pmodel[num_params_blr + 4 + parset.flag_trend + m-1] * tmp;
+          ftrend += pmodel[num_params_blr + num_params_drw + num_params_trend + m-1] * tmp;
         }
         fcon += ftrend;
       }
@@ -122,7 +122,7 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
     tmp = 0.0;
     for(m=1; m<num_params_difftrend+1; m++)
     {
-      tmp += pmodel[num_params_blr + 4 + parset.flag_trend + m-1] * pow_Tcon_data[m-1];
+      tmp += pmodel[num_params_blr + num_params_drw + num_params_trend + m-1] * pow_Tcon_data[m-1];
     }
     a0 = -tmp;
   }
@@ -161,7 +161,7 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
         for(m=1; m<num_params_difftrend+1; m++)
         {
           tmp *= (tc - Tmed_data);
-          ftrend += pmodel[num_params_blr + 4 + parset.flag_trend + m-1] * tmp;
+          ftrend += pmodel[num_params_blr + num_params_drw + num_params_trend + m-1] * tmp;
         }
         fcon += ftrend;
       }
