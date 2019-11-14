@@ -75,6 +75,7 @@ int dnest_con(int argc, char **argv)
   }
   
   set_par_range_con();
+  print_par_names_con();
   
   /* setup fixed parameters */
   for(i=0; i<num_params; i++)
@@ -144,6 +145,52 @@ void set_par_range_con()
     par_prior_gaussian[i][1] = 1.0;
   }
   return;
+}
+
+/*!
+ *  print names and prior ranges for parameters 
+ *
+ */
+void print_par_names_con()
+{
+  int i, j;
+  FILE *fp;
+  char fname[BRAINS_MAX_STR_LENGTH];
+
+  sprintf(fname, "%s/%s", parset.file_dir, "data/para_names_con.txt");
+  fp = fopen(fname, "w");
+  if(fp == NULL)
+  {
+    fprintf(stderr, "# Error: Cannot open file %s.\n", fname);
+    exit(0);
+  }
+  
+  i=0;
+  fprintf(fp, "%4d %-15s %f %f\n", i, "sys_err_con", par_range_model[i][0], par_range_model[i][1]);
+  i++;
+  fprintf(fp, "%4d %-15s %f %f\n", i, "sigmad", par_range_model[i][0], par_range_model[i][1]);
+  i++;
+  fprintf(fp, "%4d %-15s %f %f\n", i, "taud", par_range_model[i][0], par_range_model[i][1]);
+  
+  for(j=0; j<num_params_trend; j++)
+  {
+    i++;
+    fprintf(fp, "%4d %-15s %f %f\n", i, "trend", par_range_model[i][0], par_range_model[i][1]);
+  }
+
+  for(j=0; j<num_params_difftrend; j++)
+  {
+    i++;
+    fprintf(fp, "%4d %-15s %f %f\n", i, "diff trend", par_range_model[i][0], par_range_model[i][1]);
+  }
+
+  for(j=0; j<parset.n_con_recon; j++)
+  {
+    i++;
+    fprintf(fp, "%4d %-15s %f %f\n", i, "time series", par_range_model[i][0], par_range_model[i][1]);
+  }
+  
+  fclose(fp);
 }
 
 /*!

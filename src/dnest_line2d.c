@@ -178,6 +178,7 @@ int dnest_line2d(int argc, char **argv)
   }
   
   set_par_range_model2d();
+  print_par_names_model2d();
 
   /* setup the fixed parameters */
   set_par_fix(num_params_blr);
@@ -345,6 +346,79 @@ void set_par_range_model2d()
 
   return;
 }
+
+/*!
+ *  print names and prior ranges for parameters 
+ *
+ */
+void print_par_names_model2d()
+{
+  int i, j;
+  FILE *fp;
+  char fname[BRAINS_MAX_STR_LENGTH];
+
+  sprintf(fname, "%s/%s", parset.file_dir, "data/para_names_model2d.txt");
+  fp = fopen(fname, "w");
+  if(fp == NULL)
+  {
+    fprintf(stderr, "# Error: Cannot open file %s.\n", fname);
+    exit(0);
+  }
+  
+  i=-1;
+  for(j=0; j<num_params_blr_model-1; j++)
+  {
+    i++;
+    fprintf(fp, "%4d %-15s %f %f\n", i, "BLR model", par_range_model[i][0], par_range_model[i][1]);
+  }
+
+  for(j=0; j<num_params_nlr; j++)
+  {
+    i++;
+    fprintf(fp, "%4d %-15s %f %f\n", i, "narrow line", par_range_model[i][0], par_range_model[i][1]);
+  }
+  for(j=0; j<num_params_res; j++)
+  {
+    i++;
+    fprintf(fp, "%4d %-15s %f %f\n", i, "line broaden", par_range_model[i][0], par_range_model[i][1]);
+  }
+  for(j=0; j<num_params_linecenter; j++)
+  {
+    i++;
+    fprintf(fp, "%4d %-15s %f %f\n", i, "line center", par_range_model[i][0], par_range_model[i][1]);
+  }
+
+  i++;
+  fprintf(fp, "%4d %-15s %f %f\n", i, "sys_err_line", par_range_model[i][0], par_range_model[i][1]);
+
+  i++;
+  fprintf(fp, "%4d %-15s %f %f\n", i, "sys_err_con", par_range_model[i][0], par_range_model[i][1]);
+  i++;
+  fprintf(fp, "%4d %-15s %f %f\n", i, "sigmad", par_range_model[i][0], par_range_model[i][1]);
+  i++;
+  fprintf(fp, "%4d %-15s %f %f\n", i, "taud", par_range_model[i][0], par_range_model[i][1]);
+  
+  for(j=0; j<num_params_trend; j++)
+  {
+    i++;
+    fprintf(fp, "%4d %-15s %f %f\n", i, "trend", par_range_model[i][0], par_range_model[i][1]);
+  }
+
+  for(j=0; j<num_params_difftrend; j++)
+  {
+    i++;
+    fprintf(fp, "%4d %-15s %f %f\n", i, "diff trend", par_range_model[i][0], par_range_model[i][1]);
+  }
+
+  for(j=0; j<parset.n_con_recon; j++)
+  {
+    i++;
+    fprintf(fp, "%4d %-15s %f %f\n", i, "time series", par_range_model[i][0], par_range_model[i][1]);
+  }
+  
+  fclose(fp);
+}
+
 
 /*!
  * this function generates a sample from prior.
