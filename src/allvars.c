@@ -87,6 +87,7 @@ double nlr_range_model[3][2];
 double mass_range[2];
 
 int num_params, num_params_blr, num_params_blr_model, num_params_var, num_params_difftrend, num_params_nlr, num_params_res;
+int num_params_drw, num_params_trend;
 int num_params_linecenter;
 
 // continuum variation

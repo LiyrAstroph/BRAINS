@@ -95,24 +95,24 @@ void set_par_range_con()
   int i;
 
   /* variability parameters */
-  for(i=0; i<3; i++)
+  for(i=0; i<num_params_drw; i++)
   {
     par_range_model[i][0] = var_range_model[i][0];
     par_range_model[i][1] = var_range_model[i][1];
   }
 
   /* parameters for long-term trend */
-  for(i=3; i<4 + parset.flag_trend; i++) 
+  for(i=num_params_drw; i<num_params_drw + num_params_trend; i++) 
   {
     par_range_model[i][0] = var_range_model[3][0];
     par_range_model[i][1] = var_range_model[3][1];
   }
   
   /* parameter for trend difference */
-  for(i= 4 + parset.flag_trend; i<num_params_var; i++) 
+  for(i= num_params_drw + num_params_trend; i<num_params_var; i++) 
   {
-    par_range_model[i][0] = var_range_model[4 + i - (4 + parset.flag_trend)][0];
-    par_range_model[i][1] = var_range_model[4 + i - (4 + parset.flag_trend)][1];
+    par_range_model[i][0] = var_range_model[4 + i - (num_params_drw + num_params_trend)][0];
+    par_range_model[i][1] = var_range_model[4 + i - (num_params_drw + num_params_trend)][1];
   }
 
   /* continuum light curve parameters */
@@ -132,16 +132,16 @@ void from_prior_con(void *model)
   int i;
   double *pm = (double *)model;
   
-  for(i=0; i<3; i++)
+  for(i=0; i<num_params_drw; i++)
   {
     pm[i] = var_range_model[i][0] + dnest_rand()*(var_range_model[i][1] - var_range_model[i][0]);
   }
-  for(i=3; i<4 + parset.flag_trend; i++)
+  for(i=num_params_drw; i<num_params_drw + num_params_trend; i++)
   {
     pm[i] = dnest_randn();
     dnest_wrap(&pm[i], par_range_model[i][0], par_range_model[i][1]);
   }
-  for(i=4+parset.flag_trend; i<num_params_var; i++)
+  for(i=num_params_drw + num_params_trend; i<num_params_var; i++)
   {
     pm[i] = par_range_model[i][0] + dnest_rand()*(par_range_model[i][1] - par_range_model[i][0]);
   }
@@ -225,12 +225,12 @@ double perturb_con(void *model)
     width = ( par_range_model[which][1] - par_range_model[which][0] );
   }
 
-  if(which < 3)
+  if(which < num_params_drw)
   {
     pm[which] += dnest_randh() * width;
     dnest_wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
   }
-  else if(which < 4 + parset.flag_trend)
+  else if(which < num_params_drw + num_params_trend)
   {
     logH -= (-0.5*pow(pm[which], 2.0) );
     pm[which] += dnest_randh() * width;

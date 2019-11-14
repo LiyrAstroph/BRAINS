@@ -31,7 +31,9 @@ void init()
   int i, j;
 
   nq = 1 + parset.flag_trend;
-  
+  num_params_trend = nq;
+  num_params_drw = 3; /* include systematic error */
+
   if(parset.flag_trend_diff > 0)
   {
     num_params_difftrend = parset.flag_trend_diff; /* differences of the trends between continuum and line */
@@ -41,7 +43,7 @@ void init()
     num_params_difftrend = 0;
   }
   
-  num_params_var = 4 + parset.flag_trend + num_params_difftrend;
+  num_params_var = num_params_drw + num_params_trend + num_params_difftrend;
 
   /* number of parameters for narrow line, only valid for 2d RM. */
   num_params_nlr = 0;

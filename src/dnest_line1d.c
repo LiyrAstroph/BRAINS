@@ -223,7 +223,7 @@ void set_par_range_model1d()
   par_range_model[i][1] = blr_range_model[BLRmodel_size/sizeof(double)-1][1];
 
   /* variability parameters */
-  for(i=num_params_blr; i<3 + num_params_blr; i++)
+  for(i=num_params_blr; i<num_params_drw + num_params_blr; i++)
   {
     if(var_param_std[i-num_params_blr] > 0.0)
     {
@@ -240,15 +240,15 @@ void set_par_range_model1d()
       par_range_model[i][1] = var_range_model[i-num_params_blr][1];
     }
   }
-  for(i=3 + num_params_blr; i< 4 + parset.flag_trend + num_params_blr; i++)
+  for(i=num_params_drw + num_params_blr; i< num_params_drw + num_params_trend + num_params_blr; i++)
   {
     par_range_model[i][0] = var_range_model[3][0];
     par_range_model[i][1] = var_range_model[3][1];
   }
-  for(i=4 + parset.flag_trend + num_params_blr; i< num_params_var + num_params_blr; i++)
+  for(i=num_params_drw + num_params_trend + num_params_blr; i< num_params_var + num_params_blr; i++)
   {
-    par_range_model[i][0] = var_range_model[4 + i - (4 + parset.flag_trend + num_params_blr)][0];
-    par_range_model[i][1] = var_range_model[4 + i - (4 + parset.flag_trend + num_params_blr)][1];
+    par_range_model[i][0] = var_range_model[4 + i - (num_params_drw + num_params_trend + num_params_blr)][0];
+    par_range_model[i][1] = var_range_model[4 + i - (num_params_drw + num_params_trend + num_params_blr)][1];
   }
 
   /* continuum light curve parameters */
@@ -276,19 +276,19 @@ void from_prior_line1d(void *model)
   /* variability parameters
    * use priors from continuum reconstruction.
    */
-  for(i=num_params_blr; i<num_params_blr+3; i++)
+  for(i=num_params_blr; i<num_params_blr+num_params_drw; i++)
   {
     pm[i] = dnest_randn()*var_param_std[i-num_params_blr] + var_param[i-num_params_blr];
     dnest_wrap(&pm[i], par_range_model[i][0], par_range_model[i][1]);
   }
   /* long-term trend */
-  for(i=num_params_blr+3; i<num_params_blr+ 4 + parset.flag_trend; i++)
+  for(i=num_params_blr+num_params_drw; i<num_params_blr+ num_params_drw + num_params_trend; i++)
   {
     pm[i] = dnest_randn();
     dnest_wrap(&pm[i], par_range_model[i][0], par_range_model[i][1]);
   }
   /* different trend in continuum and line */
-  for( i = num_params_blr+ 4 + parset.flag_trend; i< num_params_blr + num_params_var; i++)
+  for( i = num_params_blr+ num_params_drw + num_params_trend; i< num_params_blr + num_params_var; i++)
   {
     pm[i] = par_range_model[i][0] + dnest_rand() * ( par_range_model[i][1] - par_range_model[i][0]  );
   }
@@ -423,14 +423,14 @@ double perturb_line1d(void *model)
     pm[which] += dnest_randh() * width;
     dnest_wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
   }
-  else if(which < num_params_blr + 3)  /* variability, Gaussion priors */
+  else if(which < num_params_blr + num_params_drw)  /* variability, Gaussion priors */
   {
     logH -= (-0.5*pow((pm[which]-var_param[which - num_params_blr])/var_param_std[which - num_params_blr], 2.0) );
     pm[which] += dnest_randh() * width;
     dnest_wrap(&pm[which], par_range_model[which][0], par_range_model[which][1]);
     logH += (-0.5*pow((pm[which]-var_param[which - num_params_blr])/var_param_std[which - num_params_blr], 2.0) );
   }
-  else if(which < num_params_blr + 4 + parset.flag_trend) /* long-term trend */
+  else if(which < num_params_blr + num_params_drw + num_params_trend) /* long-term trend */
   {
     logH -= (-0.5*pow(pm[which], 2.0) );
     pm[which] += dnest_randh() * width;
