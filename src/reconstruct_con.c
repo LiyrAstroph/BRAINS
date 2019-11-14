@@ -925,8 +925,11 @@ void reconstruct_con_end()
   for(i=0; i<num_params; i++)
   {
     free(par_range_model[i]);
+    free(par_prior_gaussian[i]);
   }
   free(par_range_model);
+  free(par_prior_gaussian);
+  free(par_prior_model);
   
   for(i=0; i<parset.num_particles; i++)
   {

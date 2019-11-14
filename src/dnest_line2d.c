@@ -146,8 +146,13 @@ int dnest_line2d(int argc, char **argv)
   par_fix = (int *) malloc(num_params * sizeof(int));
   par_fix_val = (double *) malloc(num_params * sizeof(double));
   par_range_model = malloc( num_params * sizeof(double *));
+  par_prior_gaussian = malloc( num_params * sizeof(double *));
   for(i=0; i<num_params; i++)
+  {
     par_range_model[i] = malloc(2*sizeof(double));
+    par_prior_gaussian[i] = malloc(2*sizeof(double));
+  }
+  par_prior_model = malloc( num_params * sizeof(int));
 
   fptrset_line2d = dnest_malloc_fptrset();
   /* setup functions used for dnest*/
@@ -236,29 +241,49 @@ void set_par_range_model2d()
   {
     par_range_model[i][0] = blr_range_model[i][0];
     par_range_model[i][1] = blr_range_model[i][1];
+
+    par_prior_model[i] = UNIFORM;
+    par_prior_gaussian[i][0] = 0.0;
+    par_prior_gaussian[i][1] = 0.0;
   }
   /* cope with narrow line */
-  for(i=num_params_blr_model-1; i<num_params_blr-num_params_res-num_params_linecenter-1; i++)
+  for(i=num_params_blr_model-1; i<num_params_blr_model-1 + num_params_nlr; i++)
   {
     par_range_model[i][0] = nlr_range_model[i - (num_params_blr_model-1)][0];
     par_range_model[i][1] = nlr_range_model[i - (num_params_blr_model-1)][1];
+    
+    par_prior_model[i] = nlr_prior_model[i - (num_params_blr_model-1)];
+    par_prior_gaussian[i][0] = 0.0;
+    par_prior_gaussian[i][1] = 1.0; /* note that for logarithm prior of flux, this value is not used, so does not matter */
   }
   /* cope with spectral broadening */
-  for(i=num_params_blr-num_params_res-num_params_linecenter-1; i<num_params_blr-num_params_linecenter-1; i++)
+  for(i=num_params_blr_model-1 + num_params_nlr; i<num_params_blr_model-1 + num_params_nlr + num_params_res; i++)
   {
     par_range_model[i][0] = -10.0;
     par_range_model[i][1] =  10.0;
+
+    par_prior_model[i] = GAUSSIAN;
+    par_prior_gaussian[i][0] = 0.0;
+    par_prior_gaussian[i][1] = 1.0;
   }
   /* cope with line center */
   for(i=num_params_blr-num_params_linecenter-1; i< num_params_blr-1; i++)
   {
     par_range_model[i][0] = -10.0;
     par_range_model[i][1] =  10.0;
+
+    par_prior_model[i] = GAUSSIAN;
+    par_prior_gaussian[i][0] = 0.0;
+    par_prior_gaussian[i][1] = 1.0;
   }
   /* the last is systematic error */
   i = num_params_blr-1;
   par_range_model[i][0] = blr_range_model[num_params_blr_model-1][0];
   par_range_model[i][1] = blr_range_model[num_params_blr_model-1][1];
+
+  par_prior_model[i] = UNIFORM;
+  par_prior_gaussian[i][0] = 0.0;
+  par_prior_gaussian[i][1] = 0.0;
 
   /* variability parameters */
   for(i=num_params_blr; i<num_params_drw + num_params_blr; i++)
@@ -271,11 +296,19 @@ void set_par_range_model2d()
       /* make sure that the range lies within the initial range */
       par_range_model[i][0] = fmax(par_range_model[i][0], var_range_model[i-num_params_blr][0]);
       par_range_model[i][1] = fmin(par_range_model[i][1], var_range_model[i-num_params_blr][1]);
+
+      par_prior_model[i] = GAUSSIAN;
+      par_prior_gaussian[i][0] = var_param[i-num_params_blr];
+      par_prior_gaussian[i][1] = var_param_std[i-num_params_blr];
     }
     else
     {
       par_range_model[i][0] = var_range_model[i-num_params_blr][0];
       par_range_model[i][1] = var_range_model[i-num_params_blr][1];
+
+      par_prior_model[i] = UNIFORM;
+      par_prior_gaussian[i][0] = 0.0;
+      par_prior_gaussian[i][1] = 0.0;
     }
   }
   /* long-term trend of continuum */
@@ -283,18 +316,31 @@ void set_par_range_model2d()
   {
     par_range_model[i][0] = var_range_model[3][0];
     par_range_model[i][1] = var_range_model[3][1];
+
+    par_prior_model[i] = GAUSSIAN;
+    par_prior_gaussian[i][0] = 0.0;
+    par_prior_gaussian[i][1] = 1.0;
   }
   /* different trend in continuum and line */
   for(i=num_params_drw + num_params_trend + num_params_blr; i< num_params_var + num_params_blr; i++)
   {
     par_range_model[i][0] = var_range_model[4 + i - (num_params_drw + num_params_trend + num_params_blr)][0];
     par_range_model[i][1] = var_range_model[4 + i - (num_params_drw + num_params_trend + num_params_blr)][1];
+
+    par_prior_model[i] = UNIFORM;
+    par_prior_gaussian[i][0] = 0.0;
+    par_prior_gaussian[i][1] = 0.0;
   }
+
   /* continuum ligth curve values */
   for(i=num_params_blr+num_params_var; i<num_params; i++)
   {
     par_range_model[i][0] = var_range_model[4+num_params_difftrend][0];
     par_range_model[i][1] = var_range_model[4+num_params_difftrend][1];
+
+    par_prior_model[i] = GAUSSIAN;
+    par_prior_gaussian[i][0] = 0.0;
+    par_prior_gaussian[i][1] = 1.0;
   }
 
   return;
@@ -308,72 +354,19 @@ void from_prior_line2d(void *model)
   int i;
   double *pm = (double *)model;
 
-  for(i=0; i<num_params_blr_model -1 ; i++)
+  for(i=0; i<num_params; i++)
   {
-    pm[i] = par_range_model[i][0] + dnest_rand() * ( par_range_model[i][1] - par_range_model[i][0]  );
-  }
-  /* cope with flux of narrow line */
-  for(i=num_params_blr_model-1; i<num_params_blr-num_params_res-num_params_linecenter-1-2; i++)
-  {
-    if(parset.flag_narrowline == 2) // Gaussian prior
+    if(par_prior_model[i] == GAUSSIAN)
     {
-      pm[i] = dnest_randn();
+      pm[i] = dnest_randn()*par_prior_gaussian[i][1] + par_prior_gaussian[i][0];
       dnest_wrap(&pm[i], par_range_model[i][0], par_range_model[i][1]);
     }
-    else  // logrithmic prior
+    else
     {
-      pm[i] = par_range_model[i][0] + dnest_rand() * ( par_range_model[i][1] - par_range_model[i][0]  );
+      pm[i] = par_range_model[i][0] + dnest_rand() * (par_range_model[i][1] - par_range_model[i][0]);
     }
   }
-  /* cope with width and shift of narrow line */
-  for(i=num_params_blr_model; i<num_params_blr-num_params_res-num_params_linecenter-1; i++)
-  {
-    pm[i] = dnest_randn();
-    dnest_wrap(&pm[i], par_range_model[i][0], par_range_model[i][1]);
-  }
-  /* cope with spectral boradening */
-  for(i=num_params_blr-num_params_res-num_params_linecenter-1; i<num_params_blr-num_params_linecenter-1; i++)
-  {
-    pm[i] = dnest_randn();
-    dnest_wrap(&pm[i], par_range_model[i][0], par_range_model[i][1]);
-  }
-  /* cope with line center */
-  for(i=num_params_blr-num_params_linecenter-1; i< num_params_blr-1; i++)
-  {
-    pm[i] = dnest_randn();
-    dnest_wrap(&pm[i], par_range_model[i][0], par_range_model[i][1]);
-  }
-  /* systematic error */
-  i=num_params_blr-1;
-  pm[i] = par_range_model[i][1] - dnest_rand() * ( par_range_model[i][1] - par_range_model[0][0] );
 
-  /* variability parameters
-   * use priors from continuum reconstruction.
-   */
-  for(i=num_params_blr; i<num_params_blr+num_params_drw; i++)
-  {
-    pm[i] = dnest_randn()*var_param_std[i-num_params_blr] + var_param[i-num_params_blr];
-    dnest_wrap(&pm[i], par_range_model[i][0], par_range_model[i][1]);
-  }
-  /* long-term trend */
-  for(i=num_params_blr+num_params_drw; i<num_params_blr+ num_params_drw + num_params_trend; i++)
-  {
-    pm[i] = dnest_randn();
-    dnest_wrap(&pm[i], par_range_model[i][0], par_range_model[i][1]);
-  }
-  /* different trend in continuum and line */
-  for( i = num_params_blr+ num_params_drw + num_params_trend; i< num_params_blr + num_params_var; i++)
-  {
-    pm[i] = par_range_model[i][0] + dnest_rand() * ( par_range_model[i][1] - par_range_model[i][0]  );
-  }
-  
-  /* continuum light curve */
-  for(i=0; i<parset.n_con_recon; i++)
-  {
-    pm[i+num_params_var+num_params_blr] = dnest_randn();
-    dnest_wrap(&pm[i], par_range_model[i][0], par_range_model[i][1]);
-  }
-  
   /* cope with fixed parameters */
   for(i=0; i<num_params_blr + num_params_var; i++)
   {
@@ -468,7 +461,7 @@ double perturb_line2d(void *model)
   do
   {
     rnd = dnest_rand();
-    if(rnd < 0.5)
+    if(rnd < 0.2)
       which = dnest_rand_int(num_params_blr + num_params_var);
     else
       which = dnest_rand_int(parset.n_con_recon) + num_params_blr + num_params_var;
@@ -491,70 +484,17 @@ double perturb_line2d(void *model)
     width = ( par_range_model[which][1] - par_range_model[which][0] );
   }
 
-  if(which < num_params_blr_model - 1)
+  if(par_prior_model[which] == GAUSSIAN)
+  {
+    logH -= (-0.5*pow((pm[which] - par_prior_gaussian[which][0])/par_prior_gaussian[which][1], 2.0) );
+    pm[which] += dnest_randh() * width;
+    dnest_wrap(&pm[which], par_range_model[which][0], par_range_model[which][1]);
+    logH += (-0.5*pow((pm[which] - par_prior_gaussian[which][0])/par_prior_gaussian[which][1], 2.0) );
+  }
+  else
   {
     pm[which] += dnest_randh() * width;
     dnest_wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
-  }
-  else if(which < num_params_blr-num_params_res-num_params_linecenter-1-2) /* cope with flux of narrow line */
-  {
-    if(parset.flag_narrowline==2)  // Gaussian prior
-    {
-      logH -= (-0.5*pow(pm[which], 2.0) );
-      pm[which] += dnest_randh() * width;
-      dnest_wrap(&pm[which], par_range_model[which][0], par_range_model[which][1]);
-      logH += (-0.5*pow(pm[which], 2.0) );
-    }
-    else  // logrithmic prior
-    {
-      pm[which] += dnest_randh() * width;
-      dnest_wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
-    }
-  }
-  else if(which < num_params_blr-num_params_res-num_params_linecenter-1 )  /* cope with width and shift of narrow line */
-  {
-    logH -= (-0.5*pow(pm[which], 2.0) );
-    pm[which] += dnest_randh() * width;
-    dnest_wrap(&pm[which], par_range_model[which][0], par_range_model[which][1]);
-    logH += (-0.5*pow(pm[which], 2.0) );
-  }
-  else if(which < num_params_blr-1)  /* spectral broadening and line center */
-  {
-    logH -= (-0.5*pow(pm[which], 2.0) );
-    pm[which] += dnest_randh() * width;
-    dnest_wrap(&pm[which], par_range_model[which][0], par_range_model[which][1]);
-    logH += (-0.5*pow(pm[which], 2.0) );
-  }
-  else if(which < num_params_blr) /* systematic error */
-  {
-    pm[which] += dnest_randh() * width;
-    dnest_wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
-  }
-  else if(which < num_params_blr + num_params_drw)  /* variability */
-  {
-    logH -= (-0.5*pow((pm[which]-var_param[which - num_params_blr])/var_param_std[which - num_params_blr], 2.0) );
-    pm[which] += dnest_randh() * width;
-    dnest_wrap(&pm[which], par_range_model[which][0], par_range_model[which][1]);
-    logH += (-0.5*pow((pm[which]-var_param[which - num_params_blr])/var_param_std[which - num_params_blr], 2.0) );
-  }
-  else if(which < num_params_blr + num_params_drw + num_params_trend)  /* long-term trend */
-  {
-    logH -= (-0.5*pow(pm[which], 2.0) );
-    pm[which] += dnest_randh() * width;
-    dnest_wrap(&pm[which], par_range_model[which][0], par_range_model[which][1]);
-    logH += (-0.5*pow(pm[which], 2.0) );
-  }
-  else if(which < num_params_blr + num_params_var)  /* different trend in continuum and line */
-  {
-    pm[which] += dnest_randh() * width;
-    dnest_wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
-  }
-  else  /* continuum light curve, Gaussian priors */
-  {
-    logH -= (-0.5*pow(pm[which], 2.0) );
-    pm[which] += dnest_randh() * width;
-    dnest_wrap(&pm[which], par_range_model[which][0], par_range_model[which][1]);
-    logH += (-0.5*pow(pm[which], 2.0) );
   }
 
   return logH;

@@ -50,6 +50,9 @@
 #define PI            M_PI
 #define BRAINS_MAX_STR_LENGTH  (256)
 
+
+enum PRIOR_TYPE {GAUSSIAN=1, UNIFORM=2};
+
 /* variables for MPICH */
 extern int thistask, totaltask, namelen;
 extern int roottask;
@@ -316,8 +319,11 @@ extern int num_params_drw, num_params_trend;
 extern int num_params_linecenter;
 
 extern double **blr_range_model, **par_range_model;
+extern int *par_prior_model;  /* prior type for model parameters */
+extern double **par_prior_gaussian; /* center and std of Gaussian priors */
 extern double var_range_model[15][2];
 extern double nlr_range_model[3][2];
+extern int nlr_prior_model[3];
 extern double mass_range[2];
 
 extern double *instres_epoch, *instres_err_epoch;

@@ -83,7 +83,10 @@ int BLRmodel_size;
 int *par_fix, npar_fix;
 double *par_fix_val;
 double **blr_range_model, **par_range_model;
+int *par_prior_model;
+double **par_prior_gaussian;
 double nlr_range_model[3][2];
+int nlr_prior_model[3];
 double mass_range[2];
 
 int num_params, num_params_blr, num_params_blr_model, num_params_var, num_params_difftrend, num_params_nlr, num_params_res;

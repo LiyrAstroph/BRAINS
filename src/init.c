@@ -248,18 +248,26 @@ void init()
     {
       nlr_range_model[0][0] = -10.0;
       nlr_range_model[0][1] =  10.0;
+
+      nlr_prior_model[0] = GAUSSIAN;
     }
     else
     {
       nlr_range_model[0][0] = log(1.0e-1); /* logrithmic prior */
       nlr_range_model[0][1] = log(1.0e4);
+
+      nlr_prior_model[0] = UNIFORM;
     }
 
     nlr_range_model[1][0] = -10.0;
     nlr_range_model[1][1] =  10.0;
 
+    nlr_prior_model[1] = GAUSSIAN;
+
     nlr_range_model[2][0] = -10.0;
     nlr_range_model[2][1] =  10.0;
+
+    nlr_prior_model[2] = GAUSSIAN;
   }
 
   set_blr_range_model();

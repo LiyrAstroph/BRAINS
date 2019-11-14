@@ -38,8 +38,14 @@ int dnest_con(int argc, char **argv)
   num_params = parset.n_con_recon + num_params_var;
 
   par_range_model = malloc( num_params * sizeof(double *));
+  par_prior_gaussian = malloc(num_params * sizeof(double *));
   for(i=0; i<num_params; i++)
+  {
     par_range_model[i] = malloc(2*sizeof(double));
+    par_prior_gaussian[i] = malloc(2*sizeof(double));
+  }
+  par_prior_model = malloc( num_params * sizeof(int));
+  
 
   par_fix = (int *) malloc(num_params * sizeof(int));
   par_fix_val = (double *) malloc(num_params * sizeof(double));
@@ -99,6 +105,10 @@ void set_par_range_con()
   {
     par_range_model[i][0] = var_range_model[i][0];
     par_range_model[i][1] = var_range_model[i][1];
+
+    par_prior_model[i] = UNIFORM;
+    par_prior_gaussian[i][0] = 0.0;
+    par_prior_gaussian[i][1] = 0.0;
   }
 
   /* parameters for long-term trend */
@@ -106,6 +116,10 @@ void set_par_range_con()
   {
     par_range_model[i][0] = var_range_model[3][0];
     par_range_model[i][1] = var_range_model[3][1];
+
+    par_prior_model[i] = GAUSSIAN;
+    par_prior_gaussian[i][0] = 0.0;
+    par_prior_gaussian[i][1] = 1.0;
   }
   
   /* parameter for trend difference */
@@ -113,6 +127,10 @@ void set_par_range_con()
   {
     par_range_model[i][0] = var_range_model[4 + i - (num_params_drw + num_params_trend)][0];
     par_range_model[i][1] = var_range_model[4 + i - (num_params_drw + num_params_trend)][1];
+
+    par_prior_model[i] = UNIFORM;
+    par_prior_gaussian[i][0] = 0.0;
+    par_prior_gaussian[i][1] = 0.0;
   }
 
   /* continuum light curve parameters */
@@ -120,6 +138,10 @@ void set_par_range_con()
   {
     par_range_model[i][0] = var_range_model[4+num_params_difftrend][0];
     par_range_model[i][1] = var_range_model[4+num_params_difftrend][1];
+
+    par_prior_model[i] = GAUSSIAN;
+    par_prior_gaussian[i][0] = 0.0;
+    par_prior_gaussian[i][1] = 1.0;
   }
   return;
 }
@@ -131,25 +153,18 @@ void from_prior_con(void *model)
 {
   int i;
   double *pm = (double *)model;
-  
-  for(i=0; i<num_params_drw; i++)
-  {
-    pm[i] = var_range_model[i][0] + dnest_rand()*(var_range_model[i][1] - var_range_model[i][0]);
-  }
-  for(i=num_params_drw; i<num_params_drw + num_params_trend; i++)
-  {
-    pm[i] = dnest_randn();
-    dnest_wrap(&pm[i], par_range_model[i][0], par_range_model[i][1]);
-  }
-  for(i=num_params_drw + num_params_trend; i<num_params_var; i++)
-  {
-    pm[i] = par_range_model[i][0] + dnest_rand()*(par_range_model[i][1] - par_range_model[i][0]);
-  }
 
-  for(i=0; i<parset.n_con_recon; i++)
+  for(i=0; i<num_params; i++)
   {
-    pm[i+num_params_var] = dnest_randn();
-    dnest_wrap(&pm[i], par_range_model[i][0], par_range_model[i][1]);
+    if(par_prior_model[i] == GAUSSIAN )
+    {
+      pm[i] = dnest_randn() * par_prior_gaussian[i][1] + par_prior_gaussian[i][0];
+      dnest_wrap(&pm[i], par_range_model[i][0], par_range_model[i][1]);
+    }
+    else
+    {
+      pm[i] = var_range_model[i][0] + dnest_rand()*(par_range_model[i][1] - par_range_model[i][0]);
+    }
   }
 
   for(i=0; i<num_params_var; i++)
@@ -225,29 +240,17 @@ double perturb_con(void *model)
     width = ( par_range_model[which][1] - par_range_model[which][0] );
   }
 
-  if(which < num_params_drw)
+  if(par_prior_model[which] == GAUSSIAN)
   {
-    pm[which] += dnest_randh() * width;
-    dnest_wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
-  }
-  else if(which < num_params_drw + num_params_trend)
-  {
-    logH -= (-0.5*pow(pm[which], 2.0) );
+    logH -= (-0.5*pow((pm[which] - par_prior_gaussian[which][0])/par_prior_gaussian[which][1], 2.0) );
     pm[which] += dnest_randh() * width;
     dnest_wrap(&pm[which], par_range_model[which][0], par_range_model[which][1]);
-    logH += (-0.5*pow(pm[which], 2.0) );
-  }
-  else if(which < num_params_var)
-  {
-    pm[which] += dnest_randh() * width;
-    dnest_wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
+    logH += (-0.5*pow((pm[which] - par_prior_gaussian[which][0])/par_prior_gaussian[which][1], 2.0) );
   }
   else
   {
-    logH -= (-0.5*pow(pm[which], 2.0) );
     pm[which] += dnest_randh() * width;
-    dnest_wrap(&pm[which], par_range_model[which][0], par_range_model[which][1]);
-    logH += (-0.5*pow(pm[which], 2.0) );
+    dnest_wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
   }
   return logH;
 }
