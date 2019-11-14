@@ -58,6 +58,8 @@ void reconstruct_con_from_varmodel(double sigma_hat, double tau, double alpha, d
 void create_con_from_random(double sigma_hat, double tau, double alpha, double syserr);
 void postprocess_con();
 void set_par_range_con();
+void print_par_names_con();
+
 
 /* 1d line reconstruction */
 int dnest_line1d(int argc, char **argv);
@@ -81,6 +83,7 @@ void transfun_1d_cloud_sample_model7(const void *pm, int flag_save);
 
 void postprocess1d();
 void set_par_range_model1d();
+void print_para_names_model1d();
 
 /* 2d line reconstruction */
 int dnest_line2d(int argc, char **argv);
@@ -96,6 +99,7 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
                                               double *fl2d, int nl, int nv);
 void postprocess2d();
 void set_par_range_model2d();
+void print_par_names_model2d();
 
 void transfun_2d_cloud_sample_model1(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save);
 void transfun_2d_cloud_sample_model2(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save);
