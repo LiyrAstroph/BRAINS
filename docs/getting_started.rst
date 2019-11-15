@@ -86,6 +86,8 @@ MCMC Samping
 
 The output Markov chain is stored in ``data/posterior_sample.txt`` for continuum reconstuction, in ``data/posterior_sample1d.txt`` for 1d reverberation mapping analysis, and in ``data/posterior_sample2d.txt`` for 2d reverberation mapping analysis.
 
+The parameter names and prior ranges are stored in ``data/para_names_con`` for continuum reconstuction, in ``data/para_names_model1d.txt`` for 1d reverberation mapping analysis, and in ``data/para_names_model2d.txt`` for 2d reverberation mapping analysis. The last column of those files indicates the prior type of the parameter with ``1`` means Gaussian and ``2`` means uniform.
+
 One need to tune the corresponding option files ``OPTIONSCON``, ``OPTIONS1D``, and ``OPTIONS2D`` accordingly, which specify configurations for nested sampling.
 
 An Exemplary Test

@@ -1,10 +1,12 @@
 ***************
-MCMC Sampling
+Nested Sampling
 ***************
+``brains`` employs the diffusive nested sampling algorithm developed by Brendon J. Brewer (https://github.com/eggplantbren/DNest3).
+We write a C version of the algorithm, dubbed as ``CDNest``.  ``CDNest`` needs to input some options.
 
-The format of option file for DNest looks like as follows::
+The format of option file for CDNest looks like as follows::
 
-  # File containing parameters for DNest
+  # File containing parameters for CDNest
   # Put comments at the top, or at the end of the line.
   # Do not change the order of lines.
   # Lines beginning with '#' are regarded as comments.
@@ -14,8 +16,8 @@ The format of option file for DNest looks like as follows::
   4000  # save interval
   800   # threadSteps - how many steps each thread should do independently before communication
   40    # maximum number of levels
-  10    # Backtracking scale length (lambda in the paper)
-  100   # Strength of effect to force histogram to equal push. 0-10 is best. (beta in the paper)
+  10    # Backtracking scale length (lambda in the paper Brewer et al. 2011)
+  100   # Strength of effect to force histogram to equal push. 0-10 is best. (beta in the paper Brewer et al. 2011)
   200   # Maximum number of saves
   data/sample2d.txt                 # sample file
   data/sample_info2d.txt            # sample_info file
