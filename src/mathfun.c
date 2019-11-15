@@ -19,8 +19,7 @@
 #include <gsl/gsl_cblas.h>
 #include <gsl/gsl_histogram.h>
 
-#include "allvars.h"
-#include "proto.h"
+#include "brains.h"
 
 /*!
  * This function calculates matrix multiply C(nxn) = A(nxn) * B(nxn).

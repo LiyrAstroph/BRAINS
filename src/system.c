@@ -19,8 +19,7 @@
 #include <mpi.h>
 #include <math.h>
 
-#include "allvars.h"
-#include "proto.h"
+#include "brains.h"
 
 /*!
  * This function provides the clock time of the system.

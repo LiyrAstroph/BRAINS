@@ -17,11 +17,7 @@
 #include <gsl/gsl_interp.h>
 #include <gsl/gsl_randist.h>
 
-#include "dnestvars.h"
-#include "allvars.h"
-#include "proto.h"
-
-#include "dnest_con.h"
+#include "brains.h"
 
 void *best_model_con;   /*!< best model */
 void *best_model_std_con;  /*!< standard deviation of the best model */

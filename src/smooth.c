@@ -22,8 +22,7 @@
 #include <gsl/gsl_fft_complex.h>
 #include <gsl/gsl_fft_halfcomplex.h>
 
-#include "allvars.h"
-#include "proto.h"
+#include "brains.h"
 
 int nd_fft;
 

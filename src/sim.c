@@ -20,8 +20,7 @@
 #include <gsl/gsl_interp.h>
 #include <mpi.h>
 
-#include "allvars.h"
-#include "proto.h"
+#include "brains.h"
 
 void *model;
 

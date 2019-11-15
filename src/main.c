@@ -10,9 +10,7 @@
 #include <mpi.h>
 #include <string.h>
 
-#include "allvars.h"
-#include "proto.h"
-#include "version.h"
+#include "brains.h"
 
 /*! \file main.c
  *  \brief start of the program

@@ -18,8 +18,7 @@
 #include <string.h>
 #include <mpi.h>
 
-#include "allvars.h"
-#include "proto.h"
+#include "brains.h"
 
 #include "nrutil.h"
 

@@ -20,8 +20,7 @@
 #include <gsl/gsl_randist.h>
 #include <gsl/gsl_interp.h>
 
-#include "allvars.h"
-#include "proto.h"
+#include "brains.h"
 
 /*! 
  * This function initialize the program.

@@ -18,11 +18,8 @@
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_interp.h>
 
-#include "dnestvars.h"
 
-#include "dnest_line1d.h"
-#include "allvars.h"
-#include "proto.h"
+#include "brains.h"
 
 
 void *best_model_line1d;     /*!< best model */

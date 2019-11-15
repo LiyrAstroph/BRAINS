@@ -21,12 +21,7 @@
 #include <gsl/gsl_interp.h>
 #include <mpi.h>
 
-// header file for DNEST
-#include "dnestvars.h"
-
-#include "allvars.h"
-#include "dnest_line2d.h"
-#include "proto.h"
+#include "brains.h"
 
 
 DNestFptrSet *fptrset_line2d;

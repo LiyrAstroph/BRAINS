@@ -19,12 +19,8 @@
 #include <gsl/gsl_randist.h>
 #include <gsl/gsl_interp.h>
 #include <mpi.h>
-// header file for DNEST
-#include "dnestvars.h"
 
-#include "allvars.h"
-#include "dnest_con.h"
-#include "proto.h"
+#include "brains.h"
 
 DNestFptrSet *fptrset_con;
 

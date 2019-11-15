@@ -10,8 +10,7 @@
 #include <mpi.h>
 #include <string.h>
 
-#include "allvars.h"
-#include "proto.h"
+#include "brains.h"
 
 #define NONE                 "\e[0m"
 #define BLACK                "\e[0;30m"

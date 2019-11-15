@@ -9,8 +9,7 @@
 #include <stdlib.h>
 #include <math.h>
  
-#include "allvars.h"
-#include "proto.h"
+#include "brains.h"
 
 /*! \file run.c
  *  \brief setup and run the program. 

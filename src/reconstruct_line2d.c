@@ -17,11 +17,7 @@
 #include <float.h>
 #include <gsl/gsl_interp.h>
 
-#include "dnestvars.h"
-
-#include "dnest_line2d.h"
-#include "allvars.h"
-#include "proto.h"
+#include "brains.h"
 
 void *best_model_line2d;      /*!< best model */
 void *best_model_std_line2d;  /*!< standard deviation of the best model */

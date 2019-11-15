@@ -24,8 +24,7 @@
 #include <mpi.h>
 #include <fftw3.h>
 
-#include "allvars.h"
-#include "proto.h"
+#include "brains.h"
 
 
 int nd_fft, npad;
