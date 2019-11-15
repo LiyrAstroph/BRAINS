@@ -369,51 +369,51 @@ void print_par_names_model2d()
   for(j=0; j<num_params_blr_model-1; j++)
   {
     i++;
-    fprintf(fp, "%4d %-15s %f %f\n", i, "BLR model", par_range_model[i][0], par_range_model[i][1]);
+    fprintf(fp, "%4d %-15s %f %f %d\n", i, "BLR model", par_range_model[i][0], par_range_model[i][1], par_prior_model[i]);
   }
 
   for(j=0; j<num_params_nlr; j++)
   {
     i++;
-    fprintf(fp, "%4d %-15s %f %f\n", i, "narrow line", par_range_model[i][0], par_range_model[i][1]);
+    fprintf(fp, "%4d %-15s %f %f %d\n", i, "narrow line", par_range_model[i][0], par_range_model[i][1], par_prior_model[i]);
   }
   for(j=0; j<num_params_res; j++)
   {
     i++;
-    fprintf(fp, "%4d %-15s %f %f\n", i, "line broaden", par_range_model[i][0], par_range_model[i][1]);
+    fprintf(fp, "%4d %-15s %f %f %d\n", i, "line broaden", par_range_model[i][0], par_range_model[i][1], par_prior_model[i]);
   }
   for(j=0; j<num_params_linecenter; j++)
   {
     i++;
-    fprintf(fp, "%4d %-15s %f %f\n", i, "line center", par_range_model[i][0], par_range_model[i][1]);
+    fprintf(fp, "%4d %-15s %f %f %d\n", i, "line center", par_range_model[i][0], par_range_model[i][1], par_prior_model[i]);
   }
 
   i++;
-  fprintf(fp, "%4d %-15s %f %f\n", i, "sys_err_line", par_range_model[i][0], par_range_model[i][1]);
+  fprintf(fp, "%4d %-15s %f %f %d\n", i, "sys_err_line", par_range_model[i][0], par_range_model[i][1], par_prior_model[i]);
 
   i++;
-  fprintf(fp, "%4d %-15s %f %f\n", i, "sys_err_con", par_range_model[i][0], par_range_model[i][1]);
+  fprintf(fp, "%4d %-15s %f %f %d\n", i, "sys_err_con", par_range_model[i][0], par_range_model[i][1], par_prior_model[i]);
   i++;
-  fprintf(fp, "%4d %-15s %f %f\n", i, "sigmad", par_range_model[i][0], par_range_model[i][1]);
+  fprintf(fp, "%4d %-15s %f %f %d\n", i, "sigmad", par_range_model[i][0], par_range_model[i][1], par_prior_model[i]);
   i++;
-  fprintf(fp, "%4d %-15s %f %f\n", i, "taud", par_range_model[i][0], par_range_model[i][1]);
+  fprintf(fp, "%4d %-15s %f %f %d\n", i, "taud", par_range_model[i][0], par_range_model[i][1], par_prior_model[i]);
   
   for(j=0; j<num_params_trend; j++)
   {
     i++;
-    fprintf(fp, "%4d %-15s %f %f\n", i, "trend", par_range_model[i][0], par_range_model[i][1]);
+    fprintf(fp, "%4d %-15s %f %f %d\n", i, "trend", par_range_model[i][0], par_range_model[i][1], par_prior_model[i]);
   }
 
   for(j=0; j<num_params_difftrend; j++)
   {
     i++;
-    fprintf(fp, "%4d %-15s %f %f\n", i, "diff trend", par_range_model[i][0], par_range_model[i][1]);
+    fprintf(fp, "%4d %-15s %f %f %d\n", i, "diff trend", par_range_model[i][0], par_range_model[i][1], par_prior_model[i]);
   }
 
   for(j=0; j<parset.n_con_recon; j++)
   {
     i++;
-    fprintf(fp, "%4d %-15s %f %f\n", i, "time series", par_range_model[i][0], par_range_model[i][1]);
+    fprintf(fp, "%4d %-15s %f %f %d\n", i, "time series", par_range_model[i][0], par_range_model[i][1], par_prior_model[i]);
   }
   
   fclose(fp);

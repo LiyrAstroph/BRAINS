@@ -166,28 +166,28 @@ void print_par_names_con()
   }
   
   i=0;
-  fprintf(fp, "%4d %-15s %f %f\n", i, "sys_err_con", par_range_model[i][0], par_range_model[i][1]);
+  fprintf(fp, "%4d %-15s %f %f %d\n", i, "sys_err_con", par_range_model[i][0], par_range_model[i][1], par_prior_model[i]);
   i++;
-  fprintf(fp, "%4d %-15s %f %f\n", i, "sigmad", par_range_model[i][0], par_range_model[i][1]);
+  fprintf(fp, "%4d %-15s %f %f %d\n", i, "sigmad", par_range_model[i][0], par_range_model[i][1], par_prior_model[i]);
   i++;
-  fprintf(fp, "%4d %-15s %f %f\n", i, "taud", par_range_model[i][0], par_range_model[i][1]);
+  fprintf(fp, "%4d %-15s %f %f %d\n", i, "taud", par_range_model[i][0], par_range_model[i][1], par_prior_model[i]);
   
   for(j=0; j<num_params_trend; j++)
   {
     i++;
-    fprintf(fp, "%4d %-15s %f %f\n", i, "trend", par_range_model[i][0], par_range_model[i][1]);
+    fprintf(fp, "%4d %-15s %f %f %d\n", i, "trend", par_range_model[i][0], par_range_model[i][1], par_prior_model[i]);
   }
 
   for(j=0; j<num_params_difftrend; j++)
   {
     i++;
-    fprintf(fp, "%4d %-15s %f %f\n", i, "diff trend", par_range_model[i][0], par_range_model[i][1]);
+    fprintf(fp, "%4d %-15s %f %f %d\n", i, "diff trend", par_range_model[i][0], par_range_model[i][1], par_prior_model[i]);
   }
 
   for(j=0; j<parset.n_con_recon; j++)
   {
     i++;
-    fprintf(fp, "%4d %-15s %f %f\n", i, "time series", par_range_model[i][0], par_range_model[i][1]);
+    fprintf(fp, "%4d %-15s %f %f %d\n", i, "time series", par_range_model[i][0], par_range_model[i][1], par_prior_model[i]);
   }
   
   fclose(fp);

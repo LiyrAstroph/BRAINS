@@ -83,7 +83,7 @@ void transfun_1d_cloud_sample_model7(const void *pm, int flag_save);
 
 void postprocess1d();
 void set_par_range_model1d();
-void print_para_names_model1d();
+void print_par_names_model1d();
 
 /* 2d line reconstruction */
 int dnest_line2d(int argc, char **argv);
