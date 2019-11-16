@@ -25,6 +25,7 @@ Documentation
    param.rst
    mcmc.rst
    model.rst
+   todo.rst
 
 
 Attribution

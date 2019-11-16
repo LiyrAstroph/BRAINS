@@ -5,12 +5,17 @@
  * Thu, Aug 4, 2016
  */
 
+/*!
+ *  \file blr_models.h
+ *  \brief header file of blr_models.c.
+ */
+
 #ifndef _BLR_MODELS_H
 #define _BLR_MODELS_H
 
 /*!
  *  \struct BLRmodel1
- *  \brief broad-line region model. 
+ *  \brief broad-line region model 1. 
  */
 typedef struct
 {
@@ -28,6 +33,10 @@ typedef struct
   double logse;    /*!< \brief 12. systematic errors in continuum and emission line */
 }BLRmodel1;
 
+/*!
+ *  \struct BLRmodel2
+ *  \brief broad-line region model 2. 
+ */
 typedef struct
 {
   double A;        /*!< \brief 1.  response coefficient */
@@ -44,6 +53,10 @@ typedef struct
   double logse;    /*!< \brief 12. systematic errors in continuum and emission line */
 }BLRmodel2;
 
+/*!
+ *  \struct BLRmodel3
+ *  \brief broad-line region model 3. 
+ */
 typedef struct
 {
   double A;        /*!< \brief 1.  response coefficient */
@@ -60,9 +73,16 @@ typedef struct
   double logse;    /*!< \brief 12. systematic errors in continuum and emission line */
 }BLRmodel3;
 
-
+/*!
+ *  \struct BLRmodel4
+ *  \brief broad-line region model 4. 
+ */
 typedef BLRmodel3 BLRmodel4;
 
+/*!
+ *  \struct BLRmodel5
+ *  \brief broad-line region model 5. 
+ */
 typedef struct 
 {
   double A;             /*!< \brief 1. line response*/    
@@ -88,7 +108,10 @@ typedef struct
   double logse;         /*!< \brief 21. */
 }BLRmodel5;
 
-/* Pancoast 2014's model */
+/*!
+ *  \struct BLRmodel6
+ *  \brief broad-line region model 6, Pancoast 2014's model. 
+ */
 typedef struct 
 {
   double A;             /*!< \brief 1. line response*/    
@@ -114,7 +137,10 @@ typedef struct
 }BLRmodel6;
 
 
-/* shadowed model */
+/*!
+ *  \struct BLRmodel7
+ *  \brief broad-line region model 6, shadowed model in Li et al. 2018. 
+ */
 typedef struct 
 {
   double A;             /*!< \brief 1. line response*/    
