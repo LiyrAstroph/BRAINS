@@ -20,6 +20,7 @@
 #include "dnest_con.h"
 #include "dnest_line1d.h"
 #include "dnest_line2d.h"
+#include "command_line.h"
 
 /* header files for CDNest */
 #include "dnestvars.h"

@@ -69,7 +69,7 @@ OBJS     = $(SRC)/main.o $(SRC)/allvars.o $(SRC)/read.o $(SRC)/run.o     \
            $(SRC)/reconstruct_line1d.o  $(SRC)/reconstruct_line2d.o      \
            $(SRC)/transfun.o $(SRC)/smooth_fftw.o $(SRC)/nrutil.o        \
            $(SRC)/system.o  $(SRC)/sim.o $(SRC)/help.o $(SRC)/version.o  \
-           $(SRC)/blr_models.o
+           $(SRC)/blr_models.o $(SRC)/command_line.o
  
 INCL     = Makefile $(SRC)/allvars.h $(SRC)/proto.h $(SRC)/dnest_con.h   \
            $(SRC)/dnest_line1d.h  $(SRC)/dnest_line2d.h $(SRC)/nrutil.h  \

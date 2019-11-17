@@ -120,6 +120,8 @@ typedef struct
   int flag_con_sys_err, flag_line_sys_err;
   
   double temperature;
+
+  int flag_help, flag_end;
 }PARSET;
 extern PARSET parset;
 
