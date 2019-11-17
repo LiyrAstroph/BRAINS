@@ -12,7 +12,7 @@ and emit broad emission lines.
 .. figure:: _static/fig_blr_disk.jpg
   :align: center
 
-  Schematic of a disk-like broad-line region.
+  Schematic of a disk-like broad-line region (Li et al. 2013).
 
 BLR model 1
 ===========
@@ -100,5 +100,11 @@ This is the shadowed model in Li et al. (2018).
 .. figure:: _static/fig_blr_twozone.jpg
   :align: center 
 
-  Schematic of a disk-like broad-line region with two zones.
+  Schematic of a disk-like broad-line region with two zones (Li et al. 2018).
+
+References
+==========
+Li, Y.-R. et al. 2013, ApJ, 779, 110
+Li, Y.-R. et al. 2018, ApJ, 869, 137
+Pancoast, A. et al. 2014, MNRAS, 445, 3055
 
