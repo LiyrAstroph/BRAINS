@@ -122,6 +122,7 @@ typedef struct
   double temperature;
 
   int flag_help, flag_end;
+  int flag_para_name;
 }PARSET;
 extern PARSET parset;
 

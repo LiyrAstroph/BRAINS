@@ -268,7 +268,8 @@ void reconstruct_line1d()
 // dnest run
   dnest_line1d(argc, argv);
 
-  if(parset.flag_exam_prior != 1)
+  
+  if(parset.flag_exam_prior != 1 && parset.flag_para_name != 1)
   {
     postprocess1d();
 

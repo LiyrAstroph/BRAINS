@@ -208,7 +208,8 @@ int dnest_line2d(int argc, char **argv)
   }
 
   force_update = parset.flag_force_update;
-  logz_line2d = dnest(argc, argv, fptrset_line2d, num_params, dnest_options_file);
+  if(parset.flag_para_name != 1)
+    logz_line2d = dnest(argc, argv, fptrset_line2d, num_params, dnest_options_file);
   
   dnest_free_fptrset(fptrset_line2d);
   return 0;
@@ -348,6 +349,9 @@ void set_par_range_model2d()
  */
 void print_par_names_model2d()
 {
+  if(thistask != roottask)
+    return;
+
   int i, j;
   FILE *fp;
   char fname[BRAINS_MAX_STR_LENGTH];
@@ -360,6 +364,9 @@ void print_par_names_model2d()
     exit(0);
   }
   
+  printf("# Print parameter name in %s\n", fname);
+
+
   i=-1;
   for(j=0; j<num_params_blr_model-1; j++)
   {

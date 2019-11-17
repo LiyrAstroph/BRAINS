@@ -199,7 +199,9 @@ int dnest_line1d(int argc, char **argv)
   }
   
   force_update = parset.flag_force_update;
-  logz_line = dnest(argc, argv, fptrset_line1d, num_params, dnest_options_file);
+
+  if(parset.flag_para_name != 1)
+    logz_line = dnest(argc, argv, fptrset_line1d, num_params, dnest_options_file);
 
   dnest_free_fptrset(fptrset_line1d);
   return 0;
@@ -295,6 +297,9 @@ void set_par_range_model1d()
  */
 void print_par_names_model1d()
 {
+  if(thistask!= roottask)
+    return;
+
   int i, j;
   FILE *fp;
   char fname[BRAINS_MAX_STR_LENGTH];
@@ -307,6 +312,8 @@ void print_par_names_model1d()
     exit(0);
   }
   
+  printf("# Print parameter name in %s\n", fname);
+
   i=-1;
   for(j=0; j<num_params_blr-1; j++)
   {

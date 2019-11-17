@@ -8,6 +8,8 @@
 #ifndef _BRAINS_COMMANDLINE_H
 #define _BRAINS_COMMANDLINE_H
 
+#include <getopt.h>
+
 int command_line_options(int argc, char** argv);
 
 #endif

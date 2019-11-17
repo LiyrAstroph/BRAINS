@@ -11,11 +11,26 @@
 
 int command_line_options(int argc, char** argv)
 {
-  int opt;
+  int opt, opt_idx;
 
   /* cope with command options. */
   if(thistask == roottask)
   {
+    static struct option long_options[] = 
+    {
+      {"para_name", no_argument, 0, 'n'},
+      {"version", no_argument, 0, 'v'},
+      {"help", no_argument, 0, 'h'},
+      {"restart", no_argument, 0, 'r'},
+      {"post_proc", no_argument, 0, 'p'},
+      {"exam_prior", no_argument, 0, 'e'},
+      {"recalc_info", no_argument, 0, 'c'},
+      {"temperature", required_argument, 0, 't'},
+      {"temp", required_argument, 0, 't'},
+      {"seed", required_argument, 0, 's'},
+      {0, 0, 0, 0}
+    };
+
     opterr = 0; /* reset getopt. */
     optind = 0; /* reset getopt. */
     parset.flag_postprc = 0; /* default value, 0 means postprocessing after runing MCMC sampling. */
@@ -27,8 +42,9 @@ int command_line_options(int argc, char** argv)
     parset.flag_rng_seed = 0;
     parset.flag_help = 0;
     parset.flag_end = 0;
+    parset.flag_para_name = 0;
 
-    while( (opt = getopt(argc, argv, "pt:rcs:ehv")) != -1)
+    while( (opt = getopt_long(argc, argv, "pt:rcs:ehvn", long_options, &opt_idx)) != -1)
     {
       switch(opt)
       {
@@ -83,10 +99,15 @@ int command_line_options(int argc, char** argv)
           parset.flag_help = 1;
           print_version();
           break;
+
+        case 'n': /* print parameter names */
+          printf("# Print parameter name.\n");
+          parset.flag_para_name = 1;
+          break;
           
         case '?':
           printf("# Incorrect option -%c %s.\n", optopt, optarg);
-          exit(0);
+          return EXIT_FAILURE;
           break;
 
         default:
@@ -118,8 +139,6 @@ int command_line_options(int argc, char** argv)
     {
       fprintf(stdout, "Ends incorrectly.\n");
     }
-
-    MPI_Finalize();
     return EXIT_FAILURE;
   }
 

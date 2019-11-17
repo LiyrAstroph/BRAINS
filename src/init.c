@@ -381,7 +381,7 @@ void scale_con_line()
   }
 
   if(thistask == roottask)
-    printf("task %d con scale: %e\t%e\n", thistask, con_scale, ave_con);
+    printf("con scale: %e\t%e\n", con_scale, ave_con);
   
   con_error_mean *= con_scale;
 
@@ -399,7 +399,7 @@ void scale_con_line()
   line_scale = 1.0/ave_line;
   
   if(thistask == roottask)
-    printf("task %d line scale: %e\t%e\n", thistask, line_scale, ave_line);
+    printf("line scale: %e\t%e\n", line_scale, ave_line);
 
   for(i=0; i<n_line_data; i++)
   {

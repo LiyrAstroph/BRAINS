@@ -333,7 +333,7 @@ void reconstruct_line2d()
   dnest_line2d(argc, argv);
   smooth_end();
 
-  if(parset.flag_exam_prior != 1)
+  if(parset.flag_exam_prior != 1 && parset.flag_para_name != 1)
   {
     postprocess2d();
 

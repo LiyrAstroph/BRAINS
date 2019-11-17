@@ -38,7 +38,10 @@ int main(int argc, char **argv)
   }
   
   if(command_line_options(argc, argv) != EXIT_SUCCESS)
+  {
+    MPI_Finalize();
     return 0;
+  }
 
   if(parset.flag_help == 0)
   {

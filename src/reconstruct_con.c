@@ -196,52 +196,55 @@ void reconstruct_con()
   reconstruct_con_init();
   logz_con = dnest_con(argc, argv);
 
-  if(parset.flag_exam_prior != 1)
+  if(parset.flag_para_name != 1)
   {
-    postprocess_con();
+    if(parset.flag_exam_prior != 1)
+    {
+      postprocess_con();
   
-    if(thistask == roottask)
-    {
-      which_parameter_update = -1;
-      which_particle_update = 0;
-      Fcon = Fcon_particles[which_particle_update];
-
-      calculate_con_from_model_semiseparable(best_model_con);
- 
-      FILE *fp;
-      char fname[200];
-      int i;
-      sprintf(fname, "%s/%s", parset.file_dir, parset.pcon_out_file);
-      fp = fopen(fname, "w");
-      if(fp == NULL)
+      if(thistask == roottask)
       {
-        fprintf(stderr, "# Error: Cannot open file %s\n", fname);
-        exit(-1);
-      }
- 
-      for(i=0; i<parset.n_con_recon; i++)
-      {
-        fprintf(fp, "%f %f %f\n", Tcon[i], Fcon[i] / con_scale, Fcerrs[i]/con_scale);
-      }
-      fclose(fp);
- 
-      memcpy(var_param, best_model_con, num_params_var*sizeof(double));
-      memcpy(var_param_std, best_model_std_con, num_params_var*sizeof(double));
-    }
-  }
-  else
-  {
-    for(i=0; i<num_params_var; i++)
-    {
-      var_param[i] = 0.5*(par_range_model[i][0] + par_range_model[i][1]);
-      var_param_std[i] =0.5*(par_range_model[i][1] - par_range_model[i][0])/2.35;
-    }
-  }
+        which_parameter_update = -1;
+        which_particle_update = 0;
+        Fcon = Fcon_particles[which_particle_update];
 
-  //use the posterior mean and standard variance as the prior for the 1d and 2d RM.
-  //only for variability parameters.
-  MPI_Bcast(var_param, num_params_var, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
-  MPI_Bcast(var_param_std, num_params_var, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+        calculate_con_from_model_semiseparable(best_model_con);
+ 
+        FILE *fp;
+        char fname[200];
+        int i;
+        sprintf(fname, "%s/%s", parset.file_dir, parset.pcon_out_file);
+        fp = fopen(fname, "w");
+        if(fp == NULL)
+        {
+          fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+          exit(-1);
+        }
+ 
+        for(i=0; i<parset.n_con_recon; i++)
+        {
+          fprintf(fp, "%f %f %f\n", Tcon[i], Fcon[i] / con_scale, Fcerrs[i]/con_scale);
+        }
+        fclose(fp);
+ 
+        memcpy(var_param, best_model_con, num_params_var*sizeof(double));
+        memcpy(var_param_std, best_model_std_con, num_params_var*sizeof(double));
+      }
+    }
+    else
+    {
+      for(i=0; i<num_params_var; i++)
+      {
+        var_param[i] = 0.5*(par_range_model[i][0] + par_range_model[i][1]);
+        var_param_std[i] =0.5*(par_range_model[i][1] - par_range_model[i][0])/2.35;
+      }
+    }
+
+    //use the posterior mean and standard variance as the prior for the 1d and 2d RM.
+    //only for variability parameters.
+    MPI_Bcast(var_param, num_params_var, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(var_param_std, num_params_var, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+  }
 
   reconstruct_con_end();
 

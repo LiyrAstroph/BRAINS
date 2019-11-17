@@ -84,7 +84,9 @@ int dnest_con(int argc, char **argv)
     par_fix_val[0] = log(1.0);
   }
 
-  logz_con = dnest(argc, argv, fptrset_con, num_params, dnest_options_file);
+  /* if not only print parameter name */
+  if(parset.flag_para_name != 1)
+    logz_con = dnest(argc, argv, fptrset_con, num_params, dnest_options_file);
   
   dnest_free_fptrset(fptrset_con);
   return 0;
@@ -149,6 +151,9 @@ void set_par_range_con()
  */
 void print_par_names_con()
 {
+  if(thistask!= roottask)
+    return;
+  
   int i, j;
   FILE *fp;
   char fname[BRAINS_MAX_STR_LENGTH];
@@ -161,6 +166,8 @@ void print_par_names_con()
     exit(0);
   }
   
+  printf("# Print parameter name in %s\n", fname);
+
   i=0;
   fprintf(fp, "%4d %-15s %f %f %d\n", i, "sys_err_con", par_range_model[i][0], par_range_model[i][1], par_prior_model[i]);
   i++;
