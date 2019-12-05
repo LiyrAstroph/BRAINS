@@ -85,7 +85,7 @@ For example, if one want to redo posterior processing with a different temperatu
 
 
 
-MCMC Samping
+MCMC Sampling
 ============
 
 The output Markov chain is stored in ``data/posterior_sample.txt`` for continuum reconstuction, in ``data/posterior_sample1d.txt`` for 1d reverberation mapping analysis, and in ``data/posterior_sample2d.txt`` for 2d reverberation mapping analysis.

@@ -36,7 +36,7 @@ gsl_fft_complex_workspace * work_cmp;
 
 
 /*!
- * This function initates workspace for FFT.
+ * This function initiates workspace for FFT.
  */
 void smooth_init(int nv, const double *transv)
 {

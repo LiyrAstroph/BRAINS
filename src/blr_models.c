@@ -351,7 +351,7 @@ void transfun_2d_cloud_sample_model1(const void *pm, double *transv, double *tra
  * model 2
  * 
  * geometry: radial Gamma distribution
- * dynamics: ellipitical orbits (Gaussian around circular orbits)
+ * dynamics: elliptical orbits (Gaussian around circular orbits)
  *================================================================
  */
 /*! 
@@ -1018,7 +1018,7 @@ void transfun_2d_cloud_sample_model4(const void *pm, double *transv, double *tra
  * model 5
  *
  * geometry: double pow-law 
- * dynamics: ellipitical orbits and inflow/outflow as in Pancoast's model
+ * dynamics: elliptical orbits and inflow/outflow as in Pancoast's model
  *====================================================================
  */
 

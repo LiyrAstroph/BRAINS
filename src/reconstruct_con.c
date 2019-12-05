@@ -259,7 +259,7 @@ void reconstruct_con()
 }
 
 /*!
- *  this function calculates continuum light curves form model parameters 
+ *  this function calculates continuum light curves from model parameters 
  *  and stores it into Fcon.
  */
 void calculate_con_from_model(const void *model)
@@ -451,7 +451,7 @@ void calculate_con_from_model_semiseparable(const void *model)
 
 
 /*!
- * This function calculate continuum ligth curves from varibility parameters.
+ * This function calculate continuum ligth curves from variability parameters.
  */
 void reconstruct_con_from_varmodel(double sigma_hat, double tau, double alpha, double syserr)
 {

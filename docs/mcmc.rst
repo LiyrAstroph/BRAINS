@@ -33,7 +33,7 @@ for 2d RM is ``OPTIONS2D``. ``brains`` will automatically reads these options ap
 
 One should not change the orders of lines. Lines beginning with '\#' are regarded as comments. 
 There is not a general rule to set the values of options. The most important options are the options 
-for new level interval and maximum number of levels. Sufficently large values will work better, but also
+for new level interval and maximum number of levels. Sufficiently large values will work better, but also
 will cause extra computation time. The option for maximum number of saves controls the length of the 
 Markov chains. Note that this is not the length of the final posterior sample. 
 

@@ -736,7 +736,7 @@ void allocate_memory_data()
 }
 
 /*!
- * fee data memory.
+ * free data memory.
  */
 void free_memory_data()
 {

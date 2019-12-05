@@ -25,7 +25,7 @@
 DNestFptrSet *fptrset_con;
 
 /*!
- *  This function run denst sampling for continuum.
+ *  This function run dnest sampling for continuum.
  */
 int dnest_con(int argc, char **argv)
 {
