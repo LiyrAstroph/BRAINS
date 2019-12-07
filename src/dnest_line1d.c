@@ -487,14 +487,14 @@ void accept_action_1d()
     con_q_particles[which_particle_update] = con_q_particles_perturb[which_particle_update];
     con_q_particles_perturb[which_particle_update] = ptemp;
   }
-  else 
+  else if( param < num_params_blr-1 )
   {
     /* BLR parameter is updated 
      * Note a) that the (num_par_blr-1)-th parameter is systematic error of line.
      * when this parameter is updated, Trans1D and Fline are unchanged.
-     *      b) Fline is always changed, except param = num_params_blr-1 or num_params_blr.
+     *      b) Fline is always changed, except param = num_params_blr-1.
      */
-    if( param < num_params_blr-1 )
+    
     {
 
       ptemp = TransTau_particles[which_particle_update];
