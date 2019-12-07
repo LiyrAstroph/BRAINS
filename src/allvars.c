@@ -112,7 +112,7 @@ double **Trans2D_at_veldata_particles, **Trans2D_at_veldata_particles_perturb;
 double **Fline_at_data_particles, **Fline_at_data_particles_perturb;
 
 double tau_max, tau_min;
-double *tmp_tau, *tmp_weight, *tmp_vel;
+double *clouds_tau, *clouds_weight, *clouds_vel;
 
 FILE *fcloud_out = NULL;
 int icr_cloud_save = 1;

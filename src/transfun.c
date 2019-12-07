@@ -230,14 +230,14 @@ void transfun_1d_cal(const void *pm, int flag_save)
   /* generate cloud sample and calculate the corresponding time lags and weights */
   transfun_1d_cloud_sample(pm, flag_save);
 
-  tau_min = tmp_tau[0];
-  tau_max = tmp_tau[0];
+  tau_min = clouds_tau[0];
+  tau_max = clouds_tau[0];
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
-    if(tau_min > tmp_tau[i])
-      tau_min = tmp_tau[i];
-    if(tau_max < tmp_tau[i])
-      tau_max = tmp_tau[i];
+    if(tau_min > clouds_tau[i])
+      tau_min = clouds_tau[i];
+    if(tau_max < clouds_tau[i])
+      tau_max = clouds_tau[i];
   }
 
   dTransTau = (tau_max - tau_min)/(parset.n_tau - 1);
@@ -249,10 +249,10 @@ void transfun_1d_cal(const void *pm, int flag_save)
 
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
-    dis = tmp_tau[i];
+    dis = clouds_tau[i];
     idt = (dis - tau_min)/dTransTau;
     //Trans1D[idt] += pow(1.0/r, 2.0*(1 + gam)) * weight;
-    Trans1D[idt] += tmp_weight[i];
+    Trans1D[idt] += clouds_weight[i];
   }
 
   /* normalize transfer function */
@@ -294,14 +294,14 @@ void transfun_2d_cal(const void *pm, double *transv, double *trans2d, int n_vel,
   /* generate cloud sample and calculate the corresponding time lags, LOS velocity, and weights */
   transfun_2d_cloud_sample(pm, transv, trans2d, n_vel, flag_save);
 
-  tau_min = tmp_tau[0];
-  tau_max = tmp_tau[0];
+  tau_min = clouds_tau[0];
+  tau_max = clouds_tau[0];
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
-    if(tau_min > tmp_tau[i])
-      tau_min = tmp_tau[i];
-    if(tau_max < tmp_tau[i])
-      tau_max = tmp_tau[i];
+    if(tau_min > clouds_tau[i])
+      tau_min = clouds_tau[i];
+    if(tau_max < clouds_tau[i])
+      tau_max = clouds_tau[i];
   }
 
   dTransTau = (tau_max - tau_min)/(parset.n_tau - 1);
@@ -317,17 +317,17 @@ void transfun_2d_cal(const void *pm, double *transv, double *trans2d, int n_vel,
 
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
-    dis = tmp_tau[i];
+    dis = clouds_tau[i];
     idt = (dis - tau_min)/dTransTau;
 
     for(j=0; j<parset.n_vel_per_cloud; j++)
     {
-      V = tmp_vel[i*parset.n_vel_per_cloud + j];
+      V = clouds_vel[i*parset.n_vel_per_cloud + j];
       if(V<transv[0] || V >= transv[n_vel-1]+dV)
         continue;
       idV = (V - transv[0])/dV;
       //trans2d[idt*n_vel + idV] += pow(1.0/r, 2.0*(1 + gam)) * weight;
-      trans2d[idt*n_vel + idV] += tmp_weight[i];
+      trans2d[idt*n_vel + idV] += clouds_weight[i];
     }
   }
 

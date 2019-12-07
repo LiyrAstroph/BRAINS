@@ -619,9 +619,9 @@ void reconstruct_line2d_init()
     con_q_particles_perturb[i] = malloc(nq* sizeof(double));
   }
 
-  tmp_tau = malloc(parset.n_cloud_per_task * sizeof(double));
-  tmp_weight = malloc(parset.n_cloud_per_task * sizeof(double));
-  tmp_vel = malloc(parset.n_cloud_per_task * parset.n_vel_per_cloud * sizeof(double));
+  clouds_tau = malloc(parset.n_cloud_per_task * sizeof(double));
+  clouds_weight = malloc(parset.n_cloud_per_task * sizeof(double));
+  clouds_vel = malloc(parset.n_cloud_per_task * parset.n_vel_per_cloud * sizeof(double));
 
   if(parset.flag_save_clouds && thistask == roottask)
   {
@@ -703,9 +703,9 @@ void reconstruct_line2d_end()
   free(par_prior_gaussian);
   free(par_prior_model);
   
-  free(tmp_tau);
-  free(tmp_weight);
-  free(tmp_vel);
+  free(clouds_tau);
+  free(clouds_weight);
+  free(clouds_vel);
   
   if(parset.flag_save_clouds && thistask==roottask)
   {

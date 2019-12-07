@@ -106,8 +106,8 @@ void transfun_1d_cloud_sample_model1(const void *pm, int flag_save)
 
     dis = r - x;
     weight = 0.5 + k*(x/r);
-    tmp_tau[i] = dis;
-    tmp_weight[i] = weight;
+    clouds_tau[i] = dis;
+    clouds_weight[i] = weight;
 
     if(flag_save && thistask==roottask)
     {
@@ -203,8 +203,8 @@ void transfun_2d_cloud_sample_model1(const void *pm, double *transv, double *tra
 
     dis = r - x;
     weight = 0.5 + k*(x/r);
-    tmp_tau[i] = dis;
-    tmp_weight[i] = weight;
+    clouds_tau[i] = dis;
+    clouds_weight[i] = weight;
     
     /* velocity  
      * note that a cloud moves in its orbit plane, whose direction
@@ -261,7 +261,7 @@ void transfun_2d_cloud_sample_model1(const void *pm, double *transv, double *tra
                 // velocity relative to the observer.
       
       V += linecenter;
-      tmp_vel[i*parset.n_vel_per_cloud + j] = V;
+      clouds_vel[i*parset.n_vel_per_cloud + j] = V;
 
       if(flag_save && thistask==roottask)
       {
@@ -367,8 +367,8 @@ void transfun_2d_cloud_sample_model2(const void *pm, double *transv, double *tra
 
     dis = r - x;
     weight = 0.5 + k*(x/r);
-    tmp_tau[i] = dis;
-    tmp_weight[i] = weight;
+    clouds_tau[i] = dis;
+    clouds_weight[i] = weight;
     
     
     /* velocity  
@@ -412,7 +412,7 @@ void transfun_2d_cloud_sample_model2(const void *pm, double *transv, double *tra
                 // velocity relative to the observer.
 
       V += linecenter;
-      tmp_vel[i*parset.n_vel_per_cloud + j] = V;
+      clouds_vel[i*parset.n_vel_per_cloud + j] = V;
 
       if(flag_save && thistask==roottask)
       {
@@ -509,8 +509,8 @@ void transfun_1d_cloud_sample_model3(const void *pm, int flag_save)
 
     dis = r - x;
     weight = 0.5 + k*(x/r);
-    tmp_tau[i] = dis;
-    tmp_weight[i] = weight;
+    clouds_tau[i] = dis;
+    clouds_weight[i] = weight;
 
     if(flag_save && thistask==roottask)
     {
@@ -606,8 +606,8 @@ void transfun_2d_cloud_sample_model3(const void *pm, double *transv, double *tra
 
     dis = r - x;
     weight = 0.5 + k*(x/r);
-    tmp_tau[i] = dis;
-    tmp_weight[i] = weight;
+    clouds_tau[i] = dis;
+    clouds_weight[i] = weight;
     
 // velocity  
 // note that a cloud moves in its orbit plane, whose direction
@@ -651,7 +651,7 @@ void transfun_2d_cloud_sample_model3(const void *pm, double *transv, double *tra
                 // velocity relative to the observer.
 
       V += linecenter;
-      tmp_vel[i*parset.n_vel_per_cloud + j] = V;
+      clouds_vel[i*parset.n_vel_per_cloud + j] = V;
 
       if(flag_save && thistask==roottask)
       {
@@ -748,8 +748,8 @@ void transfun_2d_cloud_sample_model4(const void *pm, double *transv, double *tra
 
     dis = r - x;
     weight = 0.5 + k*(x/r);
-    tmp_tau[i] = dis;
-    tmp_weight[i] = weight;
+    clouds_tau[i] = dis;
+    clouds_weight[i] = weight;
     
 // velocity  
 // note that a cloud moves in its orbit plane, whose direction
@@ -793,7 +793,7 @@ void transfun_2d_cloud_sample_model4(const void *pm, double *transv, double *tra
                 // velocity relative to the observer.
 
       V += linecenter;
-      tmp_vel[i*parset.n_vel_per_cloud + j] = V;
+      clouds_vel[i*parset.n_vel_per_cloud + j] = V;
 
       if(flag_save && thistask==roottask)
       {
@@ -912,8 +912,8 @@ void transfun_1d_cloud_sample_model5(const void *pm, int flag_save)
 
     dis = r - x;
     weight = 0.5 + k*(x/r);
-    tmp_tau[i] = dis;
-    tmp_weight[i] = weight;
+    clouds_tau[i] = dis;
+    clouds_weight[i] = weight;
 
     if(flag_save && thistask==roottask)
     {
@@ -1045,8 +1045,8 @@ void transfun_2d_cloud_sample_model5(const void *pm, double *transv, double *tra
 
     dis = r - x;
     weight = 0.5 + k*(x/r);
-    tmp_tau[i] = dis;
-    tmp_weight[i] = weight;
+    clouds_tau[i] = dis;
+    clouds_weight[i] = weight;
 
     Vkep = sqrt(mbh/r);
 
@@ -1107,7 +1107,7 @@ void transfun_2d_cloud_sample_model5(const void *pm, double *transv, double *tra
       V = (g-1.0)*C_Unit;
 
       V += linecenter;
-      tmp_vel[i*parset.n_vel_per_cloud + j] = V;
+      clouds_vel[i*parset.n_vel_per_cloud + j] = V;
 
       if(flag_save && thistask==roottask)
       {
@@ -1218,8 +1218,8 @@ void transfun_1d_cloud_sample_model6(const void *pm, int flag_save)
 
     dis = r - x;
     weight = 0.5 + k*(x/r);    
-    tmp_tau[i] = dis;
-    tmp_weight[i] = weight;
+    clouds_tau[i] = dis;
+    clouds_weight[i] = weight;
 
     if(flag_save && thistask==roottask)
     {
@@ -1342,8 +1342,8 @@ void transfun_2d_cloud_sample_model6(const void *pm, double *transv, double *tra
 
     dis = r - x;
     weight = 0.5 + k*(x/r);
-    tmp_tau[i] = dis;
-    tmp_weight[i] = weight;
+    clouds_tau[i] = dis;
+    clouds_weight[i] = weight;
 
     Vkep = sqrt(mbh/r);
     
@@ -1409,7 +1409,7 @@ void transfun_2d_cloud_sample_model6(const void *pm, double *transv, double *tra
       V = (g-1.0)*C_Unit;
 
       V += linecenter;
-      tmp_vel[i*parset.n_vel_per_cloud + j] = V;
+      clouds_vel[i*parset.n_vel_per_cloud + j] = V;
 
       if(flag_save && thistask==roottask)
       {
@@ -1520,8 +1520,8 @@ void transfun_1d_cloud_sample_model7(const void *pm, int flag_save)
 
     dis = r - x;
     weight = 0.5 + k*(x/r);
-    tmp_tau[i] = dis;
-    tmp_weight[i] = weight;
+    clouds_tau[i] = dis;
+    clouds_weight[i] = weight;
 
     if(flag_save && thistask==roottask)
     {
@@ -1596,8 +1596,8 @@ void transfun_1d_cloud_sample_model7(const void *pm, int flag_save)
 
     dis = r - x;
     weight = 0.5 + k*(x/r);
-    tmp_tau[i] = dis;
-    tmp_weight[i] = weight;
+    clouds_tau[i] = dis;
+    clouds_weight[i] = weight;
 
     if(flag_save && thistask==roottask)
     {
@@ -1718,8 +1718,8 @@ void transfun_2d_cloud_sample_model7(const void *pm, double *transv, double *tra
 
     dis = r - x;
     weight = 0.5 + k*(x/r);
-    tmp_tau[i] = dis;
-    tmp_weight[i] = weight;
+    clouds_tau[i] = dis;
+    clouds_weight[i] = weight;
 
     Vkep = sqrt(mbh/r);
 
@@ -1780,7 +1780,7 @@ void transfun_2d_cloud_sample_model7(const void *pm, double *transv, double *tra
       V = (g-1.0)*C_Unit;
 
       V += linecenter;
-      tmp_vel[i*parset.n_vel_per_cloud + j] = V;
+      clouds_vel[i*parset.n_vel_per_cloud + j] = V;
 
       if(flag_save && thistask==roottask)
       {
@@ -1862,8 +1862,8 @@ void transfun_2d_cloud_sample_model7(const void *pm, double *transv, double *tra
 
     dis = r - x;
     weight = 0.5 + k*(x/r);
-    tmp_tau[i] = dis;
-    tmp_weight[i] = weight;
+    clouds_tau[i] = dis;
+    clouds_weight[i] = weight;
 
 
     Vkep = sqrt(mbh/r);
@@ -1926,7 +1926,7 @@ void transfun_2d_cloud_sample_model7(const void *pm, double *transv, double *tra
 
       V += linecenter;
 
-      tmp_vel[i*parset.n_vel_per_cloud + j] = V;
+      clouds_vel[i*parset.n_vel_per_cloud + j] = V;
 
       if(flag_save && thistask==roottask)
       {

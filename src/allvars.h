@@ -204,7 +204,7 @@ extern double **Trans2D_at_veldata_particles, **Trans2D_at_veldata_particles_per
 extern double **Fline_at_data_particles, **Fline_at_data_particles_perturb;
 
 extern double tau_max, tau_min;
-extern double *tmp_tau, *tmp_weight, *tmp_vel;
+extern double *clouds_tau, *clouds_weight, *clouds_vel;
 
 extern FILE *fcloud_out;
 extern int icr_cloud_save;
