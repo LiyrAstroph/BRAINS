@@ -429,7 +429,7 @@ void sim_init()
   which_parameter_update = -1;
   
   num_params_blr = num_params_blr_model + num_params_nlr + num_params_res + num_params_linecenter;
-  num_params_var = 4 + parset.flag_trend;
+  num_params_var = num_params_drw + num_params_trend + num_params_difftrend;
   num_params = num_params_blr + num_params_var + parset.n_con_recon;
 
   model = malloc(num_params * sizeof(double));
