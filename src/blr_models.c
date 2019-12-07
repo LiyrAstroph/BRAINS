@@ -35,13 +35,12 @@
  */
 void transfun_1d_cloud_sample_model1(const void *pm, int flag_save)
 {
-  int i, nc, flag_update=0;
+  int i, nc;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0;
   double inc, F, beta, mu, k, a, s, rin, sig;
   double Lphi, Lthe;
   double weight, rnd;
-  double *pr;
   BLRmodel1 *model = (BLRmodel1 *)pm;
 
   Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
@@ -55,55 +54,6 @@ void transfun_1d_cloud_sample_model1(const void *pm, int flag_save)
   s = mu/a;
   rin=mu*F;
   sig=(1.0-F)*s;
-
-  /* "which_parameter_update = -1" means that all parameters are updated, 
-   * usually occurs at the initial step.
-   */
-  if(force_update == 1 || which_parameter_update == -1 )
-  {
-    flag_update = 1;
-  }
-  else
-  {
-    for(i=0; i<num_params_radial_samp;i++)
-    {
-      if(which_parameter_update == params_radial_samp[i])
-      {
-        flag_update = 1;
-        break;
-      }
-    }
-  }
-
-  /* generate clouds' radial location */
-  if( flag_update == 1 )
-  {
-    pr = clouds_particles_perturb[which_particle_update];
-
-    for(i=0; i<parset.n_cloud_per_task; i++)
-    {
-      nc = 0;
-      r = rcloud_max_set+1.0;
-      while(r>rcloud_max_set || r<rcloud_min_set)
-      {
-        if(nc > 1000)
-        {
-          printf("# Error, too many tries in generating ridial location of clouds.\n");
-          exit(0);
-        }
-        rnd = gsl_ran_gamma(gsl_r, a, 1.0);
-//      r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
-        r = rin + sig * rnd;
-        nc++;
-      }
-
-      pr[i] = r;
-    }
-  }
-  else
-  {
-    pr = clouds_particles[which_particle_update];
-  }
   
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
@@ -111,7 +61,20 @@ void transfun_1d_cloud_sample_model1(const void *pm, int flag_save)
     Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
     Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
 
-    r = pr[i];
+    nc = 0;
+    r = rcloud_max_set+1.0;
+    while(r>rcloud_max_set || r<rcloud_min_set)
+    {
+      if(nc > 1000)
+      {
+        printf("# Error, too many tries in generating ridial location of clouds.\n");
+        exit(0);
+      }
+      rnd = gsl_ran_gamma(gsl_r, a, 1.0);
+//    r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
+      r = rin + sig * rnd;
+      nc++;
+    }
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
     /* Polar coordinates to Cartesian coordinate */
@@ -163,13 +126,12 @@ void transfun_1d_cloud_sample_model1(const void *pm, int flag_save)
  */
 void transfun_2d_cloud_sample_model1(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
-  int i, j, nc, flag_update=0;
+  int i, j, nc;
   double r, phi, dis, Lopn_cos, u;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
   double inc, F, beta, mu, k, a, s, rin, sig;
   double Lphi, Lthe, L, E, linecenter = 0.0;
   double V, weight, rnd;
-  double *pr;
   double *pmodel = (double *)pm;
   BLRmodel1 *model = (BLRmodel1 *)pm;
   double Emin, Lmax, Vr, Vr2, Vph, mbh, chi, lambda, q;
@@ -196,59 +158,26 @@ void transfun_2d_cloud_sample_model1(const void *pm, double *transv, double *tra
     linecenter = pmodel[num_params_blr - num_params_linecenter - 1] * parset.linecenter_err; 
   }
 
-  if(force_update == 1 || which_parameter_update == -1 )
-  {
-    flag_update = 1;
-  }
-  else
-  {
-    for(i=0; i<num_params_radial_samp;i++)
-    {
-      if(which_parameter_update == params_radial_samp[i])
-      {
-        flag_update = 1;
-        break;
-      }
-    }
-  }
-
-  /* generate clouds' radial location */
-  if( flag_update == 1 )
-  {
-    pr = clouds_particles_perturb[which_particle_update];
-
-    for(i=0; i<parset.n_cloud_per_task; i++)
-    {
-      nc = 0;
-      r = rcloud_max_set+1.0;
-      while(r>rcloud_max_set || r<rcloud_min_set)
-      {
-        if(nc > 1000)
-        {
-          printf("# Error, too many tries in generating ridial location of clouds.\n");
-          exit(0);
-        }
-        rnd = gsl_ran_gamma(gsl_r, a, 1.0);
-//      r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
-        r = rin + sig * rnd;
-        nc++;
-      }
-
-      pr[i] = r;
-    }
-  }
-  else
-  {
-    pr = clouds_particles[which_particle_update];
-  }
-
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
 // generate a direction of the angular momentum     
     Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
     Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
 
-    r = pr[i];
+    nc = 0;
+    r = rcloud_max_set+1.0;
+    while(r>rcloud_max_set || r<rcloud_min_set)
+    {
+      if(nc > 1000)
+      {
+        printf("# Error, too many tries in generating ridial location of clouds.\n");
+        exit(0);
+      }
+      rnd = gsl_ran_gamma(gsl_r, a, 1.0);
+//    r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
+        r = rin + sig * rnd;
+      nc++;
+    }
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
     x = r * cos(phi); 
@@ -360,13 +289,12 @@ void transfun_2d_cloud_sample_model1(const void *pm, double *transv, double *tra
  */
 void transfun_2d_cloud_sample_model2(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
-  int i, j, nc, flag_update=0;
+  int i, j, nc;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
   double inc, F, beta, mu, k, a, s, rin, sig;
   double Lphi, Lthe, linecenter = 0.0;
   double V, weight, rnd;
-  double *pr;
   double *pmodel = (double *)pm;
   BLRmodel2 *model = (BLRmodel2 *)pm;
   double Emin, Ecirc, Lcirc, Vcirc, Vr, Vph, mbh, sigr, sigtheta, rhor, rhotheta;
@@ -393,60 +321,26 @@ void transfun_2d_cloud_sample_model2(const void *pm, double *transv, double *tra
     linecenter = pmodel[num_params_blr - num_params_linecenter - 1] * parset.linecenter_err; 
   }
 
-  if(force_update == 1 || which_parameter_update == -1 )
-  {
-    flag_update = 1;
-  }
-  else
-  {
-    for(i=0; i<num_params_radial_samp;i++)
-    {
-      if(which_parameter_update == params_radial_samp[i])
-      {
-        flag_update = 1;
-        break;
-      }
-    }
-  }
-
-  /* generate clouds' radial location */
-  if( flag_update == 1 )
-  {
-    pr = clouds_particles_perturb[which_particle_update];
-
-    for(i=0; i<parset.n_cloud_per_task; i++)
-    {
-      nc = 0;
-      r = rcloud_max_set+1.0;
-      while(r>rcloud_max_set || r<rcloud_min_set)
-      {
-        if(nc > 1000)
-        {
-          printf("# Error, too many tries in generating ridial location of clouds.\n");
-          exit(0);
-        }
-        rnd = gsl_ran_gamma(gsl_r, a, 1.0);
-//      r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
-        r = rin + sig * rnd;
-        nc++;
-      }
-
-      pr[i] = r;
-    }
-  }
-  else
-  {
-    pr = clouds_particles[which_particle_update];
-  }
-
-
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
     /* generate a direction of the angular momentum */    
     Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
     Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
 
-    r = pr[i];
+    nc = 0;
+    r = rcloud_max_set+1.0;
+    while(r>rcloud_max_set || r<rcloud_min_set)
+    {
+      if(nc > 1000)
+      {
+        printf("# Error, too many tries in generating ridial location of clouds.\n");
+        exit(0);
+      }
+      rnd = gsl_ran_gamma(gsl_r, a, 1.0);
+//    r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
+      r = rin + sig * rnd;
+      nc++;
+    }
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
     x = r * cos(phi); 
@@ -545,13 +439,12 @@ void transfun_2d_cloud_sample_model2(const void *pm, double *transv, double *tra
  */
 void transfun_1d_cloud_sample_model3(const void *pm, int flag_save)
 {
-  int i, nc, flag_update=0;
+  int i, nc;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0;
   double inc, F, alpha, Rin, k;
   double Lphi, Lthe;
   double weight, rnd;
-  double *pr;
   BLRmodel3 *model = (BLRmodel3 *)pm;
 
   Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
@@ -564,61 +457,28 @@ void transfun_1d_cloud_sample_model3(const void *pm, int flag_save)
   if(F*Rin > rcloud_max_set)
     F = rcloud_max_set/Rin;
 
-  if(force_update == 1 || which_parameter_update == -1 )
-  {
-    flag_update = 1;
-  }
-  else
-  {
-    for(i=0; i<num_params_radial_samp;i++)
-    {
-      if(which_parameter_update == params_radial_samp[i])
-      {
-        flag_update = 1;
-        break;
-      }
-    }
-  }
-  
-  /* generate clouds' radial location */
-  if( flag_update == 1 )
-  {
-    pr = clouds_particles_perturb[which_particle_update];
-
-    for(i=0; i<parset.n_cloud_per_task; i++)
-    {
-      nc = 0;
-      r = rcloud_max_set+1.0;
-      while(r>rcloud_max_set || r<rcloud_min_set)
-      {
-        if(nc > 1000)
-        {
-          printf("# Error, too many tries in generating ridial location of clouds.\n");
-          exit(0);
-        }
-        if(fabs(1.0-alpha) > 1.0e-4)
-           rnd = pow( gsl_rng_uniform(gsl_r) * ( pow(F, 1.0-alpha) - 1.0) + 1.0,  1.0/(1.0-alpha) );
-        else
-           rnd = exp( gsl_rng_uniform(gsl_r) * log(F) );
-        r = Rin * rnd ;
-        nc++;
-      }
-
-      pr[i] = r;
-    }
-  }
-  else
-  {
-    pr = clouds_particles[which_particle_update];
-  }
-
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
     /* generate a direction of the angular momentum of the orbit */
     Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
     Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
     
-    r = pr[i];
+    nc = 0;
+    r = rcloud_max_set+1.0;
+    while(r>rcloud_max_set || r<rcloud_min_set)
+    {
+      if(nc > 1000)
+      {
+        printf("# Error, too many tries in generating ridial location of clouds.\n");
+        exit(0);
+      }
+      if(fabs(1.0-alpha) > 1.0e-4)
+        rnd = pow( gsl_rng_uniform(gsl_r) * ( pow(F, 1.0-alpha) - 1.0) + 1.0,  1.0/(1.0-alpha) );
+      else
+       rnd = exp( gsl_rng_uniform(gsl_r) * log(F) );
+      r = Rin * rnd ;
+      nc++;
+    }
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
     /* Polar coordinates to Cartesian coordinate */
@@ -668,13 +528,12 @@ void transfun_1d_cloud_sample_model3(const void *pm, int flag_save)
  */
 void transfun_2d_cloud_sample_model3(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
-  int i, j, nc, flag_update=0;
+  int i, j, nc;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
   double inc, F, alpha, Rin, k;
   double Lphi, Lthe, L, E, linecenter=0.0;
   double V, weight, rnd;
-  double *pr;
   double *pmodel = (double *)pm;
   BLRmodel3 *model = (BLRmodel3 *)pm;
   double Emin, Lmax, Vr, Vph, mbh, xi, q;
@@ -699,61 +558,28 @@ void transfun_2d_cloud_sample_model3(const void *pm, double *transv, double *tra
     linecenter = pmodel[num_params_blr - num_params_linecenter - 1] * parset.linecenter_err; 
   }
 
-  if(force_update == 1 || which_parameter_update == -1 )
-  {
-    flag_update = 1;
-  }
-  else
-  {
-    for(i=0; i<num_params_radial_samp;i++)
-    {
-      if(which_parameter_update == params_radial_samp[i])
-      {
-        flag_update = 1;
-        break;
-      }
-    }
-  }
-
-  /* generate clouds' radial location */
-  if( flag_update == 1 )
-  {
-    pr = clouds_particles_perturb[which_particle_update];
-
-    for(i=0; i<parset.n_cloud_per_task; i++)
-    {
-      nc = 0;
-      r = rcloud_max_set+1.0;
-      while(r>rcloud_max_set || r<rcloud_min_set)
-      {
-        if(nc > 1000)
-        {
-          printf("# Error, too many tries in generating ridial location of clouds.\n");
-          exit(0);
-        }
-        if(fabs(1.0-alpha) > 1.0e-4)
-           rnd = pow( gsl_rng_uniform(gsl_r) * ( pow(F, 1.0-alpha) - 1.0) + 1.0,  1.0/(1.0-alpha) );
-        else
-           rnd = exp( gsl_rng_uniform(gsl_r) * log(F) );
-        r = Rin * rnd ;
-        nc++;
-      }
-
-      pr[i] = r;
-    }
-  }
-  else
-  {
-    pr = clouds_particles[which_particle_update];
-  }
-
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
 // generate a direction of the angular momentum     
     Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
     Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
 
-    r = pr[i];
+    nc = 0;
+    r = rcloud_max_set+1.0;
+    while(r>rcloud_max_set || r<rcloud_min_set)
+    {
+      if(nc > 1000)
+      {
+        printf("# Error, too many tries in generating ridial location of clouds.\n");
+        exit(0);
+      }
+      if(fabs(1.0-alpha) > 1.0e-4)
+        rnd = pow( gsl_rng_uniform(gsl_r) * ( pow(F, 1.0-alpha) - 1.0) + 1.0,  1.0/(1.0-alpha) );
+      else
+        rnd = exp( gsl_rng_uniform(gsl_r) * log(F) );
+      r = Rin * rnd ;
+      nc++;
+    }
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
     x = r * cos(phi); 
@@ -844,13 +670,12 @@ void transfun_2d_cloud_sample_model3(const void *pm, double *transv, double *tra
  */
 void transfun_2d_cloud_sample_model4(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
-  int i, j, nc, flag_update=0;
+  int i, j, nc;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
   double inc, F, alpha, Rin, k;
   double Lphi, Lthe, L, E, linecenter=0.0;
   double V, weight, rnd;
-  double *pr;
   double *pmodel = (double *)pm;
   BLRmodel4 *model = (BLRmodel4 *)pm;
   double Emin, Lmax, Vr, Vph, mbh, xi, q;
@@ -874,54 +699,6 @@ void transfun_2d_cloud_sample_model4(const void *pm, double *transv, double *tra
   {
     linecenter = pmodel[num_params_blr - num_params_linecenter - 1] * parset.linecenter_err; 
   }
-  
-  if(force_update == 1 || which_parameter_update == -1 )
-  {
-    flag_update = 1;
-  }
-  else
-  {
-    for(i=0; i<num_params_radial_samp;i++)
-    {
-      if(which_parameter_update == params_radial_samp[i])
-      {
-        flag_update = 1;
-        break;
-      }
-    }
-  }
-
-  /* generate clouds' radial location */
-  if( flag_update == 1 )
-  {
-    pr = clouds_particles_perturb[which_particle_update];
-
-    for(i=0; i<parset.n_cloud_per_task; i++)
-    {
-      nc = 0;
-      r = rcloud_max_set+1.0;
-      while(r>rcloud_max_set || r<rcloud_min_set)
-      {
-        if(nc > 1000)
-        {
-          printf("# Error, too many tries in generating ridial location of clouds.\n");
-          exit(0);
-        }
-        if(fabs(1.0-alpha) > 1.0e-4)
-           rnd = pow( gsl_rng_uniform(gsl_r) * ( pow(F, 1.0-alpha) - 1.0) + 1.0,  1.0/(1.0-alpha) );
-        else
-           rnd = exp( gsl_rng_uniform(gsl_r) * log(F) );
-        r = Rin * rnd ;
-        nc++;
-      }
-
-      pr[i] = r;
-    }
-  }
-  else
-  {
-    pr = clouds_particles[which_particle_update];
-  }
 
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
@@ -929,7 +706,22 @@ void transfun_2d_cloud_sample_model4(const void *pm, double *transv, double *tra
     Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
     Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
 
-    r = pr[i];
+    nc = 0;
+    r = rcloud_max_set+1.0;
+    while(r>rcloud_max_set || r<rcloud_min_set)
+    {
+      if(nc > 1000)
+      {
+        printf("# Error, too many tries in generating ridial location of clouds.\n");
+        exit(0);
+      }
+      if(fabs(1.0-alpha) > 1.0e-4)
+        rnd = pow( gsl_rng_uniform(gsl_r) * ( pow(F, 1.0-alpha) - 1.0) + 1.0,  1.0/(1.0-alpha) );
+      else
+        rnd = exp( gsl_rng_uniform(gsl_r) * log(F) );
+      r = Rin * rnd ;
+      nc++;
+    }
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
     x = r * cos(phi); 
@@ -1027,13 +819,12 @@ void transfun_2d_cloud_sample_model4(const void *pm, double *transv, double *tra
  */
 void transfun_1d_cloud_sample_model5(const void *pm, int flag_save)
 {
-  int i, nc, flag_update=0;
+  int i, nc;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0;
   double inc, Fin, Fout, alpha, k, gam, mu, xi;
   double Lphi, Lthe, cos_Lphi, sin_Lphi, cos_Lthe, sin_Lthe, cos_inc_cmp, sin_inc_cmp;
   double weight, rndr, rnd, rnd_xi, rnd_frac, frac1, frac2, ratio;
-  double *pr;
   BLRmodel5 *model = (BLRmodel5 *)pm;
 
   Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
@@ -1056,61 +847,6 @@ void transfun_1d_cloud_sample_model5(const void *pm, int flag_save)
 
   sin_inc_cmp = cos(inc);//sin(PI/2.0 - inc);
   cos_inc_cmp = sin(inc);//cos(PI/2.0 - inc);
-
-  if(force_update == 1 || which_parameter_update == -1 )
-  {
-    flag_update = 1;
-  }
-  else
-  {
-    for(i=0; i<num_params_radial_samp;i++)
-    {
-      if(which_parameter_update == params_radial_samp[i])
-      {
-        flag_update = 1;
-        break;
-      }
-    }
-  }
-
-  /* generate clouds' radial location */
-  if( flag_update == 1 )
-  {
-    pr = clouds_particles_perturb[which_particle_update];
-
-    for(i=0; i<parset.n_cloud_per_task; i++)
-    {
-      nc = 0;
-      r = rcloud_max_set+1.0;
-      while(r>rcloud_max_set || r<rcloud_min_set)
-      {
-        if(nc > 1000)
-        {
-          printf("# Error, too many tries in generating ridial location of clouds.\n");
-          exit(0);
-        }
-        
-        rnd_frac = gsl_rng_uniform(gsl_r);
-        rnd = gsl_rng_uniform(gsl_r);
-        if(rnd_frac < ratio)
-        {
-          rndr = pow( 1.0 - rnd * (1.0 - pow(Fin, alpha+1.0)), 1.0/(1.0+alpha));
-        }
-        else
-        {
-          rndr = pow( 1.0 - rnd * (1.0 - pow(Fout, -alpha+1.0)), 1.0/(1.0-alpha));
-        }
-        r = rndr*mu;
-        nc++;
-      }
-
-      pr[i] = r;
-    }
-  }
-  else
-  {
-    pr = clouds_particles[which_particle_update];
-  }
   
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
@@ -1122,7 +858,29 @@ void transfun_1d_cloud_sample_model5(const void *pm, int flag_save)
     cos_Lthe = cos(Lthe);
     sin_Lthe = sin(Lthe);
     
-    r = pr[i];
+    nc = 0;
+    r = rcloud_max_set+1.0;
+    while(r>rcloud_max_set || r<rcloud_min_set)
+    {
+      if(nc > 1000)
+      {
+        printf("# Error, too many tries in generating ridial location of clouds.\n");
+        exit(0);
+      }
+        
+      rnd_frac = gsl_rng_uniform(gsl_r);
+      rnd = gsl_rng_uniform(gsl_r);
+      if(rnd_frac < ratio)
+      {
+        rndr = pow( 1.0 - rnd * (1.0 - pow(Fin, alpha+1.0)), 1.0/(1.0+alpha));
+      }
+      else
+      {
+        rndr = pow( 1.0 - rnd * (1.0 - pow(Fout, -alpha+1.0)), 1.0/(1.0-alpha));
+      }
+      r = rndr*mu;
+      nc++;
+    }
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
     /* Polar coordinates to Cartesian coordinate */
@@ -1172,7 +930,7 @@ void transfun_1d_cloud_sample_model5(const void *pm, int flag_save)
  */
 void transfun_2d_cloud_sample_model5(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
-  int i, j, nc, flag_update=0;
+  int i, j, nc;
   double r, phi, cos_phi, sin_phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0;
   double inc, Fin, Fout, alpha, k, gam, mu, xi;
@@ -1181,7 +939,6 @@ void transfun_2d_cloud_sample_model5(const void *pm, double *transv, double *tra
   double cos_Lphi, sin_Lphi, cos_Lthe, sin_Lthe, cos_inc_cmp, sin_inc_cmp;
   double weight, rndr, rnd, rnd_frac, rnd_xi, frac1, frac2, ratio, Rs, g;
   double vx, vy, vz, vxb, vyb, vzb;
-  double *pr;
   double *pmodel = (double *)pm;
   BLRmodel5 *model = (BLRmodel5 *)pm;
 
@@ -1221,61 +978,6 @@ void transfun_2d_cloud_sample_model5(const void *pm, double *transv, double *tra
   {
     linecenter = pmodel[num_params_blr - num_params_linecenter - 1] * parset.linecenter_err; 
   }
-
-  if(force_update == 1 || which_parameter_update == -1 )
-  {
-    flag_update = 1;
-  }
-  else
-  {
-    for(i=0; i<num_params_radial_samp;i++)
-    {
-      if(which_parameter_update == params_radial_samp[i])
-      {
-        flag_update = 1;
-        break;
-      }
-    }
-  }
-  
-  /* generate clouds' radial location */
-  if( flag_update == 1 )
-  {
-    pr = clouds_particles_perturb[which_particle_update];
-
-    for(i=0; i<parset.n_cloud_per_task; i++)
-    {
-      nc = 0;
-      r = rcloud_max_set+1.0;
-      while(r>rcloud_max_set || r<rcloud_min_set)
-      {
-        if(nc > 1000)
-        {
-          printf("# Error, too many tries in generating ridial location of clouds.\n");
-          exit(0);
-        }
-        
-        rnd_frac = gsl_rng_uniform(gsl_r);
-        rnd = gsl_rng_uniform(gsl_r);
-        if(rnd_frac < ratio)
-        {
-          rndr = pow( 1.0 - rnd * (1.0 - pow(Fin, alpha+1.0)), 1.0/(1.0+alpha));
-        }
-        else
-        {
-          rndr = pow( 1.0 - rnd * (1.0 - pow(Fout, -alpha+1.0)), 1.0/(1.0-alpha));
-        }
-        r = rndr*mu;
-        nc++;
-      }
-
-      pr[i] = r;
-    }
-  }
-  else
-  {
-    pr = clouds_particles[which_particle_update];
-  }
   
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
@@ -1287,7 +989,29 @@ void transfun_2d_cloud_sample_model5(const void *pm, double *transv, double *tra
     cos_Lthe = cos(Lthe);
     sin_Lthe = sin(Lthe);
     
-    r = pr[i];
+    nc = 0;
+    r = rcloud_max_set+1.0;
+    while(r>rcloud_max_set || r<rcloud_min_set)
+    {
+      if(nc > 1000)
+      {
+        printf("# Error, too many tries in generating ridial location of clouds.\n");
+        exit(0);
+      }
+      
+      rnd_frac = gsl_rng_uniform(gsl_r);
+      rnd = gsl_rng_uniform(gsl_r);
+      if(rnd_frac < ratio)
+      {
+        rndr = pow( 1.0 - rnd * (1.0 - pow(Fin, alpha+1.0)), 1.0/(1.0+alpha));
+      }
+      else
+      {
+        rndr = pow( 1.0 - rnd * (1.0 - pow(Fout, -alpha+1.0)), 1.0/(1.0-alpha));
+      }
+      r = rndr*mu;
+      nc++;
+    }
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
     cos_phi = cos(phi);
     sin_phi = sin(phi);
@@ -1410,13 +1134,12 @@ void transfun_2d_cloud_sample_model5(const void *pm, double *transv, double *tra
  */
 void transfun_1d_cloud_sample_model6(const void *pm, int flag_save)
 {
-  int i, nc, flag_update=0;
+  int i, nc;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0;
   double inc, F, beta, mu, k, gam, xi, a, s, rin, sig;
   double Lphi, Lthe, sin_Lphi, cos_Lphi, sin_Lthe, cos_Lthe, sin_inc_cmp, cos_inc_cmp;
   double weight, rnd, rnd_xi;
-  double *pr;
   BLRmodel6 *model = (BLRmodel6 *)pm;
 
   Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
@@ -1436,52 +1159,6 @@ void transfun_1d_cloud_sample_model6(const void *pm, int flag_save)
   sin_inc_cmp = cos(inc);//sin(PI/2.0 - inc);
   cos_inc_cmp = sin(inc);//cos(PI/2.0 - inc);
 
-  if(force_update == 1 || which_parameter_update == -1 )
-  {
-    flag_update = 1;
-  }
-  else
-  {
-    for(i=0; i<num_params_radial_samp;i++)
-    {
-      if(which_parameter_update == params_radial_samp[i])
-      {
-        flag_update = 1;
-        break;
-      }
-    }
-  }
-  
-
-  /* generate clouds' radial location */
-  if( flag_update == 1 )
-  {
-    pr = clouds_particles_perturb[which_particle_update];
-
-    for(i=0; i<parset.n_cloud_per_task; i++)
-    {
-      nc = 0;
-      r = rcloud_max_set+1.0;
-      while(r>rcloud_max_set || r<rcloud_min_set)
-      {
-        if(nc > 1000)
-        {
-          printf("# Error, too many tries in generating ridial location of clouds.\n");
-          exit(0);
-        }
-        rnd = gsl_ran_gamma(gsl_r, a, 1.0);
-//      r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
-        r = rin + sig * rnd;
-        nc++;
-      }
-      pr[i] = r;
-    }
-  }
-  else
-  {
-    pr = clouds_particles[which_particle_update];
-  }
-
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
 // generate a direction of the angular momentum of the orbit   
@@ -1492,7 +1169,20 @@ void transfun_1d_cloud_sample_model6(const void *pm, int flag_save)
     sin_Lthe = sin(Lthe);
     cos_Lthe = cos(Lthe);
 
-    r = pr[i];
+    nc = 0;
+    r = rcloud_max_set+1.0;
+    while(r>rcloud_max_set || r<rcloud_min_set)
+    {
+      if(nc > 1000)
+      {
+        printf("# Error, too many tries in generating ridial location of clouds.\n");
+        exit(0);
+      }
+      rnd = gsl_ran_gamma(gsl_r, a, 1.0);
+//    r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
+      r = rin + sig * rnd;
+      nc++;
+    }
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
     /* Polar coordinates to Cartesian coordinates */
@@ -1546,7 +1236,7 @@ void transfun_1d_cloud_sample_model6(const void *pm, int flag_save)
  */
 void transfun_2d_cloud_sample_model6(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
-  int i, j, nc, flag_update=0;
+  int i, j, nc;
   double r, phi, cos_phi, sin_phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
   double V, rhoV, theV, Vr, Vph, Vkep, Rs, g;
@@ -1554,7 +1244,6 @@ void transfun_2d_cloud_sample_model6(const void *pm, double *transv, double *tra
   double mbh, fellip, fflow, sigr_circ, sigthe_circ, sigr_rad, sigthe_rad, theta_rot, sig_turb;
   double Lphi, Lthe, sin_Lphi, cos_Lphi, sin_Lthe, cos_Lthe, sin_inc_cmp, cos_inc_cmp, linecenter=0.0;
   double weight, rnd, rnd_xi;
-  double *pr;
   double *pmodel = (double *)pm;
   BLRmodel6 *model = (BLRmodel6 *)pm;
 
@@ -1591,54 +1280,6 @@ void transfun_2d_cloud_sample_model6(const void *pm, double *transv, double *tra
   {
     linecenter = pmodel[num_params_blr - num_params_linecenter - 1] * parset.linecenter_err; 
   }
-
-  // "which_parameter_update = -1" means that all parameters are updated, usually occurs at the 
-  // initial step.
-  if(force_update == 1 || which_parameter_update == -1 )
-  {
-    flag_update = 1;
-  }
-  else
-  {
-    for(i=0; i<num_params_radial_samp;i++)
-    {
-      if(which_parameter_update == params_radial_samp[i])
-      {
-        flag_update = 1;
-        break;
-      }
-    }
-  }
-  
-  /* generate clouds' radial location */
-  if( flag_update == 1 )
-  {
-    pr = clouds_particles_perturb[which_particle_update];
-
-    for(i=0; i<parset.n_cloud_per_task; i++)
-    {
-      nc = 0;
-      r = rcloud_max_set+1.0;
-      while(r>rcloud_max_set || r<rcloud_min_set)
-      {
-        if(nc > 1000)
-        {
-          printf("# Error, too many tries in generating ridial location of clouds.\n");
-          exit(0);
-        }
-        rnd = gsl_ran_gamma(gsl_r, a, 1.0);
-//      r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
-        r = rin + sig * rnd;
-        nc++;
-      }
-      pr[i] = r;
-    }
-  }
-  else
-  {
-    pr = clouds_particles[which_particle_update];
-  }
-
   
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
@@ -1650,7 +1291,20 @@ void transfun_2d_cloud_sample_model6(const void *pm, double *transv, double *tra
     sin_Lthe = sin(Lthe);
     cos_Lthe = cos(Lthe);
 
-    r = pr[i];
+    nc = 0;
+    r = rcloud_max_set+1.0;
+    while(r>rcloud_max_set || r<rcloud_min_set)
+    {
+      if(nc > 1000)
+      {
+        printf("# Error, too many tries in generating ridial location of clouds.\n");
+        exit(0);
+      }
+      rnd = gsl_ran_gamma(gsl_r, a, 1.0);
+//    r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
+      r = rin + sig * rnd;
+      nc++;
+    }
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
     cos_phi = cos(phi);
     sin_phi = sin(phi);
@@ -1781,13 +1435,12 @@ void transfun_2d_cloud_sample_model6(const void *pm, double *transv, double *tra
  */
 void transfun_1d_cloud_sample_model7(const void *pm, int flag_save)
 {
-  int i, nc, flag_update=0, num_sh;
+  int i, nc, num_sh;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0;
   double inc, F, beta, mu, k, gam, xi, a, s, rin, sig;
   double Lphi, Lthe, sin_Lphi, cos_Lphi, sin_Lthe, cos_Lthe, sin_inc_cmp, cos_inc_cmp;
   double weight, rnd, rnd_xi;
-  double *pr;
   BLRmodel7 *model = (BLRmodel7 *)pm;
 
   Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
@@ -1807,64 +1460,10 @@ void transfun_1d_cloud_sample_model7(const void *pm, int flag_save)
   sin_inc_cmp = cos(inc); //sin(PI/2.0 - inc);
   cos_inc_cmp = sin(inc); //cos(PI/2.0 - inc);
 
-  for(i=0; i<num_params_radial_samp;i++)
-  {
-    if(which_parameter_update == params_radial_samp[i])
-    {
-      flag_update = 1;
-      break;
-    }
-  }
-  // "which_parameter_update = -1" means that all parameters are updated, usually occurs at the 
-  // initial step.
-  if(force_update == 1 || which_parameter_update == -1 )
-  {
-    flag_update = 1;
-  }
-  else
-  {
-    for(i=0; i<num_params_radial_samp;i++)
-    {
-      if(which_parameter_update == params_radial_samp[i])
-      {
-        flag_update = 1;
-        break;
-      }
-    }
-  }
   
   /* number of particles in first region */
   
   num_sh = (int)(parset.n_cloud_per_task * model->fsh);
-
-  /* generate clouds' radial location */
-  if( flag_update == 1 )
-  {
-    pr = clouds_particles_perturb[which_particle_update];
-
-    for(i=0; i<num_sh; i++)
-    {
-      nc = 0;
-      r = rcloud_max_set+1.0;
-      while(r>rcloud_max_set || r<rcloud_min_set)
-      {
-        if(nc > 1000)
-        {
-          printf("# Error, too many tries in generating ridial location of clouds.\n");
-          exit(0);
-        }
-        rnd = gsl_ran_gamma(gsl_r, a, 1.0);
-//      r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
-        r = rin + sig * rnd;
-        nc++;
-      }
-      pr[i] = r;
-    }
-  }
-  else
-  {
-    pr = clouds_particles[which_particle_update];
-  }
 
   for(i=0; i<num_sh; i++)
   {
@@ -1876,7 +1475,20 @@ void transfun_1d_cloud_sample_model7(const void *pm, int flag_save)
     sin_Lthe = sin(Lthe);
     cos_Lthe = cos(Lthe);
 
-    r = pr[i];
+    nc = 0;
+    r = rcloud_max_set+1.0;
+    while(r>rcloud_max_set || r<rcloud_min_set)
+    {
+      if(nc > 1000)
+      {
+        printf("# Error, too many tries in generating ridial location of clouds.\n");
+        exit(0);
+      }
+      rnd = gsl_ran_gamma(gsl_r, a, 1.0);
+//    r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
+      r = rin + sig * rnd;
+      nc++;
+    }
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
     /* Polar coordinates to Cartesian coordinates */
@@ -1929,35 +1541,6 @@ void transfun_1d_cloud_sample_model7(const void *pm, int flag_save)
   else
     Lopn_cos_un2 = 0.0;
 
-  /* generate clouds' radial location */
-  if( flag_update == 1 )
-  {
-    pr = clouds_particles_perturb[which_particle_update];
-
-    for(i = num_sh; i<parset.n_cloud_per_task; i++)
-    {
-      nc = 0;
-      r = rcloud_max_set+1.0;
-      while(r>rcloud_max_set || r<rcloud_min_set)
-      {
-        if(nc > 1000)
-        {
-          printf("# Error, too many tries in generating ridial location of clouds.\n");
-          exit(0);
-        }
-        rnd = gsl_ran_gamma(gsl_r, a, 1.0);
-//      r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
-        r = rin + sig * rnd;
-        nc++;
-      }
-      pr[i] = r;
-    }
-  }
-  else
-  {
-    pr = clouds_particles[which_particle_update];
-  }
-
   for(i=num_sh; i<parset.n_cloud_per_task; i++)
   {
     /* generate a direction of the angular momentum of the orbit  */ 
@@ -1968,7 +1551,20 @@ void transfun_1d_cloud_sample_model7(const void *pm, int flag_save)
     sin_Lthe = sin(Lthe);
     cos_Lthe = cos(Lthe);
 
-    r = pr[i];
+    nc = 0;
+    r = rcloud_max_set+1.0;
+    while(r>rcloud_max_set || r<rcloud_min_set)
+    {
+      if(nc > 1000)
+      {
+        printf("# Error, too many tries in generating ridial location of clouds.\n");
+        exit(0);
+      }
+      rnd = gsl_ran_gamma(gsl_r, a, 1.0);
+//    r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
+      r = rin + sig * rnd;
+      nc++;
+    }
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
 
     /* Polar coordinates to Cartesian coordinates */
@@ -2018,7 +1614,7 @@ void transfun_1d_cloud_sample_model7(const void *pm, int flag_save)
  */
 void transfun_2d_cloud_sample_model7(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
-  int i, j, nc, flag_update=0, num_sh;
+  int i, j, nc, num_sh;
   double r, phi, dis, Lopn_cos, cos_phi, sin_phi;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb, Rs, g, sig_turb;
   double V, rhoV, theV, Vr, Vph, Vkep;
@@ -2026,7 +1622,6 @@ void transfun_2d_cloud_sample_model7(const void *pm, double *transv, double *tra
   double mbh, fellip, fflow, sigr_circ, sigthe_circ, sigr_rad, sigthe_rad, theta_rot;
   double Lphi, Lthe, sin_Lphi, cos_Lphi, sin_Lthe, cos_Lthe, sin_inc_cmp, cos_inc_cmp,linecenter=0.0;
   double weight, rnd, rnd_xi;
-  double *pr;
   double *pmodel = (double *)pm;
   BLRmodel7 *model = (BLRmodel7 *)pm;
 
@@ -2063,53 +1658,8 @@ void transfun_2d_cloud_sample_model7(const void *pm, double *transv, double *tra
   {
     linecenter = pmodel[num_params_blr - num_params_linecenter - 1] * parset.linecenter_err; 
   }
-
-  if(force_update == 1 || which_parameter_update == -1 )
-  {
-    flag_update = 1;
-  }
-  else
-  {
-    for(i=0; i<num_params_radial_samp;i++)
-    {
-      if(which_parameter_update == params_radial_samp[i])
-      {
-        flag_update = 1;
-        break;
-      }
-    }
-  }
   
   num_sh = (int)(parset.n_cloud_per_task * model->fsh);
-
-  /* generate clouds' radial location */
-  if( flag_update == 1 )
-  {
-    pr = clouds_particles_perturb[which_particle_update];
-
-    for(i=0; i<num_sh; i++)
-    {
-      nc = 0;
-      r = rcloud_max_set+1.0;
-      while(r>rcloud_max_set || r<rcloud_min_set)
-      {
-        if(nc > 1000)
-        {
-          printf("# Error, too many tries in generating ridial location of clouds.\n");
-          exit(0);
-        }
-        rnd = gsl_ran_gamma(gsl_r, a, 1.0);
-//      r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
-        r = rin + sig * rnd;
-        nc++;
-      }
-      pr[i] = r;
-    }
-  }
-  else
-  {
-    pr = clouds_particles[which_particle_update];
-  }
 
   for(i=0; i<num_sh; i++)
   {
@@ -2121,7 +1671,20 @@ void transfun_2d_cloud_sample_model7(const void *pm, double *transv, double *tra
     sin_Lthe = sin(Lthe);
     cos_Lthe = cos(Lthe);
 
-    r = pr[i];
+    nc = 0;
+    r = rcloud_max_set+1.0;
+    while(r>rcloud_max_set || r<rcloud_min_set)
+    {
+      if(nc > 1000)
+      {
+        printf("# Error, too many tries in generating ridial location of clouds.\n");
+        exit(0);
+      }
+      rnd = gsl_ran_gamma(gsl_r, a, 1.0);
+//    r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
+      r = rin + sig * rnd;
+      nc++;
+    }
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
     cos_phi = cos(phi);
     sin_phi = sin(phi);
@@ -2240,34 +1803,6 @@ void transfun_2d_cloud_sample_model7(const void *pm, double *transv, double *tra
   else
     Lopn_cos_un2 = 0.0;
 
-  /* generate clouds' radial location */
-  if( flag_update == 1 )
-  {
-    pr = clouds_particles_perturb[which_particle_update];
-
-    for(i=num_sh; i<parset.n_cloud_per_task; i++)
-    {
-      nc = 0;
-      r = rcloud_max_set+1.0;
-      while(r>rcloud_max_set || r<rcloud_min_set)
-      {
-        if(nc > 1000)
-        {
-          printf("# Error, too many tries in generating ridial location of clouds.\n");
-          exit(0);
-        }
-        rnd = gsl_ran_gamma(gsl_r, a, 1.0);
-//      r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
-        r = rin + sig * rnd;
-        nc++;
-      }
-      pr[i] = r;
-    }
-  }
-  else
-  {
-    pr = clouds_particles[which_particle_update];
-  }
 
   for(i=num_sh; i<parset.n_cloud_per_task; i++)
   {
@@ -2280,7 +1815,20 @@ void transfun_2d_cloud_sample_model7(const void *pm, double *transv, double *tra
     sin_Lthe = sin(Lthe);
     cos_Lthe = cos(Lthe);
 
-    r = pr[i];
+    nc = 0;
+    r = rcloud_max_set+1.0;
+    while(r>rcloud_max_set || r<rcloud_min_set)
+    {
+      if(nc > 1000)
+      {
+        printf("# Error, too many tries in generating ridial location of clouds.\n");
+        exit(0);
+      }
+      rnd = gsl_ran_gamma(gsl_r, a, 1.0);
+//    r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
+      r = rin + sig * rnd;
+      nc++;
+    }
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
     cos_phi = cos(phi);
     sin_phi = sin(phi);
@@ -2396,7 +1944,6 @@ void restart_action_1d(int iflag)
 {
   FILE *fp;
   char str[200];
-  int i, count;
 
   sprintf(str, "%s/data/clouds_%04d.txt", parset.file_dir, thistask);
 
@@ -2412,28 +1959,11 @@ void restart_action_1d(int iflag)
 
   if(iflag == 0)
   {
-    printf("# Writing clouds at task %d.\n", thistask);
-    for(i=0; i<parset.num_particles; i++)
-    {
-      count = fwrite(clouds_particles[i], sizeof(double), parset.n_cloud_per_task, fp);
-      if(count < parset.n_cloud_per_task)
-      {
-        printf("# Error in writing clouds at task %d.\n", thistask);
-      }
-    }
+    printf("# Writing restart at task %d.\n", thistask);
   }
   else
   {
-    printf("# Reading clouds at task %d.\n", thistask);
-    for(i=0; i<parset.num_particles; i++)
-    {
-      count = fread(clouds_particles[i], sizeof(double), parset.n_cloud_per_task, fp);
-      if(count < parset.n_cloud_per_task)
-      {
-        printf("# Error in reading clouds at task %d.\n", thistask);
-      }
-    }
-
+    printf("# Reading restart at task %d.\n", thistask);
   }
   fclose(fp);
 }

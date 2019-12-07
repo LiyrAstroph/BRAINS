@@ -38,101 +38,41 @@ int dnest_line2d(int argc, char **argv)
     case 1:
       num_params_blr_model = sizeof(BLRmodel1)/sizeof(double);
       transfun_2d_cloud_sample = transfun_2d_cloud_sample_model1;
-
-      num_params_radial_samp=3;
-      params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
-      params_radial_samp[0] = 2;
-      params_radial_samp[1] = 3;
-      params_radial_samp[2] = 4;
-
       break;
+
     case 2:
       num_params_blr_model = sizeof(BLRmodel2)/sizeof(double);
       transfun_2d_cloud_sample = transfun_2d_cloud_sample_model2;
-
-      num_params_radial_samp=3;
-      params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
-      params_radial_samp[0] = 2;
-      params_radial_samp[1] = 3;
-      params_radial_samp[2] = 4;
-
       break;
+
     case 3:
       num_params_blr_model = sizeof(BLRmodel3)/sizeof(double);
       transfun_2d_cloud_sample = transfun_2d_cloud_sample_model3;
-
-      num_params_radial_samp=3;
-      params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
-      params_radial_samp[0] = 2;
-      params_radial_samp[1] = 3;
-      params_radial_samp[2] = 4;
-
       break;
+
     case 4:
       num_params_blr_model = sizeof(BLRmodel4)/sizeof(double);
       transfun_2d_cloud_sample = transfun_2d_cloud_sample_model4;
-
-      num_params_radial_samp=3;
-      params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
-      params_radial_samp[0] = 2;
-      params_radial_samp[1] = 3;
-      params_radial_samp[2] = 4;
-      
       break;
+
     case 5:
       num_params_blr_model = sizeof(BLRmodel5)/sizeof(double);
       transfun_2d_cloud_sample = transfun_2d_cloud_sample_model5;
-
-      num_params_radial_samp=5;
-      params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
-      params_radial_samp[0] = 2;
-      params_radial_samp[1] = 3;
-      params_radial_samp[2] = 4;
-      params_radial_samp[3] = 5;
-      params_radial_samp[4] = 11; // black hole mass changes Schwarzschild radius
-
       break;
     
     case 6:
       num_params_blr_model = sizeof(BLRmodel6)/sizeof(double);
       transfun_2d_cloud_sample = transfun_2d_cloud_sample_model6;
-
-      num_params_radial_samp=4;
-      params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
-      params_radial_samp[0] = 2;
-      params_radial_samp[1] = 3;
-      params_radial_samp[2] = 4;
-      params_radial_samp[3] = 10; // black hole mass changes Schwarzschild radius
-      
       break;
     
     case 7:
       num_params_blr_model = sizeof(BLRmodel7)/sizeof(double);
       transfun_2d_cloud_sample = transfun_2d_cloud_sample_model7;
-
-      num_params_radial_samp=8;
-      params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
-      params_radial_samp[0] = 2;
-      params_radial_samp[1] = 3;
-      params_radial_samp[2] = 4;
-      params_radial_samp[3] = 10;
-      params_radial_samp[4] = 11;
-      params_radial_samp[5] = 12;
-      params_radial_samp[6] = 13;
-      params_radial_samp[7] = 15; // black hole mass changes Schwarzschild radius
-      
       break;
 
     default:
       num_params_blr_model = 12;
       transfun_2d_cloud_sample = transfun_2d_cloud_sample_model1;
-
-      num_params_radial_samp=3;
-      params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
-      params_radial_samp[0] = 2;
-      params_radial_samp[1] = 3;
-      params_radial_samp[2] = 4;
-
       break;
   }
   
@@ -634,24 +574,6 @@ void accept_action_2d()
       Fline_at_data_particles[which_particle_update] = Fline_at_data_particles_perturb[which_particle_update];
       Fline_at_data_particles_perturb[which_particle_update] = ptemp;
 
-      /* when force_update is true, no need to store the perturbed value */
-      if(force_update == 0)
-      {
-        for(i=0; i<num_params_radial_samp; i++)
-        {
-          if(param == params_radial_samp[i])
-          {
-            flag_cpy = 1;
-            break;
-          }
-        }
-        if(flag_cpy == 1)
-        {
-          ptemp = clouds_particles[which_particle_update];
-          clouds_particles[which_particle_update] = clouds_particles_perturb[which_particle_update];
-          clouds_particles_perturb[which_particle_update] = ptemp;
-        }
-      }
     }
   } 
     
@@ -665,6 +587,5 @@ void kill_action_2d(int i, int i_copy)
   memcpy(con_q_particles[i], con_q_particles[i_copy], nq * sizeof(double));
   memcpy(TransTau_particles[i], TransTau_particles[i_copy], parset.n_tau*sizeof(double));
   memcpy(Trans2D_at_veldata_particles[i], Trans2D_at_veldata_particles[i_copy], parset.n_tau * n_vel_data * sizeof(double));
-  memcpy(clouds_particles[i], clouds_particles[i_copy], parset.n_cloud_per_task * sizeof(double)) ;
   return;
 }

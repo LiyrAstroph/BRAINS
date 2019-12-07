@@ -75,9 +75,6 @@ double *Fline2d_at_data;
 double *Fline2d, *Flerrs2d;
 double logz_line2d;
 
-int num_params_radial_samp;
-int *params_radial_samp;
-
 // BLR
 int BLRmodel_size;
 int *par_fix, npar_fix;
@@ -109,7 +106,6 @@ double *prob_con_particles, *prob_con_particles_perturb;
 double **con_q_particles, **con_q_particles_perturb;
 
 int force_update;
-double **clouds_particles_perturb, **clouds_particles;
 double **TransTau_particles, **TransTau_particles_perturb;
 double **Trans1D_particles, **Trans1D_particles_perturb;
 double **Trans2D_at_veldata_particles, **Trans2D_at_veldata_particles_perturb;

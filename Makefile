@@ -23,8 +23,8 @@ GSL_INCL    = $(shell pkg-config --cflags gsl)
 GSL_LIBS    = $(shell pkg-config --libs gsl) 
 LAPACK_INCL = -I/usr/include/lapacke
 LAPACK_LIBS = -L/usr/lib64 -llapacke -llapack -lblas
-DNEST_INCL  = -I /home/liyropt/Projects/GIT/DNest/
-DNEST_LIBS  = -L /home/liyropt/Projects/GIT/DNest -ldnest
+DNEST_INCL  = -I /home/liyropt/Projects/GIT/CDNest/
+DNEST_LIBS  = -L /home/liyropt/Projects/GIT/CDNest -ldnest
 FFTW_INCL   = $(shell pkg-config --cflags fftw3) 
 FFTW_LIBS   = $(shell pkg-config --libs fftw3) 
 

@@ -526,14 +526,6 @@ void sim_init()
     }
   }
   
-  clouds_particles = malloc(parset.num_particles * sizeof(double *));
-  clouds_particles_perturb = malloc(parset.num_particles * sizeof(double *));
-  for(i=0; i<parset.num_particles; i++)
-  {
-    clouds_particles[i] = malloc(parset.n_cloud_per_task * sizeof(double));
-    clouds_particles_perturb[i] = malloc(parset.n_cloud_per_task * sizeof(double));
-  }
-
   con_q = malloc(nq * sizeof(double));
 
   tmp_tau = malloc(parset.n_cloud_per_task * sizeof(double));
@@ -563,7 +555,6 @@ void sim_init()
 
 void sim_end()
 {
-  int i;
   free(model);
   free(Fcon);
 
@@ -574,13 +565,6 @@ void sim_end()
   free(Fline2d);
   free(Trans2D);
   free(Trans1D);
-  for(i=0; i<parset.num_particles; i++)
-  {
-    free(clouds_particles[i]);
-    free(clouds_particles_perturb[i]);
-  }
-  free(clouds_particles);
-  free(clouds_particles_perturb);
 
   free(con_q);
 

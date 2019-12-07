@@ -170,9 +170,6 @@ extern double *Fline2d_at_data;
 extern double *Fline2d, *Flerrs2d;
 extern double logz_line2d;
 
-extern int num_params_radial_samp;
-extern int *params_radial_samp;
-
 extern int BLRmodel_size;
 extern int *par_fix, npar_fix;
 extern double *par_fix_val;
@@ -201,7 +198,6 @@ extern double *prob_con_particles, *prob_con_particles_perturb;
 extern double **con_q_particles, **con_q_particles_perturb;
 
 extern int force_update;
-extern double **clouds_particles_perturb, **clouds_particles;
 extern double **TransTau_particles, **TransTau_particles_perturb;
 extern double **Trans1D_particles, **Trans1D_particles_perturb;
 extern double **Trans2D_at_veldata_particles, **Trans2D_at_veldata_particles_perturb;

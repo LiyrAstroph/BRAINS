@@ -587,14 +587,6 @@ void reconstruct_line2d_init()
     Fcon_particles_perturb[i] = malloc(parset.n_con_recon * sizeof(double));
   }
 
-  clouds_particles = malloc(parset.num_particles * sizeof(double *));
-  clouds_particles_perturb = malloc(parset.num_particles * sizeof(double *));
-  for(i=0; i<parset.num_particles; i++)
-  {
-    clouds_particles[i] = malloc(parset.n_cloud_per_task * sizeof(double));
-    clouds_particles_perturb[i] = malloc(parset.n_cloud_per_task * sizeof(double));
-  }
-
   TransTau_particles = malloc(parset.num_particles * sizeof(double *));
   TransTau_particles_perturb = malloc(parset.num_particles * sizeof(double *));
   for(i=0; i<parset.num_particles; i++)
@@ -682,8 +674,6 @@ void reconstruct_line2d_end()
 
   for(i=0; i<parset.num_particles; i++)
   {
-    free(clouds_particles[i]);
-    free(clouds_particles_perturb[i]);
     free(Trans2D_at_veldata_particles[i]);
     free(Trans2D_at_veldata_particles_perturb[i]);
     free(TransTau_particles[i]);
@@ -694,8 +684,6 @@ void reconstruct_line2d_end()
     free(con_q_particles[i]);
     free(con_q_particles_perturb[i]);
   }
-  free(clouds_particles);
-  free(clouds_particles_perturb);
   free(Trans2D_at_veldata_particles);
   free(Trans2D_at_veldata_particles_perturb);
   free(TransTau_particles);
@@ -714,8 +702,6 @@ void reconstruct_line2d_end()
   free(par_range_model);
   free(par_prior_gaussian);
   free(par_prior_model);
-
-  free(params_radial_samp);
   
   free(tmp_tau);
   free(tmp_weight);
@@ -771,9 +757,6 @@ double prob_initial_line2d(const void *model)
       }
     }
   }
-
-  memcpy(clouds_particles[which_particle_update], clouds_particles_perturb[which_particle_update],
-          parset.n_cloud_per_task * sizeof(double));
 
   return prob_line;
 }

@@ -36,96 +36,41 @@ int dnest_line1d(int argc, char **argv)
     case 1:
       num_params_blr_model = 9;
       transfun_1d_cloud_sample = transfun_1d_cloud_sample_model1;
-
-      num_params_radial_samp=3;
-      params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
-      params_radial_samp[0] = 2;
-      params_radial_samp[1] = 3;
-      params_radial_samp[2] = 4;
-
-
       break;
+
     case 2:
       num_params_blr_model = 9;
       transfun_1d_cloud_sample = transfun_1d_cloud_sample_model1;
-
-      num_params_radial_samp=3;
-      params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
-      params_radial_samp[0] = 2;
-      params_radial_samp[1] = 3;
-      params_radial_samp[2] = 4;
-
       break;
+
     case 3:
       num_params_blr_model = 9;
       transfun_1d_cloud_sample = transfun_1d_cloud_sample_model3;
-
-      num_params_radial_samp=3;
-      params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
-      params_radial_samp[0] = 2;
-      params_radial_samp[1] = 3;
-      params_radial_samp[2] = 4;
-
       break;
+
     case 4:
       num_params_blr_model = 9;
       transfun_1d_cloud_sample = transfun_1d_cloud_sample_model3;
-
-      num_params_radial_samp=3;
-      params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
-      params_radial_samp[0] = 2;
-      params_radial_samp[1] = 3;
-      params_radial_samp[2] = 4;
-
       break;
 
     case 5:
       num_params_blr_model = 12;
       transfun_1d_cloud_sample = transfun_1d_cloud_sample_model5;
-
-      num_params_radial_samp=4;
-      params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
-      params_radial_samp[0] = 2;
-      params_radial_samp[1] = 3;
-      params_radial_samp[2] = 4;
-      params_radial_samp[3] = 5;
       break;
 
     case 6:
       num_params_blr_model = 11;
       transfun_1d_cloud_sample = transfun_1d_cloud_sample_model6;
-
-      num_params_radial_samp=3;
-      params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
-      params_radial_samp[0] = 2;
-      params_radial_samp[1] = 3;
-      params_radial_samp[2] = 4;
       break;
 
     case 7:
       num_params_blr_model = 16;
       transfun_1d_cloud_sample = transfun_1d_cloud_sample_model7;
-
-      num_params_radial_samp=7;
-      params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
-      params_radial_samp[0] = 2;
-      params_radial_samp[1] = 3;
-      params_radial_samp[2] = 4;
-      params_radial_samp[3] = 10;
-      params_radial_samp[4] = 11;
-      params_radial_samp[5] = 12;
-      params_radial_samp[6] = 13;
       break;
 
     default:
       num_params_blr_model = 9;
       transfun_1d_cloud_sample = transfun_1d_cloud_sample_model1;
-
-      num_params_radial_samp=3;
-      params_radial_samp = malloc(num_params_radial_samp * sizeof(int));
-      params_radial_samp[0] = 2;
-      params_radial_samp[1] = 3;
-      params_radial_samp[2] = 4;
       break;
   }
   
@@ -563,26 +508,6 @@ void accept_action_1d()
       ptemp = Fline_at_data_particles[which_particle_update];
       Fline_at_data_particles[which_particle_update] = Fline_at_data_particles_perturb[which_particle_update];
       Fline_at_data_particles_perturb[which_particle_update] = ptemp;
-
-      /* when force_update is true, no need to store the perturbed value */
-      if(force_update == 0)
-      {
-        for(i=0; i<num_params_radial_samp; i++)
-        {
-          if(param == params_radial_samp[i])
-          {
-            flag_cpy = 1;
-            break;
-          }
-        }
-
-        if(flag_cpy == 1)
-        {
-          ptemp = clouds_particles[which_particle_update];
-          clouds_particles[which_particle_update] = clouds_particles_perturb[which_particle_update];
-          clouds_particles_perturb[which_particle_update] = ptemp;
-        }
-      }
     }
   }  
   
@@ -596,6 +521,5 @@ void kill_action_1d(int i, int i_copy)
   memcpy(con_q_particles[i], con_q_particles[i_copy], nq * sizeof(double));
   memcpy(TransTau_particles[i], TransTau_particles[i_copy], parset.n_tau*sizeof(double));
   memcpy(Trans1D_particles[i], Trans1D_particles[i_copy], parset.n_tau * sizeof(double));
-  memcpy(clouds_particles[i], clouds_particles[i_copy], parset.n_cloud_per_task * sizeof(double)) ;
   return;
 }
