@@ -30,7 +30,6 @@ typedef struct
   double mbh;      /*!< \brief 9.  black hole mass,  in 10e6 solar mass */
   double lambda;   /*!< \brief 10. orbit parameter */
   double q;        /*!< \brief 11. inflow/outflow */
-  double logse;    /*!< \brief 12. systematic errors in continuum and emission line */
 }BLRmodel1;
 
 /*!
@@ -50,7 +49,6 @@ typedef struct
   double mbh;      /*!< \brief 9.  black hole mass,  in 10e6 solar mass */
   double sigr;     /*!< \brief 10. orbit parameter */
   double sigtheta; /*!< \brief 11. inflow/outflow */
-  double logse;    /*!< \brief 12. systematic errors in continuum and emission line */
 }BLRmodel2;
 
 /*!
@@ -70,7 +68,6 @@ typedef struct
   double mbh;      /*!< \brief 9.  black hole mass,  in 10e6 solar mass */
   double xi;       /*!< \brief 10. orbit parameter */
   double q;        /*!< \brief 11. inflow/outflow */
-  double logse;    /*!< \brief 12. systematic errors in continuum and emission line */
 }BLRmodel3;
 
 /*!
@@ -105,7 +102,6 @@ typedef struct
   double sigthe_rad;    /*!< \brief 18. */
   double theta_rot;     /*!< \brief 19. */
   double sig_turb;      /*!< \brief 20. turbulence velocity */
-  double logse;         /*!< \brief 21. */
 }BLRmodel5;
 
 /*!
@@ -133,7 +129,6 @@ typedef struct
   double sigthe_rad;    /*!< \brief 17. */
   double theta_rot;     /*!< \brief 18. */
   double sig_turb;      /*!< \brief 19. turbulence velocity */
-  double logse;         /*!< \brief 20. */
 }BLRmodel6;
 
 
@@ -171,7 +166,6 @@ typedef struct
   double fellip_un;        /*!< \brief 24.ellipitic orbits */
   double fflow_un;         /*!< \brief 25.inflow/outflow */
   double sig_turb;      /*!< \brief 26. */
-  double logse;         /*!< \brief 27. */
 }BLRmodel7;
 
 #endif

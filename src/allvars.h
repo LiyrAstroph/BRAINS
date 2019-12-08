@@ -185,6 +185,7 @@ extern double var_range_model[15][2];
 extern double nlr_range_model[3][2];
 extern int nlr_prior_model[3];
 extern double mass_range[2];
+extern double sys_err_line_range[2]; /* range for systematic error of line */
 
 extern double *instres_epoch, *instres_err_epoch;
 

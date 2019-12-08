@@ -51,7 +51,6 @@ void sim()
       pm[8] = log(3.0);
       pm[9] = 0.1;
       pm[10] = 0.5;
-      pm[11] = log(1.0);
       break;
 
     case 2:
@@ -66,7 +65,6 @@ void sim()
       pm[8] = log(3.0);
       pm[9] = log(0.01);
       pm[10] = log(0.1);
-      pm[11] = log(1.0);
       break;
 
     case 3:
@@ -81,8 +79,6 @@ void sim()
       pm[8] = log(3.0);
       pm[9] = 0.5;
       pm[10] = 0.5;
-      pm[11] = log(1.0);
-
       break;
 
     case 4:
@@ -97,7 +93,6 @@ void sim()
       pm[8] = log(3.0);
       pm[9] = 0.5;
       pm[10] = 0.5;
-      pm[11] = log(1.0);
       break;
 
     case 5:
@@ -122,7 +117,6 @@ void sim()
       pm[18] = 0.0;      //theta_rot
       pm[19] = log(0.001); //sig_turb
       pm[20] = 0.0;      //spectral broadening
-      pm[21] = log(1.0); //systematic error
       break;
 
     case 6:
@@ -146,7 +140,6 @@ void sim()
       pm[17] = 0.0;       // theta_rot
       pm[18] = log(0.001);  // sig_turb
       pm[19] = 0.0;       // parameter for spectral broadening 
-      pm[20] = log(1.0);  // systematic error
       break;
 
     case 7:
@@ -179,7 +172,6 @@ void sim()
       pm[24] = 0.4;      //fflow_un
       pm[25] = log(0.001); // sig_turb
       pm[26] = 0.0;      // parameter for spectral broadening 
-      pm[27] = log(1.0); //systematic error
       break;
   }
 
@@ -210,7 +202,7 @@ void sim()
   
   for(i=0; i<parset.n_con_recon; i++)
   {
-    fprintf(fp, "%f %f %f\n", Tcon[i], Fcon[i]/con_scale, Fcerrs[i]/con_scale);
+    fprintf(fp, "%e %e %e\n", Tcon[i], Fcon[i]/con_scale, Fcerrs[i]/con_scale);
   }
   fclose(fp);
 
@@ -228,14 +220,14 @@ void sim()
     {
       //fprintf(fp, "%f %f %f\n", Tcon[i], Fcon[i]/con_scale, Fcerrs[i]/con_scale);
       fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, Tcon_data[i], gsl_acc);
-      fprintf(fp, "%f %f %f\n", Tcon_data[i], (fcon+gsl_ran_ugaussian(gsl_r)*con_error_mean)/con_scale, con_error_mean/con_scale);
+      fprintf(fp, "%e %e %e\n", Tcon_data[i], (fcon+gsl_ran_ugaussian(gsl_r)*con_error_mean)/con_scale, con_error_mean/con_scale);
     }
   }
   else
   {
     for(i=0; i<parset.n_con_recon; i++)
     {
-      fprintf(fp, "%f %f %f\n", Tcon[i], Fcon[i]/con_scale, Fcerrs[i]/con_scale);
+      fprintf(fp, "%e %e %e\n", Tcon[i], Fcon[i]/con_scale, Fcerrs[i]/con_scale);
     }
   }
   fclose(fp);
@@ -263,7 +255,7 @@ void sim()
   }
   for(i=0; i<parset.n_line_recon; i++)
   {
-    fprintf(fp, "%f %f %f\n", Tline[i], Fline[i]/line_scale + gsl_ran_ugaussian(gsl_r)*error/line_scale, 
+    fprintf(fp, "%e %e %e\n", Tline[i], Fline[i]/line_scale + gsl_ran_ugaussian(gsl_r)*error/line_scale, 
       error/line_scale);
   }
 
@@ -278,7 +270,7 @@ void sim()
 
   for(i=0; i<parset.n_tau; i++)
   {
-    fprintf(fp, "%f %f\n", TransTau[i], Trans1D[i]);
+    fprintf(fp, "%e %e\n", TransTau[i], Trans1D[i]);
   }
   fclose(fp);
 
@@ -300,7 +292,7 @@ void sim()
   {
     for(j=0; j<parset.n_vel_recon; j++)
     {
-      fprintf(fp, "%f %f %f %f\n", TransV[j]*VelUnit, Tline[i],  
+      fprintf(fp, "%e %e %e %e\n", TransV[j]*VelUnit, Tline[i],  
         (Fline2d[i*parset.n_vel_recon + j] + gsl_ran_ugaussian(gsl_r)*line_error_mean*0.3)/line_scale, line_error_mean/line_scale);
     }
 
@@ -335,7 +327,7 @@ void sim()
   {
     for(j=0; j<parset.n_vel_recon; j++)
     {
-      fprintf(fp, "%f %f %f\n", TransV[j]*VelUnit, TransTau[i], Trans2D[i*parset.n_vel_recon + j]);
+      fprintf(fp, "%e %e %e\n", TransV[j]*VelUnit, TransTau[i], Trans2D[i*parset.n_vel_recon + j]);
     }
 
     fprintf(fp, "\n");
@@ -428,7 +420,8 @@ void sim_init()
   force_update = 1;
   which_parameter_update = -1;
   
-  num_params_blr = num_params_blr_model + num_params_nlr + num_params_res + num_params_linecenter;
+  num_params_blr = num_params_blr_model + num_params_nlr 
+                 + num_params_res + num_params_linecenter + 1; /* one parameter for systematic error of line */
   num_params_var = num_params_drw + num_params_trend + num_params_difftrend;
   num_params = num_params_blr + num_params_var + parset.n_con_recon;
 

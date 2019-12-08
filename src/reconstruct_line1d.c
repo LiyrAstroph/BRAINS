@@ -144,19 +144,19 @@ void postprocess1d()
       {
         for(j=0; j<parset.n_con_recon; j++)
         {
-          fprintf(fcon, "%f %f\n", Tcon[j], Fcon[j]/con_scale);
+          fprintf(fcon, "%e %e\n", Tcon[j], Fcon[j]/con_scale);
         }
         fprintf(fcon, "\n");
 
         for(j=0; j<parset.n_line_recon; j++)
         {
-          fprintf(fline, "%f %f\n", Tline[j], Fline[j]/line_scale);
+          fprintf(fline, "%e %e\n", Tline[j], Fline[j]/line_scale);
         }
         fprintf(fline, "\n");
 
         for(j=0; j<parset.n_tau; j++)
         {
-          fprintf(ftran, "%f %f\n", TransTau[j], Trans1D[j]);
+          fprintf(ftran, "%e %e\n", TransTau[j], Trans1D[j]);
         }
         fprintf(ftran, "\n");
       }
@@ -304,7 +304,7 @@ void reconstruct_line1d()
 
       for(i=0; i<parset.n_con_recon; i++)
       {
-        fprintf(fp, "%f %f\n", Tcon[i], Fcon[i] / con_scale);
+        fprintf(fp, "%e %e\n", Tcon[i], Fcon[i] / con_scale);
       }
       fclose(fp);
 
@@ -322,7 +322,7 @@ void reconstruct_line1d()
 
       for(i=0; i<parset.n_line_recon; i++)
       {
-        fprintf(fp, "%f %f\n", Tline[i], Fline[i] / line_scale);
+        fprintf(fp, "%e %e\n", Tline[i], Fline[i] / line_scale);
       }
       fclose(fp);
 
@@ -337,7 +337,7 @@ void reconstruct_line1d()
 
       for(i=0; i<parset.n_tau; i++)
       {
-        fprintf(fp, "%f %f\n", TransTau[i], Trans1D[i]);
+        fprintf(fp, "%e %e\n", TransTau[i], Trans1D[i]);
       }
       fclose(fp);
     }

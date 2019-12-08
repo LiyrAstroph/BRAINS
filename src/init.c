@@ -269,6 +269,10 @@ void init()
     nlr_prior_model[2] = GAUSSIAN;
   }
 
+  // range for systematic error
+  sys_err_line_range[0] = log(1.0);
+  sys_err_line_range[1] = log(1.0+10.0);
+
   set_blr_range_model();
 }
 
@@ -449,7 +453,7 @@ void set_par_fix(int num_params_blr)
     for(i=strlen(parset.str_par_fix); i<num_params_blr; i++)
       parset.str_par_fix[i] = '0';
 
-    for(i=0; i<num_params_blr_model-1; i++)
+    for(i=0; i<num_params_blr_model; i++)
     {
       if(parset.str_par_fix[i] == '0')
       {
@@ -486,8 +490,8 @@ void set_par_fix(int num_params_blr)
       // flux
       if(parset.flux_narrowline_err == 0.0)
       {
-        par_fix[num_params_blr_model - 1] = 1.0;
-        par_fix_val[num_params_blr_model -1] = 0.0;
+        par_fix[num_params_blr_model] = 1.0;
+        par_fix_val[num_params_blr_model] = 0.0;
       }
     }
 
@@ -496,15 +500,15 @@ void set_par_fix(int num_params_blr)
       // width
       if(parset.width_narrowline_err == 0.0)
       {
-        par_fix[num_params_blr_model-1+1] = 1.0;
-        par_fix_val[num_params_blr_model-1+1] = 0.0;
+        par_fix[num_params_blr_model+1] = 1.0;
+        par_fix_val[num_params_blr_model+1] = 0.0;
       } 
 
       // shift
       if(parset.shift_narrowline_err == 0.0)
       {
-        par_fix[num_params_blr_model-1+2] = 1.0;
-        par_fix_val[num_params_blr_model-1+2] = 0.0;
+        par_fix[num_params_blr_model+2] = 1.0;
+        par_fix_val[num_params_blr_model+2] = 0.0;
       }
     }
   }
@@ -557,9 +561,6 @@ void set_blr_range_model1()
   //q
   blr_range_model[i][0] = 0.0;
   blr_range_model[i++][1] = 1.0;
-  //logse
-  blr_range_model[i][0] = log(1.0);
-  blr_range_model[i++][1] = log(1.0+10.0);
 
   //blr_range_model[2][1] = fmin(blr_range_model[2][1], log(rcloud_max_set));
   return;
@@ -604,9 +605,6 @@ void set_blr_range_model2()
   //sigtheta
   blr_range_model[i][0] = 0.0;
   blr_range_model[i++][1] = 1.0;
-  //logse
-  blr_range_model[i][0] = log(1.0);
-  blr_range_model[i++][1] = log(1.0+10.0);
 
   return;
 }
@@ -650,9 +648,6 @@ void set_blr_range_model3()
   //q
   blr_range_model[i][0] = 0.0;
   blr_range_model[i++][1] = 1.0;
-  //logse
-  blr_range_model[i][0] = log(1.0);
-  blr_range_model[i++][1] = log(1.0+10.0);
 
   //rcloud_max_set = fmax(rcloud_max_set, exp(blr_range_model[3][1] + blr_range_model[4][1]));
   return;
@@ -697,9 +692,6 @@ void set_blr_range_model4()
   //q
   blr_range_model[i][0] = 0.0;
   blr_range_model[i++][1] = 1.0;
-  //logse
-  blr_range_model[i][0] = log(1.0);
-  blr_range_model[i++][1] = log(1.0+10.0);
 
   //rcloud_max_set = fmax(rcloud_max_set, exp(blr_range_model[3][1] + blr_range_model[4][1]));
   return;
@@ -771,9 +763,6 @@ void set_blr_range_model5()
   //sig_turb
   blr_range_model[i][0] = log(0.001);
   blr_range_model[i++][1] = log(0.1);
-  //logse
-  blr_range_model[i][0] = log(1.0);
-  blr_range_model[i++][1] = log(1.0+10.0);
 
   //rcloud_max_set = fmax(rcloud_max_set, exp(blr_range_model[2][1] + blr_range_model[4][1]));
 
@@ -844,9 +833,6 @@ void set_blr_range_model6()
   //sig_turb
   blr_range_model[i][0] = log(0.0001);
   blr_range_model[i++][1] = log(0.1);
-  //logse
-  blr_range_model[i][0] = log(1.0);
-  blr_range_model[i++][1] = log(1.0+10.0);
 
   //rcloud_max_set = 44.85;
   //blr_range_model[2][1] = fmin(blr_range_model[2][1], log(rcloud_max_set));
@@ -942,10 +928,6 @@ void set_blr_range_model7()
   //sig_turb
   blr_range_model[i][0] = log(0.001);
   blr_range_model[i++][1] = log(0.1);
-
-  //logse
-  blr_range_model[i][0] = log(1.0);
-  blr_range_model[i++][1] = log(1.0+10.0);
 
   return;
 }

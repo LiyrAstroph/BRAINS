@@ -34,47 +34,47 @@ int dnest_line1d(int argc, char **argv)
   switch(parset.flag_blrmodel)
   {
     case 1:
-      num_params_blr_model = 9;
+      num_params_blr_model = 8;
       transfun_1d_cloud_sample = transfun_1d_cloud_sample_model1;
       break;
 
     case 2:
-      num_params_blr_model = 9;
+      num_params_blr_model = 8;
       transfun_1d_cloud_sample = transfun_1d_cloud_sample_model1;
       break;
 
     case 3:
-      num_params_blr_model = 9;
+      num_params_blr_model = 8;
       transfun_1d_cloud_sample = transfun_1d_cloud_sample_model3;
       break;
 
     case 4:
-      num_params_blr_model = 9;
+      num_params_blr_model = 8;
       transfun_1d_cloud_sample = transfun_1d_cloud_sample_model3;
       break;
 
     case 5:
-      num_params_blr_model = 12;
+      num_params_blr_model = 11;
       transfun_1d_cloud_sample = transfun_1d_cloud_sample_model5;
       break;
 
     case 6:
-      num_params_blr_model = 11;
+      num_params_blr_model = 10;
       transfun_1d_cloud_sample = transfun_1d_cloud_sample_model6;
       break;
 
     case 7:
-      num_params_blr_model = 16;
+      num_params_blr_model = 15;
       transfun_1d_cloud_sample = transfun_1d_cloud_sample_model7;
       break;
 
     default:
-      num_params_blr_model = 9;
+      num_params_blr_model = 8;
       transfun_1d_cloud_sample = transfun_1d_cloud_sample_model1;
       break;
   }
   
-  num_params_blr = num_params_blr_model;
+  num_params_blr = num_params_blr_model + 1; /* include one parameter for systematic error */
   num_params = parset.n_con_recon + num_params_var + num_params_blr;
 
   par_fix = (int *) malloc(num_params * sizeof(int));
@@ -171,8 +171,8 @@ void set_par_range_model1d()
   }
   /* note that the last BLR parameters is the systematic error (1d) */
   i = num_params_blr -1;
-  par_range_model[i][0] = blr_range_model[BLRmodel_size/sizeof(double)-1][0];
-  par_range_model[i][1] = blr_range_model[BLRmodel_size/sizeof(double)-1][1];
+  par_range_model[i][0] = sys_err_line_range[0];
+  par_range_model[i][1] = sys_err_line_range[1];
 
   par_prior_model[i] = UNIFORM;
   par_prior_gaussian[i][0] = 0.0;

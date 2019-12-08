@@ -71,12 +71,13 @@ int dnest_line2d(int argc, char **argv)
       break;
 
     default:
-      num_params_blr_model = 12;
+      num_params_blr_model = sizeof(BLRmodel1)/sizeof(double);
       transfun_2d_cloud_sample = transfun_2d_cloud_sample_model1;
       break;
   }
   
-  num_params_blr = num_params_blr_model + num_params_nlr + num_params_res + num_params_linecenter;
+  num_params_blr = num_params_blr_model + num_params_nlr 
+                 + num_params_res + num_params_linecenter + 1; /* include one parameter for systematic error */
   num_params = parset.n_con_recon + num_params_blr + num_params_var;
   par_fix = (int *) malloc(num_params * sizeof(int));
   par_fix_val = (double *) malloc(num_params * sizeof(double));
@@ -174,7 +175,7 @@ void set_par_range_model2d()
   int i;
 
   /* setup parameter range, BLR parameters first */
-  for(i=0; i<num_params_blr_model-1; i++)
+  for(i=0; i<num_params_blr_model; i++)
   {
     par_range_model[i][0] = blr_range_model[i][0];
     par_range_model[i][1] = blr_range_model[i][1];
@@ -184,17 +185,17 @@ void set_par_range_model2d()
     par_prior_gaussian[i][1] = 0.0;
   }
   /* cope with narrow line */
-  for(i=num_params_blr_model-1; i<num_params_blr_model-1 + num_params_nlr; i++)
+  for(i=num_params_blr_model; i<num_params_blr_model + num_params_nlr; i++)
   {
-    par_range_model[i][0] = nlr_range_model[i - (num_params_blr_model-1)][0];
-    par_range_model[i][1] = nlr_range_model[i - (num_params_blr_model-1)][1];
+    par_range_model[i][0] = nlr_range_model[i - num_params_blr_model][0];
+    par_range_model[i][1] = nlr_range_model[i - num_params_blr_model][1];
     
-    par_prior_model[i] = nlr_prior_model[i - (num_params_blr_model-1)];
+    par_prior_model[i] = nlr_prior_model[i - num_params_blr_model];
     par_prior_gaussian[i][0] = 0.0;
     par_prior_gaussian[i][1] = 1.0; /* note that for logarithm prior of flux, this value is not used, so does not matter */
   }
   /* cope with spectral broadening */
-  for(i=num_params_blr_model-1 + num_params_nlr; i<num_params_blr_model-1 + num_params_nlr + num_params_res; i++)
+  for(i=num_params_blr_model + num_params_nlr; i<num_params_blr_model + num_params_nlr + num_params_res; i++)
   {
     par_range_model[i][0] = -10.0;
     par_range_model[i][1] =  10.0;
@@ -215,8 +216,8 @@ void set_par_range_model2d()
   }
   /* the last is systematic error */
   i = num_params_blr-1;
-  par_range_model[i][0] = blr_range_model[num_params_blr_model-1][0];
-  par_range_model[i][1] = blr_range_model[num_params_blr_model-1][1];
+  par_range_model[i][0] = sys_err_line_range[0];
+  par_range_model[i][1] = sys_err_line_range[1];
 
   par_prior_model[i] = UNIFORM;
   par_prior_gaussian[i][0] = 0.0;
@@ -308,7 +309,7 @@ void print_par_names_model2d()
 
 
   i=-1;
-  for(j=0; j<num_params_blr_model-1; j++)
+  for(j=0; j<num_params_blr_model; j++)
   {
     i++;
     fprintf(fp, "%4d %-15s %f %f %d\n", i, "BLR model", par_range_model[i][0], par_range_model[i][1], par_prior_model[i]);

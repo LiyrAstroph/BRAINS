@@ -182,7 +182,7 @@ void postprocess2d()
         // output continuum
         for(j=0; j<parset.n_con_recon; j++)
         {
-          fprintf(fcon, "%f %f\n", Tcon[j], Fcon[j]/con_scale);
+          fprintf(fcon, "%e %e\n", Tcon[j], Fcon[j]/con_scale);
         }
         fprintf(fcon, "\n");
 
@@ -191,7 +191,7 @@ void postprocess2d()
         {
           for(k=0; k<n_vel_data; k++)
           {
-            fprintf(fline, "%f ", Fline2d_at_data[j * n_vel_data_ext + (k+n_vel_data_incr)]/line_scale);
+            fprintf(fline, "%e ", Fline2d_at_data[j * n_vel_data_ext + (k+n_vel_data_incr)]/line_scale);
           }
           fprintf(fline, "\n");
         }
@@ -200,11 +200,11 @@ void postprocess2d()
         // output transfer function
         for(j=0; j<parset.n_tau; j++)
         {
-          fprintf(ftran, "%f ", TransTau[j]);
+          fprintf(ftran, "%e ", TransTau[j]);
           
           for(k=0; k<n_vel_data; k++)
           {
-            fprintf(ftran, "%f ", Trans2D_at_veldata[j * n_vel_data_ext + (k+n_vel_data_incr)]);
+            fprintf(ftran, "%e ", Trans2D_at_veldata[j * n_vel_data_ext + (k+n_vel_data_incr)]);
           }
           fprintf(ftran, "\n");
         }
@@ -213,7 +213,7 @@ void postprocess2d()
         // output 1d line 
         for(j = 0; j<n_line_data; j++)
         {
-          fprintf(fline1d, "%f %f\n", Tline_data[j], Fline1d[j]);
+          fprintf(fline1d, "%e %e\n", Tline_data[j], Fline1d[j]);
         }
         fprintf(fline1d, "\n");
       }
@@ -367,7 +367,7 @@ void reconstruct_line2d()
 
       for(i=0; i<parset.n_con_recon; i++)
       {
-        fprintf(fp, "%f %f\n", Tcon[i], Fcon[i] / con_scale);
+        fprintf(fp, "%e %e\n", Tcon[i], Fcon[i] / con_scale);
       }
       fclose(fp);
 
@@ -390,7 +390,7 @@ void reconstruct_line2d()
       {
         for(j=0; j<n_vel_data; j++)
         {
-          fprintf(fp, "%f %f %f\n", Vline_data[j]*VelUnit, Tline_data[i],  Fline2d_at_data[i*n_vel_data_ext + (j+n_vel_data_incr)] / line_scale);
+          fprintf(fp, "%e %e %e\n", Vline_data[j]*VelUnit, Tline_data[i],  Fline2d_at_data[i*n_vel_data_ext + (j+n_vel_data_incr)] / line_scale);
         }
         fprintf(fp, "\n");
       }
@@ -409,7 +409,7 @@ void reconstruct_line2d()
       {
         for(j=0; j<n_vel_data; j++)
         {
-          fprintf(fp, "%f %f %f\n", Vline_data[j]*VelUnit, TransTau[i],  Trans2D_at_veldata[i*n_vel_data_ext + (j+n_vel_data_incr)]);
+          fprintf(fp, "%e %e %e\n", Vline_data[j]*VelUnit, TransTau[i],  Trans2D_at_veldata[i*n_vel_data_ext + (j+n_vel_data_incr)]);
         }
         fprintf(fp, "\n");
       }
@@ -454,7 +454,7 @@ void reconstruct_line2d()
       {
         for(j=0; j<parset.n_vel_recon; j++)
         {
-          fprintf(fp, "%f %f %f\n", TransV[j]*VelUnit, Tline[i],  Fline2d[i*parset.n_vel_recon + j] / line_scale);
+          fprintf(fp, "%e %e %e\n", TransV[j]*VelUnit, Tline[i],  Fline2d[i*parset.n_vel_recon + j] / line_scale);
         }
 
         fprintf(fp, "\n");
@@ -474,7 +474,7 @@ void reconstruct_line2d()
       {
         for(j=0; j<parset.n_vel_recon; j++)
         {
-          fprintf(fp, "%f %f %f\n", TransV[j]*VelUnit, TransTau[i], Trans2D[i*parset.n_vel_recon + j]);
+          fprintf(fp, "%e %e %e\n", TransV[j]*VelUnit, TransTau[i], Trans2D[i*parset.n_vel_recon + j]);
         }
 
         fprintf(fp, "\n");
