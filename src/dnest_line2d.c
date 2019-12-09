@@ -154,7 +154,7 @@ int dnest_line2d(int argc, char **argv)
     par_fix[num_params_blr-2] = 1;
     par_fix_val[num_params_blr-2] = 0.0;
   }
-  
+
   force_update = parset.flag_force_update;
   if(parset.flag_para_name != 1)
     logz_line2d = dnest(argc, argv, fptrset_line2d, num_params, dnest_options_file);
@@ -166,16 +166,17 @@ int dnest_line2d(int argc, char **argv)
 /*!
  * this function setups parameter ranges.
  * 
- * The order of parameters is:
- *   I.   blr model.............(except systematic error)
- *   II.  narrow line...........(if flag_narrowline is true)
- *   III. spectral broadening...()
- *   IV.  line center...........(if flag_linecenter is true)
- *   V.   systematic error......()
- *   VI.  variability...........()
- *   VII. long-term trend.......()
- *   VIII.different trend.......()
- *   IX.  continuum light curve.()
+ * The order of parameters is:                              \n
+ *   I.   blr model.............()                          \n
+ *   II.  narrow line...........(if flag_narrowline is true)\n
+ *   III. spectral broadening...()                          \n
+ *   IV.  line center...........(if flag_linecenter is true)\n
+ *   V.   response A and Ag.....()                          \n
+ *   VI.  systematic error......()                          \n
+ *   VII. variability...........()                          \n
+ *   VIII.long-term trend.......()                          \n
+ *   IX.  different trend.......()                          \n
+ *   X.   continuum light curve.()                          \n
  */
 void set_par_range_model2d()
 {
