@@ -41,8 +41,8 @@ void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl
   double fline, fcon, tl, tc, tau, A, Ag, ftrend, a0=0.0, tmp;
   double *pmodel = (double *)pm;
 
-  A=exp(pmodel[0]); /*  response coefficient */
-  Ag=pmodel[1];     /*  no-linearity of response */
+  A=exp(pmodel[num_params_blr-3]); /*  response coefficient */
+  Ag=pmodel[num_params_blr-2];     /*  no-linearity of response */
 
   if(parset.flag_trend_diff > 0)
   {
@@ -113,8 +113,8 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
   double tau, tl, tc, fcon, A, Ag, ftrend, fnarrow, a0=0.0, tmp;
   double *pmodel = (double *)pm;
 
-  A=exp(pmodel[0]);
-  Ag=pmodel[1];
+  A=exp(pmodel[num_params_blr-3]);
+  Ag=pmodel[num_params_blr-2];
 
   if(parset.flag_trend_diff > 0)
   {
@@ -192,15 +192,15 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
     }
     else if(parset.flag_narrowline == 2) /* narrow line with Gaussian priors */
     {
-      flux =  parset.flux_narrowline  + pmodel[num_params_blr-num_params_res-num_params_linecenter-1-3] * parset.flux_narrowline_err;
-      width = parset.width_narrowline + pmodel[num_params_blr-num_params_res-num_params_linecenter-1-2] * parset.width_narrowline_err;
-      shift = parset.shift_narrowline + pmodel[num_params_blr-num_params_res-num_params_linecenter-1-1] * parset.shift_narrowline_err;
+      flux =  parset.flux_narrowline  + pmodel[num_params_blr-num_params_res-num_params_linecenter-3-3] * parset.flux_narrowline_err;
+      width = parset.width_narrowline + pmodel[num_params_blr-num_params_res-num_params_linecenter-3-2] * parset.width_narrowline_err;
+      shift = parset.shift_narrowline + pmodel[num_params_blr-num_params_res-num_params_linecenter-3-1] * parset.shift_narrowline_err;
     }
     else  /* narrow line with logrithmic prior of flux */
     {
-      flux =  exp(pmodel[num_params_blr-num_params_res-num_params_linecenter-1-3]);
-      width = parset.width_narrowline + pmodel[num_params_blr-num_params_res-num_params_linecenter-1-2] * parset.width_narrowline_err;
-      shift = parset.shift_narrowline + pmodel[num_params_blr-num_params_res-num_params_linecenter-1-1] * parset.shift_narrowline_err;
+      flux =  exp(pmodel[num_params_blr-num_params_res-num_params_linecenter-3-3]);
+      width = parset.width_narrowline + pmodel[num_params_blr-num_params_res-num_params_linecenter-3-2] * parset.width_narrowline_err;
+      shift = parset.shift_narrowline + pmodel[num_params_blr-num_params_res-num_params_linecenter-3-1] * parset.shift_narrowline_err;
     }
 
     width = fmax(1.0e-10, width); /* make sure thant width is not zero */

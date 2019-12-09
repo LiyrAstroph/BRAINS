@@ -27,7 +27,7 @@
 DNestFptrSet *fptrset_line2d;
 
 /*!
- * this function does dnest samling.
+ * this function does dnest sampling.
  */
 int dnest_line2d(int argc, char **argv)
 {
@@ -77,7 +77,7 @@ int dnest_line2d(int argc, char **argv)
   }
   
   num_params_blr = num_params_blr_model + num_params_nlr 
-                 + num_params_res + num_params_linecenter + 1; /* include one parameter for systematic error */
+                 + num_params_res + num_params_linecenter + 2 + 1; /* include A, Ag, and line sys err */
   num_params = parset.n_con_recon + num_params_blr + num_params_var;
   par_fix = (int *) malloc(num_params * sizeof(int));
   par_fix_val = (double *) malloc(num_params * sizeof(double));
@@ -117,7 +117,7 @@ int dnest_line2d(int argc, char **argv)
   print_par_names_model2d();
 
   /* setup the fixed parameters */
-  set_par_fix(num_params_blr);
+  set_par_fix();
 
   /* setup the remaining paramters */
   for(i=num_params_blr; i<num_params; i++)
@@ -184,6 +184,7 @@ void set_par_range_model2d()
     par_prior_gaussian[i][0] = 0.0;
     par_prior_gaussian[i][1] = 0.0;
   }
+
   /* cope with narrow line */
   for(i=num_params_blr_model; i<num_params_blr_model + num_params_nlr; i++)
   {
@@ -205,7 +206,7 @@ void set_par_range_model2d()
     par_prior_gaussian[i][1] = 1.0;
   }
   /* cope with line center */
-  for(i=num_params_blr-num_params_linecenter-1; i< num_params_blr-1; i++)
+  for(i=num_params_blr-num_params_linecenter-3; i< num_params_blr-3; i++)
   {
     par_range_model[i][0] = -10.0;
     par_range_model[i][1] =  10.0;
@@ -214,6 +215,17 @@ void set_par_range_model2d()
     par_prior_gaussian[i][0] = 0.0;
     par_prior_gaussian[i][1] = 1.0;
   }
+  
+  for(i=num_params_blr-3; i<num_params_blr-1; i++)
+  {
+    par_range_model[i][0] = resp_range[i - (num_params_blr-3)][0];
+    par_range_model[i][1] = resp_range[i - (num_params_blr-3)][1];
+
+    par_prior_model[i] = UNIFORM;
+    par_prior_gaussian[i][0] = 0.0;
+    par_prior_gaussian[i][1] = 0.0;
+  }
+
   /* the last is systematic error */
   i = num_params_blr-1;
   par_range_model[i][0] = sys_err_line_range[0];
@@ -330,6 +342,12 @@ void print_par_names_model2d()
     i++;
     fprintf(fp, "%4d %-15s %f %f %d\n", i, "line center", par_range_model[i][0], par_range_model[i][1], par_prior_model[i]);
   }
+  
+  i++;
+  fprintf(fp, "%4d %-15s %f %f %d\n", i, "A", par_range_model[i][0], par_range_model[i][1], par_prior_model[i]);
+
+  i++;
+  fprintf(fp, "%4d %-15s %f %f %d\n", i, "Ag", par_range_model[i][0], par_range_model[i][1], par_prior_model[i]);
 
   i++;
   fprintf(fp, "%4d %-15s %f %f %d\n", i, "sys_err_line", par_range_model[i][0], par_range_model[i][1], par_prior_model[i]);

@@ -451,7 +451,7 @@ void calculate_con_from_model_semiseparable(const void *model)
 
 
 /*!
- * This function calculate continuum ligth curves from variability parameters.
+ * This function calculate continuum light curves from variability parameters.
  */
 void reconstruct_con_from_varmodel(double sigma_hat, double tau, double alpha, double syserr)
 {
@@ -949,7 +949,7 @@ void reconstruct_con_end()
 }
 
 /*!
- *  create continumm from random number generate based on damped random walk model.
+ *  create continuum from random number generate based on damped random walk model.
  */
 
 void create_con_from_random(double sigma_hat, double tau, double alpha, double syserr)

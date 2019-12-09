@@ -46,7 +46,7 @@ void postprocess2d()
     FILE *fp, *fcon, *fline, *ftran, *fline1d;
     double *Fline1d, dV;
 
-    // velocity grid widht, in term of wavelength of Hbeta.
+    // velocity grid width, in term of wavelength of Hbeta.
     dV = (Vline_data[n_vel_data-1]-Vline_data[0])/(n_vel_data-1) * VelUnit * 4861.0/3.0e5; 
     Fline1d = malloc(n_line_data * sizeof(double));
 

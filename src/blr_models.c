@@ -83,7 +83,7 @@ void transfun_1d_cloud_sample_model1(const void *pm, int flag_save)
     z = 0.0;
 
    /* right-handed framework
-    * first rotate around y axis by an angle of Lthe, then roate around z axis 
+    * first rotate around y axis by an angle of Lthe, then rotate around z axis 
     * by an angle of Lphi
     */
   
@@ -196,7 +196,7 @@ void transfun_2d_cloud_sample_model1(const void *pm, double *transv, double *tra
     if(zb0 < 0.0)
       zb = -zb;
 
-    /* conter-rotate around y */
+    /* counter-rotate around y */
     x = xb * cos(PI/2.0-inc) + zb * sin(PI/2.0-inc);
     y = yb;
     z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
@@ -236,7 +236,7 @@ void transfun_2d_cloud_sample_model1(const void *pm, double *transv, double *tra
       {
         Vr = 0.0;
       }
-      Vph = L/r; /* RM cannot distiguish the orientation of the rotation. */
+      Vph = L/r; /* RM cannot distinguish the orientation of the rotation. */
 
       vx = Vr * cos(phi) - Vph * sin(phi);
       vy = Vr * sin(phi) + Vph * cos(phi);
@@ -257,7 +257,7 @@ void transfun_2d_cloud_sample_model1(const void *pm, double *transv, double *tra
       vy = vyb;
       vz =-vxb * sin(PI/2.0-inc) + vzb * cos(PI/2.0-inc);
 
-      V = -vx;  //note the definition of the line-of-sight velocity. postive means a receding 
+      V = -vx;  //note the definition of the line-of-sight velocity. positive means a receding 
                 // velocity relative to the observer.
       
       V += linecenter;
@@ -435,7 +435,7 @@ void transfun_2d_cloud_sample_model2(const void *pm, double *transv, double *tra
  */
 
 /* 
- * This function caclulate 1d transfer function.
+ * This function calculate 1d transfer function.
  */
 void transfun_1d_cloud_sample_model3(const void *pm, int flag_save)
 {
@@ -809,7 +809,7 @@ void transfun_2d_cloud_sample_model4(const void *pm, double *transv, double *tra
 /*====================================================================
  * model 5
  *
- * geometry: double pow-law 
+ * geometry: double power-law 
  * dynamics: elliptical orbits and inflow/outflow as in Pancoast's model
  *====================================================================
  */

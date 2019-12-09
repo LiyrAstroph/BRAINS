@@ -19,8 +19,8 @@
  */
 typedef struct
 {
-  double A;        /*!< \brief 1.  response coefficient */
-  double Ag;       /*!< \brief 2.  nonlinear response */
+  //double A;        /*!< \brief 1.  response coefficient */
+  //double Ag;       /*!< \brief 2.  nonlinear response */
   double mu;       /*!< \brief 3.  mean BLR radius, in light day */
   double beta;     /*!< \brief 4.  shape parameter */ 
   double F;        /*!< \brief 5.  inner edge */
@@ -38,8 +38,8 @@ typedef struct
  */
 typedef struct
 {
-  double A;        /*!< \brief 1.  response coefficient */
-  double Ag;       /*!< \brief 2.  nonlinear response */
+  //double A;        /*!< \brief 1.  response coefficient */
+  //double Ag;       /*!< \brief 2.  nonlinear response */
   double mu;       /*!< \brief 3.  mean BLR radius, in light day */
   double beta;     /*!< \brief 4.  shape parameter */ 
   double F;        /*!< \brief 5.  inner edge */
@@ -57,8 +57,8 @@ typedef struct
  */
 typedef struct
 {
-  double A;        /*!< \brief 1.  response coefficient */
-  double Ag;       /*!< \brief 2.  nonlinear response */
+  //double A;        /*!< \brief 1.  response coefficient */
+  //double Ag;       /*!< \brief 2.  nonlinear response */
   double alpha;    /*!< \brief 3.  shape parameter */ 
   double Rin;      /*!< \brief 4.  mean BLR radius, in light day */
   double F;        /*!< \brief 5.  inner edge */
@@ -82,8 +82,8 @@ typedef BLRmodel3 BLRmodel4;
  */
 typedef struct 
 {
-  double A;             /*!< \brief 1. line response*/    
-  double Ag;            /*!< \brief 2. no-linearity */
+  //double A;             /*!< \brief 1. line response*/    
+  //double Ag;            /*!< \brief 2. no-linearity */
   double mu;            /*!< \brief 3. peak radius*/
   double Fin;           /*!< \brief 4. fraction of inner radius*/
   double Fout;          /*!< \brief 5. fraction of outer radius*/
@@ -110,8 +110,8 @@ typedef struct
  */
 typedef struct 
 {
-  double A;             /*!< \brief 1. line response*/    
-  double Ag;            /*!< \brief 2. no-linearity */
+  //double A;             /*!< \brief 1. line response*/    
+  //double Ag;            /*!< \brief 2. no-linearity */
   double mu;            /*!< \brief 3. peak radius*/
   double beta;          /*!< \brief 4. fraction of inner radius*/
   double F;             /*!< \brief 5. fraction of outer radius*/
@@ -138,8 +138,8 @@ typedef struct
  */
 typedef struct 
 {
-  double A;             /*!< \brief 1. line response*/    
-  double Ag;            /*!< \brief 2. no-linearity */
+  //double A;             /*!< \brief 1. line response*/    
+  //double Ag;            /*!< \brief 2. no-linearity */
   double mu;            /*!< \brief 3. peak radius*/
   double beta;          /*!< \brief 4. fraction of inner radius*/
   double F;             /*!< \brief 5. fraction of outer radius*/

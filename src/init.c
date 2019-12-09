@@ -273,6 +273,13 @@ void init()
   sys_err_line_range[0] = log(1.0);
   sys_err_line_range[1] = log(1.0+10.0);
 
+  // response range
+  resp_range[0][0] = log(0.01);
+  resp_range[0][1] = log(10.0);
+
+  resp_range[1][0] = -1.0;
+  resp_range[1][1] =  3.0;
+
   set_blr_range_model();
 }
 
@@ -439,7 +446,7 @@ void scale_con_line()
  * This function copes with parameter fixing.\n
  * Only fix BLR model parameters. 
  */
-void set_par_fix(int num_params_blr)
+void set_par_fix()
 {
   int i;
   char *pstr;
@@ -450,7 +457,7 @@ void set_par_fix(int num_params_blr)
   {
     pstr = parset.str_par_fix_val;
     // set the default value if not provided.
-    for(i=strlen(parset.str_par_fix); i<num_params_blr; i++)
+    for(i=strlen(parset.str_par_fix); i<num_params_blr_model; i++)
       parset.str_par_fix[i] = '0';
 
     for(i=0; i<num_params_blr_model; i++)
@@ -513,8 +520,8 @@ void set_par_fix(int num_params_blr)
     }
   }
 
-  MPI_Bcast(par_fix, num_params_blr, MPI_INT, roottask, MPI_COMM_WORLD);
-  MPI_Bcast(par_fix_val, num_params_blr, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+  MPI_Bcast(par_fix, num_params_blr_model, MPI_INT, roottask, MPI_COMM_WORLD);
+  MPI_Bcast(par_fix_val, num_params_blr_model, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
   return;
 }
 
@@ -528,12 +535,6 @@ void set_blr_range_model1()
   int i;
 
   i = 0;
-  //A
-  blr_range_model[i][0] = log(0.01);
-  blr_range_model[i++][1] = log(10.0);
-  //Ag
-  blr_range_model[i][0] = -1.0;
-  blr_range_model[i++][1] = 3.0;
   //mu
   blr_range_model[i][0] = log(0.1);
   blr_range_model[i++][1] = log(rcloud_max_set*0.5);
@@ -572,12 +573,6 @@ void set_blr_range_model2()
   int i;
 
   i = 0;
-  //A
-  blr_range_model[i][0] = log(0.01);
-  blr_range_model[i++][1] = log(10.0);
-  //Ag
-  blr_range_model[i][0] = -1.0;
-  blr_range_model[i++][1] = 3.0;
   //mu
   blr_range_model[i][0] = log(0.1);
   blr_range_model[i++][1] = log(rcloud_max_set*0.5);
@@ -615,12 +610,6 @@ void set_blr_range_model3()
   int i;
   
   i = 0;
-  //A
-  blr_range_model[i][0] = log(0.01);
-  blr_range_model[i++][1] = log(10.0);
-  //Ag
-  blr_range_model[i][0] = -1.0;
-  blr_range_model[i++][1] = 3.0;
   //alpha
   blr_range_model[i][0] = -3.0;
   blr_range_model[i++][1] = 3.0;
@@ -659,12 +648,6 @@ void set_blr_range_model4()
   int i;
   
   i = 0;
-  //A
-  blr_range_model[i][0] = log(0.01);
-  blr_range_model[i++][1] = log(10.0);
-  //Ag
-  blr_range_model[i][0] = -1.0;
-  blr_range_model[i++][1] = 3.0;
   //alpha
   blr_range_model[i][0] = -3.0;
   blr_range_model[i++][1] = 3.0;
@@ -703,12 +686,6 @@ void set_blr_range_model5()
   int i;
   
   i = 0;
-  //A
-  blr_range_model[i][0] = log(0.01);
-  blr_range_model[i++][1] = log(10.0);
-  //Ag
-  blr_range_model[i][0] = -1.0;
-  blr_range_model[i++][1] = 3.0;
   //mu
   blr_range_model[i][0] = log(0.1);
   blr_range_model[i++][1] = log(rcloud_max_set*0.5);
@@ -776,12 +753,6 @@ void set_blr_range_model6()
   int i;
   
   i = 0;
-  //A
-  blr_range_model[i][0] = log(0.01);
-  blr_range_model[i++][1] = log(10.0);
-  //Ag
-  blr_range_model[i][0] = -1.0;
-  blr_range_model[i++][1] = 3.0;
   //mu
   blr_range_model[i][0] = log(0.1);
   blr_range_model[i++][1] = log(rcloud_max_set*0.5);
@@ -846,12 +817,6 @@ void set_blr_range_model7()
   
 
   i = 0;
-  //A
-  blr_range_model[i][0] = log(0.01);
-  blr_range_model[i++][1] = log(10.0);
-  //Ag
-  blr_range_model[i][0] = -1.0;
-  blr_range_model[i++][1] = 3.0;
   //mu
   blr_range_model[i][0] = log(0.1);
   blr_range_model[i++][1] = log(rcloud_max_set*0.5);

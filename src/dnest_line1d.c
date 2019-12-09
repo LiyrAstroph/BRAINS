@@ -34,47 +34,47 @@ int dnest_line1d(int argc, char **argv)
   switch(parset.flag_blrmodel)
   {
     case 1:
-      num_params_blr_model = 8;
+      num_params_blr_model = 6;
       transfun_1d_cloud_sample = transfun_1d_cloud_sample_model1;
       break;
 
     case 2:
-      num_params_blr_model = 8;
+      num_params_blr_model = 6;
       transfun_1d_cloud_sample = transfun_1d_cloud_sample_model1;
       break;
 
     case 3:
-      num_params_blr_model = 8;
+      num_params_blr_model = 6;
       transfun_1d_cloud_sample = transfun_1d_cloud_sample_model3;
       break;
 
     case 4:
-      num_params_blr_model = 8;
+      num_params_blr_model = 6;
       transfun_1d_cloud_sample = transfun_1d_cloud_sample_model3;
       break;
 
     case 5:
-      num_params_blr_model = 11;
+      num_params_blr_model = 9;
       transfun_1d_cloud_sample = transfun_1d_cloud_sample_model5;
       break;
 
     case 6:
-      num_params_blr_model = 10;
+      num_params_blr_model = 8;
       transfun_1d_cloud_sample = transfun_1d_cloud_sample_model6;
       break;
 
     case 7:
-      num_params_blr_model = 15;
+      num_params_blr_model = 13;
       transfun_1d_cloud_sample = transfun_1d_cloud_sample_model7;
       break;
 
     default:
-      num_params_blr_model = 8;
+      num_params_blr_model = 6;
       transfun_1d_cloud_sample = transfun_1d_cloud_sample_model1;
       break;
   }
   
-  num_params_blr = num_params_blr_model + 1; /* include one parameter for systematic error */
+  num_params_blr = num_params_blr_model + 2 + 1; /* include A, Ag, and line sys err */
   num_params = parset.n_con_recon + num_params_var + num_params_blr;
 
   par_fix = (int *) malloc(num_params * sizeof(int));
@@ -115,7 +115,7 @@ int dnest_line1d(int argc, char **argv)
   
   set_par_range_model1d();
   print_par_names_model1d();
-  set_par_fix(num_params_blr);
+  set_par_fix();
 
   for(i=num_params_blr; i<num_params; i++)
     par_fix[i] = 0;
@@ -160,7 +160,7 @@ void set_par_range_model1d()
   int i;
 
   /* BLR parameters first */
-  for(i=0; i<num_params_blr-1; i++)
+  for(i=0; i<num_params_blr_model; i++)
   {
     par_range_model[i][0] = blr_range_model[i][0];
     par_range_model[i][1] = blr_range_model[i][1];
@@ -169,6 +169,18 @@ void set_par_range_model1d()
     par_prior_gaussian[i][0] = 0.0;
     par_prior_gaussian[i][1] = 0.0;
   }
+
+  // response 
+  for(i=num_params_blr_model; i<num_params_blr_model+2; i++)
+  {
+    par_range_model[i][0] = resp_range[i-num_params_blr_model][0];
+    par_range_model[i][1] = resp_range[i-num_params_blr_model][1];
+
+    par_prior_model[i] = UNIFORM;
+    par_prior_gaussian[i][0] = 0.0;
+    par_prior_gaussian[i][1] = 0.0;
+  }
+
   /* note that the last BLR parameters is the systematic error (1d) */
   i = num_params_blr -1;
   par_range_model[i][0] = sys_err_line_range[0];
@@ -260,11 +272,18 @@ void print_par_names_model1d()
   printf("# Print parameter name in %s\n", fname);
 
   i=-1;
-  for(j=0; j<num_params_blr-1; j++)
+  for(j=0; j<num_params_blr_model; j++)
   {
     i++;
     fprintf(fp, "%4d %-15s %f %f %d\n", i, "BLR model", par_range_model[i][0], par_range_model[i][1], par_prior_model[i]);
   }
+
+  i++;
+  fprintf(fp, "%4d %-15s %f %f %d\n", i, "A", par_range_model[i][0], par_range_model[i][1], par_prior_model[i]);
+
+  i++;
+  fprintf(fp, "%4d %-15s %f %f %d\n", i, "Ag", par_range_model[i][0], par_range_model[i][1], par_prior_model[i]);
+
   i++;
   fprintf(fp, "%4d %-15s %f %f %d\n", i, "sys_err_line", par_range_model[i][0], par_range_model[i][1], par_prior_model[i]);
 
