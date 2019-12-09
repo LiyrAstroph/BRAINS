@@ -211,6 +211,10 @@ void read_parset()
     addr[nt] = &parset.linecenter_err;
     id[nt++] = DOUBLE;
 
+    strcpy(tag[nt], "FlagNonlinear");
+    addr[nt] = &parset.flag_nonlinear;
+    id[nt++] = INT;
+
 
     /* default values */
     parset.flag_dim = 0;
@@ -224,6 +228,7 @@ void read_parset()
     parset.flag_force_update= 0;
     parset.flag_con_sys_err = 0;
     parset.flag_line_sys_err = 0;
+    parset.flag_nonlinear = 1;
 
     
     char fname[200];
@@ -375,6 +380,7 @@ void read_parset()
     if(parset.flag_dim < 1)
     {
       parset.flag_trend_diff = 0;
+      parset.flag_nonlinear = 0;
     }
 
     if(parset.flag_dim < 0) // create mock data

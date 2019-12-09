@@ -142,6 +142,13 @@ int dnest_line1d(int argc, char **argv)
     par_fix[num_params_blr] = 1;
     par_fix_val[num_params_blr] = log(1.0);
   }
+
+  /* fix non-linear response */
+  if(parset.flag_nonlinear !=1)
+  {
+    par_fix[num_params_blr-2] = 1;
+    par_fix_val[num_params_blr-2] = 0.0;
+  }
   
   force_update = parset.flag_force_update;
 
