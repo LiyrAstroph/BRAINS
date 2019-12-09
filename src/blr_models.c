@@ -99,7 +99,7 @@ void transfun_1d_cloud_sample_model1(const void *pm, int flag_save)
     if(zb0 < 0.0)
       zb = -zb;
 
-    /* conter-rotate around y, LOS is x-axis */
+    /* counter-rotate around y, LOS is x-axis */
     x = xb * cos(PI/2.0-inc) + zb * sin(PI/2.0-inc);
     y = yb;
     z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
@@ -360,7 +360,7 @@ void transfun_2d_cloud_sample_model2(const void *pm, double *transv, double *tra
     if(zb0 < 0.0)
       zb = -zb;
 
-    /* conter-rotate around y */
+    /* counter-rotate around y */
     x = xb * cos(PI/2.0-inc) + zb * sin(PI/2.0-inc);
     y = yb;
     z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
@@ -386,7 +386,7 @@ void transfun_2d_cloud_sample_model2(const void *pm, double *transv, double *tra
       rhotheta = gsl_ran_ugaussian(gsl_r) * sigtheta + 0.5*PI;
 
       Vr = rhor * cos(rhotheta) * Vcirc;
-      Vph = rhor * sin(rhotheta) * Vcirc; //RM cannot distiguish the orientation of the rotation.
+      Vph = rhor * sin(rhotheta) * Vcirc; //RM cannot distinguish the orientation of the rotation.
 
       vx = Vr * cos(phi) - Vph * sin(phi);
       vy = Vr * sin(phi) + Vph * cos(phi);
@@ -487,7 +487,7 @@ void transfun_1d_cloud_sample_model3(const void *pm, int flag_save)
     z = 0.0;
 
     /* right-handed framework
-     * first rotate around y axis by an angle of Lthe, then roate around z axis 
+     * first rotate around y axis by an angle of Lthe, then rotate around z axis 
      * by an angle of Lphi
      */
   /*xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
@@ -502,7 +502,7 @@ void transfun_1d_cloud_sample_model3(const void *pm, int flag_save)
     if(zb0 < 0.0)
       zb = -zb;
 
-    /* conter-rotate around y, LOS is x-axis */
+    /* counter-rotate around y, LOS is x-axis */
     x = xb * cos(PI/2.0-inc) + zb * sin(PI/2.0-inc);
     y = yb;
     z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
@@ -599,7 +599,7 @@ void transfun_2d_cloud_sample_model3(const void *pm, double *transv, double *tra
     if(zb0 < 0.0)
       zb = -zb;
 
-// conter-rotate around y
+// counter-rotate around y
     x = xb * cos(PI/2.0-inc) + zb * sin(PI/2.0-inc);
     y = yb;
     z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
@@ -626,7 +626,7 @@ void transfun_2d_cloud_sample_model3(const void *pm, double *transv, double *tra
       Vr = xi * sqrt(2.0*mbh/r);
       if(q <= 0.5)
         Vr = -Vr;
-      Vph = L/r; //RM cannot distiguish the orientation of the rotation.
+      Vph = L/r; //RM cannot distinguish the orientation of the rotation.
 
       vx = Vr * cos(phi) - Vph * sin(phi);
       vy = Vr * sin(phi) + Vph * cos(phi);
@@ -741,7 +741,7 @@ void transfun_2d_cloud_sample_model4(const void *pm, double *transv, double *tra
     if(zb0 < 0.0)
       zb = -zb;
 
-    /* conter-rotate around y */
+    /* counter-rotate around y */
     x = xb * cos(PI/2.0-inc) + zb * sin(PI/2.0-inc);
     y = yb;
     z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
@@ -768,7 +768,7 @@ void transfun_2d_cloud_sample_model4(const void *pm, double *transv, double *tra
       Vr = xi * sqrt(2.0*mbh/r);
       if(q<=0.5)
         Vr = -Vr;
-      Vph = sqrt(1.0-2.0*xi*xi) * L/r; //RM cannot distiguish the orientation of the rotation.
+      Vph = sqrt(1.0-2.0*xi*xi) * L/r; //RM cannot distinguish the orientation of the rotation.
 
       vx = Vr * cos(phi) - Vph * sin(phi);
       vy = Vr * sin(phi) + Vph * cos(phi);
@@ -889,7 +889,7 @@ void transfun_1d_cloud_sample_model5(const void *pm, int flag_save)
     z = 0.0;
 
 /* right-handed framework
- * first rotate around y axis by an angle of Lthe, then roate around z axis 
+ * first rotate around y axis by an angle of Lthe, then rotate around z axis 
  * by an angle of Lphi
  */
   /*xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
@@ -905,7 +905,7 @@ void transfun_1d_cloud_sample_model5(const void *pm, int flag_save)
     if( (rnd_xi < 1.0 - xi) && zb0 < 0.0)
       zb = -zb;
 
-// conter-rotate around y, LOS is x-axis 
+// counter-rotate around y, LOS is x-axis 
     x = xb * cos_inc_cmp + zb * sin_inc_cmp;
     y = yb;
     z =-xb * sin_inc_cmp + zb * cos_inc_cmp;
@@ -1022,7 +1022,7 @@ void transfun_2d_cloud_sample_model5(const void *pm, double *transv, double *tra
     z = 0.0;
 
 /* right-handed framework
- * first rotate around y axis by an angle of Lthe, then roate around z axis 
+ * first rotate around y axis by an angle of Lthe, then rotate around z axis 
  * by an angle of Lphi
  */
   /*xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
@@ -1191,7 +1191,7 @@ void transfun_1d_cloud_sample_model6(const void *pm, int flag_save)
     z = 0.0;
 
 /* right-handed framework
- * first rotate around y axis by an angle of Lthe, then roate around z axis 
+ * first rotate around y axis by an angle of Lthe, then rotate around z axis 
  * by an angle of Lphi
  */
   /*xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
@@ -1207,7 +1207,7 @@ void transfun_1d_cloud_sample_model6(const void *pm, int flag_save)
     if( (rnd_xi < 1.0 - xi) && zb0 < 0.0)
       zb = -zb;
 
-// conter-rotate around y, LOS is x-axis 
+// counter-rotate around y, LOS is x-axis 
     /*x = xb * cos(PI/2.0-inc) + zb * sin(PI/2.0-inc);
     y = yb;
     z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc); */
@@ -1315,7 +1315,7 @@ void transfun_2d_cloud_sample_model6(const void *pm, double *transv, double *tra
     z = 0.0;
 
 /* right-handed framework
- * first rotate around y axis by an angle of Lthe, then roate around z axis 
+ * first rotate around y axis by an angle of Lthe, then rotate around z axis 
  * by an angle of Lphi
  */
   /*xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
@@ -1331,7 +1331,7 @@ void transfun_2d_cloud_sample_model6(const void *pm, double *transv, double *tra
     if( (rnd_xi < 1.0 - xi) && zb0 < 0.0)
       zb = -zb;
 
-// conter-rotate around y, LOS is x-axis 
+// counter-rotate around y, LOS is x-axis 
     /* x = xb * cos(PI/2.0-inc) + zb * sin(PI/2.0-inc);
        y = yb;
        z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc); */
@@ -1497,7 +1497,7 @@ void transfun_1d_cloud_sample_model7(const void *pm, int flag_save)
     z = 0.0;
 
 /* right-handed framework
- * first rotate around y axis by an angle of Lthe, then roate around z axis 
+ * first rotate around y axis by an angle of Lthe, then rotate around z axis 
  * by an angle of Lphi
  */
   /*xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
@@ -1513,7 +1513,7 @@ void transfun_1d_cloud_sample_model7(const void *pm, int flag_save)
     if( (rnd_xi < 1.0 - xi) && zb0 < 0.0)
       zb = -zb;
 
-// conter-rotate around y, LOS is x-axis 
+// counter-rotate around y, LOS is x-axis 
     x = xb * cos_inc_cmp + zb * sin_inc_cmp;
     y = yb;
     z =-xb * sin_inc_cmp + zb * cos_inc_cmp;
@@ -1573,7 +1573,7 @@ void transfun_1d_cloud_sample_model7(const void *pm, int flag_save)
     z = 0.0;
 
 /* right-handed framework
- * first rotate around y axis by an angle of Lthe, then roate around z axis 
+ * first rotate around y axis by an angle of Lthe, then rotate around z axis 
  * by an angle of Lphi
  */
   /*xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
@@ -1589,7 +1589,7 @@ void transfun_1d_cloud_sample_model7(const void *pm, int flag_save)
     if( (rnd_xi < 1.0 - xi) && zb0 < 0.0)
       zb = -zb;
 
-// conter-rotate around y, LOS is x-axis 
+// counter-rotate around y, LOS is x-axis 
     x = xb * cos_inc_cmp + zb * sin_inc_cmp;
     y = yb;
     z =-xb * sin_inc_cmp + zb * cos_inc_cmp;
@@ -1695,7 +1695,7 @@ void transfun_2d_cloud_sample_model7(const void *pm, double *transv, double *tra
     z = 0.0;
 
 /* right-handed framework
- * first rotate around y axis by an angle of Lthe, then roate around z axis 
+ * first rotate around y axis by an angle of Lthe, then rotate around z axis 
  * by an angle of Lphi
  */
   /*xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
@@ -1711,7 +1711,7 @@ void transfun_2d_cloud_sample_model7(const void *pm, double *transv, double *tra
     if( (rnd_xi < 1.0 - xi) && zb0 < 0.0)
       zb = -zb;
 
-// conter-rotate around y, LOS is x-axis 
+// counter-rotate around y, LOS is x-axis 
     x = xb * cos_inc_cmp + zb * sin_inc_cmp;
     y = yb;
     z =-xb * sin_inc_cmp + zb * cos_inc_cmp;
@@ -1839,7 +1839,7 @@ void transfun_2d_cloud_sample_model7(const void *pm, double *transv, double *tra
     z = 0.0;
 
 /* right-handed framework
- * first rotate around y axis by an angle of Lthe, then roate around z axis 
+ * first rotate around y axis by an angle of Lthe, then rotate around z axis 
  * by an angle of Lphi
  */
   /*xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
@@ -1855,7 +1855,7 @@ void transfun_2d_cloud_sample_model7(const void *pm, double *transv, double *tra
     if( (rnd_xi < 1.0 - xi) && zb0 < 0.0)
       zb = -zb;
 
-// conter-rotate around y, LOS is x-axis 
+// counter-rotate around y, LOS is x-axis 
     x = xb * cos_inc_cmp + zb * sin_inc_cmp;
     y = yb;
     z =-xb * sin_inc_cmp + zb * cos_inc_cmp;
