@@ -155,7 +155,7 @@ void transfun_2d_cloud_sample_model1(const void *pm, double *transv, double *tra
   
   if(parset.flag_linecenter !=0)
   {
-    linecenter = pmodel[num_params_blr - num_params_linecenter - 1] * parset.linecenter_err; 
+    linecenter = pmodel[num_params_blr - num_params_linecenter - 3] * parset.linecenter_err; 
   }
 
   for(i=0; i<parset.n_cloud_per_task; i++)
@@ -318,7 +318,7 @@ void transfun_2d_cloud_sample_model2(const void *pm, double *transv, double *tra
   
   if(parset.flag_linecenter !=0)
   {
-    linecenter = pmodel[num_params_blr - num_params_linecenter - 1] * parset.linecenter_err; 
+    linecenter = pmodel[num_params_blr - num_params_linecenter - 3] * parset.linecenter_err; 
   }
 
   for(i=0; i<parset.n_cloud_per_task; i++)
@@ -555,7 +555,7 @@ void transfun_2d_cloud_sample_model3(const void *pm, double *transv, double *tra
 
   if(parset.flag_linecenter !=0)
   {
-    linecenter = pmodel[num_params_blr - num_params_linecenter - 1] * parset.linecenter_err; 
+    linecenter = pmodel[num_params_blr - num_params_linecenter - 3] * parset.linecenter_err; 
   }
 
   for(i=0; i<parset.n_cloud_per_task; i++)
@@ -697,7 +697,7 @@ void transfun_2d_cloud_sample_model4(const void *pm, double *transv, double *tra
   
   if(parset.flag_linecenter !=0)
   {
-    linecenter = pmodel[num_params_blr - num_params_linecenter - 1] * parset.linecenter_err; 
+    linecenter = pmodel[num_params_blr - num_params_linecenter - 3] * parset.linecenter_err; 
   }
 
   for(i=0; i<parset.n_cloud_per_task; i++)
@@ -976,7 +976,7 @@ void transfun_2d_cloud_sample_model5(const void *pm, double *transv, double *tra
 
   if(parset.flag_linecenter !=0)
   {
-    linecenter = pmodel[num_params_blr - num_params_linecenter - 1] * parset.linecenter_err; 
+    linecenter = pmodel[num_params_blr - num_params_linecenter - 3] * parset.linecenter_err; 
   }
   
   for(i=0; i<parset.n_cloud_per_task; i++)
@@ -1278,7 +1278,7 @@ void transfun_2d_cloud_sample_model6(const void *pm, double *transv, double *tra
 
   if(parset.flag_linecenter !=0)
   {
-    linecenter = pmodel[num_params_blr - num_params_linecenter - 1] * parset.linecenter_err; 
+    linecenter = pmodel[num_params_blr - num_params_linecenter - 3] * parset.linecenter_err; 
   }
   
   for(i=0; i<parset.n_cloud_per_task; i++)
@@ -1656,7 +1656,7 @@ void transfun_2d_cloud_sample_model7(const void *pm, double *transv, double *tra
 
   if(parset.flag_linecenter !=0)
   {
-    linecenter = pmodel[num_params_blr - num_params_linecenter - 1] * parset.linecenter_err; 
+    linecenter = pmodel[num_params_blr - num_params_linecenter - 3] * parset.linecenter_err; 
   }
   
   num_sh = (int)(parset.n_cloud_per_task * model->fsh);
