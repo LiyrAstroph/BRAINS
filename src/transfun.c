@@ -192,15 +192,15 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
     }
     else if(parset.flag_narrowline == 2) /* narrow line with Gaussian priors */
     {
-      flux =  parset.flux_narrowline  + pmodel[num_params_blr-num_params_res-num_params_linecenter-3-3] * parset.flux_narrowline_err;
-      width = parset.width_narrowline + pmodel[num_params_blr-num_params_res-num_params_linecenter-3-2] * parset.width_narrowline_err;
-      shift = parset.shift_narrowline + pmodel[num_params_blr-num_params_res-num_params_linecenter-3-1] * parset.shift_narrowline_err;
+      flux =  parset.flux_narrowline  + pmodel[num_params_blr_model] * parset.flux_narrowline_err;
+      width = parset.width_narrowline + pmodel[num_params_blr_model+1] * parset.width_narrowline_err;
+      shift = parset.shift_narrowline + pmodel[num_params_blr_model+2] * parset.shift_narrowline_err;
     }
     else  /* narrow line with logrithmic prior of flux */
     {
-      flux =  exp(pmodel[num_params_blr-num_params_res-num_params_linecenter-3-3]);
-      width = parset.width_narrowline + pmodel[num_params_blr-num_params_res-num_params_linecenter-3-2] * parset.width_narrowline_err;
-      shift = parset.shift_narrowline + pmodel[num_params_blr-num_params_res-num_params_linecenter-3-1] * parset.shift_narrowline_err;
+      flux =  exp(pmodel[num_params_blr_model]);
+      width = parset.width_narrowline + pmodel[num_params_blr_model+1] * parset.width_narrowline_err;
+      shift = parset.shift_narrowline + pmodel[num_params_blr_model+2] * parset.shift_narrowline_err;
     }
 
     width = fmax(1.0e-10, width); /* make sure thant width is not zero */
