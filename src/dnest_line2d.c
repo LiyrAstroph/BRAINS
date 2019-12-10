@@ -35,6 +35,11 @@ int dnest_line2d(int argc, char **argv)
 
   switch(parset.flag_blrmodel)
   {
+    case 0:
+      num_params_blr_model = num_params_MyBLRmodel2d;
+      transfun_2d_cloud_sample = transfun_2d_cloud_sample_mymodel;
+      break;
+
     case 1:
       num_params_blr_model = sizeof(BLRmodel1)/sizeof(double);
       transfun_2d_cloud_sample = transfun_2d_cloud_sample_model1;

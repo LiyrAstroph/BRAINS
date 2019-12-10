@@ -21,6 +21,7 @@
 #include "dnest_line1d.h"
 #include "dnest_line2d.h"
 #include "command_line.h"
+#include "user_blr_model.h"
 
 /* header files for CDNest */
 #include "dnestvars.h"

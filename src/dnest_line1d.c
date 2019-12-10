@@ -33,6 +33,11 @@ int dnest_line1d(int argc, char **argv)
   
   switch(parset.flag_blrmodel)
   {
+    case 0: 
+      num_params_blr_model = num_params_MyBLRmodel1d;
+      transfun_1d_cloud_sample = transfun_1d_cloud_sample_mymodel;
+      break;
+
     case 1:
       num_params_blr_model = 6;
       transfun_1d_cloud_sample = transfun_1d_cloud_sample_model1;

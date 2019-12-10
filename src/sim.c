@@ -39,6 +39,10 @@ void sim()
   
   switch(parset.flag_blrmodel)
   {
+    case 0:
+      set_par_value_mymodel_sim(pm);
+      break;
+
     case 1:
       i=0;
       pm[i++] = log(4.0);
@@ -341,6 +345,12 @@ void sim_init()
 
   switch(parset.flag_blrmodel)
   {
+    case 0:
+      num_params_blr_model = num_params_MyBLRmodel2d;
+      transfun_1d_cloud_sample = transfun_1d_cloud_sample_mymodel;
+      transfun_2d_cloud_sample = transfun_2d_cloud_sample_mymodel;
+      break;
+
     case 1:
       num_params_blr_model = sizeof(BLRmodel1)/sizeof(double);
       transfun_1d_cloud_sample = transfun_1d_cloud_sample_model1;

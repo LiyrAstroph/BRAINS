@@ -61,6 +61,10 @@ void init()
   
   switch(parset.flag_blrmodel)
   {
+    case 0:
+      BLRmodel_size = num_params_MyBLRmodel2d * sizeof(double);
+      set_blr_range_model = set_blr_range_mymodel;
+      break;
     case 1:
       BLRmodel_size = sizeof(BLRmodel1);
       set_blr_range_model = set_blr_range_model1;
