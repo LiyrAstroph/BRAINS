@@ -203,7 +203,16 @@ void set_par_range_model1d()
   par_prior_gaussian[i][1] = 0.0;
 
   /* variability parameters */
-  for(i=num_params_blr; i<num_params_drw + num_params_blr; i++)
+  /* first systematic error */
+  i = num_params_blr;
+  par_range_model[i][0] = var_range_model[0][0];
+  par_range_model[i][1] = var_range_model[0][1];
+
+  par_prior_model[i] = UNIFORM;
+  par_prior_gaussian[i][0] = 0.0;
+  par_prior_gaussian[i][1] = 0.0;
+
+  for(i=num_params_blr+1; i<num_params_drw + num_params_blr; i++)
   {
     if(var_param_std[i-num_params_blr] > 0.0)
     {
