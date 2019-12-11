@@ -13,6 +13,8 @@
  *              GSL documents
  */
 
+///////////////THIS FILE IS DEPRECATED///////////////////////////
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>

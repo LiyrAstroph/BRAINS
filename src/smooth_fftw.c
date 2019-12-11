@@ -12,6 +12,16 @@
  *  References: Press et al., Numerical Recipes, Chapter 13.1.
  *              FFTW website: http://www.fftw.org/
  *
+ *  FFTW library implements forward FFT as
+ *
+ *        H(f) = \sum h(t) e^{-i*2pi*f*t},   H_k = \sum_j H_j e^{-i*2pi*j*k/n},
+ *  
+ *  and backward FFT as
+ *
+ *        h(t) = \sum H(f) e^{ i*2pi*t*f},   h_k = \sum_j H_j e^{ i*2pi*j*k/n},
+ *
+ *  Note that FFTW does not include the normalization factor 1/sqrt{n}.
+ * 
  *  To facilitate computation, we use the factor:
  *  the Fourier transform a Gaussian is still a Gaussian, which can be expressed analytically.
  */
@@ -82,8 +92,13 @@ void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int
 {
   int i, j;
   // initialize response and its fft.
-  double sigV, sigV_instrinsic, dV;
+  double sigV, sigV_instrinsic, dV, linecenter=0.0;
   double *pmodel = (double *)pm;
+
+  if(parset.flag_linecenter !=0)
+  {
+    linecenter = pmodel[num_params_blr - num_params_linecenter - 3] * parset.linecenter_err; 
+  }
 
   dV = transv[1] - transv[0];
 
@@ -112,6 +127,10 @@ void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int
     {
       resp_fft[i][0] = exp(-2.0 * PI*PI * sigV/dV*sigV/dV * i*i*1.0/nd_fft/nd_fft)/nd_fft;
       resp_fft[i][1] = 0.0;
+
+      /* line center */
+      resp_fft[i][1] = -resp_fft[i][0] * sin(2.0*PI*linecenter/dV * i*1.0/nd_fft);
+      resp_fft[i][0] =  resp_fft[i][0] * cos(2.0*PI*linecenter/dV * i*1.0/nd_fft);
     }
     
     for(j=0; j<nl; j++)
@@ -155,6 +174,10 @@ void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int
       {
         resp_fft[i][0] = exp(-2.0 * PI*PI * sigV/dV*sigV/dV * i*i*1.0/nd_fft/nd_fft)/nd_fft;
         resp_fft[i][1] = 0.0;
+
+        /* line center */
+        resp_fft[i][1] = -resp_fft[i][0] * sin(2.0*PI*linecenter/dV * i*1.0/nd_fft);
+        resp_fft[i][0] =  resp_fft[i][0] * cos(2.0*PI*linecenter/dV * i*1.0/nd_fft);
       }
     
       memcpy(real_data+npad/2, &fl2d[j*nv], nv*sizeof(double));

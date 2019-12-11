@@ -234,9 +234,8 @@ void transfun_2d_cloud_sample_mymodel(const void *pm, double *transv, double *tr
   double V, rhoV, theV, Vr, Vph, Vkep, Rs, g;
   double inc, F, beta, mu, k, gam, xi, a, s, sig, rin;
   double mbh, fellip, fflow, sigr_circ, sigthe_circ, sigr_rad, sigthe_rad, theta_rot, sig_turb;
-  double Lphi, Lthe, sin_Lphi, cos_Lphi, sin_Lthe, cos_Lthe, sin_inc_cmp, cos_inc_cmp, linecenter=0.0;
+  double Lphi, Lthe, sin_Lphi, cos_Lphi, sin_Lthe, cos_Lthe, sin_inc_cmp, cos_inc_cmp;
   double weight, rnd, rnd_xi;
-  double *pmodel = (double *)pm;
   MyBLRmodel *model = (MyBLRmodel *)pm;
 
   Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
@@ -267,11 +266,6 @@ void transfun_2d_cloud_sample_mymodel(const void *pm, double *transv, double *tr
   
   sin_inc_cmp = cos(inc); //sin(PI/2.0 - inc);
   cos_inc_cmp = sin(inc); //cos(PI/2.0 - inc);
-
-  if(parset.flag_linecenter !=0)
-  {
-    linecenter = pmodel[num_params_blr - num_params_linecenter - 3] * parset.linecenter_err; 
-  }
   
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
@@ -400,7 +394,6 @@ void transfun_2d_cloud_sample_mymodel(const void *pm, double *transv, double *tr
       g = sqrt( (1.0 + V/C_Unit) / (1.0 - V/C_Unit) ) / sqrt(1.0 - Rs/r); //relativistic effects
       V = (g-1.0)*C_Unit;
 
-      V += linecenter;
       clouds_vel[i*parset.n_vel_per_cloud + j] = V;
 
       if(flag_save && thistask==roottask)

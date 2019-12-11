@@ -130,9 +130,8 @@ void transfun_2d_cloud_sample_model1(const void *pm, double *transv, double *tra
   double r, phi, dis, Lopn_cos, u;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
   double inc, F, beta, mu, k, a, s, rin, sig;
-  double Lphi, Lthe, L, E, linecenter = 0.0;
+  double Lphi, Lthe, L, E;
   double V, weight, rnd;
-  double *pmodel = (double *)pm;
   BLRmodel1 *model = (BLRmodel1 *)pm;
   double Emin, Lmax, Vr, Vr2, Vph, mbh, chi, lambda, q;
   
@@ -153,11 +152,6 @@ void transfun_2d_cloud_sample_model1(const void *pm, double *transv, double *tra
   lambda = model->lambda;
   q = model->q;
   
-  if(parset.flag_linecenter !=0)
-  {
-    linecenter = pmodel[num_params_blr - num_params_linecenter - 3] * parset.linecenter_err; 
-  }
-
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
 // generate a direction of the angular momentum     
@@ -260,7 +254,6 @@ void transfun_2d_cloud_sample_model1(const void *pm, double *transv, double *tra
       V = -vx;  //note the definition of the line-of-sight velocity. positive means a receding 
                 // velocity relative to the observer.
       
-      V += linecenter;
       clouds_vel[i*parset.n_vel_per_cloud + j] = V;
 
       if(flag_save && thistask==roottask)
@@ -293,9 +286,8 @@ void transfun_2d_cloud_sample_model2(const void *pm, double *transv, double *tra
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
   double inc, F, beta, mu, k, a, s, rin, sig;
-  double Lphi, Lthe, linecenter = 0.0;
+  double Lphi, Lthe;
   double V, weight, rnd;
-  double *pmodel = (double *)pm;
   BLRmodel2 *model = (BLRmodel2 *)pm;
   double Emin, Ecirc, Lcirc, Vcirc, Vr, Vph, mbh, sigr, sigtheta, rhor, rhotheta;
   
@@ -315,11 +307,6 @@ void transfun_2d_cloud_sample_model2(const void *pm, double *transv, double *tra
   mbh = exp(model->mbh);
   sigr = model->sigr;
   sigtheta = model->sigtheta * PI;
-  
-  if(parset.flag_linecenter !=0)
-  {
-    linecenter = pmodel[num_params_blr - num_params_linecenter - 3] * parset.linecenter_err; 
-  }
 
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
@@ -411,7 +398,6 @@ void transfun_2d_cloud_sample_model2(const void *pm, double *transv, double *tra
       V = -vx;  //note the definition of the line-of-sight velocity. postive means a receding 
                 // velocity relative to the observer.
 
-      V += linecenter;
       clouds_vel[i*parset.n_vel_per_cloud + j] = V;
 
       if(flag_save && thistask==roottask)
@@ -532,9 +518,8 @@ void transfun_2d_cloud_sample_model3(const void *pm, double *transv, double *tra
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
   double inc, F, alpha, Rin, k;
-  double Lphi, Lthe, L, E, linecenter=0.0;
+  double Lphi, Lthe, L, E;
   double V, weight, rnd;
-  double *pmodel = (double *)pm;
   BLRmodel3 *model = (BLRmodel3 *)pm;
   double Emin, Lmax, Vr, Vph, mbh, xi, q;
   
@@ -552,11 +537,6 @@ void transfun_2d_cloud_sample_model3(const void *pm, double *transv, double *tra
   
   if(F*Rin > rcloud_max_set)
     F = rcloud_max_set/Rin;
-
-  if(parset.flag_linecenter !=0)
-  {
-    linecenter = pmodel[num_params_blr - num_params_linecenter - 3] * parset.linecenter_err; 
-  }
 
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
@@ -650,7 +630,6 @@ void transfun_2d_cloud_sample_model3(const void *pm, double *transv, double *tra
       V = -vx;  //note the definition of the line-of-sight velocity. postive means a receding 
                 // velocity relative to the observer.
 
-      V += linecenter;
       clouds_vel[i*parset.n_vel_per_cloud + j] = V;
 
       if(flag_save && thistask==roottask)
@@ -674,9 +653,8 @@ void transfun_2d_cloud_sample_model4(const void *pm, double *transv, double *tra
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
   double inc, F, alpha, Rin, k;
-  double Lphi, Lthe, L, E, linecenter=0.0;
+  double Lphi, Lthe, L, E;
   double V, weight, rnd;
-  double *pmodel = (double *)pm;
   BLRmodel4 *model = (BLRmodel4 *)pm;
   double Emin, Lmax, Vr, Vph, mbh, xi, q;
   
@@ -694,11 +672,6 @@ void transfun_2d_cloud_sample_model4(const void *pm, double *transv, double *tra
 
   if(Rin*F > rcloud_max_set)
     F = rcloud_max_set/Rin;
-  
-  if(parset.flag_linecenter !=0)
-  {
-    linecenter = pmodel[num_params_blr - num_params_linecenter - 3] * parset.linecenter_err; 
-  }
 
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
@@ -792,7 +765,6 @@ void transfun_2d_cloud_sample_model4(const void *pm, double *transv, double *tra
       V = -vx;  //note the definition of the line-of-sight velocity. postive means a receding 
                 // velocity relative to the observer.
 
-      V += linecenter;
       clouds_vel[i*parset.n_vel_per_cloud + j] = V;
 
       if(flag_save && thistask==roottask)
@@ -935,11 +907,10 @@ void transfun_2d_cloud_sample_model5(const void *pm, double *transv, double *tra
   double x, y, z, xb, yb, zb, zb0;
   double inc, Fin, Fout, alpha, k, gam, mu, xi;
   double mbh, fellip, fflow, sigr_circ, sigthe_circ, sigr_rad, sigthe_rad, theta_rot, sig_turb;
-  double Lphi, Lthe, V, Vr, Vph, Vkep, rhoV, theV, linecenter=0.0;
+  double Lphi, Lthe, V, Vr, Vph, Vkep, rhoV, theV;
   double cos_Lphi, sin_Lphi, cos_Lthe, sin_Lthe, cos_inc_cmp, sin_inc_cmp;
   double weight, rndr, rnd, rnd_frac, rnd_xi, frac1, frac2, ratio, Rs, g;
   double vx, vy, vz, vxb, vyb, vzb;
-  double *pmodel = (double *)pm;
   BLRmodel5 *model = (BLRmodel5 *)pm;
 
   Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
@@ -973,11 +944,6 @@ void transfun_2d_cloud_sample_model5(const void *pm, double *transv, double *tra
 
   sin_inc_cmp = cos(inc);//sin(PI/2.0 - inc);
   cos_inc_cmp = sin(inc);//cos(PI/2.0 - inc);
-
-  if(parset.flag_linecenter !=0)
-  {
-    linecenter = pmodel[num_params_blr - num_params_linecenter - 3] * parset.linecenter_err; 
-  }
   
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
@@ -1106,7 +1072,6 @@ void transfun_2d_cloud_sample_model5(const void *pm, double *transv, double *tra
       g = sqrt( (1.0 + V/C_Unit) / (1.0 - V/C_Unit) ) / sqrt(1.0 - Rs/r); //relativistic effects
       V = (g-1.0)*C_Unit;
 
-      V += linecenter;
       clouds_vel[i*parset.n_vel_per_cloud + j] = V;
 
       if(flag_save && thistask==roottask)
@@ -1242,9 +1207,8 @@ void transfun_2d_cloud_sample_model6(const void *pm, double *transv, double *tra
   double V, rhoV, theV, Vr, Vph, Vkep, Rs, g;
   double inc, F, beta, mu, k, gam, xi, a, s, sig, rin;
   double mbh, fellip, fflow, sigr_circ, sigthe_circ, sigr_rad, sigthe_rad, theta_rot, sig_turb;
-  double Lphi, Lthe, sin_Lphi, cos_Lphi, sin_Lthe, cos_Lthe, sin_inc_cmp, cos_inc_cmp, linecenter=0.0;
+  double Lphi, Lthe, sin_Lphi, cos_Lphi, sin_Lthe, cos_Lthe, sin_inc_cmp, cos_inc_cmp;
   double weight, rnd, rnd_xi;
-  double *pmodel = (double *)pm;
   BLRmodel6 *model = (BLRmodel6 *)pm;
 
   Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
@@ -1275,11 +1239,6 @@ void transfun_2d_cloud_sample_model6(const void *pm, double *transv, double *tra
   
   sin_inc_cmp = cos(inc); //sin(PI/2.0 - inc);
   cos_inc_cmp = sin(inc); //cos(PI/2.0 - inc);
-
-  if(parset.flag_linecenter !=0)
-  {
-    linecenter = pmodel[num_params_blr - num_params_linecenter - 3] * parset.linecenter_err; 
-  }
   
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
@@ -1408,7 +1367,6 @@ void transfun_2d_cloud_sample_model6(const void *pm, double *transv, double *tra
       g = sqrt( (1.0 + V/C_Unit) / (1.0 - V/C_Unit) ) / sqrt(1.0 - Rs/r); //relativistic effects
       V = (g-1.0)*C_Unit;
 
-      V += linecenter;
       clouds_vel[i*parset.n_vel_per_cloud + j] = V;
 
       if(flag_save && thistask==roottask)
@@ -1620,9 +1578,8 @@ void transfun_2d_cloud_sample_model7(const void *pm, double *transv, double *tra
   double V, rhoV, theV, Vr, Vph, Vkep;
   double inc, F, beta, mu, k, gam, xi, a, s, sig, rin;
   double mbh, fellip, fflow, sigr_circ, sigthe_circ, sigr_rad, sigthe_rad, theta_rot;
-  double Lphi, Lthe, sin_Lphi, cos_Lphi, sin_Lthe, cos_Lthe, sin_inc_cmp, cos_inc_cmp,linecenter=0.0;
+  double Lphi, Lthe, sin_Lphi, cos_Lphi, sin_Lthe, cos_Lthe, sin_inc_cmp, cos_inc_cmp;
   double weight, rnd, rnd_xi;
-  double *pmodel = (double *)pm;
   BLRmodel7 *model = (BLRmodel7 *)pm;
 
   Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
@@ -1654,11 +1611,7 @@ void transfun_2d_cloud_sample_model7(const void *pm, double *transv, double *tra
   sin_inc_cmp = cos(inc); //sin(PI/2.0 - inc);
   cos_inc_cmp = sin(inc); //cos(PI/2.0 - inc);
 
-  if(parset.flag_linecenter !=0)
-  {
-    linecenter = pmodel[num_params_blr - num_params_linecenter - 3] * parset.linecenter_err; 
-  }
-  
+
   num_sh = (int)(parset.n_cloud_per_task * model->fsh);
 
   for(i=0; i<num_sh; i++)
@@ -1779,7 +1732,6 @@ void transfun_2d_cloud_sample_model7(const void *pm, double *transv, double *tra
       g = sqrt( (1.0 + V/C_Unit) / (1.0 - V/C_Unit) ) / sqrt(1.0 - Rs/r); //relativistic effects
       V = (g-1.0)*C_Unit;
 
-      V += linecenter;
       clouds_vel[i*parset.n_vel_per_cloud + j] = V;
 
       if(flag_save && thistask==roottask)
@@ -1923,8 +1875,6 @@ void transfun_2d_cloud_sample_model7(const void *pm, double *transv, double *tra
 
       g = sqrt( (1.0 + V/C_Unit) / (1.0 - V/C_Unit) ) / sqrt(1.0 - Rs/r); //relativistic effects
       V = (g-1.0)*C_Unit;
-
-      V += linecenter;
 
       clouds_vel[i*parset.n_vel_per_cloud + j] = V;
 
