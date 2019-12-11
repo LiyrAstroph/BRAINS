@@ -451,7 +451,7 @@ double perturb_line1d(void *model)
   do
   {
     rnd = dnest_rand();
-    if(rnd < 0.2)
+    if(rnd < fmax(0.2, 1.0*(num_params_blr+num_params_var)/num_params))
       which = dnest_rand_int(num_params_blr + num_params_var);
     else
       which = dnest_rand_int(parset.n_con_recon) + num_params_blr + num_params_var;
@@ -501,7 +501,7 @@ double log_likelihoods_cal_line1d_exam(const void *model)
 
 void accept_action_1d()
 {
-  int param, i, flag_cpy=0;
+  int param;
   double *ptemp;
 
   // the parameter previously updated
