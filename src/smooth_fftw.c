@@ -39,7 +39,7 @@
 
 int nd_fft, npad;
 
-fftw_complex *data_fft, *resp_fft, *conv_fft;
+fftw_complex *data_fft, *resp_fft, *resp_fft0, *conv_fft;
 fftw_plan pdata, presp, pback;
 double *real_data, *real_resp, *real_conv;
 
@@ -54,6 +54,7 @@ void smooth_init(int nv, const double *transv)
   nd_fft = nv+npad;
 
   data_fft = (fftw_complex *) fftw_malloc((nd_fft/2+1) * sizeof(fftw_complex));
+  resp_fft0 = (fftw_complex *) fftw_malloc((nd_fft/2+1) * sizeof(fftw_complex));
   resp_fft = (fftw_complex *) fftw_malloc((nd_fft/2+1) * sizeof(fftw_complex));
   conv_fft = (fftw_complex *) fftw_malloc((nd_fft/2+1) * sizeof(fftw_complex));
 
@@ -77,6 +78,7 @@ void smooth_end()
   fftw_destroy_plan(pback);
 
   fftw_free(data_fft);
+  fftw_free(resp_fft0);
   fftw_free(resp_fft);
   fftw_free(conv_fft);
   
@@ -94,11 +96,6 @@ void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int
   // initialize response and its fft.
   double sigV, sigV_instrinsic, dV, linecenter=0.0;
   double *pmodel = (double *)pm;
-
-  if(parset.flag_linecenter !=0)
-  {
-    linecenter = pmodel[num_params_blr - num_params_linecenter - 3] * parset.linecenter_err; 
-  }
 
   dV = transv[1] - transv[0];
 
@@ -125,16 +122,29 @@ void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int
 
     for(i=0; i<nd_fft/2+1; i++)
     {
-      resp_fft[i][0] = exp(-2.0 * PI*PI * sigV/dV*sigV/dV * i*i*1.0/nd_fft/nd_fft)/nd_fft;
-      resp_fft[i][1] = 0.0;
-
-      /* line center */
-      resp_fft[i][1] = -resp_fft[i][0] * sin(2.0*PI*linecenter/dV * i*1.0/nd_fft);
-      resp_fft[i][0] =  resp_fft[i][0] * cos(2.0*PI*linecenter/dV * i*1.0/nd_fft);
+      resp_fft0[i][0] = exp(-2.0 * PI*PI * sigV/dV*sigV/dV * i*i*1.0/nd_fft/nd_fft)/nd_fft;
+      resp_fft0[i][1] = 0.0;
     }
     
     for(j=0; j<nl; j++)
     {
+      /* line center */
+      if(parset.flag_linecenter > 0) /* uniform */
+      {
+        linecenter = pmodel[num_params_blr - num_params_linecenter - 3] * parset.linecenter_err; 
+      }
+      else if(parset.flag_linecenter < 0) /* epoch dependent */
+      {
+        linecenter = pmodel[num_params_blr - num_params_linecenter - 3 + j] * parset.linecenter_err;
+      }
+
+      for(i=0; i<nd_fft/2+1; i++)
+      {  
+        /* line center */
+        resp_fft[i][1] = -resp_fft0[i][0] * sin(2.0*PI*linecenter/dV * i*1.0/nd_fft);
+        resp_fft[i][0] =  resp_fft0[i][0] * cos(2.0*PI*linecenter/dV * i*1.0/nd_fft);
+      }
+
       memcpy(real_data+npad/2, &fl2d[j*nv], nv*sizeof(double));
       for(i=0; i<npad/2; i++)
         real_data[i] = real_data[nd_fft-1-i] = 0.0;
@@ -169,15 +179,24 @@ void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int
       sigV = fmax(0.0, sigV*sigV - sigV_instrinsic*sigV_instrinsic);
       sigV = sqrt(sigV);
 
+      /* line center */
+      if(parset.flag_linecenter > 0) /* uniform  */
+      {
+        linecenter = pmodel[num_params_blr - num_params_linecenter - 3] * parset.linecenter_err; 
+      }
+      else if(parset.flag_linecenter < 0) /* epoch dependent */
+      {
+        linecenter = pmodel[num_params_blr - num_params_linecenter - 3 + j] * parset.linecenter_err;
+      }
       /* setup response */
       for(i=0; i<nd_fft/2+1; i++)
       {
-        resp_fft[i][0] = exp(-2.0 * PI*PI * sigV/dV*sigV/dV * i*i*1.0/nd_fft/nd_fft)/nd_fft;
-        resp_fft[i][1] = 0.0;
+        resp_fft0[i][0] = exp(-2.0 * PI*PI * sigV/dV*sigV/dV * i*i*1.0/nd_fft/nd_fft)/nd_fft;
+        resp_fft0[i][1] = 0.0;
 
         /* line center */
-        resp_fft[i][1] = -resp_fft[i][0] * sin(2.0*PI*linecenter/dV * i*1.0/nd_fft);
-        resp_fft[i][0] =  resp_fft[i][0] * cos(2.0*PI*linecenter/dV * i*1.0/nd_fft);
+        resp_fft[i][1] = -resp_fft0[i][0] * sin(2.0*PI*linecenter/dV * i*1.0/nd_fft);
+        resp_fft[i][0] =  resp_fft0[i][0] * cos(2.0*PI*linecenter/dV * i*1.0/nd_fft);
       }
     
       memcpy(real_data+npad/2, &fl2d[j*nv], nv*sizeof(double));

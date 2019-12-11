@@ -9,6 +9,7 @@ FlagDim                     2                          % -2, generate fully rand
 
 FlagBLRModel                6                           % 1, 2, 3, 4, 5, 6, 7; BLR model type
                                                         % 5 is double power-law model; 6 is Pancoast's model; 7 is two-zone model
+                                                        % 0 is user defined
 
 %========================================================================
 % data file
@@ -60,12 +61,12 @@ FlagNonlinear               1                           % 0, linear response; 1,
 %========================================================================
 % spectral broadening
 
-InstRes                     492                           % instrument broadening (modeled by a Gaussian), in km/s
+InstRes                     200                           % instrument broadening (modeled by a Gaussian), in km/s
                                                           % if seting to <0.0, the broadening is epoch dependent, stored in "InstResFile"
 
 InstResErr                  100.0                          % instrument broadening error, in km/s
 
-InstResFile                 data/arp151_broaden.txt       % file for storing epoch-dependent instrument broadening
+InstResFile                 data/sim_broaden.txt       % file for storing epoch-dependent instrument broadening
                                                           % two columns: broadening width and error (km/s), in the order of time as the 2d line data
 
 %========================================================================
@@ -79,17 +80,16 @@ FlagNarrowLine              3                           % 0, no narrow line;
 
 FluxNarrowLine              1.5                         % flux of narrow line
 FluxNarrowLineErr           0.50                        % flux error of narrow line
-WidthNarrowLine             200.0                        % width km/s
-WidthNarrowLineErr          100.0                         % width error
-ShiftNarrowLine             10.0                        % shift, km/s, with respect to broad line center.  
+WidthNarrowLine             93.0                        % width km/s
+WidthNarrowLineErr          10.0                         % width error
+ShiftNarrowLine             0.0                        % shift, km/s, with respect to broad line center.  
 ShiftNarrowLineErr          0.0                         % shift error
 
 %========================================================================
 % 
 
-FlagLineCenter              1
+FlagLineCenter              -1                          % -1, epoch-dependent; 0, not included; 1, uniform
 LineCenterErr               50.0                        % km/s
-
 
 
 %========================================================================

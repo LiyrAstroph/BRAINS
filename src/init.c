@@ -56,8 +56,10 @@ void init()
 
   /* number of parameters for line center, only valid for 2d RM */
   num_params_linecenter = 0;
-  if(parset.flag_linecenter !=  0)
+  if(parset.flag_linecenter >  0)
     num_params_linecenter = 1;
+  else if(parset.flag_linecenter <  0)
+    num_params_linecenter = n_line_data;
   
   switch(parset.flag_blrmodel)
   {

@@ -317,6 +317,7 @@ void read_parset()
     if(parset.flag_dim < 2)
     {
       parset.flag_narrowline = 0;
+      parset.flag_linecenter = 0;
     }
     if(parset.flag_dim ==2)
     {
