@@ -438,6 +438,21 @@ void reconstruct_line2d()
         parset.InstRes = instres_mean/norm;
         parset.InstRes_err = 0.0;
       }
+
+      /* similarly, there is no data for line center information at given specified epoch,
+       * using the mean value
+       */
+      if(parset.flag_linecenter < 0)
+      {
+        parset.flag_linecenter = 1; /* force to be uniform prior, not num_params_linecenter is still unchanged */
+        double linecenter_mean = 0.0;
+        double *pm = (double *)best_model_line2d;
+        for(i=0; i<n_line_data; i++)
+        {
+          linecenter_mean += pm[num_params_blr - num_params_linecenter - 3 + i];
+        }
+        pm[num_params_blr - num_params_linecenter - 3] = linecenter_mean/n_line_data;
+      }
       
       calculate_line2d_from_blrmodel(best_model_line2d, Tline, TransV, 
           Trans2D, Fline2d, parset.n_line_recon, parset.n_vel_recon);
