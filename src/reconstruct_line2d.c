@@ -444,7 +444,7 @@ void reconstruct_line2d()
        */
       if(parset.flag_linecenter < 0)
       {
-        parset.flag_linecenter = 1; /* force to be uniform prior, not num_params_linecenter is still unchanged */
+        parset.flag_linecenter = 1; /* force to be uniform prior, note num_params_linecenter is still unchanged */
         double linecenter_mean = 0.0;
         double *pm = (double *)best_model_line2d;
         for(i=0; i<n_line_data; i++)

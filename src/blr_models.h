@@ -86,7 +86,7 @@ typedef struct
   double gam;           /*!< \brief 8. gamma */
   double xi;            /*!< \brief 9. obscuration */
   double mbh;           /*!< \brief 10.black hole mass */
-  double fellip;        /*!< \brief 11.ellipitic orbits */
+  double fellip;        /*!< \brief 11.elliptic orbits */
   double fflow;         /*!< \brief 12.inflow/outflow */
   double sigr_circ;     /*!< \brief 13. */
   double sigthe_circ;   /*!< \brief 14. */
@@ -111,7 +111,7 @@ typedef struct
   double gam;           /*!< \brief 7. gamma */
   double xi;            /*!< \brief 8. obscuration */
   double mbh;           /*!< \brief 9. black hole mass */
-  double fellip;        /*!< \brief 10.ellipitic orbits */
+  double fellip;        /*!< \brief 10.elliptic orbits */
   double fflow;         /*!< \brief 11.inflow/outflow */
   double sigr_circ;     /*!< \brief 12. */
   double sigthe_circ;   /*!< \brief 13. */
@@ -144,14 +144,14 @@ typedef struct
   double opn_un;        /*!< \brief 13.opening angle */
 
   double mbh;           /*!< \brief 14.black hole mass */
-  double fellip;        /*!< \brief 15.ellipitic orbits */
+  double fellip;        /*!< \brief 15.elliptic orbits */
   double fflow;         /*!< \brief 16.inflow/outflow */
   double sigr_circ;     /*!< \brief 17. */
   double sigthe_circ;   /*!< \brief 18. */
   double sigr_rad;      /*!< \brief 19. */
   double sigthe_rad;    /*!< \brief 20. */
   double theta_rot;     /*!< \brief 21. */
-  double fellip_un;     /*!< \brief 22.ellipitic orbits */
+  double fellip_un;     /*!< \brief 22.elliptic orbits */
   double fflow_un;      /*!< \brief 23.inflow/outflow */
   double sig_turb;      /*!< \brief 24. */
 }BLRmodel7;
