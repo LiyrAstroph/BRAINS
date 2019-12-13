@@ -396,7 +396,7 @@ void sim_init()
       break;
   }
 
-  if(parset.InstRes <= 0.0)
+  if(parset.flag_InstRes > 1)
   {
     num_params_res = 1;
     parset.InstRes = 220.0/VelUnit;

@@ -61,10 +61,13 @@ FlagNonlinear               1                           % 0, linear response; 1,
 %========================================================================
 % spectral broadening
 
-InstRes                     200                           % instrument broadening (modeled by a Gaussian), in km/s
-                                                          % if seting to <0.0, the broadening is epoch dependent, stored in "InstResFile"
+FlagInstRes                 2                           % 0, uniform prior, epoch-independent
+                                                        % 1, uniform prior, but epoch-dependent parameterization
+                                                        % 2, epoch-dependent parameterization, prior stored in "InstResFile"
 
-InstResErr                  100.0                          % instrument broadening error, in km/s
+InstRes                     400                           % instrument broadening (modeled by a Gaussian), in km/s, for FlagInstRes=0, or 1
+                                                          
+InstResErr                  100.0                         % instrument broadening error, in km/s, for FlagInstRes=0, or 1
 
 InstResFile                 data/sim_broaden.txt       % file for storing epoch-dependent instrument broadening
                                                           % two columns: broadening width and error (km/s), in the order of time as the 2d line data

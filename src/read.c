@@ -142,6 +142,9 @@ void read_parset()
     addr[nt] = &parset.flag_line_sys_err;
     id[nt++] = INT;
 
+    strcpy(tag[nt], "FlagInstRes");
+    addr[nt] = &parset.flag_InstRes;
+    id[nt++] = INT;
 
     strcpy(tag[nt], "InstRes");
     addr[nt] = &parset.InstRes;
@@ -229,6 +232,9 @@ void read_parset()
     parset.flag_con_sys_err = 0;
     parset.flag_line_sys_err = 0;
     parset.flag_nonlinear = 1;
+    parset.flag_InstRes = 0;
+    parset.InstRes = 0.0;
+    parset.InstRes_err = 0.0;
 
     
     char fname[200];
@@ -313,11 +319,36 @@ void read_parset()
       exit(0);
     }
 
+    if(parset.flag_InstRes < 0 || parset.flag_InstRes > 2)
+    {
+      fprintf(stderr, "# Error in FlagInstRes: value %d is not allowed.\n# Please specify a value in [0-2].\n", parset.flag_InstRes);
+      exit(0);
+    }
+
+    if(parset.flag_linecenter < -1 || parset.flag_linecenter > 1)
+    {
+      fprintf(stderr, "# Error in FlagLineCenter: value %d is not allowed.\n# Please specify a value in [-1-1].\n", parset.flag_linecenter);
+      exit(0);
+    }
+
+    if(parset.InstRes < 0.0)
+    {
+      fprintf(stderr, "# Error in InstRes: value %d is not allowed.\n# Please specify a positive value.\n", parset.InstRes);
+      exit(0);
+    }
+
+    if(parset.InstRes_err < 0.0)
+    {
+      fprintf(stderr, "# Error in InstResErr: value %d is not allowed.\n# Please specify a positive value.\n", parset.InstRes_err);
+      exit(0);
+    }
+
     /* narrow line only applies in 2D RM */
     if(parset.flag_dim < 2)
     {
       parset.flag_narrowline = 0;
       parset.flag_linecenter = 0;
+      parset.flag_InstRes = 0;
     }
     if(parset.flag_dim ==2)
     {
@@ -355,7 +386,7 @@ void read_parset()
       parset.shift_narrowline /= VelUnit;
       parset.shift_narrowline_err /= VelUnit;
 
-      if(parset.InstRes < 0.0) // epoch-dependent spectral broadening
+      if(parset.flag_InstRes > 1) // epoch-dependent spectral broadening
       {
         if(strlen(parset.file_instres) == 0)
         {
@@ -667,7 +698,7 @@ void read_data()
   }
 
   /* read instrument broadening data */
-  if(parset.InstRes < 0.0 && parset.flag_dim == 2)
+  if(parset.flag_InstRes == 2 && parset.flag_dim == 2)
   {
     if(thistask == roottask)
     {
@@ -700,6 +731,15 @@ void read_data()
     }
     MPI_Bcast(instres_epoch, n_line_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
     MPI_Bcast(instres_err_epoch, n_line_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+  }
+  /*uniform prior of line broadening*/
+  if(parset.flag_InstRes == 1 && parset.flag_dim == 2)
+  {
+    for(i=0; i<n_line_data; i++)
+    {
+      instres_epoch[i] = parset.InstRes;
+      instres_err_epoch[i] = parset.InstRes_err;
+    }
   }
   return;
 }
@@ -735,7 +775,7 @@ void allocate_memory_data()
     Flerrs2d_data = malloc(n_line_data * n_vel_data * sizeof(double *));
   }
 
-  if(parset.InstRes < 0.0 && parset.flag_dim == 2)
+  if(parset.flag_InstRes > 0 && parset.flag_dim == 2)
   {
     instres_epoch = malloc(n_line_data * sizeof(double));
     instres_err_epoch = malloc(n_line_data * sizeof(double));
@@ -773,7 +813,7 @@ void free_memory_data()
   }
 
 
-  if(parset.InstRes < 0.0 && parset.flag_dim == 2)
+  if(parset.flag_InstRes > 0 && parset.flag_dim == 2)
   {
     free(instres_epoch); 
     free(instres_err_epoch);

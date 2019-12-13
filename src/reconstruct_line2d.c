@@ -427,16 +427,24 @@ void reconstruct_line2d()
       /* there is no data for spectral broadening at given specified epoch, using the mean value
        * and set InstRes_err=0.0.
        */ 
-      if(parset.InstRes < 0.0) 
+      double *pm = (double *)best_model_line2d;
+      if(parset.flag_InstRes > 0) 
       {
-        double instres_mean = 0.0, norm=0.0;
+        parset.flag_InstRes = 0; /* force to be uniform prior */
+        double instres_mean = 0.0;
         for(i=0; i<n_line_data; i++)
         {
-          instres_mean += instres_epoch[i]/(instres_err_epoch[i]*instres_err_epoch[i]);
-          norm += 1.0/(instres_err_epoch[i]*instres_err_epoch[i]);
+          instres_mean += instres_epoch[i];
         }
-        parset.InstRes = instres_mean/norm;
+        parset.InstRes = instres_mean/n_line_data;
         parset.InstRes_err = 0.0;
+        
+        instres_mean = 0.0;
+        for(i=0; i<n_line_data; i++)
+        {
+          instres_mean += pm[num_params_blr_model+num_params_nlr+i];
+        }
+        pm[num_params_blr_model + num_params_nlr ] = instres_mean/n_line_data;
       }
 
       /* similarly, there is no data for line center information at given specified epoch,
@@ -446,7 +454,6 @@ void reconstruct_line2d()
       {
         parset.flag_linecenter = 1; /* force to be uniform prior, note num_params_linecenter is still unchanged */
         double linecenter_mean = 0.0;
-        double *pm = (double *)best_model_line2d;
         for(i=0; i<n_line_data; i++)
         {
           linecenter_mean += pm[num_params_blr - num_params_linecenter - 3 + i];

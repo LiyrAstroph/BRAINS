@@ -93,6 +93,7 @@ typedef struct
 
   int flag_save_clouds;
 
+  int flag_InstRes;
   double InstRes, InstRes_err;
   char file_instres[BRAINS_MAX_STR_LENGTH];
 
