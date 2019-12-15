@@ -301,9 +301,9 @@ void read_parset()
       exit(0);
     }
 
-    if(parset.flag_blrmodel > 7 || parset.flag_blrmodel < 0)
+    if(parset.flag_blrmodel > 8 || parset.flag_blrmodel < 0)
     {
-      fprintf(stderr, "# Error in FlagBLRModel: value %d is not allowed.\n# Please specify a value in [0-7].\n", parset.flag_blrmodel);
+      fprintf(stderr, "# Error in FlagBLRModel: value %d is not allowed.\n# Please specify a value in [0-8].\n", parset.flag_blrmodel);
       exit(0);
     }
 
@@ -429,7 +429,7 @@ void read_parset()
     }
 
     
-    if(parset.flag_blrmodel == 3 || parset.flag_blrmodel == 4)
+    if(parset.flag_blrmodel == 3 || parset.flag_blrmodel == 4 || parset.flag_blrmodel == 8)
     {
       parset.n_vel_per_cloud = 1;
     }

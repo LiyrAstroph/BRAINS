@@ -73,6 +73,11 @@ int dnest_line1d(int argc, char **argv)
       transfun_1d_cloud_sample = transfun_1d_cloud_sample_model7;
       break;
 
+    case 8:
+      num_params_blr_model = 12;
+      transfun_1d_cloud_sample = transfun_1d_cloud_sample_model8;
+      break;
+
     default:
       num_params_blr_model = 6;
       transfun_1d_cloud_sample = transfun_1d_cloud_sample_model1;

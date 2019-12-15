@@ -115,7 +115,6 @@ void sim()
       pm[i++] = log(0.1);
       pm[i++] = 0.0;      //theta_rot
       pm[i++] = log(0.001); //sig_turb
-      pm[i++] = 0.0;      //spectral broadening
       break;
 
     case 6:
@@ -137,7 +136,6 @@ void sim()
       pm[i++] = log(0.1);  //
       pm[i++] = 0.0;       // theta_rot
       pm[i++] = log(0.001);  // sig_turb
-      pm[i++] = 0.0;       // parameter for spectral broadening 
       break;
 
     case 7:
@@ -168,9 +166,26 @@ void sim()
       pm[i++] = 0.5;      //fellip_un
       pm[i++] = 0.4;      //fflow_un
       pm[i++] = log(0.001); // sig_turb
-      pm[i++] = 0.0;      // parameter for spectral broadening 
+      break;
+
+    case 8:
+      i=0;
+      pm[i++] = 50.0;   //theta_min
+      pm[i++] = 20.0;   //dtheta_max
+      pm[i++] = log(1.0); // r_min
+      pm[i++] = 4.0;      // fr_max
+      pm[i++] = 1.0;      // gamma
+      pm[i++] = 1.0;      // alpha
+      pm[i++] = -2.0;      // lambda
+      pm[i++] = 0.0;      // xi
+      pm[i++] = log(30.0);     // Rv
+      pm[i++] = log(20.0);     // Rblr, should larger than r_max=r_max * fr_max
+      pm[i++] = cos(30.0/180.0*PI);     // inc
+      pm[i++] = log(4.0); // mbh
       break;
   }
+
+  pm[num_params_blr_model + num_params_nlr ] = 0.0; // spectral broadening
 
   pm[num_params_blr-3] = log(1.0); //A
   pm[num_params_blr-2] = 0.0;      //Ag
@@ -387,6 +402,12 @@ void sim_init()
       num_params_blr_model = sizeof(BLRmodel7)/sizeof(double);
       transfun_1d_cloud_sample = transfun_1d_cloud_sample_model7;
       transfun_2d_cloud_sample = transfun_2d_cloud_sample_model7;
+      break;
+
+    case 8:
+      num_params_blr_model = sizeof(BLRmodel8)/sizeof(double);
+      transfun_1d_cloud_sample = transfun_1d_cloud_sample_model8;
+      transfun_2d_cloud_sample = transfun_2d_cloud_sample_model8;
       break;
 
     default:

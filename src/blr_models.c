@@ -1889,9 +1889,199 @@ void transfun_2d_cloud_sample_model7(const void *pm, double *transv, double *tra
   return;
 }
 
+/*!
+ *
+ */
+void transfun_1d_cloud_sample_model8(const void *pm, int flag_save)
+{
+  int i;
+  double theta_min, theta_max, r_min, r_max, Rblr, Rv, mbh, alpha, gamma, xi, lambda;
+  double rnd, r, r0, theta, phi, xb, yb, zb, x, y, z, l, weight, sin_inc_cmp, cos_inc_cmp, inc;
+  double dis, density, vl, vesc, rnd_xi, zb0, lmax;
+  double v0=6.0/VelUnit;
+  BLRmodel8 *model=(BLRmodel8 *)pm;
+
+  theta_min = model->theta_min/180.0 * PI;
+  theta_max = model->dtheta_max/180.0*PI + theta_min;
+  theta_max = fmin(theta_max, 0.5*PI);
+
+  r_min = exp(model->r_min);
+  r_max = model->fr_max * r_min;
+  if(r_max > 0.5*rcloud_max_set) r_max = 0.5*rcloud_max_set;
+  
+  gamma = model->gamma;
+  alpha = model->alpha;
+  lambda = model->lamda;
+
+  xi = model->xi;
+
+  Rv = exp(model->Rv);
+  Rblr = exp(model->Rblr);
+  if(Rblr < r_max) Rblr = r_max;
+  inc = acos(model->inc);
+  
+  mbh = exp(model->mbh);
+
+  sin_inc_cmp = cos(inc); //sin(PI/2.0 - inc);
+  cos_inc_cmp = sin(inc); //cos(PI/2.0 - inc);
+
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    rnd = gsl_rng_uniform(gsl_r);
+    r0 = r_min +  rnd * (r_max - r_min);
+    theta = theta_min + (theta_max - theta_min) * pow(rnd, gamma); 
+    /* the maximum allowed value of l */
+    lmax = -r0*sin(theta) + sqrt(r0*r0*sin(theta)*sin(theta) + (Rblr*Rblr - r0*r0));
+    l = gsl_rng_uniform(gsl_r) * lmax;
+
+    r = l * sin(theta) + r0;
+    if(gsl_rng_uniform(gsl_r) < 0.5)
+      zb = l * cos(theta);
+    else
+      zb =-l * cos(theta);
+      
+    phi = gsl_rng_uniform(gsl_r) * 2.0*PI;
+
+    xb = r * cos(phi);
+    yb = r * sin(phi);
+
+    zb0 = zb;
+    rnd_xi = gsl_rng_uniform(gsl_r);
+    if( (rnd_xi < 1.0 - xi) && zb0 < 0.0)
+      zb = -zb;
+
+    vesc = sqrt(2.0*mbh/r0);
+    vl = v0 + (vesc - v0) * pow(l/Rv, alpha)/(1.0 + pow(l/Rv, alpha));
+    density = pow(r0, lambda)/vl;
+
+    // counter-rotate around y, LOS is x-axis 
+    x = xb * cos_inc_cmp + zb * sin_inc_cmp;
+    y = yb;
+    z =-xb * sin_inc_cmp + zb * cos_inc_cmp;
+
+    weight = 1.0;
+    dis = sqrt(r*r+zb*zb) - x;
+    clouds_tau[i] = dis;
+    clouds_weight[i] = weight * density;
+    
+    if(flag_save && thistask==roottask)
+    {
+      if(i%(icr_cloud_save) == 0)
+        fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+    }
+  }
+
+  return;
+}
+
+/* 
+ * This function caclulate 2d transfer function.
+ */
+void transfun_2d_cloud_sample_model8(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
+{
+  int i;
+  double theta_min, theta_max, r_min, r_max, Rblr, Rv, mbh, alpha, gamma, xi, lambda;
+  double rnd, r, r0, theta, phi, xb, yb, zb, x, y, z, l, weight, sin_inc_cmp, cos_inc_cmp, inc;
+  double dis, density, vl, vesc, Vr, Vph, vx, vy, vz, vxb, vyb, vzb, V, rnd_xi, zb0, lmax;
+  double v0=6.0/VelUnit;
+  BLRmodel8 *model=(BLRmodel8 *)pm;
+
+  theta_min = model->theta_min/180.0 * PI;
+  theta_max = model->dtheta_max/180.0*PI + theta_min;
+  theta_max = fmin(theta_max, 0.5*PI);
+
+  r_min = exp(model->r_min);
+  r_max = model->fr_max * r_min;
+  if(r_max > 0.5*rcloud_max_set) r_max = 0.5*rcloud_max_set;
+  
+  gamma = model->gamma;
+  alpha = model->alpha;
+  lambda = model->lamda;
+
+  xi = model->xi;
+
+  Rv = exp(model->Rv);
+  Rblr = exp(model->Rblr);
+  if(Rblr < r_max) Rblr = r_max;
+  inc = acos(model->inc);
+  
+  mbh = exp(model->mbh);
+
+  sin_inc_cmp = cos(inc); //sin(PI/2.0 - inc);
+  cos_inc_cmp = sin(inc); //cos(PI/2.0 - inc);
+
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    rnd = gsl_rng_uniform(gsl_r);
+    r0 = r_min +  rnd * (r_max - r_min);
+    theta = theta_min + (theta_max - theta_min) * pow(rnd, gamma); 
+    /* the maximum allowed value of l */
+    lmax = -r0*sin(theta) + sqrt(r0*r0*sin(theta)*sin(theta) + (Rblr*Rblr - r0*r0));
+    l = gsl_rng_uniform(gsl_r) * lmax;
+
+    r = l * sin(theta) + r0;
+    if(gsl_rng_uniform(gsl_r) < 0.5)
+      zb = l * cos(theta);
+    else
+      zb =-l * cos(theta);
+
+    phi = gsl_rng_uniform(gsl_r) * 2.0*PI;
+
+    xb = r * cos(phi);
+    yb = r * sin(phi);
+
+    zb0 = zb;
+    rnd_xi = gsl_rng_uniform(gsl_r);
+    if( (rnd_xi < 1.0 - xi) && zb0 < 0.0)
+      zb = -zb;
+
+    vesc = sqrt(2.0*mbh/r0);
+    vl = v0 + (vesc - v0) * pow(l/Rv, alpha)/(1.0 + pow(l/Rv, alpha));
+    density = pow(r0, lambda)/vl;
+
+    // counter-rotate around y, LOS is x-axis 
+    x = xb * cos_inc_cmp + zb * sin_inc_cmp;
+    y = yb;
+    z =-xb * sin_inc_cmp + zb * cos_inc_cmp;
+
+    weight = 1.0;
+    dis = sqrt(r*r+zb*zb) - x;
+    clouds_tau[i] = dis;
+    clouds_weight[i] = weight * density;
+
+    Vr = vl * sin(theta);
+    vzb = vl * cos(theta);
+    Vph = sqrt(mbh*r0) / r;
+
+    vxb = Vr * cos(phi) - Vph * sin(phi);
+    vyb = Vr * sin(phi) + Vph * cos(phi);
+
+    if(zb < 0.0)
+      vzb = -vzb;
+
+    vx = vxb * cos_inc_cmp + vzb * sin_inc_cmp;
+    vy = vyb;
+    vz =-vxb * sin_inc_cmp + vzb * cos_inc_cmp;
+
+    V = -vx;  //note the definition of the line-of-sight velocity. postive means a receding 
+                // velocity relative to the observer.
+    clouds_vel[i] = V;
+
+    if(flag_save && thistask==roottask)
+    {
+      if(i%(icr_cloud_save) == 0)
+        fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx*VelUnit, vy*VelUnit, vz*VelUnit, weight);
+    }
+  }
+
+  return;
+}
+
 
 void restart_action_1d(int iflag)
 {
+  /* at present, nothing needs to do */
+  /*
   FILE *fp;
   char str[200];
 
@@ -1915,7 +2105,8 @@ void restart_action_1d(int iflag)
   {
     printf("# Reading restart at task %d.\n", thistask);
   }
-  fclose(fp);
+  fclose(fp);*/
+  return;
 }
 
 void restart_action_2d(int iflag)

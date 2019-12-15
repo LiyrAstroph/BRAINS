@@ -95,6 +95,10 @@ void init()
       BLRmodel_size = sizeof(BLRmodel7);
       set_blr_range_model = set_blr_range_model7;
       break;
+    case 8:
+      BLRmodel_size = sizeof(BLRmodel8);
+      set_blr_range_model = set_blr_range_model8;
+      break;
     default:
       BLRmodel_size = sizeof(BLRmodel1);
       set_blr_range_model = set_blr_range_model1;
@@ -899,6 +903,52 @@ void set_blr_range_model7()
   //sig_turb
   blr_range_model[i][0] = log(0.001);
   blr_range_model[i++][1] = log(0.1);
+
+  return;
+}
+
+// model 8
+void set_blr_range_model8()
+{
+  int i;
+  
+  i = 0;
+  //theta_min
+  blr_range_model[i][0] = 20.0;     // in degree
+  blr_range_model[i++][1] = 90.0;
+  //dtheta_max
+  blr_range_model[i][0] = 0.0;      // in degree
+  blr_range_model[i++][1] = 90.0;
+  //r_min
+  blr_range_model[i][0] = log(0.1);
+  blr_range_model[i++][1] = log(rcloud_max_set*0.25);
+  //fr_min
+  blr_range_model[i][0] = 0.0;  //
+  blr_range_model[i++][1] = 10.0;
+  //gamma
+  blr_range_model[i][0] = 0.0;  //
+  blr_range_model[i++][1] = 3.0;
+  //alpha
+  blr_range_model[i][0] = 0.0;
+  blr_range_model[i++][1] = 3.0;
+  //lambda
+  blr_range_model[i][0] = -3.0;
+  blr_range_model[i++][1] = 0.0;
+  //xi
+  blr_range_model[i][0] = 0.0;
+  blr_range_model[i++][1] = 1.0;
+  //Rv
+  blr_range_model[i][0] = log(10.0);
+  blr_range_model[i++][1] = log(50.0);
+  //Rblr
+  blr_range_model[i][0] = log(10.0);
+  blr_range_model[i++][1] = log(rcloud_max_set*0.5);
+  //inc
+  blr_range_model[i][0] = 0.0;   // cos(inc)
+  blr_range_model[i++][1] = 1.0;
+  //mbh
+  blr_range_model[i][0] = log(mass_range[0]);
+  blr_range_model[i++][1] = log(mass_range[1]);
 
   return;
 }

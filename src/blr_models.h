@@ -156,4 +156,25 @@ typedef struct
   double sig_turb;      /*!< \brief 24. */
 }BLRmodel7;
 
+
+/*!
+ *  \struct BLRmodel8
+ *  \brief broad-line region model 8, disk wind model
+ */
+typedef struct
+{
+  double theta_min;     /*!< \brief 1 */
+  double dtheta_max;    /*!< \brief 2 */
+  double r_min;         /*!< \brief 3 */
+  double fr_max;        /*!< \brief 4 */
+  double gamma;         /*!< \brief 5 */
+  double alpha;         /*!< \brief 6 */
+  double lamda;         /*!< \brief 7 */
+  double xi;            /*!< \brief 8 */
+  double Rv;            /*!< \brief 9 */ 
+  double Rblr;          /*!< \brief 10 */
+  double inc;           /*!< \brief 11 */
+  double mbh;           /*!< \brief 12 */
+}BLRmodel8;
+
 #endif

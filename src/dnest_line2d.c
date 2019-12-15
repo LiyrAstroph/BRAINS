@@ -75,6 +75,11 @@ int dnest_line2d(int argc, char **argv)
       transfun_2d_cloud_sample = transfun_2d_cloud_sample_model7;
       break;
 
+    case 8:
+      num_params_blr_model = sizeof(BLRmodel8)/sizeof(double);
+      transfun_2d_cloud_sample = transfun_2d_cloud_sample_model8;
+      break;
+
     default:
       num_params_blr_model = sizeof(BLRmodel1)/sizeof(double);
       transfun_2d_cloud_sample = transfun_2d_cloud_sample_model1;
