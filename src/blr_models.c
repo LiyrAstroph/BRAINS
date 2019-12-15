@@ -1895,9 +1895,9 @@ void transfun_2d_cloud_sample_model7(const void *pm, double *transv, double *tra
 void transfun_1d_cloud_sample_model8(const void *pm, int flag_save)
 {
   int i;
-  double theta_min, theta_max, r_min, r_max, Rblr, Rv, mbh, alpha, gamma, xi, lambda;
+  double theta_min, theta_max, r_min, r_max, Rblr, Rv, mbh, alpha, gamma, xi, lambda, k;
   double rnd, r, r0, theta, phi, xb, yb, zb, x, y, z, l, weight, sin_inc_cmp, cos_inc_cmp, inc;
-  double dis, density, vl, vesc, rnd_xi, zb0, lmax;
+  double dis, density, vl, vesc, rnd_xi, zb0, lmax, R;
   double v0=6.0/VelUnit;
   BLRmodel8 *model=(BLRmodel8 *)pm;
 
@@ -1912,7 +1912,8 @@ void transfun_1d_cloud_sample_model8(const void *pm, int flag_save)
   gamma = model->gamma;
   alpha = model->alpha;
   lambda = model->lamda;
-
+  
+  k = model->k;
   xi = model->xi;
 
   Rv = exp(model->Rv);
@@ -1959,8 +1960,9 @@ void transfun_1d_cloud_sample_model8(const void *pm, int flag_save)
     y = yb;
     z =-xb * sin_inc_cmp + zb * cos_inc_cmp;
 
-    weight = 1.0;
-    dis = sqrt(r*r+zb*zb) - x;
+    R = sqrt(r*r + zb*zb);
+    weight = 0.5 + k*(x/R);;
+    dis = R - x;
     clouds_tau[i] = dis;
     clouds_weight[i] = weight * density;
     
@@ -1980,9 +1982,9 @@ void transfun_1d_cloud_sample_model8(const void *pm, int flag_save)
 void transfun_2d_cloud_sample_model8(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
   int i;
-  double theta_min, theta_max, r_min, r_max, Rblr, Rv, mbh, alpha, gamma, xi, lambda;
+  double theta_min, theta_max, r_min, r_max, Rblr, Rv, mbh, alpha, gamma, xi, lambda, k;
   double rnd, r, r0, theta, phi, xb, yb, zb, x, y, z, l, weight, sin_inc_cmp, cos_inc_cmp, inc;
-  double dis, density, vl, vesc, Vr, Vph, vx, vy, vz, vxb, vyb, vzb, V, rnd_xi, zb0, lmax;
+  double dis, density, vl, vesc, Vr, Vph, vx, vy, vz, vxb, vyb, vzb, V, rnd_xi, zb0, lmax, R;
   double v0=6.0/VelUnit;
   BLRmodel8 *model=(BLRmodel8 *)pm;
 
@@ -1997,7 +1999,8 @@ void transfun_2d_cloud_sample_model8(const void *pm, double *transv, double *tra
   gamma = model->gamma;
   alpha = model->alpha;
   lambda = model->lamda;
-
+  
+  k = model->k;
   xi = model->xi;
 
   Rv = exp(model->Rv);
@@ -2044,8 +2047,9 @@ void transfun_2d_cloud_sample_model8(const void *pm, double *transv, double *tra
     y = yb;
     z =-xb * sin_inc_cmp + zb * cos_inc_cmp;
 
-    weight = 1.0;
-    dis = sqrt(r*r+zb*zb) - x;
+    R = sqrt(r*r + zb*zb);
+    weight = 0.5 + k*(x/R);
+    dis = R - x;
     clouds_tau[i] = dis;
     clouds_weight[i] = weight * density;
 

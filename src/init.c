@@ -934,6 +934,9 @@ void set_blr_range_model8()
   //lambda
   blr_range_model[i][0] = -3.0;
   blr_range_model[i++][1] = 0.0;
+  //k
+  blr_range_model[i][0] = -0.5;
+  blr_range_model[i++][1] = 0.5;
   //xi
   blr_range_model[i][0] = 0.0;
   blr_range_model[i++][1] = 1.0;

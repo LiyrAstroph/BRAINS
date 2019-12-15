@@ -74,7 +74,7 @@ int dnest_line1d(int argc, char **argv)
       break;
 
     case 8:
-      num_params_blr_model = 12;
+      num_params_blr_model = 13;
       transfun_1d_cloud_sample = transfun_1d_cloud_sample_model8;
       break;
 

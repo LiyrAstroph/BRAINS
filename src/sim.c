@@ -177,6 +177,7 @@ void sim()
       pm[i++] = 1.0;      // gamma
       pm[i++] = 1.0;      // alpha
       pm[i++] = -2.0;      // lambda
+      pm[i++] = -0.5;      // k
       pm[i++] = 0.0;      // xi
       pm[i++] = log(30.0);     // Rv
       pm[i++] = log(20.0);     // Rblr, should larger than r_max=r_max * fr_max

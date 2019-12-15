@@ -170,11 +170,12 @@ typedef struct
   double gamma;         /*!< \brief 5 */
   double alpha;         /*!< \brief 6 */
   double lamda;         /*!< \brief 7 */
-  double xi;            /*!< \brief 8 */
-  double Rv;            /*!< \brief 9 */ 
-  double Rblr;          /*!< \brief 10 */
-  double inc;           /*!< \brief 11 */
-  double mbh;           /*!< \brief 12 */
+  double k;         /*!< \brief 8 */
+  double xi;            /*!< \brief 9 */
+  double Rv;            /*!< \brief 10 */ 
+  double Rblr;          /*!< \brief 11 */
+  double inc;           /*!< \brief 12 */
+  double mbh;           /*!< \brief 13 */
 }BLRmodel8;
 
 #endif
