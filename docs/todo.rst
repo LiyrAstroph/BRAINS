@@ -2,14 +2,14 @@
 To-do list
 ***********************
 
-Wind-like BLR model
-===================
-Create a wind-like BLR model.
+.. todo:: 
+  Create wind-like BLR model
 
-An interface for external BLR dynamical models
-==============================================
-Create an interface to all users to input their own BLR dynamical models.
+  **Finished on Dec 16, 2019**.
 
-Python wrap
-===========
-Create a Python wrapper to call ``brains`` in Python environoment.
+
+.. todo::
+  Create an interface to all users to input their own BLR dynamical models.
+
+.. todo::
+  Create a Python wrapper to call ``brains`` in Python environoment.

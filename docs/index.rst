@@ -25,6 +25,7 @@ Documentation
    param.rst
    mcmc.rst
    model.rst
+   user_model.rst
    todo.rst
 
 

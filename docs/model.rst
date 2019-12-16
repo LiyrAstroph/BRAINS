@@ -102,9 +102,60 @@ This is the shadowed model in Li et al. (2018).
 
   Schematic of a disk-like broad-line region with two zones (Li et al. 2018).
 
+BLR model 8
+===========
+A disk wind model from Shlosman & Vitello (1993).
+
+.. figure:: _static/fig_diskwind.jpg
+  :align: center 
+
+  Schematic of a disk wind model (figure credit: Higginbottom et al. 2013).
+
+In the cylindrical coordinate, the wind stream line have an angle as 
+
+.. math::
+  \theta = \theta_{\rm min} + (\theta_{\rm max}-\theta_{\rm min})x^\gamma,\\
+  x=(r_0-r_{\rm min})/(r_{\rm max}-r_{\rm min}),
+
+where :math:`r_0` is the root point of the stream line. The velocity along the stream line 
+is 
+
+.. math::
+  v_l = v_0 + (v_\infty-v_0)\frac{(l/R_v)^\alpha}{1 + (l/R_v)^\alpha},
+
+where :math:`l` is the distance along the stream line, :math:`R_v` is the scale length, 
+:math:`v_0` is the initial velocity, and :math:`v_\infty` is the terminal velocity defined 
+to be 
+
+.. math::
+  v_\infty = \sqrt{\frac{2GM_\bullet}{r_0}}.
+
+The velocity components are 
+
+.. math::
+  v_r = v_l \sin\theta, ~~~ v_z = v_l \cos\theta.
+
+The azimuthal velocity is given by assuming conservations of the angular momentum
+
+.. math::
+  v_\phi = v_{\phi, 0}\left(\frac{r_0}{r}\right) = \frac{\sqrt{GM_\bullet r_0}}{r}.
+
+The density along the stream line is given by 
+
+.. math::
+  \rho(l) = \frac{\dot m}{v_l} \frac{r_0 dr_0}{rdr},
+
+where :math:`\dot m` is the mass-loss rate at the root of the stream line.
+
 References
 ==========
-Li, Y.-R. et al. 2013, ApJ, 779, 110
-Li, Y.-R. et al. 2018, ApJ, 869, 137
-Pancoast, A. et al. 2014, MNRAS, 445, 3055
+* Higginbottom, N. et al. 2013, MNRAS, 436, 1390
+
+* Li, Y.-R. et al. 2013, ApJ, 779, 110
+
+* Li, Y.-R. et al. 2018, ApJ, 869, 137
+
+* Pancoast, A. et al. 2014, MNRAS, 445, 3055
+
+* Shlosman I., Vitello P., 1993, ApJ, 409, 372
 

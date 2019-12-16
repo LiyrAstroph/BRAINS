@@ -6,7 +6,7 @@
 
 /*!
  * \file user_blr_model.c
- * \brief allow users to define their owen BLR models.
+ * \brief allow users to define their own BLR models.
  * 
  * User should provide: 1) number of parameters in 1D and 2D; 
  *                      2) struct for BLR model;
