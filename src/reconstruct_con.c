@@ -348,7 +348,7 @@ void calculate_con_from_model(const void *model)
 }
 
 /*!
- *  this function calculates continuum light curves form model parameters 
+ *  this function calculates continuum light curves from model parameters 
  *  and stores it into Fcon.
  *  
  *  using fast algorithm for semiseparable matrices

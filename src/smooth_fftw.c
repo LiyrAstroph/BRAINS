@@ -45,7 +45,7 @@ double *real_data, *real_resp, *real_conv;
 
 
 /*!
- * This function initates workspace for FFT.
+ * This function initiates workspace for FFT.
  */
 void smooth_init(int nv, const double *transv)
 {

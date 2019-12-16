@@ -171,7 +171,7 @@ void postprocess1d()
     for(i=0; i<num_ps; i++)
     {
       if(lag[i] > -DBL_MAX)
-        mean_lag_std = (lag[i] - mean_lag) * (lag[i] - mean_lag);
+        mean_lag_std += (lag[i] - mean_lag) * (lag[i] - mean_lag);
     }
     if(nc > 1)
       mean_lag_std = sqrt(mean_lag_std/(nc -1.0));
