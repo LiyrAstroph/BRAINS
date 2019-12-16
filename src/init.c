@@ -922,8 +922,8 @@ void set_blr_range_model8()
   //r_min
   blr_range_model[i][0] = log(0.1);
   blr_range_model[i++][1] = log(rcloud_max_set*0.25);
-  //fr_min
-  blr_range_model[i][0] = 0.0;  //
+  //fr_max
+  blr_range_model[i][0] = 1.0;  //
   blr_range_model[i++][1] = 10.0;
   //gamma
   blr_range_model[i][0] = 0.0;  //
