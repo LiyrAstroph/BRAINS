@@ -333,13 +333,13 @@ void read_parset()
 
     if(parset.InstRes < 0.0)
     {
-      fprintf(stderr, "# Error in InstRes: value %d is not allowed.\n# Please specify a positive value.\n", parset.InstRes);
+      fprintf(stderr, "# Error in InstRes: value %f is not allowed.\n# Please specify a positive value.\n", parset.InstRes);
       exit(0);
     }
 
     if(parset.InstRes_err < 0.0)
     {
-      fprintf(stderr, "# Error in InstResErr: value %d is not allowed.\n# Please specify a positive value.\n", parset.InstRes_err);
+      fprintf(stderr, "# Error in InstResErr: value %f is not allowed.\n# Please specify a positive value.\n", parset.InstRes_err);
       exit(0);
     }
 

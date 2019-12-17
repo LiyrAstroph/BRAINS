@@ -500,38 +500,36 @@ void set_par_fix()
         par_fix_val[i] = -DBL_MAX;
       }
     }
-
-    // cope with narrow line
-    if(parset.flag_narrowline == 2)
-    {
-      // flux
-      if(parset.flux_narrowline_err == 0.0)
-      {
-        par_fix[num_params_blr_model] = 1.0;
-        par_fix_val[num_params_blr_model] = 0.0;
-      }
-    }
-
-    if(parset.flag_narrowline >= 2)
-    {
-      // width
-      if(parset.width_narrowline_err == 0.0)
-      {
-        par_fix[num_params_blr_model+1] = 1.0;
-        par_fix_val[num_params_blr_model+1] = 0.0;
-      } 
-
-      // shift
-      if(parset.shift_narrowline_err == 0.0)
-      {
-        par_fix[num_params_blr_model+2] = 1.0;
-        par_fix_val[num_params_blr_model+2] = 0.0;
-      }
-    }
   }
 
   MPI_Bcast(par_fix, num_params_blr_model, MPI_INT, roottask, MPI_COMM_WORLD);
   MPI_Bcast(par_fix_val, num_params_blr_model, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+
+  // cope with narrow line
+  if(parset.flag_narrowline == 2)
+  {
+    // flux
+    if(parset.flux_narrowline_err == 0.0)
+    {
+      par_fix[num_params_blr_model] = 1.0;
+      par_fix_val[num_params_blr_model] = 0.0;
+    }
+  }
+  if(parset.flag_narrowline >= 2)
+  {
+    // width
+    if(parset.width_narrowline_err == 0.0)
+    {
+      par_fix[num_params_blr_model+1] = 1.0;
+      par_fix_val[num_params_blr_model+1] = 0.0;
+    } 
+    // shift
+    if(parset.shift_narrowline_err == 0.0)
+    {
+      par_fix[num_params_blr_model+2] = 1.0;
+      par_fix_val[num_params_blr_model+2] = 0.0;
+    }
+  }
   return;
 }
 
