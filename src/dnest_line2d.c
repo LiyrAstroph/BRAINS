@@ -127,7 +127,7 @@ int dnest_line2d(int argc, char **argv)
   print_par_names_model2d();
 
   /* setup the fixed parameters */
-  set_par_fix();
+  set_par_fix_blrmodel();
 
   /* setup the remaining paramters */
   for(i=num_params_blr; i<num_params; i++)
@@ -135,6 +135,33 @@ int dnest_line2d(int argc, char **argv)
     par_fix[i] = 0;
     par_fix_val[i] = -DBL_MAX;
   }
+
+  /* cope with narrow line */
+  if(parset.flag_narrowline == 2)
+  {
+    /* flux */
+    if(parset.flux_narrowline_err == 0.0)
+    {
+      par_fix[num_params_blr_model] = 1.0;
+      par_fix_val[num_params_blr_model] = 0.0;
+    }
+  }
+  if(parset.flag_narrowline >= 2)
+  {
+    /* width */
+    if(parset.width_narrowline_err == 0.0)
+    {
+      par_fix[num_params_blr_model+1] = 1.0;
+      par_fix_val[num_params_blr_model+1] = 0.0;
+    } 
+    /* shift */
+    if(parset.shift_narrowline_err == 0.0)
+    {
+      par_fix[num_params_blr_model+2] = 1.0;
+      par_fix_val[num_params_blr_model+2] = 0.0;
+    }
+  }
+
   /* if flag_fixvar is true, fix continuum variation parameter sigma and tau */
   if(parset.flag_fixvar == 1)
   {

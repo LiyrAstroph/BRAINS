@@ -125,7 +125,7 @@ int dnest_line1d(int argc, char **argv)
   
   set_par_range_model1d();
   print_par_names_model1d();
-  set_par_fix();
+  set_par_fix_blrmodel();
 
   for(i=num_params_blr; i<num_params; i++)
     par_fix[i] = 0;
