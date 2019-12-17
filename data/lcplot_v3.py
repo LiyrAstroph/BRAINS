@@ -1,23 +1,64 @@
+#
+# BRAINS
+# (B)LR (R)everberation-mapping (A)nalysis (I)ntegrated with (N)ested (S)ampling
+# Yan-Rong Li, liyanrong@ihep.ac.cn
+# Thu, Aug 4, 2016
+#
+
+#
+# plot 2D results
+# 
+
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 from matplotlib.ticker import FuncFormatter
 import copy
+import re
+
+# 
+# read parameter names
+def read_para_names():
+  fp = open("para_names_model2d.txt", "r")
+  lines = fp.readlines()
+  fp.close()
+  for line in lines:
+    if re.match(".*sys_err_con.*", line):
+      idx_sys_err_con = int(line.split()[0])
+    if re.match(".*sys_err_line.*", line):
+      idx_sys_err_line = int(line.split()[0])
+  
+  return idx_sys_err_line, idx_sys_err_con
+
+#
+# read param file
+def read_param():
+  fp = open("../src/param", "r");
+  lines = fp.readlines()
+  for line in lines:
+    if line[0] == "#":
+      continue
+    if re.match("^FileDir.*", line):
+      filedir = line.split()[1]
+    if re.match("^ContinuumFile.*", line):
+      contfile = line.split()[1]
+    if re.match("^Line2DFile.*", line):
+      line2dfile = line.split()[1]
+  fp.close()
+
+  return filedir, contfile, line2dfile
 
 VelUnit = np.sqrt( 6.672e-8 * 1.0e6 * 1.989e33 / (2.9979e10*8.64e4)) / 1.0e5
-
-def set_cov_Pmat(sigma, tau, alpha, Tcon):
-  Pmat = np.zeros((Tcon.shape[0], Tcon.shape[0]))
-  xv, yv = np.meshgrid(Tcon, Tcon)
-  Pmat = sigma*sigma*np.exp( - pow( np.fabs( xv - yv )/tau, alpha) )
-  return Pmat
 
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif', size=15)
 
-obj = "sim"
+filedir, contfile, line2dfile = read_param()
+obj = re.search("^(.*/)*(.*)_", contfile).group(2)
+print obj
 
-fp=open(obj + "_hb2d.txt", "r")
+
+fp=open(filedir+"/"+line2dfile, "r")
 line=fp.readline()
 text=line.split()
 nt=int(text[1])
@@ -45,7 +86,7 @@ dV = (grid_vel[1]-grid_vel[0]) / VelUnit
 line_mean_err = np.mean(prof_err)
 
 # read sim
-fp=open("pline2d_data.txt", "r")
+fp=open(filedir+"/data/pline2d_data.txt", "r")
 
 date_hb_sim=np.zeros(nt)
 grid_vel_sim=np.zeros(nv)
@@ -63,8 +104,8 @@ fp.close()
 
 
 # read light curves
-conlc=np.loadtxt(obj + "_con.txt")
-conlc_sim=np.loadtxt("pcon.txt")
+conlc=np.loadtxt(filedir+"/"+contfile)
+conlc_sim=np.loadtxt(filedir+"/data/pcon.txt")
 hblc=np.zeros((nt, 3))
 hblc[:, 1]=np.sum(prof, axis=1) * dV
 hblc[:, 2]=np.sqrt(np.sum(prof_err**2, axis=1)) * dV
@@ -83,20 +124,18 @@ grid_vel_sim /= 1.0e3
 # read sample
 con_scale = 1.0/np.mean(conlc[:, 1])
 line_scale = 1.0/np.mean(hblc[:, 1])
-hd=np.loadtxt("sample2d.txt", skiprows=1)
-phd = np.loadtxt("posterior_sample2d.txt")
-hd_info = np.loadtxt("sample_info2d.txt", skiprows=1)
-level = np.loadtxt("levels2d.txt", skiprows=1)
-idx_mbh = np.where(hd_info[:, 0]>level.shape[0] - 60)
-hd_sort=np.sort(hd[idx_mbh[0], 11]/np.log(10.0)+6.0)
+phd = np.loadtxt(filedir+"/data/posterior_sample2d.txt")
+level = np.loadtxt(filedir+"/data/levels2d.txt", skiprows=1)
 
-syserr_con = 0.0
-syserr =0.0 #(np.exp(np.mean(phd[:, 19])) - 1.0)/line_scale * line_mean_err
+idx_con, idx_line = read_para_names()
+print idx_con, idx_line
+syserr_con = (np.exp(np.mean(phd[:, idx_con])) - 1.0) * line_mean_err
+syserr = (np.exp(np.mean(phd[:, idx_line])) - 1.0) * line_mean_err
 
 print("scale:", con_scale, line_scale)
 print("syserr:", syserr_con, syserr)
 
-logP = np.loadtxt("posterior_sample_info2d.txt", skiprows=1)
+logP = np.loadtxt(filedir+"/data/posterior_sample_info2d.txt", skiprows=1)
 nmax = np.argmax(logP)
 print(nmax, logP[nmax])
 
@@ -115,7 +154,7 @@ prof_rec = np.zeros((nt, nv))
 prof_rec_max = np.zeros((nt, nv))
 line_rec = np.zeros(nt)
 line_rec_max = np.zeros(nt)
-fp = open("line2d_rec.txt", "r")
+fp = open(filedir+"/data/line2d_rec.txt", "r")
 chi = np.zeros(len(logP))
  
 for i in range(len(logP)):
@@ -132,7 +171,7 @@ fp.close()
 
 np.savetxt("chi.txt", chi)
 
-fp = open("line2d_rec.txt", "r")
+fp = open(filedir+"/data/line2d_rec.txt", "r")
 ichimin = np.argmin(chi)
 #ichimin = nmax
 print(ichimin, chi[ichimin])
@@ -185,7 +224,7 @@ ax5.xaxis.set_ticks_position("both")
 xlim = ax5.get_xlim()
 ylim = ax5.get_ylim()
 
-ax5.text(xlim[0]+0.02*(xlim[1]-xlim[0]), ylim[1]-0.22*(ylim[1]-ylim[0]), r'$\rm Mrk\ 142$')
+ax5.text(xlim[0]+0.02*(xlim[1]-xlim[0]), ylim[1]-0.22*(ylim[1]-ylim[0]), obj)
 
 #========================================================================
 # subfig 4
@@ -196,7 +235,7 @@ con = np.zeros(conlc_sim.shape[0])
 date = np.zeros(conlc_sim.shape[0])
 chi = np.zeros(len(logP))
 
-fp = open("con_rec.txt", "r")
+fp = open(filedir+"/data/con_rec.txt", "r")
 for i in range(len(logP)):
   for j in range(len(con)):
     line = fp.readline()
@@ -210,7 +249,7 @@ fp.close()
 print(chi[ichimin])
 
 plotnum = 0
-fp = open("con_rec.txt", "r")
+fp = open(filedir+"/data/con_rec.txt", "r")
 for i in range(len(logP)):
   for j in range(len(con)):
     line = fp.readline()
@@ -246,8 +285,8 @@ ax4.xaxis.set_ticks_position("both")
 [i.set_visible(False) for i in ax4.get_xticklabels()]
 
 xlim=ax5.get_xlim()
-ax5.set_xlim([xlim[0], 170])
-ax4.set_xlim([xlim[0], 170])
+ax5.set_xlim([xlim[0], xlim[1]])
+ax4.set_xlim([xlim[0], xlim[1]])
 
 plt.rcParams['xtick.direction'] = 'out'
 plt.rcParams['ytick.direction'] = 'out'
