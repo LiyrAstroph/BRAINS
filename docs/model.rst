@@ -1,5 +1,5 @@
 ************************
-Broad-line region models
+Broad-Line Region Models
 ************************
 
 ``brains`` already encapsulates several BLR dynamical models detailed below. To specify those models in 

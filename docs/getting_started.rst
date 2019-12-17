@@ -1,10 +1,10 @@
 .. _getting_started:
 
 ***************
-Getting started
+Getting Started
 ***************
 
-Third-party package dependence
+Third-party Package Dependence
 ===============================
 
   * **MPICH** --- an MPI implementation library, available at http://www-unix.mcs.anl.gov/mpi/mpich

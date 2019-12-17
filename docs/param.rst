@@ -1,5 +1,5 @@
 **************
-Parameter file
+Parameter File
 **************
   
 ``brains`` reads a parameter file to configure its running. A typical parameter file looks like::
