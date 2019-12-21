@@ -462,7 +462,7 @@ void read_parset()
 void read_data()
 {
   FILE *fp;
-  int i;
+  int i, error_flag = 0;
   char buf[200], fname[200];
 
   // first need to determine the number of data points 
@@ -471,7 +471,7 @@ void read_data()
     
     int count;
     
-    if(parset.flag_dim >= -1)
+    if(parset.flag_dim >= -1 && error_flag == 0)
     { 
       // continuum file
       sprintf(fname, "%s/%s", parset.file_dir, parset.continuum_file);
@@ -479,24 +479,27 @@ void read_data()
       if(fp == NULL)
       {
         fprintf(stderr, "# Error: Cannot open file %s\n", fname);
-        exit(-1);
+        error_flag = 2;
       }
-      // count the number of lines
-      count = 0;
-      while(1)
+      else
       {
-        fgets(buf, 200, fp);
-        if(feof(fp)!=0)
-          break;
-        count++;
+        // count the number of lines
+        count = 0;
+        while(1)
+        {
+          fgets(buf, 200, fp);
+          if(feof(fp)!=0)
+            break;
+          count++;
+        }
+        fclose(fp);
+        n_con_data = count;
+      
+        printf("continuum data points: %d\n", n_con_data);
       }
-      fclose(fp);
-      n_con_data = count;
-    
-      printf("continuum data points: %d\n", n_con_data);
     }
 
-    if(parset.flag_dim == 1)
+    if(parset.flag_dim == 1 && error_flag == 0)
     {
       sprintf(fname, "%s/%s", parset.file_dir, parset.line_file);
     // emission flux line
@@ -504,36 +507,48 @@ void read_data()
       if(fp == NULL)
       {
         fprintf(stderr, "# Error: Cannot open file %s\n", fname);
-        exit(-1);
+        error_flag = 2;
       }
-
-      // count the number of lines
-      count = 0;
-      while(1)
+      else
       {
-        fgets(buf, 200, fp);
-        if(feof(fp)!=0)
-          break;
-        count++;
+        // count the number of lines
+        count = 0;
+        while(1)
+        {
+          fgets(buf, 200, fp);
+          if(feof(fp)!=0)
+            break;
+          count++;
+        }
+        fclose(fp);
+        n_line_data = count;
+        printf("line data points: %d\n", n_line_data);
       }
-      fclose(fp);
-      n_line_data = count;
-      printf("line data points: %d\n", n_line_data);
     }
 
-    if(parset.flag_dim == 2 || parset.flag_dim == -1)
+    if( (parset.flag_dim == 2 || parset.flag_dim == -1) && error_flag == 0 )
     {
       sprintf(fname, "%s/%s", parset.file_dir, parset.line2d_file);
       fp = fopen(fname, "r");
       if(fp == NULL)
       {
         fprintf(stderr, "# Error: Cannot open file %s\n", fname);
-        exit(-1);
+        error_flag = 2;
       }
-      fscanf(fp, "%s %d %d\n", buf, &n_line_data, &n_vel_data);
-      fclose(fp);
-      printf("line2d data points: %d %d\n", n_line_data, n_vel_data);
+      else
+      {
+        fscanf(fp, "%s %d %d\n", buf, &n_line_data, &n_vel_data);
+        fclose(fp);
+        printf("line2d data points: %d %d\n", n_line_data, n_vel_data);
+      }
     }
+  }
+
+  MPI_Bcast(&error_flag, 1, MPI_INT, roottask, MPI_COMM_WORLD);
+  if(error_flag != 0)
+  {
+    MPI_Finalize();
+    exit(0);
   }
 
   if(parset.flag_dim >= -1)
@@ -563,11 +578,6 @@ void read_data()
       // continuum data
       sprintf(fname, "%s/%s", parset.file_dir, parset.continuum_file);
       fp = fopen(fname, "r");
-      if(fp == NULL)
-      {
-        fprintf(stderr, "# Error: Cannot open file %s\n", fname);
-        exit(-1);
-      }
       for(i=0; i<n_con_data; i++)
       {
         fscanf(fp, "%lf %lf %lf \n", &Tcon_data[i], &Fcon_data[i], &Fcerrs_data[i]);
@@ -598,11 +608,6 @@ void read_data()
       // line flux data
       sprintf(fname, "%s/%s", parset.file_dir, parset.line_file);
       fp = fopen(fname, "r");
-      if(fp == NULL)
-      {
-        fprintf(stderr, "# Error: Cannot open file %s\n", fname);
-        exit(-1);
-      }
       for(i=0; i<n_line_data; i++)
       {
         fscanf(fp, "%lf %lf %lf \n", &Tline_data[i], &Fline_data[i], &Flerrs_data[i]);
@@ -614,7 +619,7 @@ void read_data()
         fprintf(stderr, "# Error: No time overlap between ontinuum and line time series.\n");
         fprintf(stderr, "# Error: continuum, %f-%f; line, %f-%f.\n", Tcon_data[0], Tcon_data[n_con_data-1], 
           Tline_data[0], Tline_data[n_line_data-1]);
-        exit(-1);
+        error_flag = 4;
       }
 
       /* cal mean line error */
@@ -626,6 +631,14 @@ void read_data()
           line_error_mean += Flerrs_data[i];
       }
       line_error_mean /= n_line_data;
+    }
+
+    MPI_Bcast(&error_flag, 1, MPI_INT, roottask, MPI_COMM_WORLD);
+    if(error_flag != 0)
+    {
+      MPI_Finalize();
+      free_memory_data();
+      exit(0);
     }
 
     MPI_Bcast(Tline_data, n_line_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
@@ -644,11 +657,6 @@ void read_data()
 
       sprintf(fname, "%s/%s", parset.file_dir, parset.line2d_file);
       fp = fopen(fname, "r");
-      if(fp == NULL)
-      {
-        fprintf(stderr, "# Error: Cannot open file %s\n", fname);
-        exit(-1);
-      }
 
       fgets(buf, 200, fp);
 
@@ -671,7 +679,7 @@ void read_data()
         fprintf(stderr, "# Error: No time overlap between ontinuum and line time series.\n");
         fprintf(stderr, "# Error: continuum, %f-%f; line, %f-%f.\n", Tcon_data[0], Tcon_data[n_con_data-1], 
           Tline_data[0], Tline_data[n_line_data-1]);
-        exit(-1);
+        error_flag = 4;
       }
       
       // cal mean line error
@@ -685,6 +693,14 @@ void read_data()
         }
 
       line_error_mean /= (n_line_data*n_vel_data);
+    }
+    
+    MPI_Bcast(&error_flag, 1, MPI_INT, roottask, MPI_COMM_WORLD);
+    if(error_flag != 0)
+    {
+      MPI_Finalize();
+      free_memory_data();
+      exit(0);
     }
 
     // broadcast 2d data
@@ -719,28 +735,39 @@ void read_data()
       if(fp == NULL)
       {
         fprintf(stderr, "# Error: Cannot open file %s.\n", fname);
-        exit(-1);
+        error_flag = 2;
       }
-
-      for(i=0; i<n_line_data; i++)
+      else 
       {
-        if(fscanf(fp, "%lf %lf\n", &instres_epoch[i], &instres_err_epoch[i]) < 2)
+        for(i=0; i<n_line_data; i++)
         {
-          fprintf(stderr, "Error: Cannot read file %s.\n", fname);
+          if(fscanf(fp, "%lf %lf\n", &instres_epoch[i], &instres_err_epoch[i]) < 2)
+          {
+            fprintf(stderr, "Error: Cannot read file %s.\n", fname);
+          }
+          //printf("%d %f %f\n", i, instres_epoch[i], instres_err_epoch[i]);
+          instres_epoch[i] /= VelUnit;
+          instres_err_epoch[i] /= VelUnit;
+  
+          if(instres_epoch[i] < parset.width_narrowline)
+          {
+            printf("# Error narrow line width %f should be smaller than InstRes %f at %d epoch.\n",
+              parset.width_narrowline*VelUnit, parset.InstRes*VelUnit, i);    
+            error_flag = 1;      
+          }
         }
-        //printf("%d %f %f\n", i, instres_epoch[i], instres_err_epoch[i]);
-        instres_epoch[i] /= VelUnit;
-        instres_err_epoch[i] /= VelUnit;
-
-        if(instres_epoch[i] < parset.width_narrowline)
-        {
-          printf("# Error narrow line width %f should be smaller than InstRes %f at %d epoch.\n",
-            parset.width_narrowline*VelUnit, parset.InstRes*VelUnit, i);    
-          exit(0);      
-        }
+        fclose(fp);
       }
-      fclose(fp);
     }
+
+    MPI_Bcast(&error_flag, 1, MPI_INT, roottask, MPI_COMM_WORLD);
+    if(error_flag != 0)
+    {
+      MPI_Finalize();
+      free_memory_data();
+      exit(0);
+    }
+
     MPI_Bcast(instres_epoch, n_line_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
     MPI_Bcast(instres_err_epoch, n_line_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
   }
