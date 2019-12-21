@@ -23,6 +23,7 @@ Documentation
    
    getting_started.rst
    param.rst
+   data.rst
    mcmc.rst
    model.rst
    user_model.rst

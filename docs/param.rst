@@ -10,16 +10,17 @@ Parameter File
   
   FileDir                     /home/liyropt/Projects/GIT/BRAINS      % directory for where all the output files are stored
   
-  FlagDim                     2                           % -2, generate fully random lc; -1, mock lc based on input data; 
+  FlagDim                     2                          % -2, generate fully random lc; -1, mock lc based on input data; 
                                                           % 0, only continuum modeling; 1, 1d line RM; 2, 2d line RM
   
-  FlagBLRModel                6                           % 1, 2, 3, 4, 5, 6, 7; BLR model type
+  FlagBLRModel                8                           % 1, 2, 3, 4, 5, 6, 7, 8; BLR model type
                                                           % 5 is double power-law model; 6 is Pancoast's model; 7 is two-zone model
+                                                          % 0 is user defined
   
   %========================================================================
   % data file
   
-  ContinuumFile               data/sim_con.txt          % file for contnnum data
+  ContinuumFile               data/sim_con.txt          % file for continuum data
   LineFile                    data/sim_hb.txt           % file for line data
   Line2DFile                  data/sim_hb2d.txt         % file for line 2d data
   
@@ -27,7 +28,9 @@ Parameter File
   % reconstruction
   NConRecon                   200                         % number of points for continuum reconstruction
   FlagTrend                   0                           % 0, mean; 1, first-order trend
-  FlagTrendDiff               0                           % 0, no difference; 1, add difference in the long-term trends between continuum and line. 
+  FlagTrendDiff               0                           % 0, no difference; 1 or larger, add difference in the long-term trends between continuum and line
+                                                          % the different trend is modelled by a polynomical with the order set by the value of FlagTrendDiff.
+  
   ConConstructFileOut         data/pcon.txt               % output filename for continuum reconstruction
   
   FlagFixVar                  0                           % 0, not fixed; 1, fix the parameters of variation from continuum data.
@@ -41,7 +44,7 @@ Parameter File
   Tran2DFileOut               data/tran2d.txt             % output filename for 2d transfer function
   Tran2DDataFileOut           data/tran2d_data.txt        % output filename for 2d transfer function at velocity points same with data
   
-  NCloudPerCore               1000                        % number of clouds per task
+  NCloudPerCore               5000                        % number of clouds per task
   NVPerCloud                  5                           % number of velocities per cloud
   
   NTau                        200                         % number of time-lag points calculated in transfer function
@@ -53,20 +56,26 @@ Parameter File
   
   %========================================================================
   %
-  FlagCloudsForceUpdate       1                           % default 0; 0, not update; 1, update whenever BLR parameters are changed
+  FlagCloudsForceUpdate       0                           % default 0; 
+                                                          % 0, only update when BLR parameters are updated 
+                                                          % 1, update every MCMC perturb (continuum + BLR)
   
   FlagConSysErr               0                           % 0, not include systematic error of contininuum; 1, include
   FlagLineSysErr              0                           % 0, not include systematic error of line; 1, include
   
+  FlagNonlinear               1                           % 0, linear response; 1, non-linear response
   %========================================================================
   % spectral broadening
   
-  InstRes                     220                           % instrument broadening (modeled by a Gaussian), in km/s
-                                                            % if seting to <0.0, the broadening is epoch dependent, stored in "InstResFile"
+  FlagInstRes                 1                           % 0, uniform prior, epoch-independent
+                                                          % 1, uniform prior, but epoch-dependent parameterization
+                                                          % 2, epoch-dependent parameterization, prior stored in "InstResFile"
   
-  InstResErr                  34.0                          % instrument broadening error, in km/s
+  InstRes                     220                           % instrument broadening (modeled by a Gaussian), in km/s, for FlagInstRes=0, or 1
+                                                            
+  InstResErr                  50.0                         % instrument broadening error, in km/s, for FlagInstRes=0, or 1
   
-  InstResFile                 data/arp151_broaden.txt       % file for storing epoch-dependent instrument broadening
+  InstResFile                 data/sim_broaden.txt       % file for storing epoch-dependent instrument broadening
                                                             % two columns: broadening width and error (km/s), in the order of time as the 2d line data
   
   %========================================================================
@@ -80,16 +89,17 @@ Parameter File
   
   FluxNarrowLine              1.5                         % flux of narrow line
   FluxNarrowLineErr           0.50                        % flux error of narrow line
-  WidthNarrowLine             14.0                        % width km/s
-  WidthNarrowLineErr          4.4                         % width error
-  ShiftNarrowLine             10.0                        % shift, km/s, with respect to broad line center.  
+  WidthNarrowLine             93.0                        % width km/s
+  WidthNarrowLineErr          10.0                         % width error
+  ShiftNarrowLine             0.0                        % shift, km/s, with respect to broad line center.  
   ShiftNarrowLineErr          0.0                         % shift error
   
   %========================================================================
   % 
   
-  FlagLineCenter              1
-  LineCenterErr               62.0                        % km/s
+  FlagLineCenter              0                          % -1, epoch-dependent; 0, not included; 1, uniform
+  LineCenterErr               50.0                        % km/s
+  
   
   %========================================================================
   % set fixed BLR parameters and their fixed values
@@ -98,4 +108,4 @@ Parameter File
   % values are separated by ":"
   
   BLRParFix                   0000000000
-  BLRParFixVal                0.0:1.0           
+  BLRParFixVal                2.0:1.0
