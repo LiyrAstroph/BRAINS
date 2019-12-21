@@ -5,6 +5,11 @@
  * Thu, Aug 4, 2016
  */
 
+/*!
+ *  \file command_line.h
+ *  \brief header file for command_line.c.
+ */
+
 #ifndef _BRAINS_COMMANDLINE_H
 #define _BRAINS_COMMANDLINE_H
 

@@ -362,5 +362,6 @@ void transfun_2d_cal(const void *pm, double *transv, double *trans2d, int n_vel,
       }
     }
   }
+  return;
 }
 

@@ -340,10 +340,11 @@ void read_parset()
     if(parset.InstRes_err < 0.0)
     {
       fprintf(stderr, "# Error in InstResErr: value %f is not allowed.\n# Please specify a positive value.\n", parset.InstRes_err);
+      
       exit(0);
     }
 
-    /* narrow line only applies in 2D RM */
+    /* narrow line, line center, and InstRes only apply in 2D RM */
     if(parset.flag_dim < 2)
     {
       parset.flag_narrowline = 0;
@@ -386,7 +387,7 @@ void read_parset()
       parset.shift_narrowline /= VelUnit;
       parset.shift_narrowline_err /= VelUnit;
 
-      if(parset.flag_InstRes > 1) // epoch-dependent spectral broadening
+      if(parset.flag_InstRes > 1) /* epoch-dependent spectral broadening */
       {
         if(strlen(parset.file_instres) == 0)
         {

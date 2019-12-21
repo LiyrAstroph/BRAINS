@@ -5,6 +5,11 @@
  * Thu, Aug 4, 2016
  */
 
+/*!
+ *  \file command_line.c
+ *  \brief cope with command-line options.
+ */
+
 #include <getopt.h>
 
 #include "brains.h"
@@ -95,7 +100,7 @@ int command_line_options(int argc, char** argv)
           print_help();
           break;
 
-        case 'v': /* */
+        case 'v': /* print version */
           parset.flag_help = 1;
           print_version();
           break;
@@ -118,9 +123,9 @@ int command_line_options(int argc, char** argv)
     if(parset.flag_postprc == 1 || parset.flag_sample_info == 1)
       parset.flag_restart = 0;
     
-    if(parset.flag_help == 0) // not only print help.
+    if(parset.flag_help == 0) /* not only print help */
     {
-      if(argv[optind] != NULL) // parameter file is specified 
+      if(argv[optind] != NULL) /* parameter file is specified */
         strcpy(parset.param_file, argv[optind]); /* copy input parameter file */
       else
       {
