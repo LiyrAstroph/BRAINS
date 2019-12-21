@@ -56,8 +56,10 @@ Data Format
     ...
     velocity bin nb, time, flux, error
   
-  **The velocity bins should be equally spaced.** Blocks are 
-  separated by a blank line.
+  where time is the epoch of the current block. Blocks are separated by a blank line.
+
+  .. note::
+    Velocity is in a unit of km/s and velocity bins should be equally spaced.
 
 Data Mask
 =========

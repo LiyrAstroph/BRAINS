@@ -11,6 +11,7 @@ and emit broad emission lines.
 
 .. figure:: _static/fig_blr_disk.jpg
   :align: center
+  :width: 12 cm
 
   Schematic of a disk-like broad-line region (Li et al. 2013).
 
@@ -99,6 +100,7 @@ This is the shadowed model in Li et al. (2018).
 
 .. figure:: _static/fig_blr_twozone.jpg
   :align: center 
+  :width: 12 cm
 
   Schematic of a disk-like broad-line region with two zones (Li et al. 2018).
 
@@ -108,6 +110,7 @@ A disk wind model from Shlosman & Vitello (1993).
 
 .. figure:: _static/fig_diskwind.jpg
   :align: center 
+  :width: 12 cm
 
   Schematic of a disk wind model (figure credit: Higginbottom et al. 2013).
 
