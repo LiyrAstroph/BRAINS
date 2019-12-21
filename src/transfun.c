@@ -225,6 +225,7 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
 void transfun_1d_cal_cloud(const void *pm, int flag_save)
 {
   int i, idt;
+  double tau_min, tau_max;
   double Anorm, dis;
 
   /* generate cloud sample and calculate the corresponding time lags and weights */
@@ -289,6 +290,7 @@ void transfun_1d_cal_cloud(const void *pm, int flag_save)
 void transfun_2d_cal_cloud(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
   int i, j, idt, idV;
+  double tau_min, tau_max;
   double Anorm, dis, V, dV;
 
   /* generate cloud sample and calculate the corresponding time lags, LOS velocity, and weights */

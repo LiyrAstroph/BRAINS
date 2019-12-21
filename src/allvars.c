@@ -113,7 +113,6 @@ double **Trans1D_particles, **Trans1D_particles_perturb;
 double **Trans2D_at_veldata_particles, **Trans2D_at_veldata_particles_perturb;
 double **Fline_at_data_particles, **Fline_at_data_particles_perturb;
 
-double tau_max, tau_min;
 double *clouds_tau, *clouds_weight, *clouds_vel;
 
 FILE *fcloud_out = NULL;

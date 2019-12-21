@@ -207,7 +207,6 @@ extern double **Trans1D_particles, **Trans1D_particles_perturb;
 extern double **Trans2D_at_veldata_particles, **Trans2D_at_veldata_particles_perturb;
 extern double **Fline_at_data_particles, **Fline_at_data_particles_perturb;
 
-extern double tau_max, tau_min;
 extern double *clouds_tau, *clouds_weight, *clouds_vel;
 
 extern FILE *fcloud_out;

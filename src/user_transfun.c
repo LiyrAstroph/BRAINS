@@ -47,8 +47,9 @@ void transfun_1d_cal_mytransfun(const void *pm, int flag_save)
 {
   int i;
   double cen, sig, Anorm;
+  double tau_min, tau_max;
   double *model = (double *)pm;
-
+  
   cen = model[0];
   sig = exp(model[1]);
   
@@ -95,6 +96,7 @@ void transfun_2d_cal_mytransfun(const void *pm, double *transv, double *trans2d,
   int i, j;
   double Anorm, dV;
   double cen, sig, cenV, sigV;
+  double tau_min, tau_max;
   double *model = (double *)pm;
 
   cen = model[0];
