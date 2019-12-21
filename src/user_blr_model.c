@@ -21,7 +21,6 @@
 
 #include <gsl/gsl_randist.h>
 #include "brains.h"
-#include "user_blr_model.h"
 
 const int num_params_MyBLRmodel1d = 8;   /*!< number of parameters for 1D model */
 const int num_params_MyBLRmodel2d = 17;  /*!< number of parameters for 2D model */

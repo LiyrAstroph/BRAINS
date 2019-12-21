@@ -13,8 +13,8 @@
 
 #define _BRAINS_USER_BLR_MODEL_H
 
-const int num_params_MyBLRmodel1d;  /*!< number of parameters for 1D model */
-const int num_params_MyBLRmodel2d;  /*!< number of parameters for 2D model */
+extern const int num_params_MyBLRmodel1d;  /*!< number of parameters for 1D model */
+extern const int num_params_MyBLRmodel2d;  /*!< number of parameters for 2D model */
 
 void set_blr_range_mymodel();
 void transfun_1d_cloud_sample_mymodel(const void *pm, int flag_save);

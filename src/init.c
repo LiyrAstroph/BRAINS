@@ -63,6 +63,10 @@ void init()
   
   switch(parset.flag_blrmodel)
   {
+    case -1:  /* user defined analytical transfer function */
+      BLRmodel_size = num_params_MyTransfun2d * sizeof(double);
+      set_blr_range_model = set_par_range_mytransfun;
+      break;
     case 0:
       BLRmodel_size = num_params_MyBLRmodel2d * sizeof(double);
       set_blr_range_model = set_blr_range_mymodel;

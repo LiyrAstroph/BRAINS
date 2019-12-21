@@ -303,9 +303,9 @@ void read_parset()
       error_flag = 1;
     }
 
-    if(parset.flag_blrmodel > 8 || parset.flag_blrmodel < 0)
+    if(parset.flag_blrmodel > 8 || parset.flag_blrmodel < -1)
     {
-      fprintf(stderr, "# Error in FlagBLRModel: value %d is not allowed.\n# Please specify a value in [0-8].\n", parset.flag_blrmodel);
+      fprintf(stderr, "# Error in FlagBLRModel: value %d is not allowed.\n# Please specify a value in [-1-8].\n", parset.flag_blrmodel);
       error_flag = 1;
     }
 

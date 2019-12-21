@@ -222,7 +222,7 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
 /*!
  * This function calculates 1d transfer function.
  */
-void transfun_1d_cal(const void *pm, int flag_save)
+void transfun_1d_cal_cloud(const void *pm, int flag_save)
 {
   int i, idt;
   double Anorm, dis;
@@ -286,7 +286,7 @@ void transfun_1d_cal(const void *pm, int flag_save)
 /*!
  * This function calculates 2d transfer function.
  */
-void transfun_2d_cal(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
+void transfun_2d_cal_cloud(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
   int i, j, idt, idV;
   double Anorm, dis, V, dV;
@@ -364,4 +364,3 @@ void transfun_2d_cal(const void *pm, double *transv, double *trans2d, int n_vel,
   }
   return;
 }
-

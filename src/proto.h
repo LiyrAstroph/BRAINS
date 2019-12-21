@@ -73,9 +73,9 @@ double prob_restart_line1d(const void *model);
 
 void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl);
 void (*transfun_1d_cloud_sample)(const void *pm, int flag_save);
+void (*transfun_1d_cal)(const void *pm, int flag_save);
 
-void transfun_1d_cal(const void *pm, int flag_save);
-
+void transfun_1d_cal_cloud(const void *pm, int flag_save);
 void transfun_1d_cloud_sample_model1(const void *pm, int flag_save);
 void transfun_1d_cloud_sample_model3(const void *pm, int flag_save);
 void transfun_1d_cloud_sample_model5(const void *pm, int flag_save);
@@ -112,7 +112,8 @@ void transfun_2d_cloud_sample_model6(const void *pm, double *transv, double *tra
 void transfun_2d_cloud_sample_model7(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save);
 void transfun_2d_cloud_sample_model8(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save);
 
-void transfun_2d_cal(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save);
+void (*transfun_2d_cal)(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save);
+void transfun_2d_cal_cloud(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save);
 
 void smooth_init(int nv, const double *transv);
 void smooth_end();
