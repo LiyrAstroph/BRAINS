@@ -23,6 +23,8 @@
  */
 void read_parset()
 {
+  int error_flag = 0;
+
   if(thistask == roottask)
   {
     #define MAXTAGS 300
@@ -244,7 +246,7 @@ void read_parset()
     if(fparam == NULL)
     {
       fprintf(stderr, "# Error: Cannot open file %s\n", fname);
-      exit(-1);
+      error_flag = 2;
     }
 
     while(!feof(fparam))
@@ -283,7 +285,7 @@ void read_parset()
       {
         fprintf(stderr, "# Error in file %s: Tag '%s' is not allowed or multiple defined.\n", 
                       parset.param_file, buf1);
-        exit(0);
+        error_flag = 3;
       }
     }
     fclose(fparam);
@@ -292,160 +294,169 @@ void read_parset()
     if(parset.flag_dim > 2 || parset.flag_dim < -2)
     {
       fprintf(stderr, "# Error in FlagDim: value %d is not allowed.\n# Please specify a value in [-2-2].\n", parset.flag_dim);
-      exit(0);
+      error_flag = 1;
     }
 
     if(parset.flag_trend > 2 || parset.flag_trend < 0)
     {
       fprintf(stderr, "# Error in FlagTrend: value %d is not allowed.\n# Please specify a value in [0-1].\n", parset.flag_trend);
-      exit(0);
+      error_flag = 1;
     }
 
     if(parset.flag_blrmodel > 8 || parset.flag_blrmodel < 0)
     {
       fprintf(stderr, "# Error in FlagBLRModel: value %d is not allowed.\n# Please specify a value in [0-8].\n", parset.flag_blrmodel);
-      exit(0);
+      error_flag = 1;
     }
 
-    if(parset.flag_narrowline > 3 || parset.flag_narrowline < 0)
+    if((parset.flag_narrowline > 3 || parset.flag_narrowline < 0) && parset.flag_dim == 2)
     {
       fprintf(stderr, "# Error in FlagNarrowLine: value %d is not allowed.\n# Please specify a value in [0-3].\n", parset.flag_narrowline);
-      exit(0);
+      error_flag = 1;
     }
 
-    if(parset.flag_trend_diff < 0 || parset.flag_trend_diff > 10)
+    if((parset.flag_trend_diff < 0 || parset.flag_trend_diff > 10) && parset.flag_dim > 0)
     {
       fprintf(stderr, "# Error in FlagTrendDiff: value %d is not allowed.\n# Please specify a value in [0-10].\n", parset.flag_trend_diff);
-      exit(0);
+      error_flag = 1;
     }
 
-    if(parset.flag_InstRes < 0 || parset.flag_InstRes > 2)
+    if((parset.flag_InstRes < 0 || parset.flag_InstRes > 2) && (parset.flag_dim == 2 || parset.flag_dim < 0))
     {
       fprintf(stderr, "# Error in FlagInstRes: value %d is not allowed.\n# Please specify a value in [0-2].\n", parset.flag_InstRes);
-      exit(0);
+      error_flag = 1;
     }
 
-    if(parset.flag_linecenter < -1 || parset.flag_linecenter > 1)
+    if((parset.flag_linecenter < -1 || parset.flag_linecenter > 1) && parset.flag_dim == 2)
     {
       fprintf(stderr, "# Error in FlagLineCenter: value %d is not allowed.\n# Please specify a value in [-1-1].\n", parset.flag_linecenter);
-      exit(0);
+      error_flag = 1;
     }
-
-    if(parset.InstRes < 0.0)
+  
+    if(parset.InstRes < 0.0 && (parset.flag_dim == 2 || parset.flag_dim < 0) )
     {
       fprintf(stderr, "# Error in InstRes: value %f is not allowed.\n# Please specify a positive value.\n", parset.InstRes);
-      exit(0);
+      error_flag = 1;
     }
 
-    if(parset.InstRes_err < 0.0)
+    if(parset.InstRes_err < 0.0 && (parset.flag_dim == 2 || parset.flag_dim < 0))
     {
       fprintf(stderr, "# Error in InstResErr: value %f is not allowed.\n# Please specify a positive value.\n", parset.InstRes_err);
+      error_flag = 1;
+    }
+  
+    if( error_flag == 0 )
+    {
+      /* narrow line, line center, and InstRes only apply in 2D RM */
+      if(parset.flag_dim < 2)
+      {
+        parset.flag_narrowline = 0;
+        parset.flag_linecenter = 0;
+        parset.flag_InstRes = 0;
+      }
+      if(parset.flag_dim ==2)
+      {
+        if(parset.flag_narrowline == 0)
+        {
+          printf("# No narrow-line.\n");
+          parset.width_narrowline = 0.0;
+          
+        }
+        else if(parset.flag_narrowline == 1)
+        {
+          printf("# add fixed narrow-line: flux=%e, width=%fkm/s, shift=%fkm/s.\n", parset.flux_narrowline, 
+             parset.width_narrowline, parset.shift_narrowline);
+        }
+        else if(parset.flag_narrowline == 2 )
+        {
+          printf("# add narrow-line with Gaussian priors: flux=%e, width=%fkm/s, shift=%fkm/s.\n", parset.flux_narrowline, 
+             parset.width_narrowline, parset.shift_narrowline);
+        }
+        else
+        {
+          printf("# add narrow-line with logrithmic prior of flux and Gaussian priors of width and shift: width=%fkm/s, shift=%fkm/s.\n",
+             parset.width_narrowline, parset.shift_narrowline);
+        }
+  
+        if(parset.width_narrowline<=0.0 && parset.flag_narrowline > 0)
+        {
+          printf("# Error in narrow line width %f.\n", parset.width_narrowline);
+          error_flag = 1;
+        }
+  
+        parset.width_narrowline /= VelUnit;
+        parset.width_narrowline_err /= VelUnit;
+  
+        parset.shift_narrowline /= VelUnit;
+        parset.shift_narrowline_err /= VelUnit;
+  
+        if(parset.flag_InstRes > 1) /* epoch-dependent spectral broadening */
+        {
+          if(strlen(parset.file_instres) == 0)
+          {
+            printf("# Error in file_instres, not specified.\n");
+            error_flag = 1;
+          }
+          printf("# use epoch dependent spectral resolution, stored at %s.\n", parset.file_instres);
+        }
+        else
+        {
+          parset.InstRes /= VelUnit;
+          parset.InstRes_err /= VelUnit;
+  
+          if(parset.width_narrowline > parset.InstRes)
+          {
+            printf("# Error narrow line width %f should be smaller than InstRes %f. \n", 
+                    parset.width_narrowline*VelUnit, parset.InstRes*VelUnit);
+            error_flag = 1;
+          }
+        }
+      }
+  
+      if(parset.flag_dim < 1)
+      {
+        parset.flag_trend_diff = 0;
+        parset.flag_nonlinear = 0;
+      }
+  
+      if(parset.flag_dim < 0) // create mock data
+      {
+        // set large values
+        parset.n_cloud_per_task = fmax(2.0e5, parset.n_cloud_per_task);
+        parset.n_vel_per_cloud = fmax(10.0, parset.n_vel_per_cloud);
+        printf("# set NCloudPerCore and NVPerCloud: %d %d\n", parset.n_cloud_per_task, parset.n_vel_per_cloud);
+  
+        parset.n_tau = fmax(500, parset.n_tau);
+        parset.n_con_recon = fmax(500, parset.n_con_recon);
+        printf("# set NTau and NConRecon: %d %d\n", parset.n_tau, parset.n_con_recon);
+        parset.flag_save_clouds = 1;
+      }
+  
       
-      exit(0);
-    }
-
-    /* narrow line, line center, and InstRes only apply in 2D RM */
-    if(parset.flag_dim < 2)
-    {
-      parset.flag_narrowline = 0;
-      parset.flag_linecenter = 0;
-      parset.flag_InstRes = 0;
-    }
-    if(parset.flag_dim ==2)
-    {
-      if(parset.flag_narrowline == 0)
+      if(parset.flag_blrmodel == 3 || parset.flag_blrmodel == 4 || parset.flag_blrmodel == 8)
       {
-        printf("# No narrow-line.\n");
-        parset.width_narrowline = 0.0;
-        
+        parset.n_vel_per_cloud = 1;
       }
-      else if(parset.flag_narrowline == 1)
+  
+      if(parset.flag_linecenter != 0)
       {
-        printf("# add fixed narrow-line: flux=%e, width=%fkm/s, shift=%fkm/s.\n", parset.flux_narrowline, 
-           parset.width_narrowline, parset.shift_narrowline);
-      }
-      else if(parset.flag_narrowline == 2 )
-      {
-        printf("# add narrow-line with Gaussian priors: flux=%e, width=%fkm/s, shift=%fkm/s.\n", parset.flux_narrowline, 
-           parset.width_narrowline, parset.shift_narrowline);
-      }
-      else
-      {
-        printf("# add narrow-line with logrithmic prior of flux and Gaussian priors of width and shift: width=%fkm/s, shift=%fkm/s.\n",
-           parset.width_narrowline, parset.shift_narrowline);
-      }
-
-      if(parset.width_narrowline<=0.0 && parset.flag_narrowline > 0)
-      {
-        printf("# Error in narrow line width %f.\n", parset.width_narrowline);
-        exit(0);
-      }
-
-      parset.width_narrowline /= VelUnit;
-      parset.width_narrowline_err /= VelUnit;
-
-      parset.shift_narrowline /= VelUnit;
-      parset.shift_narrowline_err /= VelUnit;
-
-      if(parset.flag_InstRes > 1) /* epoch-dependent spectral broadening */
-      {
-        if(strlen(parset.file_instres) == 0)
-        {
-          printf("# Error in file_instres, not specified.\n");
-          exit(0);
-        }
-        printf("# use epoch dependent spectral resolution, stored at %s.\n", parset.file_instres);
-      }
-      else
-      {
-        parset.InstRes /= VelUnit;
-        parset.InstRes_err /= VelUnit;
-
-        if(parset.width_narrowline > parset.InstRes)
-        {
-          printf("# Error narrow line width %f should be smaller than InstRes %f. \n", 
-                  parset.width_narrowline*VelUnit, parset.InstRes*VelUnit);
-          exit(0);
-        }
+        parset.linecenter_err /= VelUnit;
       }
     }
-
-    if(parset.flag_dim < 1)
-    {
-      parset.flag_trend_diff = 0;
-      parset.flag_nonlinear = 0;
-    }
-
-    if(parset.flag_dim < 0) // create mock data
-    {
-      // set large values
-      parset.n_cloud_per_task = fmax(2.0e5, parset.n_cloud_per_task);
-      parset.n_vel_per_cloud = fmax(10.0, parset.n_vel_per_cloud);
-      printf("# set NCloudPerCore and NVPerCloud: %d %d\n", parset.n_cloud_per_task, parset.n_vel_per_cloud);
-
-      parset.n_tau = fmax(500, parset.n_tau);
-      parset.n_con_recon = fmax(500, parset.n_con_recon);
-      printf("# set NTau and NConRecon: %d %d\n", parset.n_tau, parset.n_con_recon);
-      parset.flag_save_clouds = 1;
-    }
-
+  }  
     
-    if(parset.flag_blrmodel == 3 || parset.flag_blrmodel == 4 || parset.flag_blrmodel == 8)
-    {
-      parset.n_vel_per_cloud = 1;
-    }
-
-    if(parset.flag_linecenter != 0)
-    {
-      parset.linecenter_err /= VelUnit;
-    }
+  MPI_Bcast(&error_flag, 1, MPI_INT, roottask, MPI_COMM_WORLD);
+  if(error_flag != 0)
+  {  
+    MPI_Finalize();
+    exit(0);
   }
   
   MPI_Bcast(&parset, sizeof(parset), MPI_BYTE, roottask, MPI_COMM_WORLD);
   return;
-}
-
-/*!
+}  
+  
+/*!  
  * read dataset.
  */
 void read_data()
