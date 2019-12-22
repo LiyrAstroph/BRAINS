@@ -25,6 +25,8 @@ const int num_params_MyTransfun2d = 4; /* number of parameters for 2D transfer f
 
 /*!
  * this function set the parameter prior range.
+ * 
+ * "blr_range_model" is an nx2 array that stores the prior range, which must be assigned.
  */
 void set_par_range_mytransfun()
 {
@@ -42,12 +44,15 @@ void set_par_range_mytransfun()
 
 /*!
  * this function calculates 1D transfer function.
+ * 
+ * "TransTau" and "Trans1D" are arrays to store the lag grid and transfer function,
+ * which must be assigned.
  */
 void transfun_1d_cal_mytransfun(const void *pm, int flag_save)
 {
   int i;
   double cen, sig, Anorm;
-  double tau_min, tau_max;
+  double tau_min, tau_max, dTransTau;
   double *model = (double *)pm;
   
   cen = model[0];
@@ -90,13 +95,15 @@ void transfun_1d_cal_mytransfun(const void *pm, int flag_save)
 
 /*!
  * this function calculates 2D transfer function.
+ * 
+ * "TransTau" is an array to store the lag grid, which must be assigned.
  */
 void transfun_2d_cal_mytransfun(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
   int i, j;
   double Anorm, dV;
   double cen, sig, cenV, sigV;
-  double tau_min, tau_max;
+  double tau_min, tau_max, dTransTau;
   double *model = (double *)pm;
 
   cen = model[0];

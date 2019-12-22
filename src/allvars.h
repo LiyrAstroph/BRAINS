@@ -194,7 +194,6 @@ extern double *instres_epoch, *instres_err_epoch;
 
 /* transfer function / velocity-delay map */
 extern double *TransTau, *TransV, *Trans1D, *Trans2D_at_veldata, *Trans2D;
-extern double dTransTau, dTransV;
 extern double rcloud_min_set, rcloud_max_set;
 
 extern double **Fcon_particles, **Fcon_particles_perturb;

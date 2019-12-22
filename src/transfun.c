@@ -38,7 +38,7 @@
 void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl)
 {
   int i, j, m;
-  double fline, fcon, tl, tc, tau, A, Ag, ftrend, a0=0.0, tmp;
+  double fline, fcon, tl, tc, tau, A, Ag, ftrend, a0=0.0, tmp, dTransTau;
   double *pmodel = (double *)pm;
 
   A=exp(pmodel[num_params_blr-3]); /*  response coefficient */
@@ -53,6 +53,8 @@ void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl
     }
     a0 = -tmp;
   }
+
+  dTransTau = TransTau[1] - TransTau[0];
 
   for(i=0;i<nl;i++)
   {
@@ -110,7 +112,7 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
                                               double *fl2d, int nl, int nv)
 {
   int i, j, k, m;
-  double tau, tl, tc, fcon, A, Ag, ftrend, fnarrow, a0=0.0, tmp;
+  double tau, tl, tc, fcon, A, Ag, ftrend, fnarrow, a0=0.0, tmp, dTransTau;
   double *pmodel = (double *)pm;
 
   A=exp(pmodel[num_params_blr-3]);
@@ -125,6 +127,8 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
     }
     a0 = -tmp;
   }
+
+  dTransTau = TransTau[1] - TransTau[0];
 
   for(j=0;j<nl; j++)
   {
@@ -225,7 +229,7 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
 void transfun_1d_cal_cloud(const void *pm, int flag_save)
 {
   int i, idt;
-  double tau_min, tau_max;
+  double tau_min, tau_max, dTransTau;
   double Anorm, dis;
 
   /* generate cloud sample and calculate the corresponding time lags and weights */
@@ -290,7 +294,7 @@ void transfun_1d_cal_cloud(const void *pm, int flag_save)
 void transfun_2d_cal_cloud(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
   int i, j, idt, idV;
-  double tau_min, tau_max;
+  double tau_min, tau_max, dTransTau;
   double Anorm, dis, V, dV;
 
   /* generate cloud sample and calculate the corresponding time lags, LOS velocity, and weights */
