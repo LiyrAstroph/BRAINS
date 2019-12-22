@@ -39,6 +39,12 @@ void set_par_range_mytransfun()
   blr_range_model[i][0] = log(0.1);
   blr_range_model[i++][1] = log(100.0);
 
+  blr_range_model[i][0] = -100.0/VelUnit;
+  blr_range_model[i++][1] = 100.0/VelUnit;
+
+  blr_range_model[i][0] = log(0.1/VelUnit);
+  blr_range_model[i++][1] = log(100.0/VelUnit);
+
   return;
 }
 
