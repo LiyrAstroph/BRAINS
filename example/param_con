@@ -1,0 +1,19 @@
+% parameter file
+% lines beginning with '%' are regarded as comments and are neglected
+% 
+% an example parameter file for only continuum reconstruction.
+
+FileDir                     /home/liyropt/Projects/GIT/BRAINS      % directory for where all the output files are stored
+
+FlagDim                     0                          % -2, generate fully random lc; -1, mock lc based on input data; 
+                                                        % 0, only continuum modeling; 1, 1d line RM; 2, 2d line RM
+
+ContinuumFile               data/sim_con.txt          % file for continuum data
+
+NConRecon                   200                         % number of points for continuum reconstruction
+FlagTrend                   0                           % 0, mean; 1, first-order trend
+
+ConConstructFileOut         data/pcon.txt               % output filename for continuum reconstruction
+
+FlagConSysErr               0                           % 0, not include systematic error of contininuum; 1, include
+

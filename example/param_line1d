@@ -1,0 +1,65 @@
+% parameter file
+% lines beginning with '%' are regarded as comments and are neglected
+% 
+% an example parameter file for 1D analysis.
+
+
+FileDir                     /home/liyropt/Projects/GIT/BRAINS      % directory for where all the output files are stored
+
+FlagDim                     1                          % -2, generate fully random lc; -1, mock lc based on input data; 
+                                                        % 0, only continuum modeling; 1, 1d line RM; 2, 2d line RM
+
+FlagBLRModel                6                           % 1, 2, 3, 4, 5, 6, 7, 8; BLR model type
+                                                        % 5 is double power-law model; 6 is Pancoast's model; 7 is two-zone model
+                                                        % 0 is user defined
+                                                        % -1 is user defined, analytical transfer function
+
+%========================================================================
+% data file
+
+ContinuumFile               data/sim_con.txt          % file for continuum data
+LineFile                    data/sim_hb.txt           % file for line data
+
+%========================================================================
+% reconstruction
+NConRecon                   200                         % number of points for continuum reconstruction
+FlagTrend                   0                           % 0, mean; 1, first-order trend
+FlagTrendDiff               0                           % 0, no difference; 1 or larger, add difference in the long-term trends between continuum and line
+                                                        % the different trend is modelled by a polynomical with the order set by the value of FlagTrendDiff.
+
+ConConstructFileOut         data/pcon.txt               % output filename for continuum reconstruction
+
+FlagFixVar                  0                           % 0, not fixed; 1, fix the parameters of variation from continuum data.
+NLineRecon                  100                         % number of points for line reconstruction along time axis
+LineConstructFileOut        data/pline.txt              % output filename for 1d line reconstruction
+TranFileOut                 data/tran.txt               % output filename for 1d transfer function
+
+
+NCloudPerCore               5000                        % number of clouds per task
+
+NTau                        200                         % number of time-lag points calculated in transfer function
+RCloudMax                   -1                          % outer edge of broad-line region in a unit of light-day; -1, set automatically 
+TimeBack                    -1                          % time prior to the start of continuum in reconstruction; -1, set automatically
+
+FlagCloudsOut               1                           % 1, save clouds at the last run; 0, do not save
+CloudsFileOut               data/clouds.txt             % output filename for clouds 
+
+%========================================================================
+%
+FlagCloudsForceUpdate       0                           % default 0; 
+                                                        % 0, only update when BLR parameters are updated 
+                                                        % 1, update every MCMC perturb (continuum + BLR)
+
+FlagConSysErr               0                           % 0, not include systematic error of contininuum; 1, include
+FlagLineSysErr              0                           % 0, not include systematic error of line; 1, include
+
+FlagNonlinear               1                           % 0, linear response; 1, non-linear response
+
+%========================================================================
+% set fixed BLR parameters and their fixed values
+% do not put sapce in the strings
+% 1: fixed; 0: not fixed;
+% values are separated by ":"
+
+BLRParFix                   0000000000
+BLRParFixVal                2.0:1.0           

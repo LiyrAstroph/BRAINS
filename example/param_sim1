@@ -1,0 +1,80 @@
+% parameter file
+% lines beginning with '%' are regarded as comments and are neglected
+% 
+% an example parameter file for generating mock data based on input data.
+
+FileDir                     /home/liyropt/Projects/GIT/BRAINS      % directory for where all the output files are stored
+
+FlagDim                     -1                          % -2, generate fully random lc; -1, mock lc based on input data; 
+                                                        % 0, only continuum modeling; 1, 1d line RM; 2, 2d line RM
+
+FlagBLRModel                6                           % 1, 2, 3, 4, 5, 6, 7, 8; BLR model type
+                                                        % 5 is double power-law model; 6 is Pancoast's model; 7 is two-zone model
+                                                        % 0 is user defined
+                                                        % -1 is user defined, analytical transfer function
+
+%========================================================================
+% data file
+
+ContinuumFile               data/mrk142_con.txt          % file for continuum data
+Line2DFile                  data/mrk142_hb2d.txt         % file for line 2d data
+
+%========================================================================
+% reconstruction
+NConRecon                   200                         % number of points for continuum reconstruction
+FlagTrend                   0                           % 0, mean; 1, first-order trend
+
+ConConstructFileOut         data/pcon.txt               % output filename for continuum reconstruction
+TranFileOut                 data/tran.txt               % output filename for 1d transfer function
+Tran2DFileOut               data/tran2d.txt             % output filename for 2d transfer function
+
+NCloudPerCore               5000                        % number of clouds per task
+NVPerCloud                  5                           % number of velocities per cloud
+
+NTau                        200                         % number of time-lag points calculated in transfer function
+RCloudMax                   -1                          % outer edge of broad-line region in a unit of light-day; -1, set automatically 
+TimeBack                    -1                          % time prior to the start of continuum in reconstruction; -1, set automatically
+
+FlagCloudsOut               1                           % 1, save clouds at the last run; 0, do not save
+CloudsFileOut               data/clouds.txt             % output filename for clouds 
+
+%========================================================================
+%
+
+FlagConSysErr               0                           % 0, not include systematic error of contininuum; 1, include
+
+%========================================================================
+% spectral broadening
+
+FlagInstRes                 1                           % 0, uniform prior, epoch-independent
+                                                        % 1, uniform prior, but epoch-dependent parameterization
+                                                        % 2, epoch-dependent parameterization, prior stored in "InstResFile"
+
+InstRes                     220                           % instrument broadening (modeled by a Gaussian), in km/s, for FlagInstRes=0, or 1
+                                                          
+InstResErr                  50.0                         % instrument broadening error, in km/s, for FlagInstRes=0, or 1
+
+InstResFile                 data/sim_broaden.txt       % file for storing epoch-dependent instrument broadening
+                                                          % two columns: broadening width and error (km/s), in the order of time as the 2d line data
+
+%========================================================================
+% narrow-line component
+% use a gaussian to model the narrow-line component
+
+FlagNarrowLine              0                           % 0, no narrow line; 
+                                                        % 1, add fixed narrow line; 
+                                                        % 2, add Gaussian priors of the flux for narrow line; 
+                                                        % 3, add logarithmic prior of the flux for narrow line
+
+FluxNarrowLine              1.5                         % flux of narrow line
+FluxNarrowLineErr           0.50                        % flux error of narrow line
+WidthNarrowLine             93.0                        % width km/s
+WidthNarrowLineErr          10.0                         % width error
+ShiftNarrowLine             0.0                        % shift, km/s, with respect to broad line center.  
+ShiftNarrowLineErr          0.0                         % shift error
+
+%========================================================================
+% 
+
+FlagLineCenter              0                          % -1, epoch-dependent; 0, not included; 1, uniform
+LineCenterErr               50.0                        % km/s
