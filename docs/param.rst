@@ -16,6 +16,7 @@ Parameter File
   FlagBLRModel                8                           % 1, 2, 3, 4, 5, 6, 7, 8; BLR model type
                                                           % 5 is double power-law model; 6 is Pancoast's model; 7 is two-zone model
                                                           % 0 is user defined
+                                                          % -1 is user defined, analytical transfer function
   
   %========================================================================
   % data file
@@ -109,3 +110,7 @@ Parameter File
   
   BLRParFix                   0000000000
   BLRParFixVal                2.0:1.0
+
+.. note::
+  In the subdirectory ``example/", some examples of parameter file are provided. Users can choose appropriate 
+  parameter files with their purposes.
