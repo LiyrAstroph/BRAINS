@@ -19,7 +19,7 @@ Documentation
 -------------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    
    getting_started.rst
    param.rst
@@ -27,6 +27,7 @@ Documentation
    mcmc.rst
    model.rst
    user_model.rst
+   transfun.rst
    todo.rst
 
 
