@@ -238,6 +238,18 @@ void read_parset()
     parset.InstRes = 0.0;
     parset.InstRes_err = 0.0;
 
+    strcpy(parset.continuum_file, "");
+    strcpy(parset.line_file, "");
+    strcpy(parset.line2d_file, "");
+    strcpy(parset.file_instres, "");
+    strcpy(parset.pcon_out_file, "data/pcon.txt");
+    strcpy(parset.pline_out_file, "data/pline.txt");
+    strcpy(parset.pline2d_out_file, "data/pline2d_data.txt");
+    strcpy(parset.pline2d_data_out_file, "data/pline2d_data.txt");
+    strcpy(parset.cloud_out_file, "data/clouds.txt");
+    strcpy(parset.tran_out_file, "data/tran.txt");
+    strcpy(parset.tran2d_out_file, "data/tran2d.txt");
+    strcpy(parset.tran2d_data_out_file, "data/tran2d_data.txt");
     
     char fname[200];
     sprintf(fname, "%s", parset.param_file);
@@ -344,6 +356,32 @@ void read_parset()
       fprintf(stderr, "# Error in InstResErr: value %f is not allowed.\n# Please specify a positive value.\n", parset.InstRes_err);
       error_flag = 1;
     }
+
+    /* check whether necessary files provided */
+    if(parset.flag_dim >= -1)
+    {
+      if(strlen(parset.continuum_file) == 0)
+      {
+        fprintf(stderr, "# Please specify continuum data file in parameter file.\n");
+        error_flag = 4;
+      }
+    }
+    if(parset.flag_dim == 1)
+    {
+      if(strlen(parset.line_file) == 0)
+      {
+        fprintf(stderr, "# Please specify 1D line data file in parameter file.\n");
+        error_flag = 4;
+      }
+    }
+    if(parset.flag_dim == -1 || parset.flag_dim == 2)
+    {
+      if(strlen(parset.line2d_file) == 0)
+      {
+        fprintf(stderr, "# Please specify 2D line data file in parameter file.\n");
+        error_flag = 4;
+      }
+    }
   
     if( error_flag == 0 )
     {
@@ -395,7 +433,7 @@ void read_parset()
           if(strlen(parset.file_instres) == 0)
           {
             printf("# Error in file_instres, not specified.\n");
-            error_flag = 1;
+            error_flag = 4;
           }
           printf("# use epoch dependent spectral resolution, stored at %s.\n", parset.file_instres);
         }
