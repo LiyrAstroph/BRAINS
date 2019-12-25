@@ -105,6 +105,7 @@ fp.close()
 
 # read light curves
 conlc=np.loadtxt(filedir+"/"+contfile)
+con_mean_err = np.mean(conlc[:, 2])
 conlc_sim=np.loadtxt(filedir+"/data/pcon.txt")
 hblc=np.zeros((nt, 3))
 hblc[:, 1]=np.sum(prof, axis=1) * dV
@@ -127,9 +128,9 @@ line_scale = 1.0/np.mean(hblc[:, 1])
 phd = np.loadtxt(filedir+"/data/posterior_sample2d.txt")
 level = np.loadtxt(filedir+"/data/levels2d.txt", skiprows=1)
 
-idx_con, idx_line = read_para_names()
+idx_line, idx_con = read_para_names()
 print idx_con, idx_line
-syserr_con = (np.exp(np.mean(phd[:, idx_con])) - 1.0) * line_mean_err
+syserr_con = (np.exp(np.mean(phd[:, idx_con])) - 1.0) * con_mean_err
 syserr = (np.exp(np.mean(phd[:, idx_line])) - 1.0) * line_mean_err
 
 print("scale:", con_scale, line_scale)
@@ -368,7 +369,7 @@ ax3.xaxis.set_ticks_position("both")
 # subfig 6
 ax6=fig.add_axes([0.7, 0.2, 0.25, 0.3])
 
-hp, bins, patches=plt.hist(phd[:, 10]/np.log(10.0)+6.0, bins=10, normed=1)
+hp, bins, patches=plt.hist(phd[:, 8]/np.log(10.0)+6.0, bins=10, normed=1)
 
 #hp, bins, patches=plt.hist(hd[idx_mbh[0], 8]/np.log(10.0)+6.0, bins=10, normed=1)
 ax6.set_xlabel(r'$\log(M_\bullet/M_\odot)$')
@@ -376,11 +377,11 @@ ax6.set_ylabel(r'$\rm Hist$')
 ylim=ax6.get_ylim()
 
 ax6.set_ylim(ylim)
-ax6.set_xlim((5.0, 7.5))
+#ax6.set_xlim((5.0, 7.5))
 #ax6.xaxis.set_major_locator(MultipleLocator(1.0))
 
 #ax6.fill_between([6.14-0.11, 6.14+0.04], [ylim[0], ylim[0]], [ylim[1], ylim[1]], zorder=32, alpha=0.5, color='red')
-ax6.axvline(x=6.0+np.log10(2.0), ls="--", linewidth=2, color='r',zorder=50)
+#ax6.axvline(x=6.0+np.log10(2.0), ls="--", linewidth=2, color='r',zorder=50)
 #ax6.axvline(x=6.14-0.11, ls="--", linewidth=3, color='r')
 #ax6.axvline(x=6.14+0.04, ls="--", linewidth=3, color='r')
 
@@ -398,8 +399,8 @@ plt.savefig('lc.pdf', bbox_inches='tight')
 
 fig = plt.figure(figsize=(6, 10))
 ax = fig.add_subplot(211)
-ax.yaxis.set_major_locator(MultipleLocator(50))
-cmap=ax.imshow(prof_diff/np.sqrt(prof_err**2 + syserr**2),  aspect='auto', extent=[grid_vel[0], grid_vel[nv-1], date_hb[-1], date_hb[0]], vmax=2.5, vmin=-2.5)
+#ax.yaxis.set_major_locator(MultipleLocator(50))
+cmap=ax.imshow(prof_diff/np.sqrt(prof_err**2 + syserr**2),  aspect='auto', extent=[grid_vel[0], grid_vel[nv-1], date_hb[-1], date_hb[0]])
 
 plt.colorbar(cmap)
 
