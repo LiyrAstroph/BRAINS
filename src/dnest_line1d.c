@@ -539,15 +539,18 @@ void accept_action_1d()
     Fcon_particles[which_particle_update] = Fcon_particles_perturb[which_particle_update];
     Fcon_particles_perturb[which_particle_update] = ptemp;
 
-    ptemp = Fline_at_data_particles[which_particle_update];
-    Fline_at_data_particles[which_particle_update] = Fline_at_data_particles_perturb[which_particle_update];
-    Fline_at_data_particles_perturb[which_particle_update] = ptemp;
-
     ptemp = con_q_particles[which_particle_update];
     con_q_particles[which_particle_update] = con_q_particles_perturb[which_particle_update];
     con_q_particles_perturb[which_particle_update] = ptemp;
+
+    if(force_update != 1)
+    {
+      ptemp = Fline_at_data_particles[which_particle_update];
+      Fline_at_data_particles[which_particle_update] = Fline_at_data_particles_perturb[which_particle_update];
+      Fline_at_data_particles_perturb[which_particle_update] = ptemp;
+    }
   }
-  else if( param < num_params_blr-1 )
+  else if( param < num_params_blr-1 && force_update != 1)
   {
     /* BLR parameter is updated 
      * Note a) that the (num_par_blr-1)-th parameter is systematic error of line.
