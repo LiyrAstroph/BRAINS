@@ -4,8 +4,6 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 import sys
 
-pdf = PdfPages('dnest.pdf')
-
 def logsumexp(values):     # log SUM( exp(values) )
   biggest = np.max(values)
   x = values - biggest
@@ -19,12 +17,15 @@ def logdiffexp(x1, x2):    # log( exp(x1) - exp(x2))
   result = np.log(np.exp(xx1) - np.exp(xx2)) + biggest
   return result
 
-def postprocess(ndim):
-  cut = 0;
+def postprocess(ndim, temp=1.0, fcut=0.0):
+
+  pdf = PdfPages('dnest.pdf')
+
+  cut = fcut;
   numResampleLogX=1
   compression_bias_min=1.
   compression_scatter=0.
-  temperature = 5.0
+  temperature = temp
   zoom_in = True
   moreSamples = 1
  
@@ -37,9 +38,20 @@ def postprocess(ndim):
   else:
     print('incorrect dimension.')
 
-  levels_orig = np.loadtxt("../data/levels"+str_dim+".txt", comments='#')
-  sample_info = np.loadtxt("../data/sample_info"+str_dim+".txt", comments='#')
-  sample = np.atleast_2d(np.loadtxt("../data/sample"+str_dim+".txt"))
+  try:
+    levels_orig = np.loadtxt("../data/levels"+str_dim+".txt", comments='#')
+  except:
+    levels_orig = np.genfromtxt("../data/levels"+str_dim+".txt", comments='#', skip_footer=1)
+
+  try:  
+    sample_info = np.loadtxt("../data/sample_info"+str_dim+".txt", comments='#')
+  except:
+    sample_info = np.genfromtxt("../data/sample_info"+str_dim+".txt", comments='#', skip_footer=1)
+
+  try:
+    sample = np.atleast_2d(np.loadtxt("../data/sample"+str_dim+".txt"))
+  except:
+    sample = np.atleast_2d(np.genfromtxt("../data/sample"+str_dim+".txt", skip_footer=1))
   
   sample = sample[int(cut*sample.shape[0]):, :]
   sample_info = sample_info[int(cut*sample_info.shape[0]):, :]
@@ -151,9 +163,7 @@ def postprocess(ndim):
   
     plt.figure(3)
     plt.subplot(2,1,1)
-    plt.hold(False)
     plt.plot(logx_samples[:,z], sample_info[:,1], 'b.', label='Samples')
-    plt.hold(True)
     plt.plot(levels[1:,0], levels[1:,1], 'r.', label='Levels')
     plt.legend(numpoints=1, loc='lower left')
     plt.ylabel('log(L)')
@@ -172,7 +182,6 @@ def postprocess(ndim):
     xlim = plt.gca().get_xlim()
   
     plt.subplot(2,1,2)
-    plt.hold(False)
     plt.plot(logx_samples[:,z], P_samples[:,z], 'b.')
     plt.ylabel('Posterior Weights')
     plt.xlabel('log(X)')
@@ -214,8 +223,14 @@ def postprocess(ndim):
 
 
 if __name__ == "__main__":
-  if(len(sys.argv) < 2):
-    print("No dimension specified.")
-    exit(0);
+  temp = 1.0
+  fcut = 0.0
+  assert len(sys.argv) >= 2, "No dimension specified."
+  
+  if len(sys.argv) >= 3:
+    temp = float(sys.argv[2])
 
-  postprocess(int(sys.argv[1]))
+  if len(sys.argv) >= 4:
+    fcut = float(sys.argv[3])
+
+  postprocess(int(sys.argv[1]), temp=temp, fcut=fcut)
