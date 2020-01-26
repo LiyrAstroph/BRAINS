@@ -15,6 +15,7 @@ from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 from matplotlib.ticker import FuncFormatter
 import copy
 import re
+from os.path import basename
 
 # 
 # read parameter names
@@ -54,7 +55,8 @@ plt.rc('text', usetex=True)
 plt.rc('font', family='serif', size=15)
 
 filedir, contfile, line2dfile = read_param()
-obj = re.search("^(.*/)*(.*)_", contfile).group(2)
+obj = re.search("^(.*)\.(.*)", basename(contfile)).group(1)
+obj = obj.replace("_", " ")
 print obj
 
 
@@ -196,8 +198,9 @@ for i in range(len(logP)):
 
   fp.readline()
   #if (chi[i] < chi[ichimin] * (1.0 + 0.5)) and (plotnum < 100):
-  ax5.plot(date_hb, line_rec* 4861*VelUnit/3e5, color='grey', lw=0.1, alpha=0.1)
-  plotnum += 1
+  if np.random.rand() < 100.0/len(logP):
+    ax5.plot(date_hb, line_rec* 4861*VelUnit/3e5, color='grey', lw=0.1, alpha=0.1)
+    plotnum += 1
     
 fp.close()
 
@@ -259,8 +262,9 @@ for i in range(len(logP)):
     con_max = copy.copy(con)  
   fp.readline()
   #if (chi[i] < chi[ichimin] * (1.0 + 0.01)) and (plotnum < 100):
-  ax4.plot(date-date0, con, color='grey', lw=0.1, alpha=0.1)
-  plotnum += 1
+  if np.random.rand() < 100.0/len(logP):
+    ax4.plot(date-date0, con, color='grey', lw=0.1, alpha=0.1)
+    plotnum += 1
 
 fp.close()
 
@@ -310,7 +314,7 @@ plt.text(xlim[0]+0.08*(xlim[1]-xlim[0]), ylim[1]-0.1*(ylim[1]-ylim[0]), r'$\rm D
 # subfig 2
 ax2=fig.add_axes([0.37, 0.6, 0.25, 0.3])
 
-plt.imshow(prof_rec_max, cmap=cmap, interpolation='gaussian',  aspect='auto', extent=[grid_vel[0], grid_vel[nv-1], date_hb[-1], date_hb[0]], vmax = np.amax(prof)/1.07, vmin=np.amin(prof)*1.07)
+plt.imshow(prof_rec_max, cmap=cmap, interpolation='gaussian',  aspect='auto', extent=[grid_vel[0], grid_vel[nv-1], date_hb[-1], date_hb[0]], vmax = np.amax(prof), vmin=np.amin(prof))
 ax2.set_xlabel(r'$\rm Velocity\ (10^3km\ s^{-1})$')
 #ax2.set_ylabel('Time (+2 450 000)')
 xlim=ax2.get_xlim()
