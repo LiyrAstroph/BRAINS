@@ -162,5 +162,5 @@ void multiply_matvec_semiseparable_uv(double *y, double *u, double  *W, double *
                                       int n, double *z);
 
 void compute_inverse_semiseparable_plus_diag(double *t, int n, double a1, double c1, 
-                double *sigma, double syserr, double *u,
+                double *sigma, double syserr, double *u, double *v,
                 double *W, double *D, double *work);

@@ -529,22 +529,24 @@ void inverse_semiseparable_uv(double *t, int n, double a1, double c1, double *A)
 }
 
 /**
- *  caclulate inverse of a DRW semiseparable matrix plus a diagonal matrix, which 
- *  is still a semiseparable matrix.
- *  e.g., Q = [S^-1+N^-1]^-1
+ *  calculate Q = [S^-1+N^-1]^-1, where S is a DRW symmetric semiseparable matrix 
+ *  and N is a diagonal matrix.
+ *  
+ *  S^-1 + N^-1 is a tridiagonal symmetric matrix.
+ * 
+ *  [S^-1 + N^-1]^-1 is a semiseparable symmetric matrix.
+ * 
  */
 void compute_inverse_semiseparable_plus_diag(double *t, int n, double a1, double c1, 
-                double *sigma, double syserr, double *u,
+                double *sigma, double syserr, double *u, double *v,
                 double *W, double *D, double *work)
 {
   int i;
   double dt;
-  double *a, *b, *v, S, A;
+  double *a, *b, S, A;
 
   a = work;
   b = work + n;
-  v = b + n;
-
 
   /* first S^-1 */
   dt = t[1] - t[0];
@@ -569,6 +571,7 @@ void compute_inverse_semiseparable_plus_diag(double *t, int n, double a1, double
   {
     v[i] = -(a[i-1]*v[i-1] + b[i-2]*v[i-2])/b[i-1];
   }
+
   u[n-1] = 1.0/(b[n-2]*v[n-2] + a[n-1]*v[n-1]);
   for(i=n-2; i>0; i--)
   {
@@ -594,7 +597,10 @@ void compute_inverse_semiseparable_plus_diag(double *t, int n, double a1, double
 /*
  * z = C^1/2 x y
  *
- * C(u,v) is a semiseparable matrix, y is a vector
+ * C is a semiseparable matrix with (u,v) representation, y is a vector
+ * 
+ * C = LxDxL^T,   L=I + tril(UxW^T)
+ * C^1/2 = LxD^1/2
  */
 void multiply_matvec_semiseparable_uv(double *y, double *u, double  *W, double *D, 
                                       int n, double *z)

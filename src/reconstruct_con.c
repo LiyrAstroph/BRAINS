@@ -355,7 +355,7 @@ void calculate_con_from_model(const void *model)
  */
 void calculate_con_from_model_semiseparable(const void *model)
 {
-  double *Lbuf, *ybuf, *y, *yu, *Cq, *yq, *yuq, *W, *D, *phi, *u;
+  double *Lbuf, *ybuf, *y, *yu, *Cq, *yq, *yuq, *W, *D, *phi, *u, *v;
   double syserr;
 
   double *pm = (double *)model;
@@ -379,6 +379,7 @@ void calculate_con_from_model_semiseparable(const void *model)
   D = W + n_con_max;
   phi = D + n_con_max;
   u = phi + parset.n_con_recon;
+  v = u + parset.n_con_recon;
  
   set_covar_Umat(sigma, tau, alpha);
 
@@ -448,7 +449,7 @@ void calculate_con_from_model_semiseparable(const void *model)
     Q = [S^-1 + N^-1]^-1 is a semiseparable matrix
     fast Cholesky decomposition 
   */
-  compute_inverse_semiseparable_plus_diag(Tcon, parset.n_con_recon, sigma2, 1.0/tau, Fcerrs, 0.0, u, W, D, workspace_uv);
+  compute_inverse_semiseparable_plus_diag(Tcon, parset.n_con_recon, sigma2, 1.0/tau, Fcerrs, 0.0, u, v, W, D, workspace_uv);
   multiply_matvec_semiseparable_uv(&pm[num_params_var], u, W, D, parset.n_con_recon, yu);
 
   // add back long-term trend of continuum
