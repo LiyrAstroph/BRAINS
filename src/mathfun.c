@@ -448,6 +448,171 @@ void multiply_mat_transposeB_semiseparable_drw(double *Y, double  *W, double *D,
   }
 }
 
+/**
+ *  calculate A^-1.
+ * 
+ *  A = LxDxL^T, L = I + tril(UxW^T), D is a diagonal matrix.
+ * 
+ *  M = LxD^1/2,  A = MxM^T,  A^-1 = (M^T)^-1xM^-1.
+ */
+void inverse_semiseparable(double *t, int n, double a1, double c1, double *sigma, 
+                           double syserr, double *W, double *D, double *phi,
+                           double *A, double *lndet)
+{
+  int i, j;
+
+  compute_semiseparable_drw(t, n, a1, c1, sigma, syserr, W, D, phi);
+  
+  *lndet = 0.0;
+  for(i=0; i<n; i++)
+  {
+    A[i*n + i] = 1.0 * sqrt(D[i]);
+    for(j=0; j<i; j++)
+    {
+      A[i*n + j] = a1 * (exp(-c1*(t[i]-t[j]))*W[j]) * sqrt(D[j]);
+    }
+
+    *lndet += log(D[i]);
+  }
+  LAPACKE_dtrtri(LAPACK_ROW_MAJOR, 'L', 'N', n, A, n);
+
+  LAPACKE_dlauum(LAPACK_ROW_MAJOR, 'L', n, A, n);
+
+  /* fill up upper triangle */
+  for(i=0; i<n; i++)
+    for(j=i+1; j<n; j++)
+      A[i*n+j] = A[j*n+i];
+  return;
+}
+
+/**
+ *  caclulate inverse of a DRW semiseparable matrix, which 
+ *  is a tridiagonal matrix.
+ */
+void inverse_semiseparable_uv(double *t, int n, double a1, double c1, double *A)
+{
+  int i, j;
+  double b1, b2, dt;
+
+  dt = t[2] - t[1];
+  b1 = 1.0/( a1 * (exp(-c1*dt) - exp(c1*dt)) );
+  A[0] = - b1 * exp(c1*dt);
+  A[1] = A[1*n+0] = b1;
+  for(i=2; i<n; i++)
+    A[i] = 0.0;
+
+  for(i=1; i<n-1; i++)
+  {
+    for(j=0; j<i-1; j++)
+      A[i*n+j] = A[j*n+i] = 0.0;
+    
+    for(j=i+1; j<n; j++)
+      A[i*n+j] = A[j*n+i] = 0.0;
+    
+    dt = t[i+1] - t[i];
+    b2 = 1.0/( a1 * (exp(-c1*dt) - exp(c1*dt)) );
+    dt = t[i+1] - t[i-1];
+    A[i*n+i] = -b1 * b2 *  a1 * (exp(-c1*dt) - exp(c1*dt));
+    
+    A[i*n+(i+1)] = A[(i+1)*n + i] = b2;
+
+    b1 = b2;
+  }
+
+  i = n-1;
+  dt = t[i] - t[i-1];
+  A[i*n+i] = - b1 * exp(c1 * dt);
+  
+  for(j=0; j<n-2; j++)
+    A[i*n+j] = 0.0;
+  return;
+}
+
+/**
+ *  caclulate inverse of a DRW semiseparable matrix plus a diagonal matrix, which 
+ *  is still a semiseparable matrix.
+ *  e.g., Q = [S^-1+N^-1]^-1
+ */
+void compute_inverse_semiseparable_plus_diag(double *t, int n, double a1, double c1, 
+                double *sigma, double syserr, double *u,
+                double *W, double *D, double *work)
+{
+  int i;
+  double dt;
+  double *a, *b, *v, S, A;
+
+  a = work;
+  b = work + n;
+  v = b + n;
+
+
+  /* first S^-1 */
+  dt = t[2] - t[1];
+  b[0] = 1.0/( a1 * (exp(-c1*dt) - exp(c1*dt)) );
+  a[0] = - b[0] * exp(c1*dt) + 1.0/(sigma[0]*sigma[0] + syserr*syserr);
+
+  for(i=1; i<n-1; i++)
+  {   
+    dt = t[i+1] - t[i];
+    b[i] = 1.0/( a1 * (exp(-c1*dt) - exp(c1*dt)) );
+    dt = t[i+1] - t[i-1];
+    a[i] = -b[i-1] * b[i] *  a1 * (exp(-c1*dt) - exp(c1*dt))  + 1.0/(sigma[i]*sigma[i] + syserr*syserr);
+  }
+  i = n-1;
+  dt = t[i] - t[i-1];
+  a[i] = - b[i-1] * exp(c1 * dt) + 1.0/(sigma[i]*sigma[i] + syserr*syserr);;
+  
+  /* now inverse [S^-1+N^-1]^-1*/
+  v[0] = 1.0;
+  v[1] = -a[0]/b[0];
+  for(i=2; i<n; i++)
+  {
+    v[i] = -(a[i-1]*v[i-1] + b[i-2]*v[i-2])/b[i-1];
+  }
+  u[n-1] = 1.0/(b[n-2]*v[n-2] + a[n-1]*v[n-1]);
+  for(i=n-2; i>=0; i--)
+  {
+    u[i] = (1.0 - b[i]*v[i]*u[i+1])/(a[i]*v[i]+b[i-1]*v[i-1]);
+  }
+  u[0] = (1.0-b[0]*v[0]*u[1])/(a[0]*v[0]);
+
+  /* calculate W, D */
+  S = 0.0;
+  A = u[0]*v[0];
+  D[0] = A;
+  W[0] = 1.0/D[0];
+  for(i=1; i<n; i++)
+  {
+    S = (S + D[i-1]*W[i-1]*W[i-1]);
+    A = u[i]*v[i];
+    D[i] = A - u[i]*u[i] * S;
+    W[i] = 1.0/D[i] * (v[i] - u[i]*S);
+  }
+  return;
+}
+
+/*
+ * z = C^1/2 x y
+ *
+ * C(u,v) is a semiseparable matrix, y is a vector
+ */
+void multiply_matvec_semiseparable_uv(double *y, double *u, double  *W, double *D, 
+                                      int n, double *z)
+{
+  int i;
+  double f;
+
+  f = 0.0;
+  z[0] = sqrt(D[0]) * y[0];
+  for(i=1; i<n; i++)
+  {
+    f = f + W[i-1] * sqrt(D[i-1]) * y[i-1];
+    z[i] = sqrt(D[i]) * y[i] + u[i] * f;
+  }
+  return;
+}
+
+
 /*!
  * This function display matrix on the screen.
  */

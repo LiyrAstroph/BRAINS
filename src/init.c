@@ -325,6 +325,7 @@ void allocate_memory()
   }
 
   workspace = malloc((6*n_con_data + n_con_data*nq + 5*parset.n_con_recon)*sizeof(double));
+  workspace_uv = malloc(3*parset.n_con_recon*sizeof(double));
   Larr_data = malloc(n_con_data*nq*sizeof(double));
   Larr_rec = malloc(parset.n_con_recon*nq*sizeof(double));
   pow_Tcon_data = malloc(num_params_difftrend*sizeof(double));
@@ -368,6 +369,7 @@ void free_memory()
   free(blr_range_model);
 
   free(workspace);
+  free(workspace_uv);
   free(Larr_data);
   free(Larr_rec);
   free(pow_Tcon_data);

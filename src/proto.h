@@ -155,3 +155,12 @@ void compute_semiseparable_drw(double *t, int n, double a1, double c1, double *s
 void multiply_matvec_semiseparable_drw(double *y, double  *W, double *D, double *phi, int n, double a1, double *z);
 void multiply_mat_semiseparable_drw(double *Y, double  *W, double *D, double *phi, int n, int m, double a1, double *Z);
 void multiply_mat_transposeB_semiseparable_drw(double *Y, double  *W, double *D, double *phi, int n, int m, double a1, double *Z);
+
+void inverse_semiseparable_uv(double *t, int n, double a1, double c1, double *A);
+
+void multiply_matvec_semiseparable_uv(double *y, double *u, double  *W, double *D, 
+                                      int n, double *z);
+
+void compute_inverse_semiseparable_plus_diag(double *t, int n, double a1, double c1, 
+                double *sigma, double syserr, double *u,
+                double *W, double *D, double *work);

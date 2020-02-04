@@ -152,7 +152,7 @@ extern double Tcon_min, Tcon_max;
 extern double *PSmat, *PNmat, *USmat, *PSmat_data;
 extern double *PNmat_data;
 extern double *PCmat_data, *IPCmat_data, *PQmat, *PEmat1, *PEmat2;
-extern double *workspace;
+extern double *workspace, *workspace_uv;
 extern double *var_param, *var_param_std;
 extern double *con_q;
 extern double logz_con;

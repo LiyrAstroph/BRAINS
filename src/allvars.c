@@ -55,7 +55,7 @@ double Tcon_min, Tcon_max;
 double *PSmat, *PNmat, *USmat, *PSmat_data;
 double *PNmat_data;
 double *PCmat_data, *IPCmat_data, *PQmat, *PEmat1, *PEmat2;
-double *workspace;
+double *workspace, *workspace_uv;
 double *var_param, *var_param_std;
 double *con_q;
 double logz_con;
