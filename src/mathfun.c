@@ -494,7 +494,7 @@ void inverse_semiseparable_uv(double *t, int n, double a1, double c1, double *A)
   int i, j;
   double b1, b2, dt;
 
-  dt = t[2] - t[1];
+  dt = t[1] - t[0];
   b1 = 1.0/( a1 * (exp(-c1*dt) - exp(c1*dt)) );
   A[0] = - b1 * exp(c1*dt);
   A[1] = A[1*n+0] = b1;
@@ -547,7 +547,7 @@ void compute_inverse_semiseparable_plus_diag(double *t, int n, double a1, double
 
 
   /* first S^-1 */
-  dt = t[2] - t[1];
+  dt = t[1] - t[0];
   b[0] = 1.0/( a1 * (exp(-c1*dt) - exp(c1*dt)) );
   a[0] = - b[0] * exp(c1*dt) + 1.0/(sigma[0]*sigma[0] + syserr*syserr);
 
@@ -570,7 +570,7 @@ void compute_inverse_semiseparable_plus_diag(double *t, int n, double a1, double
     v[i] = -(a[i-1]*v[i-1] + b[i-2]*v[i-2])/b[i-1];
   }
   u[n-1] = 1.0/(b[n-2]*v[n-2] + a[n-1]*v[n-1]);
-  for(i=n-2; i>=0; i--)
+  for(i=n-2; i>0; i--)
   {
     u[i] = (1.0 - b[i]*v[i]*u[i+1])/(a[i]*v[i]+b[i-1]*v[i-1]);
   }
