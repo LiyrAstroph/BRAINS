@@ -539,7 +539,7 @@ void inverse_semiseparable_uv(double *t, int n, double a1, double c1, double *A)
  */
 void compute_inverse_semiseparable_plus_diag(double *t, int n, double a1, double c1, 
                 double *sigma, double syserr, double *u, double *v,
-                double *W, double *D, double *work)
+                double *W, double *D, double *phi, double *work)
 {
   int i;
   double dt;
@@ -548,7 +548,13 @@ void compute_inverse_semiseparable_plus_diag(double *t, int n, double a1, double
   a = work;
   b = work + n;
 
-  /* first S^-1 */
+  phi[0] = 0.0;
+  for(i=1; i<n; i++)
+  {
+    phi[i] = exp(-c1 * (t[i] - t[i-1]));
+  }
+
+  /* first S^-1 + N^-1 */
   dt = t[1] - t[0];
   b[0] = 1.0/( a1 * (exp(-c1*dt) - exp(c1*dt)) );
   a[0] = - b[0] * exp(c1*dt) + 1.0/(sigma[0]*sigma[0] + syserr*syserr);
@@ -565,19 +571,19 @@ void compute_inverse_semiseparable_plus_diag(double *t, int n, double a1, double
   a[i] = - b[i-1] * exp(c1 * dt) + 1.0/(sigma[i]*sigma[i] + syserr*syserr);;
   
   /* now inverse [S^-1+N^-1]^-1*/
-  v[0] = 1.0;
-  v[1] = -a[0]/b[0];
+  v[0] = 1.0 ;
+  v[1] = -a[0]/b[0] * exp(-c1*(t[1]-t[0]));
   for(i=2; i<n; i++)
   {
-    v[i] = -(a[i-1]*v[i-1] + b[i-2]*v[i-2])/b[i-1];
+    v[i] = -(a[i-1]*v[i-1] * exp(-c1*(t[i]-t[i-1]))  + b[i-2]*v[i-2] * exp(-c1*(t[i]-t[i-2]))  )/b[i-1];
   }
 
-  u[n-1] = 1.0/(b[n-2]*v[n-2] + a[n-1]*v[n-1]);
+  u[n-1] = 1.0/(b[n-2]*v[n-2] * exp(-c1*(t[n-1]-t[n-2])) + a[n-1]*v[n-1]);
   for(i=n-2; i>0; i--)
   {
-    u[i] = (1.0 - b[i]*v[i]*u[i+1])/(a[i]*v[i]+b[i-1]*v[i-1]);
+    u[i] = (1.0 - b[i]*v[i]*u[i+1] * exp(-c1*(t[i+1]-t[i])) )/(a[i]*v[i]+b[i-1]*v[i-1]*exp(-c1*(t[i]-t[i-1])));
   }
-  u[0] = (1.0-b[0]*v[0]*u[1])/(a[0]*v[0]);
+  u[0] = (1.0-b[0]*v[0]*u[1] * exp(-c1*(t[1]-t[0])) )/(a[0]*v[0]);
 
   /* calculate W, D */
   S = 0.0;
@@ -586,10 +592,14 @@ void compute_inverse_semiseparable_plus_diag(double *t, int n, double a1, double
   W[0] = 1.0/D[0];
   for(i=1; i<n; i++)
   {
-    S = (S + D[i-1]*W[i-1]*W[i-1]);
+    /*S = phi[i]*phi[i]*(S + D[i-1]*W[i-1]*W[i-1]);
     A = u[i]*v[i];
     D[i] = A - u[i]*u[i] * S;
-    W[i] = 1.0/D[i] * (v[i] - u[i]*S);
+    W[i] = 1.0/D[i] * (v[i] - u[i]*S);*/
+
+    D[i] = -u[i]/u[i-1]/b[i-1] * exp(-c1*(t[i]-t[i-1]));
+    W[i] = 1.0/u[i];
+    //printf("%e %e %e %e %e %e\n", u[i], v[i], D[i], W[i], a[i], b[i]);
   }
   return;
 }
@@ -602,7 +612,7 @@ void compute_inverse_semiseparable_plus_diag(double *t, int n, double a1, double
  * C = LxDxL^T,   L=I + tril(UxW^T)
  * C^1/2 = LxD^1/2
  */
-void multiply_matvec_semiseparable_uv(double *y, double *u, double  *W, double *D, 
+void multiply_matvec_semiseparable_uv(double *y, double *u, double  *W, double *D, double *phi,
                                       int n, double *z)
 {
   int i;
@@ -612,7 +622,7 @@ void multiply_matvec_semiseparable_uv(double *y, double *u, double  *W, double *
   z[0] = sqrt(D[0]) * y[0];
   for(i=1; i<n; i++)
   {
-    f = f + W[i-1] * sqrt(D[i-1]) * y[i-1];
+    f = phi[i] * (f + W[i-1] * sqrt(D[i-1]) * y[i-1]);
     z[i] = sqrt(D[i]) * y[i] + u[i] * f;
   }
   return;
