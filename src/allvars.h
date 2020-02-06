@@ -15,6 +15,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <float.h>
 #include <mpi.h>
 
 #include <gsl/gsl_rng.h>
@@ -50,6 +51,7 @@
 #define PI            M_PI
 #define BRAINS_MAX_STR_LENGTH  (256)
 
+#define EPS (DBL_MIN);
 
 enum PRIOR_TYPE {GAUSSIAN=1, UNIFORM=2};
 

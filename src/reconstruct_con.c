@@ -98,7 +98,7 @@ void postprocess_con()
       {
         for(j=0; j<parset.n_con_recon; j++)
         {
-          fprintf(fcon, "%f %f %f\n", Tcon[j], Fcon[j]/con_scale, Fcerrs[j]/con_scale);
+          fprintf(fcon, "%e %e %f\n", Tcon[j], Fcon[j]/con_scale, Fcerrs[j]/con_scale);
         }
         fprintf(fcon, "\n");
       }
@@ -223,7 +223,7 @@ void reconstruct_con()
  
         for(i=0; i<parset.n_con_recon; i++)
         {
-          fprintf(fp, "%f %f %f\n", Tcon[i], Fcon[i] / con_scale, Fcerrs[i]/con_scale);
+          fprintf(fp, "%e %e %e\n", Tcon[i], Fcon[i] / con_scale, Fcerrs[i]/con_scale);
         }
         fclose(fp);
  
@@ -378,7 +378,7 @@ void calculate_con_from_model_semiseparable(const void *model)
   W = yuq + parset.n_con_recon;
   D = W + n_con_max;
   phi = D + n_con_max;
-  u = phi + parset.n_con_recon;
+  u = phi + n_con_max;
   v = u + parset.n_con_recon;
  
   set_covar_Umat(sigma, tau, alpha);

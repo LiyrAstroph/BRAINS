@@ -324,7 +324,7 @@ void allocate_memory()
     blr_range_model[i] = malloc(2*sizeof(double));
   }
 
-  workspace = malloc((6*n_con_data + n_con_data*nq + 5*parset.n_con_recon)*sizeof(double));
+  workspace = malloc((6*n_con_data + n_con_data*nq + 7*parset.n_con_recon)*sizeof(double));
   workspace_uv = malloc(2*parset.n_con_recon*sizeof(double));
   Larr_data = malloc(n_con_data*nq*sizeof(double));
   Larr_rec = malloc(parset.n_con_recon*nq*sizeof(double));
