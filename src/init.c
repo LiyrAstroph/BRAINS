@@ -109,6 +109,14 @@ void init()
       break;
   }
 
+  /* set maximum continuum point */
+  n_con_max = parset.n_con_recon;
+  if(parset.flag_dim >=-1)
+  {
+    if(n_con_data > n_con_max)
+      n_con_max = n_con_data;
+  }
+
   allocate_memory();
 
   /* initialize GSL */
@@ -146,13 +154,9 @@ void init()
   /* default rcloud_max_set */
   rcloud_max_set = 1.0e3;
 
-  /* set maximum continuum point */
-  n_con_max = parset.n_con_recon;
+
   if(parset.flag_dim >=-1)
   {
-    if(n_con_data > n_con_max)
-      n_con_max = n_con_data;
-
     /* set Larr_data */
     for(i=0;i<n_con_data;i++)
     {
@@ -324,7 +328,7 @@ void allocate_memory()
     blr_range_model[i] = malloc(2*sizeof(double));
   }
 
-  workspace = malloc((6*n_con_data + n_con_data*nq + 7*parset.n_con_recon)*sizeof(double));
+  workspace = malloc((n_con_data*nq + 7*n_con_max + nq*nq + nq)*sizeof(double));
   workspace_uv = malloc(2*parset.n_con_recon*sizeof(double));
   Larr_data = malloc(n_con_data*nq*sizeof(double));
   Larr_rec = malloc(parset.n_con_recon*nq*sizeof(double));

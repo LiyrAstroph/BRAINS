@@ -355,7 +355,7 @@ void calculate_con_from_model(const void *model)
  */
 void calculate_con_from_model_semiseparable(const void *model)
 {
-  double *Lbuf, *ybuf, *y, *yu, *Cq, *yq, *yuq, *W, *D, *phi, *u, *v;
+  double *Lbuf, *ybuf, *y, *Cq, *yq, *W, *D, *phi, *u, *v;
   double syserr;
 
   double *pm = (double *)model;
@@ -370,12 +370,10 @@ void calculate_con_from_model_semiseparable(const void *model)
   
   Lbuf = workspace;
   ybuf = Lbuf + n_con_data*nq; 
-  y = ybuf + n_con_data;
-  Cq = y + n_con_data;
+  y = ybuf + n_con_max;
+  Cq = y + n_con_max;
   yq = Cq + nq*nq;
-  yu = yq + nq; 
-  yuq = yu + parset.n_con_recon;
-  W = yuq + parset.n_con_recon;
+  W = yq + nq;
   D = W + n_con_max;
   phi = D + n_con_max;
   u = phi + n_con_max;
@@ -423,7 +421,7 @@ void calculate_con_from_model_semiseparable(const void *model)
 
   for(i=0; i<parset.n_con_recon; i++)
   {
-    Fcerrs[i] = sqrt(sigma*sigma + syserr*syserr - PEmat2[i*parset.n_con_recon + i]);
+    Fcerrs[i] = sqrt(sigma2 + syserr*syserr - PEmat2[i*parset.n_con_recon + i]);
   }
 
   /* 
@@ -445,14 +443,14 @@ void calculate_con_from_model_semiseparable(const void *model)
   
   compute_inverse_semiseparable_plus_diag(Tcon, parset.n_con_recon, sigma2, 1.0/tau, 
                                           Fcerrs, syserr, u, v, W, D, phi, workspace_uv);
-  multiply_matvec_semiseparable_uv(&pm[num_params_var], u, W, D, phi, parset.n_con_recon, yu);
+  multiply_matvec_semiseparable_uv(&pm[num_params_var], u, W, D, phi, parset.n_con_recon, y);
 
   // add back long-term trend of continuum
-  multiply_matvec_MN(Larr_rec, parset.n_con_recon, nq, yq, yuq);
+  multiply_matvec_MN(Larr_rec, parset.n_con_recon, nq, yq, ybuf);
 
   for(i=0; i<parset.n_con_recon; i++)
   {
-    Fcon[i] += yu[i] + yuq[i];
+    Fcon[i] += y[i] + ybuf[i];
   }
 
   return;
