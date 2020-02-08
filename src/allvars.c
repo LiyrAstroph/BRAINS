@@ -100,7 +100,7 @@ double *instres_epoch, *instres_err_epoch;
 
 /* transfer function / velocity-delay map */
 double *TransTau, *TransV, *Trans1D, *Trans2D_at_veldata, *Trans2D;
-double rcloud_min_set, rcloud_max_set;
+double rcloud_min_set, rcloud_max_set, time_back_set;
 
 double **Fcon_particles, **Fcon_particles_perturb;
 double *prob_con_particles, *prob_con_particles_perturb;

@@ -222,10 +222,29 @@ void init()
       pow_Tcon_data[i] = (pow(Tcon_data[n_con_data-1]-Tmed_data, i+2) 
                         - pow(Tcon_data[0]-Tmed_data, i+2)) / (i+2) / Tspan_data_con;
     }
+    
+    /* set time back for continuum reconstruction */
+    time_back_set = Tspan_data_con + (Tcon_data[0] - Tline_data[0]);
+    time_back_set = fmax(2.0*Tcad_data, time_back_set);
+
+    /* make rcloud_max and time_back consistent with each other, rcloud_max has a higher priority */
+    double DT=Tcon_data[0] - time_back_set;
+    if(parset.rcloud_max > 0.0)
+    {
+      DT = fmin(DT, Tline_data[0] - parset.rcloud_max*2.0);
+    }
+    else if(parset.time_back > 0.0) /* neglect when parset.rcloud_max is set */
+    { 
+      DT = fmin(DT, Tcon_data[0] - parset.time_back);
+    }
+    time_back_set = Tcon_data[0] - DT;
 
     /* set the range of cloud radial distribution */
     rcloud_min_set = 0.0;
     rcloud_max_set = Tspan_data/2.0;
+    
+    /* rcloud_max should smaller than  (Tl0 - Tc0)/2 */
+    rcloud_max_set = fmin( rcloud_max_set,  (Tline_data[0] - Tcon_data[0] + time_back_set)/2.0 );
 
     if(parset.rcloud_max > 0.0)
       rcloud_max_set = fmin(rcloud_max_set, parset.rcloud_max);

@@ -364,13 +364,15 @@ void reconstruct_line1d_init()
   Tspan = (Tcon_data[n_con_data-1] - Tcon_data[0]);
 
   /* set time grid for continuum */
-  if(parset.time_back > 0.0)
-    Tcon_min = Tcon_data[0] - parset.time_back;
-  else
-    Tcon_min = Tcon_data[0] - fmax(0.05*Tspan, Tspan/2.0 + (Tcon_data[0] - Tline_data[0]));
+  //if(parset.time_back > 0.0)
+  //  Tcon_min = Tcon_data[0] - parset.time_back;
+  //else
+  //  Tcon_min = Tcon_data[0] - fmax(0.05*Tspan, Tspan/2.0 + (Tcon_data[0] - Tline_data[0]));
+  
+  Tcon_min = Tcon_data[0] - time_back_set;
 
   Tcon_max = Tcon_data[n_con_data-1] + fmax(0.05*Tspan, 10.0);
-  Tcon_max = fmax(Tcon_max, Tline_data[n_line_data -1]);  /* The time span shoud cover that of the emission line data */
+  Tcon_max = fmax(Tcon_max, Tline_data[n_line_data -1]);  /* The time span should cover that of the emission line data */
   
   if(thistask == roottask)
     printf("Tcon_min_max: %f %f\n", Tcon_min - Tcon_data[0], Tcon_max - Tcon_data[n_con_data-1]);
