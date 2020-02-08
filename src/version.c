@@ -12,7 +12,7 @@
 
 void print_version()
 {
-  printf("\e[1;31m" "BRAINS Version: %d.%d.%d\n" "\e[0m", BRAINS_MAJOR_VERSION, BRAINS_MINOR_VERSION, BRAINS_PATCH_VERSION);
+  printf("\e[1;35m" "BRAINS Version: %d.%d.%d\n" "\e[0m", BRAINS_MAJOR_VERSION, BRAINS_MINOR_VERSION, BRAINS_PATCH_VERSION);
   printf("Yan-Rong Li, liyanrong@ihep.ac.cn\n");
   return;
 }

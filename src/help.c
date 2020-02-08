@@ -57,31 +57,31 @@ void print_help()
   printf("\tFILE\n");
   printf("\t\tparameter file.\n");
 
-  printf("\t" RED BOLD "-h  or --help\n" NONE);
+  printf("\t" PURPLE BOLD "-h or --help\n" NONE);
   printf("\t\tprint help information.\n");
 
-  printf("\t" RED BOLD "-p or --post_proc\n" NONE);
+  printf("\t" PURPLE BOLD "-p or --post_proc\n" NONE);
   printf("\t\tonly do posterior processing.\n");
 
-  printf("\t" RED BOLD "-r or --restart\n" NONE);
+  printf("\t" PURPLE BOLD "-r or --restart\n" NONE);
   printf("\t\trestart from the backup.\n");
 
-  printf("\t" RED BOLD "-t or --temperature or --temp\n" NONE);
+  printf("\t" PURPLE BOLD "-t or --temperature or --temp\n" NONE);
   printf("\t\tspecify tempering temperature in posterior processing.\n");
 
-  printf("\t" RED BOLD "-s or --seed\n" NONE);
+  printf("\t" PURPLE BOLD "-s or --seed\n" NONE);
   printf("\t\tset a seed for the random number generator.\n");
 
-  printf("\t" RED BOLD "-c or --recalc_info\n" NONE);
+  printf("\t" PURPLE BOLD "-c or --recalc_info\n" NONE);
   printf("\t\tonly do posterior processing, but recalculate the posterior sample information.\n");
 
-  printf("\t" RED BOLD "-e or --exam_prior\n" NONE);
+  printf("\t" PURPLE BOLD "-e or --exam_prior\n" NONE);
   printf("\t\texamine the priors.\n");
 
-  printf("\t" RED BOLD "-v or --version\n" NONE);
+  printf("\t" PURPLE BOLD "-v or --version\n" NONE);
   printf("\t\tprint version.\n");
 
-  printf("\t" RED BOLD "-n or --para_name\n" NONE);
+  printf("\t" PURPLE BOLD "-n or --para_name\n" NONE);
   printf("\t\tprint parameter name.\n");
 
   printf("\n\n");
