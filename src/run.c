@@ -31,13 +31,20 @@ void begin_run()
 
   /* read parameter file */
   read_parset();
-  
+
   if(parset.flag_dim != -2) /* if not randomly create mock data */
   {
     /* read data files */
     read_data();
+#ifndef SA
     /* scale continuum and line to an order of unity */
     scale_con_line();
+#else
+    if(parset.flag_dim != 3)
+    {
+      scale_con_line();
+    }
+#endif
   }
 
   /* initialization */

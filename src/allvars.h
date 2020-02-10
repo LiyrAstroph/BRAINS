@@ -51,7 +51,7 @@
 #define PI            M_PI
 #define BRAINS_MAX_STR_LENGTH  (256)
 
-#define EPS (DBL_MIN);
+#define EPS (DBL_MIN)
 
 enum PRIOR_TYPE {GAUSSIAN=1, UNIFORM=2};
 
@@ -127,6 +127,11 @@ typedef struct
 
   int flag_help, flag_end;
   int flag_para_name;
+
+#ifdef SA
+  char sa_file[BRAINS_MAX_STR_LENGTH];
+  int flag_sa_blrmodel, flag_sa_par_mutual;
+#endif
 }PARSET;
 extern PARSET parset;
 
@@ -222,4 +227,13 @@ extern gsl_rng * gsl_r;
 extern gsl_interp_accel *gsl_acc;
 extern gsl_interp  *gsl_linear;
 
+
+#ifdef SA
+extern int num_params_sa, num_params_sa_blr_model;
+extern int n_epoch_sa_data, n_vel_sa_data, n_base_sa_data;
+extern double *vel_sa_data, *base_sa_data, *Fline_sa_data, *Flerrs_sa_data, *phase_sa_data, *pherrs_sa_data;
+extern double *phase_sa;
+
+extern double *clouds_alpha, *clouds_beta;
+#endif
 #endif

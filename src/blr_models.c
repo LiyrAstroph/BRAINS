@@ -1380,6 +1380,191 @@ void gen_2d_cloud_sample_model6(const void *pm, int flag_save)
   return;
 }
 
+#ifdef SA
+
+void gen_sa_cloud_sample_model6(const void *pm, int flag_save)
+{
+  int i, j, nc;
+  double r, phi, cos_phi, sin_phi, Lopn_cos;
+  double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
+  double V, rhoV, theV, Vr, Vph, Vkep, Rs, g;
+  double inc, F, beta, mu, k, gam, xi, a, s, sig, rin;
+  double mbh, fellip, fflow, sigr_circ, sigthe_circ, sigr_rad, sigthe_rad, theta_rot, sig_turb;
+  double Lphi, Lthe, sin_Lphi, cos_Lphi, sin_Lthe, cos_Lthe, sin_inc_cmp, cos_inc_cmp;
+  double weight, rnd, rnd_xi;
+  SABLRmodel6 *model = (SABLRmodel6 *)pm;
+
+  Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
+  inc = acos(model->inc);         /* inclination angle in rad */
+  beta = model->beta;         
+  F = model->F;
+  mu = exp(model->mu);                 /* mean radius */
+  k = model->k;  
+  gam = model-> gam;
+  xi = model->xi;
+
+  mbh = exp(model->mbh);
+  fellip = model->fellip;
+  fflow = model->fflow;
+  sigr_circ = exp(model->sigr_circ);
+  sigthe_circ = exp(model->sigthe_circ);
+  sigr_rad = exp(model->sigr_rad);
+  sigthe_rad = exp(model->sigthe_rad);
+  theta_rot = model->theta_rot*PI/180.0;
+  sig_turb = exp(model->sig_turb);
+
+  Rs = 3.0e11*mbh/CM_PER_LD; // Schwarzchild radius in a unit of light-days
+
+  a = 1.0/beta/beta;
+  s = mu/a;
+  rin=mu*F + Rs;  // include Scharzschild radius
+  sig=(1.0-F)*s;
+  
+  sin_inc_cmp = cos(inc); //sin(PI/2.0 - inc);
+  cos_inc_cmp = sin(inc); //cos(PI/2.0 - inc);
+  
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+// generate a direction of the angular momentum of the orbit   
+    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
+    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_r), gam));
+    sin_Lphi = sin(Lphi);
+    cos_Lphi = cos(Lphi);
+    sin_Lthe = sin(Lthe);
+    cos_Lthe = cos(Lthe);
+
+    nc = 0;
+    r = rcloud_max_set+1.0;
+    while(r>rcloud_max_set || r<rcloud_min_set)
+    {
+      if(nc > 1000)
+      {
+        printf("# Error, too many tries in generating ridial location of clouds.\n");
+        exit(0);
+      }
+      rnd = gsl_ran_gamma(gsl_r, a, 1.0);
+//    r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
+      r = rin + sig * rnd;
+      nc++;
+    }
+    phi = 2.0*PI * gsl_rng_uniform(gsl_r);
+    cos_phi = cos(phi);
+    sin_phi = sin(phi);
+
+    /* Polar coordinates to Cartesian coordinate */
+    x = r * cos_phi; 
+    y = r * sin_phi;
+    z = 0.0;
+
+/* right-handed framework
+ * first rotate around y axis by an angle of Lthe, then rotate around z axis 
+ * by an angle of Lphi
+ */
+  /*xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
+    yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
+    zb = sin(Lthe) * x + cos(Lthe) * z; */
+    
+    xb = cos_Lthe*cos_Lphi * x + sin_Lphi * y;
+    yb =-cos_Lthe*sin_Lphi * x + cos_Lphi * y;
+    zb = sin_Lthe * x;
+
+    zb0 = zb;
+    rnd_xi = gsl_rng_uniform(gsl_r);
+    if( (rnd_xi < 1.0 - xi) && zb0 < 0.0)
+      zb = -zb;
+
+// counter-rotate around y, LOS is x-axis 
+    /* x = xb * cos(PI/2.0-inc) + zb * sin(PI/2.0-inc);
+       y = yb;
+       z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc); */
+    
+    x = xb * cos_inc_cmp + zb * sin_inc_cmp;
+    y = yb;
+    z =-xb * sin_inc_cmp + zb * cos_inc_cmp;
+
+    weight = 0.5 + k*(x/r);
+
+    clouds_weight[i] = weight;
+    clouds_alpha[i] = y;  /* poisition on sky */
+    clouds_beta[i] = z;   
+
+    Vkep = sqrt(mbh/r);
+    
+    for(j=0; j<parset.n_vel_per_cloud; j++)
+    {
+      rnd = gsl_rng_uniform(gsl_r);
+
+      if(rnd < fellip)
+      {
+        rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_circ  + 1.0) * Vkep;
+        theV =  (gsl_ran_ugaussian(gsl_r) * sigthe_circ + 0.5)*PI;
+      }
+      else
+      {
+        if(fflow <= 0.5) /* inflow */
+        {
+          rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_rad   + 1.0) * Vkep;
+          theV = (gsl_ran_ugaussian(gsl_r) * sigthe_rad + 1.0) * PI + theta_rot;
+        }
+        else     /* outflow */
+        {
+          rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_rad  + 1.0) * Vkep;
+          theV = (gsl_ran_ugaussian(gsl_r) * sigthe_rad) * PI + theta_rot;
+        }
+      }
+      
+      Vr = sqrt(2.0) * rhoV * cos(theV);
+      Vph = rhoV * sin(theV);
+
+      vx = Vr * cos_phi - Vph * sin_phi;
+      vy = Vr * sin_phi + Vph * cos_phi;
+      vz = 0.0;    
+      
+    /*vxb = cos(Lthe)*cos(Lphi) * vx + sin(Lphi) * vy - sin(Lthe)*cos(Lphi) * vz;
+      vyb =-cos(Lthe)*sin(Lphi) * vx + cos(Lphi) * vy + sin(Lthe)*sin(Lphi) * vz;
+      vzb = sin(Lthe) * vx + cos(Lthe) * vz;*/
+
+      vxb = cos_Lthe*cos_Lphi * vx + sin_Lphi * vy;
+      vyb =-cos_Lthe*sin_Lphi * vx + cos_Lphi * vy;
+      vzb = sin_Lthe * vx;
+
+
+      if((rnd_xi < 1.0-xi) && zb0 < 0.0)
+        vzb = -vzb;
+    
+      /*vx = vxb * cos(PI/2.0-inc) + vzb * sin(PI/2.0-inc);
+      vy = vyb;
+      vz =-vxb * sin(PI/2.0-inc) + vzb * cos(PI/2.0-inc);*/
+
+      vx = vxb * cos_inc_cmp + vzb * sin_inc_cmp;
+      vy = vyb;
+      vz =-vxb * sin_inc_cmp + vzb * cos_inc_cmp;
+
+      V = -vx;  //note the definition of the line-of-sight velocity. postive means a receding 
+                // velocity relative to the observer.
+
+      V += gsl_ran_ugaussian(gsl_r) * sig_turb * Vkep; // add turbulence velocity
+
+      if(fabs(V) >= C_Unit) // make sure that the velocity is smaller than speed of light
+        V = 0.9999*C_Unit * (V>0.0?1.0:-1.0);
+
+      g = sqrt( (1.0 + V/C_Unit) / (1.0 - V/C_Unit) ) / sqrt(1.0 - Rs/r); //relativistic effects
+      V = (g-1.0)*C_Unit;
+
+      clouds_vel[i*parset.n_vel_per_cloud + j] = V;
+
+      if(flag_save && thistask==roottask)
+      {
+        if(i%(icr_cloud_save) == 0)
+          fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx*VelUnit, vy*VelUnit, vz*VelUnit, weight);
+      }
+    }
+  }
+
+  return;
+}
+#endif 
+
 /*================================================================
  * model 7
  * shadowed model

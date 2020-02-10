@@ -220,6 +220,20 @@ void read_parset()
     addr[nt] = &parset.flag_nonlinear;
     id[nt++] = INT;
 
+#ifdef SA
+    strcpy(tag[nt], "SAFile");
+    addr[nt] = &parset.sa_file;
+    id[nt++] = STRING;
+
+    strcpy(tag[nt], "FlagSABLRModel");
+    addr[nt] = &parset.flag_sa_blrmodel;
+    id[nt++] = INT;
+
+    strcpy(tag[nt], "FlagSAParMutual");
+    addr[nt] = &parset.flag_sa_par_mutual;
+    id[nt++] = INT;
+#endif
+
 
     /* default values */
     parset.flag_dim = 0;
@@ -250,7 +264,14 @@ void read_parset()
     strcpy(parset.tran_out_file, "data/tran.txt");
     strcpy(parset.tran2d_out_file, "data/tran2d.txt");
     strcpy(parset.tran2d_data_out_file, "data/tran2d_data.txt");
-    
+
+#ifdef SA
+    parset.flag_sa_blrmodel = 1;
+    parset.flag_sa_par_mutual = 0;
+
+    strcpy(parset.sa_file, "");
+#endif 
+
     char fname[200];
     sprintf(fname, "%s", parset.param_file);
     
@@ -303,11 +324,19 @@ void read_parset()
     fclose(fparam);
 
     /* check input options */
+#ifndef SA
     if(parset.flag_dim > 2 || parset.flag_dim < -2)
     {
       fprintf(stderr, "# Error in FlagDim: value %d is not allowed.\n# Please specify a value in [-2-2].\n", parset.flag_dim);
       error_flag = 1;
     }
+#else 
+    if(parset.flag_dim > 5 || parset.flag_dim < -2)
+    {
+      fprintf(stderr, "# Error in FlagDim: value %d is not allowed.\n# Please specify a value in [-2-5].\n", parset.flag_dim);
+      error_flag = 1;
+    }
+#endif
 
     if(parset.flag_trend > 2 || parset.flag_trend < 0)
     {
@@ -580,6 +609,26 @@ void read_data()
         printf("line2d data points: %d %d\n", n_line_data, n_vel_data);
       }
     }
+
+#ifdef SA
+    if(parset.flag_dim > 2 || parset.flag_dim == -1)
+    {
+      sprintf(fname, "%s/%s", parset.file_dir, parset.sa_file);
+      fp = fopen(fname, "r");
+      if(fp == NULL)
+      {
+        fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+        error_flag = 2;
+      }
+      else
+      {
+        fscanf(fp, "%s %d %d %d\n", buf, &n_epoch_sa_data, &n_vel_sa_data, &n_base_sa_data);
+        fclose(fp);
+        printf("sa data points: %d %d %d\n", n_epoch_sa_data, n_vel_sa_data, n_base_sa_data);
+      }
+    }
+#endif 
+
   }
 
   MPI_Bcast(&error_flag, 1, MPI_INT, roottask, MPI_COMM_WORLD);
@@ -604,6 +653,15 @@ void read_data()
 
     n_vel_data_ext = n_vel_data + 2 * n_vel_data_incr;
   }
+
+#ifdef SA
+  if(parset.flag_dim > 2 || parset.flag_dim == -1)
+  {
+    MPI_Bcast(&n_epoch_sa_data, 1, MPI_INT, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(&n_vel_sa_data,   1, MPI_INT, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(&n_base_sa_data,  1, MPI_INT, roottask, MPI_COMM_WORLD);
+  }
+#endif
 
   // now allocate memory for data
   allocate_memory_data();
@@ -818,6 +876,50 @@ void read_data()
       instres_err_epoch[i] = parset.InstRes_err;
     }
   }
+
+#ifdef SA
+/* read SA data */
+  if(parset.flag_dim > 2 || parset.flag_dim == -1)
+  {
+    int j;
+    if(thistask == roottask)
+    {
+      sprintf(fname, "%s/%s", parset.file_dir, parset.sa_file);
+      fp = fopen(fname, "r");
+  
+      fgets(buf, 200, fp);
+  
+      /* read line profile */
+      for(j=0; j<n_epoch_sa_data; j++)
+      {
+        for(i=0; i<n_vel_sa_data; i++)
+        {
+          fscanf(fp, "%lf %lf\n", &vel_sa_data[i], 
+          &Fline_sa_data[i+j*n_vel_sa_data], &Flerrs_sa_data[i+j*n_vel_sa_data]);
+        }
+        fscanf(fp, "\n");
+      }
+      
+      for(j=0; j<n_base_sa_data; j++)
+      {
+        fscanf(fp, "# %d %d\n", &base_sa_data[j*2+0], &base_sa_data[j*2+1]);
+  
+        for(i=0; i<n_vel_sa_data; i++)
+        {
+          fscanf(fp, "%lf %lf %lf\n", &vel_sa_data[i], &phase_sa_data[i+j*n_vel_sa_data], 
+          &pherrs_sa_data[i+j*n_vel_sa_data]);
+        }
+        fscanf(fp, "\n");
+      }
+      fclose(fp);
+    }
+    MPI_Bcast(vel_sa_data, n_vel_sa_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(base_sa_data, n_base_sa_data*2, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(phase_sa_data, n_vel_sa_data*n_base_sa_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(pherrs_sa_data, n_vel_sa_data*n_base_sa_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+  }
+#endif  
+
   return;
 }
 
@@ -857,6 +959,18 @@ void allocate_memory_data()
     instres_epoch = malloc(n_line_data * sizeof(double));
     instres_err_epoch = malloc(n_line_data * sizeof(double));
   }
+
+#ifdef SA
+  if(parset.flag_dim > 2 || parset.flag_dim == -1)
+  {
+    vel_sa_data = malloc(n_vel_sa_data*sizeof(double));
+    base_sa_data = malloc(n_base_sa_data * 2 * sizeof(double));
+    Fline_sa_data = malloc(n_vel_sa_data*n_epoch_sa_data*sizeof(double));
+    Flerrs_sa_data = malloc(n_vel_sa_data*n_epoch_sa_data*sizeof(double));
+    phase_sa_data = malloc(n_vel_sa_data * n_base_sa_data * sizeof(double));
+    pherrs_sa_data = malloc(n_vel_sa_data * n_base_sa_data * sizeof(double));
+  }
+#endif
 }
 
 /*!
@@ -895,6 +1009,18 @@ void free_memory_data()
     free(instres_epoch); 
     free(instres_err_epoch);
   }
+
+#ifdef SA
+  if(parset.flag_dim > 2 || parset.flag_dim == -1)
+  {
+    free(vel_sa_data);
+    free(base_sa_data);
+    free(Fline_sa_data);
+    free(Flerrs_sa_data);
+    free(phase_sa_data);
+    free(pherrs_sa_data); 
+  }
+#endif
 }
 
 /*! 
