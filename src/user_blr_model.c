@@ -120,7 +120,7 @@ void set_blr_range_mymodel()
  * The clouds' lag, and weight are stored in arrays "clouds_tau", "clouds_weight",
  * which must be provided.
  */
-void transfun_1d_cloud_sample_mymodel(const void *pm, int flag_save)
+void gen_1d_cloud_sample_mymodel(const void *pm, int flag_save)
 {
   int i, nc;
   double r, phi, dis, Lopn_cos;
@@ -225,7 +225,7 @@ void transfun_1d_cloud_sample_mymodel(const void *pm, int flag_save)
  * The clouds' lag, velocity, and weight are stored in arrays "clouds_tau", "clouds_vel", "clouds_weight",
  * which must be provided.
  */
-void transfun_2d_cloud_sample_mymodel(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
+void gen_2d_cloud_sample_mymodel(const void *pm, int flag_save)
 {
   int i, j, nc;
   double r, phi, cos_phi, sin_phi, dis, Lopn_cos;

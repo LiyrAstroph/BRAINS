@@ -33,7 +33,7 @@
 /* 
  * This function caclulate 1d transfer function.
  */
-void transfun_1d_cloud_sample_model1(const void *pm, int flag_save)
+void gen_1d_cloud_sample_model1(const void *pm, int flag_save)
 {
   int i, nc;
   double r, phi, dis, Lopn_cos;
@@ -124,7 +124,7 @@ void transfun_1d_cloud_sample_model1(const void *pm, int flag_save)
  * This function calculate 2d transfer function at velocity grid "transv" and time grid "TransTau" . 
  * Note that time-lag grid is already set by parset.n_tau.
  */
-void transfun_2d_cloud_sample_model1(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
+void gen_2d_cloud_sample_model1(const void *pm, int flag_save)
 {
   int i, j, nc;
   double r, phi, dis, Lopn_cos, u;
@@ -280,7 +280,7 @@ void transfun_2d_cloud_sample_model1(const void *pm, double *transv, double *tra
  * This function calculate 2d transfer function at velocity grid "transv" and time grid "TransTau" . 
  * Note that time-lag grid is already set by parset.n_tau.
  */
-void transfun_2d_cloud_sample_model2(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
+void gen_2d_cloud_sample_model2(const void *pm, int flag_save)
 {
   int i, j, nc;
   double r, phi, dis, Lopn_cos;
@@ -423,7 +423,7 @@ void transfun_2d_cloud_sample_model2(const void *pm, double *transv, double *tra
 /* 
  * This function calculate 1d transfer function.
  */
-void transfun_1d_cloud_sample_model3(const void *pm, int flag_save)
+void gen_1d_cloud_sample_model3(const void *pm, int flag_save)
 {
   int i, nc;
   double r, phi, dis, Lopn_cos;
@@ -512,7 +512,7 @@ void transfun_1d_cloud_sample_model3(const void *pm, int flag_save)
  * This function calculate 2d transfer function at velocity grid "transv" and time grid "TransTau" . 
  * Note that time-lag grid is already set by parset.n_tau.
  */
-void transfun_2d_cloud_sample_model3(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
+void gen_2d_cloud_sample_model3(const void *pm, int flag_save)
 {
   int i, j, nc;
   double r, phi, dis, Lopn_cos;
@@ -647,7 +647,7 @@ void transfun_2d_cloud_sample_model3(const void *pm, double *transv, double *tra
  * This function calculate 2d transfer function at velocity grid "transv" and time grid "TransTau" . 
  * Note that time-lag grid is already set by parset.n_tau.
  */
-void transfun_2d_cloud_sample_model4(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
+void gen_2d_cloud_sample_model4(const void *pm, int flag_save)
 {
   int i, j, nc;
   double r, phi, dis, Lopn_cos;
@@ -789,7 +789,7 @@ void transfun_2d_cloud_sample_model4(const void *pm, double *transv, double *tra
 /* 
  * This function caclulate 1d transfer function.
  */
-void transfun_1d_cloud_sample_model5(const void *pm, int flag_save)
+void gen_1d_cloud_sample_model5(const void *pm, int flag_save)
 {
   int i, nc;
   double r, phi, dis, Lopn_cos;
@@ -900,7 +900,7 @@ void transfun_1d_cloud_sample_model5(const void *pm, int flag_save)
 /* 
  * This function caclulate 1d transfer function.
  */
-void transfun_2d_cloud_sample_model5(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
+void gen_2d_cloud_sample_model5(const void *pm, int flag_save)
 {
   int i, j, nc;
   double r, phi, cos_phi, sin_phi, dis, Lopn_cos;
@@ -1097,7 +1097,7 @@ void transfun_2d_cloud_sample_model5(const void *pm, double *transv, double *tra
 /* 
  * This function caclulate 1d transfer function.
  */
-void transfun_1d_cloud_sample_model6(const void *pm, int flag_save)
+void gen_1d_cloud_sample_model6(const void *pm, int flag_save)
 {
   int i, nc;
   double r, phi, dis, Lopn_cos;
@@ -1199,7 +1199,7 @@ void transfun_1d_cloud_sample_model6(const void *pm, int flag_save)
 /* 
  * This function caclulate 2d transfer function.
  */
-void transfun_2d_cloud_sample_model6(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
+void gen_2d_cloud_sample_model6(const void *pm, int flag_save)
 {
   int i, j, nc;
   double r, phi, cos_phi, sin_phi, dis, Lopn_cos;
@@ -1391,7 +1391,7 @@ void transfun_2d_cloud_sample_model6(const void *pm, double *transv, double *tra
 /* 
  * This function caclulate 1d transfer function.
  */
-void transfun_1d_cloud_sample_model7(const void *pm, int flag_save)
+void gen_1d_cloud_sample_model7(const void *pm, int flag_save)
 {
   int i, nc, num_sh;
   double r, phi, dis, Lopn_cos;
@@ -1570,7 +1570,7 @@ void transfun_1d_cloud_sample_model7(const void *pm, int flag_save)
 /* 
  * This function caclulate 2d transfer function.
  */
-void transfun_2d_cloud_sample_model7(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
+void gen_2d_cloud_sample_model7(const void *pm, int flag_save)
 {
   int i, j, nc, num_sh;
   double r, phi, dis, Lopn_cos, cos_phi, sin_phi;
@@ -1892,7 +1892,7 @@ void transfun_2d_cloud_sample_model7(const void *pm, double *transv, double *tra
 /*!
  *
  */
-void transfun_1d_cloud_sample_model8(const void *pm, int flag_save)
+void gen_1d_cloud_sample_model8(const void *pm, int flag_save)
 {
   int i;
   double theta_min, theta_max, r_min, r_max, Rblr, Rv, mbh, alpha, gamma, xi, lambda, k;
@@ -1979,7 +1979,7 @@ void transfun_1d_cloud_sample_model8(const void *pm, int flag_save)
 /* 
  * This function caclulate 2d transfer function.
  */
-void transfun_2d_cloud_sample_model8(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
+void gen_2d_cloud_sample_model8(const void *pm, int flag_save)
 {
   int i;
   double theta_min, theta_max, r_min, r_max, Rblr, Rv, mbh, alpha, gamma, xi, lambda, k;
