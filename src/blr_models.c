@@ -30,101 +30,11 @@
  * dynamics: elliptical orbits
  *================================================================
  */
-/* 
- * This function caclulate 1d transfer function.
- */
-void gen_1d_cloud_sample_model1(const void *pm, int flag_save)
-{
-  int i, nc;
-  double r, phi, dis, Lopn_cos;
-  double x, y, z, xb, yb, zb, zb0;
-  double inc, F, beta, mu, k, a, s, rin, sig;
-  double Lphi, Lthe;
-  double weight, rnd;
-  BLRmodel1 *model = (BLRmodel1 *)pm;
-
-  Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
-  inc = acos(model->inc);         /* inclination angle in rad */
-  beta = model->beta;         
-  F = model->F;
-  mu = exp(model->mu);                 /* mean radius */
-  k = model->k;  
-
-  a = 1.0/beta/beta;
-  s = mu/a;
-  rin=mu*F;
-  sig=(1.0-F)*s;
-  
-  for(i=0; i<parset.n_cloud_per_task; i++)
-  {
-    /* generate a direction of the angular momentum of the orbit  */
-    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
-
-    nc = 0;
-    r = rcloud_max_set+1.0;
-    while(r>rcloud_max_set || r<rcloud_min_set)
-    {
-      if(nc > 1000)
-      {
-        printf("# Error, too many tries in generating ridial location of clouds.\n");
-        exit(0);
-      }
-      rnd = gsl_ran_gamma(gsl_r, a, 1.0);
-//    r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
-      r = rin + sig * rnd;
-      nc++;
-    }
-    phi = 2.0*PI * gsl_rng_uniform(gsl_r);
-
-    /* Polar coordinates to Cartesian coordinate */
-    x = r * cos(phi); 
-    y = r * sin(phi);
-    z = 0.0;
-
-   /* right-handed framework
-    * first rotate around y axis by an angle of Lthe, then rotate around z axis 
-    * by an angle of Lphi
-    */
-  
-  /*xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
-    yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
-    zb = sin(Lthe) * x + cos(Lthe) * z; */
-    
-    xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y;
-    yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y;
-    zb = sin(Lthe) * x;
-
-    zb0 = zb;
-    if(zb0 < 0.0)
-      zb = -zb;
-
-    /* counter-rotate around y, LOS is x-axis */
-    x = xb * cos(PI/2.0-inc) + zb * sin(PI/2.0-inc);
-    y = yb;
-    z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
-
-    dis = r - x;
-    weight = 0.5 + k*(x/r);
-    clouds_tau[i] = dis;
-    clouds_weight[i] = weight;
-
-    if(flag_save && thistask==roottask)
-    {
-      if(i%(icr_cloud_save) == 0)
-        fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
-    }
-  }
-  
-  return;
-}
-
-
 /*! 
  * This function calculate 2d transfer function at velocity grid "transv" and time grid "TransTau" . 
  * Note that time-lag grid is already set by parset.n_tau.
  */
-void gen_2d_cloud_sample_model1(const void *pm, int flag_save)
+void gen_cloud_sample_model1(const void *pm, int flag_type, int flag_save)
 {
   int i, j, nc;
   double r, phi, dis, Lopn_cos, u;
@@ -199,6 +109,16 @@ void gen_2d_cloud_sample_model1(const void *pm, int flag_save)
     weight = 0.5 + k*(x/r);
     clouds_tau[i] = dis;
     clouds_weight[i] = weight;
+
+    if(flag_type == 1)
+    {
+      if(flag_save && thistask==roottask)
+      {
+        if(i%(icr_cloud_save) == 0)
+          fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+      }
+      continue;
+    }
     
     /* velocity  
      * note that a cloud moves in its orbit plane, whose direction
@@ -280,7 +200,7 @@ void gen_2d_cloud_sample_model1(const void *pm, int flag_save)
  * This function calculate 2d transfer function at velocity grid "transv" and time grid "TransTau" . 
  * Note that time-lag grid is already set by parset.n_tau.
  */
-void gen_2d_cloud_sample_model2(const void *pm, int flag_save)
+void gen_cloud_sample_model2(const void *pm, int flag_type, int flag_save)
 {
   int i, j, nc;
   double r, phi, dis, Lopn_cos;
@@ -356,7 +276,16 @@ void gen_2d_cloud_sample_model2(const void *pm, int flag_save)
     weight = 0.5 + k*(x/r);
     clouds_tau[i] = dis;
     clouds_weight[i] = weight;
-    
+
+    if(flag_type == 1)
+    {
+      if(flag_save && thistask==roottask)
+      {
+        if(i%(icr_cloud_save) == 0)
+          fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+      }
+      continue;
+    }
     
     /* velocity  
      * note that a cloud moves in its orbit plane, whose direction
@@ -420,99 +349,11 @@ void gen_2d_cloud_sample_model2(const void *pm, int flag_save)
  *====================================================================
  */
 
-/* 
- * This function calculate 1d transfer function.
- */
-void gen_1d_cloud_sample_model3(const void *pm, int flag_save)
-{
-  int i, nc;
-  double r, phi, dis, Lopn_cos;
-  double x, y, z, xb, yb, zb, zb0;
-  double inc, F, alpha, Rin, k;
-  double Lphi, Lthe;
-  double weight, rnd;
-  BLRmodel3 *model = (BLRmodel3 *)pm;
-
-  Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
-  inc = acos(model->inc);         /* inclination angle in rad */
-  alpha = model->alpha;         
-  F = exp(model->F);
-  Rin = exp(model->Rin);                 /* mean radius */
-  k = model->k;  
-  
-  if(F*Rin > rcloud_max_set)
-    F = rcloud_max_set/Rin;
-
-  for(i=0; i<parset.n_cloud_per_task; i++)
-  {
-    /* generate a direction of the angular momentum of the orbit */
-    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
-    
-    nc = 0;
-    r = rcloud_max_set+1.0;
-    while(r>rcloud_max_set || r<rcloud_min_set)
-    {
-      if(nc > 1000)
-      {
-        printf("# Error, too many tries in generating ridial location of clouds.\n");
-        exit(0);
-      }
-      if(fabs(1.0-alpha) > 1.0e-4)
-        rnd = pow( gsl_rng_uniform(gsl_r) * ( pow(F, 1.0-alpha) - 1.0) + 1.0,  1.0/(1.0-alpha) );
-      else
-       rnd = exp( gsl_rng_uniform(gsl_r) * log(F) );
-      r = Rin * rnd ;
-      nc++;
-    }
-    phi = 2.0*PI * gsl_rng_uniform(gsl_r);
-
-    /* Polar coordinates to Cartesian coordinate */
-    x = r * cos(phi); 
-    y = r * sin(phi);
-    z = 0.0;
-
-    /* right-handed framework
-     * first rotate around y axis by an angle of Lthe, then rotate around z axis 
-     * by an angle of Lphi
-     */
-  /*xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
-    yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
-    zb = sin(Lthe) * x + cos(Lthe) * z;*/
-
-    xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y;
-    yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y;
-    zb = sin(Lthe) * x;
-
-    zb0 = zb;
-    if(zb0 < 0.0)
-      zb = -zb;
-
-    /* counter-rotate around y, LOS is x-axis */
-    x = xb * cos(PI/2.0-inc) + zb * sin(PI/2.0-inc);
-    y = yb;
-    z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
-
-    dis = r - x;
-    weight = 0.5 + k*(x/r);
-    clouds_tau[i] = dis;
-    clouds_weight[i] = weight;
-
-    if(flag_save && thistask==roottask)
-    {
-      if(i%(icr_cloud_save) == 0)
-        fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
-    }
-  }
-
-  return;
-}
-
 /*! 
  * This function calculate 2d transfer function at velocity grid "transv" and time grid "TransTau" . 
  * Note that time-lag grid is already set by parset.n_tau.
  */
-void gen_2d_cloud_sample_model3(const void *pm, int flag_save)
+void gen_cloud_sample_model3(const void *pm, int flag_type, int flag_save)
 {
   int i, j, nc;
   double r, phi, dis, Lopn_cos;
@@ -588,6 +429,16 @@ void gen_2d_cloud_sample_model3(const void *pm, int flag_save)
     weight = 0.5 + k*(x/r);
     clouds_tau[i] = dis;
     clouds_weight[i] = weight;
+
+    if(flag_type == 1)
+    {
+      if(flag_save && thistask==roottask)
+      {
+        if(i%(icr_cloud_save) == 0)
+          fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+      }
+      continue;
+    }
     
 // velocity  
 // note that a cloud moves in its orbit plane, whose direction
@@ -647,7 +498,7 @@ void gen_2d_cloud_sample_model3(const void *pm, int flag_save)
  * This function calculate 2d transfer function at velocity grid "transv" and time grid "TransTau" . 
  * Note that time-lag grid is already set by parset.n_tau.
  */
-void gen_2d_cloud_sample_model4(const void *pm, int flag_save)
+void gen_cloud_sample_model4(const void *pm, int flag_type, int flag_save)
 {
   int i, j, nc;
   double r, phi, dis, Lopn_cos;
@@ -723,6 +574,16 @@ void gen_2d_cloud_sample_model4(const void *pm, int flag_save)
     weight = 0.5 + k*(x/r);
     clouds_tau[i] = dis;
     clouds_weight[i] = weight;
+
+    if(flag_type == 1)
+    {
+      if(flag_save && thistask==roottask)
+      {
+        if(i%(icr_cloud_save) == 0)
+          fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+      }
+      continue;
+    }
     
 // velocity  
 // note that a cloud moves in its orbit plane, whose direction
@@ -789,118 +650,7 @@ void gen_2d_cloud_sample_model4(const void *pm, int flag_save)
 /* 
  * This function caclulate 1d transfer function.
  */
-void gen_1d_cloud_sample_model5(const void *pm, int flag_save)
-{
-  int i, nc;
-  double r, phi, dis, Lopn_cos;
-  double x, y, z, xb, yb, zb, zb0;
-  double inc, Fin, Fout, alpha, k, gam, mu, xi;
-  double Lphi, Lthe, cos_Lphi, sin_Lphi, cos_Lthe, sin_Lthe, cos_inc_cmp, sin_inc_cmp;
-  double weight, rndr, rnd, rnd_xi, rnd_frac, frac1, frac2, ratio;
-  BLRmodel5 *model = (BLRmodel5 *)pm;
-
-  Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
-  inc = acos(model->inc);         /* inclination angle in rad */
-  alpha = model->alpha;         
-  Fin = model->Fin;
-  Fout = exp(model->Fout);                 
-  mu = exp(model->mu);            /* mean radius */
-  k = model->k;  
-  gam = model-> gam;
-  xi = model->xi;
-  
-
-  if(mu*Fout > rcloud_max_set) // cloud radius samller than rcloud_max_set
-    Fout = rcloud_max_set/mu;
-
-  frac1 = 1.0/(alpha+1.0) * (1.0 - pow(Fin, alpha+1.0));
-  frac2 = 1.0/(alpha-1.0) * (1.0 - pow(Fout, -alpha+1.0));
-  ratio = frac1/(frac1 + frac2);
-
-  sin_inc_cmp = cos(inc);//sin(PI/2.0 - inc);
-  cos_inc_cmp = sin(inc);//cos(PI/2.0 - inc);
-  
-  for(i=0; i<parset.n_cloud_per_task; i++)
-  {
-// generate a direction of the angular momentum of the orbit   
-    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_r), gam));
-    cos_Lphi = cos(Lphi);
-    sin_Lphi = sin(Lphi);
-    cos_Lthe = cos(Lthe);
-    sin_Lthe = sin(Lthe);
-    
-    nc = 0;
-    r = rcloud_max_set+1.0;
-    while(r>rcloud_max_set || r<rcloud_min_set)
-    {
-      if(nc > 1000)
-      {
-        printf("# Error, too many tries in generating ridial location of clouds.\n");
-        exit(0);
-      }
-        
-      rnd_frac = gsl_rng_uniform(gsl_r);
-      rnd = gsl_rng_uniform(gsl_r);
-      if(rnd_frac < ratio)
-      {
-        rndr = pow( 1.0 - rnd * (1.0 - pow(Fin, alpha+1.0)), 1.0/(1.0+alpha));
-      }
-      else
-      {
-        rndr = pow( 1.0 - rnd * (1.0 - pow(Fout, -alpha+1.0)), 1.0/(1.0-alpha));
-      }
-      r = rndr*mu;
-      nc++;
-    }
-    phi = 2.0*PI * gsl_rng_uniform(gsl_r);
-
-    /* Polar coordinates to Cartesian coordinate */
-    x = r * cos(phi); 
-    y = r * sin(phi);
-    z = 0.0;
-
-/* right-handed framework
- * first rotate around y axis by an angle of Lthe, then rotate around z axis 
- * by an angle of Lphi
- */
-  /*xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
-    yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
-    zb = sin(Lthe) * x + cos(Lthe) * z;*/
-
-    xb = cos_Lthe*cos_Lphi * x + sin_Lphi * y;
-    yb =-cos_Lthe*sin_Lphi * x + cos_Lphi * y;
-    zb = sin_Lthe * x;
-    
-    zb0 = zb;
-    rnd_xi = gsl_rng_uniform(gsl_r);
-    if( (rnd_xi < 1.0 - xi) && zb0 < 0.0)
-      zb = -zb;
-
-// counter-rotate around y, LOS is x-axis 
-    x = xb * cos_inc_cmp + zb * sin_inc_cmp;
-    y = yb;
-    z =-xb * sin_inc_cmp + zb * cos_inc_cmp;
-
-    dis = r - x;
-    weight = 0.5 + k*(x/r);
-    clouds_tau[i] = dis;
-    clouds_weight[i] = weight;
-
-    if(flag_save && thistask==roottask)
-    {
-      if(i%(icr_cloud_save) == 0)
-        fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
-    }
-  }
-
-  return;
-}
-
-/* 
- * This function caclulate 1d transfer function.
- */
-void gen_2d_cloud_sample_model5(const void *pm, int flag_save)
+void gen_cloud_sample_model5(const void *pm, int flag_type, int flag_save)
 {
   int i, j, nc;
   double r, phi, cos_phi, sin_phi, dis, Lopn_cos;
@@ -1014,6 +764,16 @@ void gen_2d_cloud_sample_model5(const void *pm, int flag_save)
     clouds_tau[i] = dis;
     clouds_weight[i] = weight;
 
+    if(flag_type == 1)
+    {
+      if(flag_save && thistask==roottask)
+      {
+        if(i%(icr_cloud_save) == 0)
+          fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+      }
+      continue;
+    }
+
     Vkep = sqrt(mbh/r);
 
     for(j=0; j<parset.n_vel_per_cloud; j++)
@@ -1095,111 +855,9 @@ void gen_2d_cloud_sample_model5(const void *pm, int flag_save)
  *================================================================
  */
 /* 
- * This function caclulate 1d transfer function.
- */
-void gen_1d_cloud_sample_model6(const void *pm, int flag_save)
-{
-  int i, nc;
-  double r, phi, dis, Lopn_cos;
-  double x, y, z, xb, yb, zb, zb0;
-  double inc, F, beta, mu, k, gam, xi, a, s, rin, sig;
-  double Lphi, Lthe, sin_Lphi, cos_Lphi, sin_Lthe, cos_Lthe, sin_inc_cmp, cos_inc_cmp;
-  double weight, rnd, rnd_xi;
-  BLRmodel6 *model = (BLRmodel6 *)pm;
-
-  Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
-  inc = acos(model->inc);         /* inclination angle in rad */
-  beta = model->beta;         
-  F = model->F;
-  mu = exp(model->mu);                 /* mean radius */
-  k = model->k;  
-  gam = model-> gam;
-  xi = model->xi;
-
-  a = 1.0/beta/beta;
-  s = mu/a;
-  rin=mu*F;
-  sig=(1.0-F)*s;
-
-  sin_inc_cmp = cos(inc);//sin(PI/2.0 - inc);
-  cos_inc_cmp = sin(inc);//cos(PI/2.0 - inc);
-
-  for(i=0; i<parset.n_cloud_per_task; i++)
-  {
-// generate a direction of the angular momentum of the orbit   
-    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_r), gam));
-    sin_Lphi = sin(Lphi);
-    cos_Lphi = cos(Lphi);
-    sin_Lthe = sin(Lthe);
-    cos_Lthe = cos(Lthe);
-
-    nc = 0;
-    r = rcloud_max_set+1.0;
-    while(r>rcloud_max_set || r<rcloud_min_set)
-    {
-      if(nc > 1000)
-      {
-        printf("# Error, too many tries in generating ridial location of clouds.\n");
-        exit(0);
-      }
-      rnd = gsl_ran_gamma(gsl_r, a, 1.0);
-//    r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
-      r = rin + sig * rnd;
-      nc++;
-    }
-    phi = 2.0*PI * gsl_rng_uniform(gsl_r);
-
-    /* Polar coordinates to Cartesian coordinates */
-    x = r * cos(phi); 
-    y = r * sin(phi);
-    z = 0.0;
-
-/* right-handed framework
- * first rotate around y axis by an angle of Lthe, then rotate around z axis 
- * by an angle of Lphi
- */
-  /*xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
-    yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
-    zb = sin(Lthe) * x + cos(Lthe) * z; */
-    
-    xb = cos_Lthe*cos_Lphi * x + sin_Lphi * y;
-    yb =-cos_Lthe*sin_Lphi * x + cos_Lphi * y;
-    zb = sin_Lthe * x;
-
-    zb0 = zb;
-    rnd_xi = gsl_rng_uniform(gsl_r);
-    if( (rnd_xi < 1.0 - xi) && zb0 < 0.0)
-      zb = -zb;
-
-// counter-rotate around y, LOS is x-axis 
-    /*x = xb * cos(PI/2.0-inc) + zb * sin(PI/2.0-inc);
-    y = yb;
-    z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc); */
-
-    x = xb * cos_inc_cmp + zb * sin_inc_cmp;
-    y = yb;
-    z =-xb * sin_inc_cmp + zb * cos_inc_cmp;
-
-    dis = r - x;
-    weight = 0.5 + k*(x/r);    
-    clouds_tau[i] = dis;
-    clouds_weight[i] = weight;
-
-    if(flag_save && thistask==roottask)
-    {
-      if(i%(icr_cloud_save) == 0)
-        fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
-    }
-  }
-
-  return;
-}
-
-/* 
  * This function caclulate 2d transfer function.
  */
-void gen_2d_cloud_sample_model6(const void *pm, int flag_save)
+void gen_cloud_sample_model6(const void *pm, int flag_type, int flag_save)
 {
   int i, j, nc;
   double r, phi, cos_phi, sin_phi, dis, Lopn_cos;
@@ -1304,6 +962,16 @@ void gen_2d_cloud_sample_model6(const void *pm, int flag_save)
     clouds_tau[i] = dis;
     clouds_weight[i] = weight;
 
+    if(flag_type == 1)
+    {
+      if(flag_save && thistask==roottask)
+      {
+        if(i%(icr_cloud_save) == 0)
+          fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+      }
+      continue;
+    }
+
     Vkep = sqrt(mbh/r);
     
     for(j=0; j<parset.n_vel_per_cloud; j++)
@@ -1389,188 +1057,9 @@ void gen_2d_cloud_sample_model6(const void *pm, int flag_save)
  *================================================================
  */
 /* 
- * This function caclulate 1d transfer function.
- */
-void gen_1d_cloud_sample_model7(const void *pm, int flag_save)
-{
-  int i, nc, num_sh;
-  double r, phi, dis, Lopn_cos;
-  double x, y, z, xb, yb, zb, zb0;
-  double inc, F, beta, mu, k, gam, xi, a, s, rin, sig;
-  double Lphi, Lthe, sin_Lphi, cos_Lphi, sin_Lthe, cos_Lthe, sin_inc_cmp, cos_inc_cmp;
-  double weight, rnd, rnd_xi;
-  BLRmodel7 *model = (BLRmodel7 *)pm;
-
-  Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
-  inc = acos(model->inc);         /* inclination angle in rad */
-  beta = model->beta;         
-  F = model->F;
-  mu = exp(model->mu);                 /* mean radius */
-  k = model->k;  
-  gam = model-> gam;
-  xi = model->xi;
-
-  a = 1.0/beta/beta;
-  s = mu/a;
-  rin=mu*F;
-  sig=(1.0-F)*s;
-
-  sin_inc_cmp = cos(inc); //sin(PI/2.0 - inc);
-  cos_inc_cmp = sin(inc); //cos(PI/2.0 - inc);
-
-  
-  /* number of particles in first region */
-  
-  num_sh = (int)(parset.n_cloud_per_task * model->fsh);
-
-  for(i=0; i<num_sh; i++)
-  {
-    /* generate a direction of the angular momentum of the orbit */ 
-    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_r), gam));
-    sin_Lphi = sin(Lphi);
-    cos_Lphi = cos(Lphi);
-    sin_Lthe = sin(Lthe);
-    cos_Lthe = cos(Lthe);
-
-    nc = 0;
-    r = rcloud_max_set+1.0;
-    while(r>rcloud_max_set || r<rcloud_min_set)
-    {
-      if(nc > 1000)
-      {
-        printf("# Error, too many tries in generating ridial location of clouds.\n");
-        exit(0);
-      }
-      rnd = gsl_ran_gamma(gsl_r, a, 1.0);
-//    r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
-      r = rin + sig * rnd;
-      nc++;
-    }
-    phi = 2.0*PI * gsl_rng_uniform(gsl_r);
-
-    /* Polar coordinates to Cartesian coordinates */
-    x = r * cos(phi); 
-    y = r * sin(phi);
-    z = 0.0;
-
-/* right-handed framework
- * first rotate around y axis by an angle of Lthe, then rotate around z axis 
- * by an angle of Lphi
- */
-  /*xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
-    yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
-    zb = sin(Lthe) * x + cos(Lthe) * z; */
-    
-    xb = cos_Lthe*cos_Lphi * x + sin_Lphi * y;
-    yb =-cos_Lthe*sin_Lphi * x + cos_Lphi * y;
-    zb = sin_Lthe * x;
-
-    zb0 = zb;
-    rnd_xi = gsl_rng_uniform(gsl_r);
-    if( (rnd_xi < 1.0 - xi) && zb0 < 0.0)
-      zb = -zb;
-
-// counter-rotate around y, LOS is x-axis 
-    x = xb * cos_inc_cmp + zb * sin_inc_cmp;
-    y = yb;
-    z =-xb * sin_inc_cmp + zb * cos_inc_cmp;
-
-    dis = r - x;
-    weight = 0.5 + k*(x/r);
-    clouds_tau[i] = dis;
-    clouds_weight[i] = weight;
-
-    if(flag_save && thistask==roottask)
-    {
-      if(i%(icr_cloud_save) == 0)
-        fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
-    }
-  }
-
-  /* second BLR region */
-  rin = exp(model->mu_un) * model->F_un;
-  a = 1.0/(model->beta_un * model->beta_un);
-  sig = exp(model->mu_un) * (1.0-model->F_un)/a;
-  double Lopn_cos_un1, Lopn_cos_un2;
-  Lopn_cos_un1 = Lopn_cos;
-  if(model->opn + model->opn_un < 90.0)
-    Lopn_cos_un2 = cos((model->opn + model->opn_un)/180.0*PI);
-  else
-    Lopn_cos_un2 = 0.0;
-
-  for(i=num_sh; i<parset.n_cloud_per_task; i++)
-  {
-    /* generate a direction of the angular momentum of the orbit  */ 
-    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    Lthe = acos(Lopn_cos_un2 + (Lopn_cos_un1-Lopn_cos_un2) * pow(gsl_rng_uniform(gsl_r), gam));
-    sin_Lphi = sin(Lphi);
-    cos_Lphi = cos(Lphi);
-    sin_Lthe = sin(Lthe);
-    cos_Lthe = cos(Lthe);
-
-    nc = 0;
-    r = rcloud_max_set+1.0;
-    while(r>rcloud_max_set || r<rcloud_min_set)
-    {
-      if(nc > 1000)
-      {
-        printf("# Error, too many tries in generating ridial location of clouds.\n");
-        exit(0);
-      }
-      rnd = gsl_ran_gamma(gsl_r, a, 1.0);
-//    r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
-      r = rin + sig * rnd;
-      nc++;
-    }
-    phi = 2.0*PI * gsl_rng_uniform(gsl_r);
-
-    /* Polar coordinates to Cartesian coordinates */
-    x = r * cos(phi); 
-    y = r * sin(phi);
-    z = 0.0;
-
-/* right-handed framework
- * first rotate around y axis by an angle of Lthe, then rotate around z axis 
- * by an angle of Lphi
- */
-  /*xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
-    yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
-    zb = sin(Lthe) * x + cos(Lthe) * z; */
-    
-    xb = cos_Lthe*cos_Lphi * x + sin_Lphi * y;
-    yb =-cos_Lthe*sin_Lphi * x + cos_Lphi * y;
-    zb = sin_Lthe * x;
-
-    zb0 = zb;
-    rnd_xi = gsl_rng_uniform(gsl_r);
-    if( (rnd_xi < 1.0 - xi) && zb0 < 0.0)
-      zb = -zb;
-
-// counter-rotate around y, LOS is x-axis 
-    x = xb * cos_inc_cmp + zb * sin_inc_cmp;
-    y = yb;
-    z =-xb * sin_inc_cmp + zb * cos_inc_cmp;
-
-    dis = r - x;
-    weight = 0.5 + k*(x/r);
-    clouds_tau[i] = dis;
-    clouds_weight[i] = weight;
-
-    if(flag_save && thistask==roottask)
-    {
-      if(i%(icr_cloud_save) == 0)
-        fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
-    }
-  }
-
-  return;
-}
-
-/* 
  * This function caclulate 2d transfer function.
  */
-void gen_2d_cloud_sample_model7(const void *pm, int flag_save)
+void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save)
 {
   int i, j, nc, num_sh;
   double r, phi, dis, Lopn_cos, cos_phi, sin_phi;
@@ -1673,6 +1162,16 @@ void gen_2d_cloud_sample_model7(const void *pm, int flag_save)
     weight = 0.5 + k*(x/r);
     clouds_tau[i] = dis;
     clouds_weight[i] = weight;
+
+    if(flag_type == 1)
+    {
+      if(flag_save && thistask==roottask)
+      {
+        if(i%(icr_cloud_save) == 0)
+          fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+      }
+      continue;
+    }
 
     Vkep = sqrt(mbh/r);
 
@@ -1816,7 +1315,16 @@ void gen_2d_cloud_sample_model7(const void *pm, int flag_save)
     weight = 0.5 + k*(x/r);
     clouds_tau[i] = dis;
     clouds_weight[i] = weight;
-
+    
+    if(flag_type == 1)
+    {
+      if(flag_save && thistask==roottask)
+      {
+        if(i%(icr_cloud_save) == 0)
+          fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+      }
+      continue;
+    }
 
     Vkep = sqrt(mbh/r);
 
@@ -1889,15 +1397,16 @@ void gen_2d_cloud_sample_model7(const void *pm, int flag_save)
   return;
 }
 
-/*!
- *
+
+/* 
+ * This function caclulate 2d transfer function.
  */
-void gen_1d_cloud_sample_model8(const void *pm, int flag_save)
+void gen_cloud_sample_model8(const void *pm, int flag_type, int flag_save)
 {
   int i;
   double theta_min, theta_max, r_min, r_max, Rblr, Rv, mbh, alpha, gamma, xi, lambda, k;
   double rnd, r, r0, theta, phi, xb, yb, zb, x, y, z, l, weight, sin_inc_cmp, cos_inc_cmp, inc;
-  double dis, density, vl, vesc, rnd_xi, zb0, lmax, R;
+  double dis, density, vl, vesc, Vr, Vph, vx, vy, vz, vxb, vyb, vzb, V, rnd_xi, zb0, lmax, R;
   double v0=6.0/VelUnit;
   BLRmodel8 *model=(BLRmodel8 *)pm;
 
@@ -1961,97 +1470,20 @@ void gen_1d_cloud_sample_model8(const void *pm, int flag_save)
     z =-xb * sin_inc_cmp + zb * cos_inc_cmp;
 
     R = sqrt(r*r + zb*zb);
-    weight = 0.5 + k*(x/R);;
-    dis = R - x;
-    clouds_tau[i] = dis;
-    clouds_weight[i] = weight * density;
-    
-    if(flag_save && thistask==roottask)
-    {
-      if(i%(icr_cloud_save) == 0)
-        fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
-    }
-  }
-
-  return;
-}
-
-/* 
- * This function caclulate 2d transfer function.
- */
-void gen_2d_cloud_sample_model8(const void *pm, int flag_save)
-{
-  int i;
-  double theta_min, theta_max, r_min, r_max, Rblr, Rv, mbh, alpha, gamma, xi, lambda, k;
-  double rnd, r, r0, theta, phi, xb, yb, zb, x, y, z, l, weight, sin_inc_cmp, cos_inc_cmp, inc;
-  double dis, density, vl, vesc, Vr, Vph, vx, vy, vz, vxb, vyb, vzb, V, rnd_xi, zb0, lmax, R;
-  double v0=6.0/VelUnit;
-  BLRmodel8 *model=(BLRmodel8 *)pm;
-
-  theta_min = model->theta_min/180.0 * PI;
-  theta_max = model->dtheta_max/180.0*PI + theta_min;
-  theta_max = fmin(theta_max, 0.5*PI);
-
-  r_min = exp(model->r_min);
-  r_max = model->fr_max * r_min;
-  if(r_max > 0.5*rcloud_max_set) r_max = 0.5*rcloud_max_set;
-  
-  gamma = model->gamma;
-  alpha = model->alpha;
-  lambda = model->lamda;
-  
-  k = model->k;
-  xi = model->xi;
-
-  Rv = exp(model->Rv);
-  Rblr = exp(model->Rblr);
-  if(Rblr < r_max) Rblr = r_max;
-  inc = acos(model->inc);
-  
-  mbh = exp(model->mbh);
-
-  sin_inc_cmp = cos(inc); //sin(PI/2.0 - inc);
-  cos_inc_cmp = sin(inc); //cos(PI/2.0 - inc);
-
-  for(i=0; i<parset.n_cloud_per_task; i++)
-  {
-    rnd = gsl_rng_uniform(gsl_r);
-    r0 = r_min +  rnd * (r_max - r_min);
-    theta = theta_min + (theta_max - theta_min) * pow(rnd, gamma); 
-    /* the maximum allowed value of l */
-    lmax = -r0*sin(theta) + sqrt(r0*r0*sin(theta)*sin(theta) + (Rblr*Rblr - r0*r0));
-    l = gsl_rng_uniform(gsl_r) * lmax;
-
-    r = l * sin(theta) + r0;
-    if(gsl_rng_uniform(gsl_r) < 0.5)
-      zb = l * cos(theta);
-    else
-      zb =-l * cos(theta);
-
-    phi = gsl_rng_uniform(gsl_r) * 2.0*PI;
-
-    xb = r * cos(phi);
-    yb = r * sin(phi);
-
-    zb0 = zb;
-    rnd_xi = gsl_rng_uniform(gsl_r);
-    if( (rnd_xi < 1.0 - xi) && zb0 < 0.0)
-      zb = -zb;
-
-    vesc = sqrt(2.0*mbh/r0);
-    vl = v0 + (vesc - v0) * pow(l/Rv, alpha)/(1.0 + pow(l/Rv, alpha));
-    density = pow(r0, lambda)/vl;
-
-    // counter-rotate around y, LOS is x-axis 
-    x = xb * cos_inc_cmp + zb * sin_inc_cmp;
-    y = yb;
-    z =-xb * sin_inc_cmp + zb * cos_inc_cmp;
-
-    R = sqrt(r*r + zb*zb);
     weight = 0.5 + k*(x/R);
     dis = R - x;
     clouds_tau[i] = dis;
     clouds_weight[i] = weight * density;
+
+    if(flag_type == 1)
+    {
+      if(flag_save && thistask==roottask)
+      {
+        if(i%(icr_cloud_save) == 0)
+          fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+      }
+      continue;
+    }
 
     Vr = vl * sin(theta);
     vzb = vl * cos(theta);
