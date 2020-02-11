@@ -75,14 +75,6 @@ void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl
 void (*transfun_1d_cal)(const void *pm, int flag_save);
 void transfun_1d_cal_cloud(const void *pm, int flag_save);
 
-void (*gen_1d_cloud_sample)(const void *pm, int flag_save);
-void gen_1d_cloud_sample_model1(const void *pm, int flag_save);
-void gen_1d_cloud_sample_model3(const void *pm, int flag_save);
-void gen_1d_cloud_sample_model5(const void *pm, int flag_save);
-void gen_1d_cloud_sample_model6(const void *pm, int flag_save);
-void gen_1d_cloud_sample_model7(const void *pm, int flag_save);
-void gen_1d_cloud_sample_model8(const void *pm, int flag_save);
-
 void postprocess1d();
 void set_par_range_model1d();
 void print_par_names_model1d();
@@ -102,15 +94,15 @@ void postprocess2d();
 void set_par_range_model2d();
 void print_par_names_model2d();
 
-void (*gen_2d_cloud_sample)(const void *pm, int flag_save);
-void gen_2d_cloud_sample_model1(const void *pm, int flag_save);
-void gen_2d_cloud_sample_model2(const void *pm, int flag_save);
-void gen_2d_cloud_sample_model3(const void *pm, int flag_save);
-void gen_2d_cloud_sample_model4(const void *pm, int flag_save);
-void gen_2d_cloud_sample_model5(const void *pm, int flag_save);
-void gen_2d_cloud_sample_model6(const void *pm, int flag_save);
-void gen_2d_cloud_sample_model7(const void *pm, int flag_save);
-void gen_2d_cloud_sample_model8(const void *pm, int flag_save);
+void (*gen_cloud_sample)(const void *pm, int flag_type, int flag_save);
+void gen_cloud_sample_model1(const void *pm, int flag_type, int flag_save);
+void gen_cloud_sample_model2(const void *pm, int flag_type, int flag_save);
+void gen_cloud_sample_model3(const void *pm, int flag_type, int flag_save);
+void gen_cloud_sample_model4(const void *pm, int flag_type, int flag_save);
+void gen_cloud_sample_model5(const void *pm, int flag_type, int flag_save);
+void gen_cloud_sample_model6(const void *pm, int flag_type, int flag_save);
+void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save);
+void gen_cloud_sample_model8(const void *pm, int flag_type, int flag_save);
 
 void (*transfun_2d_cal)(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save);
 void transfun_2d_cal_cloud(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save);

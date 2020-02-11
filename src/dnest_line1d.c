@@ -40,61 +40,61 @@ int dnest_line1d(int argc, char **argv)
 
     case 0: 
       num_params_blr_model = num_params_MyBLRmodel1d;
-      gen_1d_cloud_sample = gen_1d_cloud_sample_mymodel;
+      gen_cloud_sample = gen_cloud_sample_mymodel;
       transfun_1d_cal = transfun_1d_cal_cloud;
       break;
 
     case 1:
       num_params_blr_model = 6;
-      gen_1d_cloud_sample = gen_1d_cloud_sample_model1;
+      gen_cloud_sample = gen_cloud_sample_model1;
       transfun_1d_cal = transfun_1d_cal_cloud;
       break;
 
     case 2:
       num_params_blr_model = 6;
-      gen_1d_cloud_sample = gen_1d_cloud_sample_model1;
+      gen_cloud_sample = gen_cloud_sample_model1;
       transfun_1d_cal = transfun_1d_cal_cloud;
       break;
 
     case 3:
       num_params_blr_model = 6;
-      gen_1d_cloud_sample = gen_1d_cloud_sample_model3;
+      gen_cloud_sample = gen_cloud_sample_model3;
       transfun_1d_cal = transfun_1d_cal_cloud;
       break;
 
     case 4:
       num_params_blr_model = 6;
-      gen_1d_cloud_sample = gen_1d_cloud_sample_model3;
+      gen_cloud_sample = gen_cloud_sample_model3;
       transfun_1d_cal = transfun_1d_cal_cloud;
       break;
 
     case 5:
       num_params_blr_model = 9;
-      gen_1d_cloud_sample = gen_1d_cloud_sample_model5;
+      gen_cloud_sample = gen_cloud_sample_model5;
       transfun_1d_cal = transfun_1d_cal_cloud;
       break;
 
     case 6:
       num_params_blr_model = 8;
-      gen_1d_cloud_sample = gen_1d_cloud_sample_model6;
+      gen_cloud_sample = gen_cloud_sample_model6;
       transfun_1d_cal = transfun_1d_cal_cloud;
       break;
 
     case 7:
       num_params_blr_model = 13;
-      gen_1d_cloud_sample = gen_1d_cloud_sample_model7;
+      gen_cloud_sample = gen_cloud_sample_model7;
       transfun_1d_cal = transfun_1d_cal_cloud;
       break;
 
     case 8:
       num_params_blr_model = 13;
-      gen_1d_cloud_sample = gen_1d_cloud_sample_model8;
+      gen_cloud_sample = gen_cloud_sample_model8;
       transfun_1d_cal = transfun_1d_cal_cloud;
       break;
 
     default:
       num_params_blr_model = 6;
-      gen_1d_cloud_sample = gen_1d_cloud_sample_model1;
+      gen_cloud_sample = gen_cloud_sample_model1;
       transfun_1d_cal = transfun_1d_cal_cloud;
       break;
   }

@@ -233,7 +233,7 @@ void transfun_1d_cal_cloud(const void *pm, int flag_save)
   double Anorm, dis;
 
   /* generate cloud sample and calculate the corresponding time lags and weights */
-  gen_1d_cloud_sample(pm, flag_save);
+  gen_cloud_sample(pm, 1, flag_save);
 
   tau_min = clouds_tau[0];
   tau_max = clouds_tau[0];
@@ -298,7 +298,7 @@ void transfun_2d_cal_cloud(const void *pm, double *transv, double *trans2d, int 
   double Anorm, dis, V, dV;
 
   /* generate cloud sample and calculate the corresponding time lags, LOS velocity, and weights */
-  gen_2d_cloud_sample(pm, flag_save);
+  gen_cloud_sample(pm, 2, flag_save);
 
   tau_min = clouds_tau[0];
   tau_max = clouds_tau[0];

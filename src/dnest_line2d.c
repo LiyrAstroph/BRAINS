@@ -42,61 +42,61 @@ int dnest_line2d(int argc, char **argv)
 
     case 0:
       num_params_blr_model = num_params_MyBLRmodel2d;
-      gen_2d_cloud_sample = gen_2d_cloud_sample_mymodel;
+      gen_cloud_sample = gen_cloud_sample_mymodel;
       transfun_2d_cal = transfun_2d_cal_cloud;
       break;
 
     case 1:
       num_params_blr_model = sizeof(BLRmodel1)/sizeof(double);
-      gen_2d_cloud_sample = gen_2d_cloud_sample_model1;
+      gen_cloud_sample = gen_cloud_sample_model1;
       transfun_2d_cal = transfun_2d_cal_cloud;
       break;
 
     case 2:
       num_params_blr_model = sizeof(BLRmodel2)/sizeof(double);
-      gen_2d_cloud_sample = gen_2d_cloud_sample_model2;
+      gen_cloud_sample = gen_cloud_sample_model2;
       transfun_2d_cal = transfun_2d_cal_cloud;
       break;
 
     case 3:
       num_params_blr_model = sizeof(BLRmodel3)/sizeof(double);
-      gen_2d_cloud_sample = gen_2d_cloud_sample_model3;
+      gen_cloud_sample = gen_cloud_sample_model3;
       transfun_2d_cal = transfun_2d_cal_cloud;
       break;
 
     case 4:
       num_params_blr_model = sizeof(BLRmodel4)/sizeof(double);
-      gen_2d_cloud_sample = gen_2d_cloud_sample_model4;
+      gen_cloud_sample = gen_cloud_sample_model4;
       transfun_2d_cal = transfun_2d_cal_cloud;
       break;
 
     case 5:
       num_params_blr_model = sizeof(BLRmodel5)/sizeof(double);
-      gen_2d_cloud_sample = gen_2d_cloud_sample_model5;
+      gen_cloud_sample = gen_cloud_sample_model5;
       transfun_2d_cal = transfun_2d_cal_cloud;
       break;
     
     case 6:
       num_params_blr_model = sizeof(BLRmodel6)/sizeof(double);
-      gen_2d_cloud_sample = gen_2d_cloud_sample_model6;
+      gen_cloud_sample = gen_cloud_sample_model6;
       transfun_2d_cal = transfun_2d_cal_cloud;
       break;
     
     case 7:
       num_params_blr_model = sizeof(BLRmodel7)/sizeof(double);
-      gen_2d_cloud_sample = gen_2d_cloud_sample_model7;
+      gen_cloud_sample = gen_cloud_sample_model7;
       transfun_2d_cal = transfun_2d_cal_cloud;
       break;
 
     case 8:
       num_params_blr_model = sizeof(BLRmodel8)/sizeof(double);
-      gen_2d_cloud_sample = gen_2d_cloud_sample_model8;
+      gen_cloud_sample = gen_cloud_sample_model8;
       transfun_2d_cal = transfun_2d_cal_cloud;
       break;
 
     default:
       num_params_blr_model = sizeof(BLRmodel1)/sizeof(double);
-      gen_2d_cloud_sample = gen_2d_cloud_sample_model1;
+      gen_cloud_sample = gen_cloud_sample_model1;
       transfun_2d_cal = transfun_2d_cal_cloud;
       break;
   }
