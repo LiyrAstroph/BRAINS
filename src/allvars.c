@@ -130,6 +130,8 @@ gsl_interp  *gsl_linear;
 
 double PhaseFactor;
 
+int num_params_rm;
+int num_params_blr_tot;
 int num_params_sa, num_params_sa_blr_model, num_params_sa_extpar;
 int n_epoch_sa_data, n_vel_sa_data, n_base_sa_data;
 double *vel_sa_data, *base_sa_data, *Fline_sa_data, *Flerrs_sa_data, *phase_sa_data, *pherrs_sa_data;

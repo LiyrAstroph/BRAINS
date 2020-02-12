@@ -550,10 +550,9 @@ void read_data()
   // first need to determine the number of data points 
   if(thistask == roottask)
   {
-    
     int count;
     
-    if(parset.flag_dim >= -1 && error_flag == 0)
+    if(parset.flag_dim >= -1 && parset.flag_dim != 3 && error_flag == 0)
     { 
       // continuum file
       sprintf(fname, "%s/%s", parset.file_dir, parset.continuum_file);
@@ -581,7 +580,7 @@ void read_data()
       }
     }
 
-    if(parset.flag_dim == 1 && error_flag == 0)
+    if((parset.flag_dim == 1 || parset.flag_dim == 4) && error_flag == 0)
     {
       sprintf(fname, "%s/%s", parset.file_dir, parset.line_file);
     // emission flux line
@@ -608,7 +607,7 @@ void read_data()
       }
     }
 
-    if( (parset.flag_dim == 2 || parset.flag_dim == -1) && error_flag == 0 )
+    if( (parset.flag_dim == 2 || parset.flag_dim == -1 || parset.flag_dim == 5) && error_flag == 0 )
     {
       sprintf(fname, "%s/%s", parset.file_dir, parset.line2d_file);
       fp = fopen(fname, "r");
@@ -653,15 +652,17 @@ void read_data()
     exit(0);
   }
 
-  if(parset.flag_dim >= -1)
+  if(parset.flag_dim >= -1 && parset.flag_dim != 3)
   {
     MPI_Bcast(&n_con_data, 1, MPI_INT, roottask, MPI_COMM_WORLD);
   }
 
-  if(parset.flag_dim == 1 )
+  if(parset.flag_dim == 1 || parset.flag_dim == 4)
+  {
     MPI_Bcast(&n_line_data, 1, MPI_INT, roottask, MPI_COMM_WORLD);
+  }
 
-  if(parset.flag_dim == 2 || parset.flag_dim == -1)
+  if(parset.flag_dim == 2 || parset.flag_dim == -1 || parset.flag_dim == 5)
   {
     MPI_Bcast(&n_line_data, 1, MPI_INT, roottask, MPI_COMM_WORLD);
     MPI_Bcast(&n_vel_data, 1, MPI_INT, roottask, MPI_COMM_WORLD);
@@ -682,7 +683,7 @@ void read_data()
   allocate_memory_data();
 
   // now read data
-  if(parset.flag_dim >= -1)
+  if(parset.flag_dim >= -1 && parset.flag_dim != 3)
   {
     if(thistask == roottask)
     {
@@ -712,7 +713,7 @@ void read_data()
   }
 
   // read line
-  if(parset.flag_dim == 1)
+  if(parset.flag_dim == 1 || parset.flag_dim == 4)
   {
     if(thistask == roottask)
     {
@@ -760,7 +761,7 @@ void read_data()
   }
 
   // read 2d line data
-  if(parset.flag_dim == 2 || parset.flag_dim == -1)
+  if(parset.flag_dim == 2 || parset.flag_dim == -1 || parset.flag_dim == 5)
   {
     if(thistask == roottask)
     {
@@ -837,7 +838,7 @@ void read_data()
   }
 
   /* read instrument broadening data */
-  if(parset.flag_InstRes == 2 && parset.flag_dim == 2)
+  if(parset.flag_InstRes == 2 && (parset.flag_dim == 2 || parset.flag_dim == 5))
   {
     if(thistask == roottask)
     {
@@ -883,7 +884,7 @@ void read_data()
     MPI_Bcast(instres_err_epoch, n_line_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
   }
   /*uniform prior of line broadening*/
-  if(parset.flag_InstRes == 1 && parset.flag_dim == 2)
+  if(parset.flag_InstRes == 1 && (parset.flag_dim == 2 || parset.flag_dim == 5))
   {
     for(i=0; i<n_line_data; i++)
     {
@@ -970,21 +971,21 @@ void read_data()
  */
 void allocate_memory_data()
 {
-  if(parset.flag_dim >=-1)
+  if(parset.flag_dim >=-1 && parset.flag_dim != 3)
   {
     Tcon_data = malloc(n_con_data * sizeof(double));
     Fcon_data = malloc(n_con_data * sizeof(double));
     Fcerrs_data = malloc(n_con_data * sizeof(double));
   }
 
-  if(parset.flag_dim == 1)
+  if(parset.flag_dim == 1 || parset.flag_dim == 4)
   {
     Tline_data = malloc(n_line_data * sizeof(double));
     Fline_data = malloc(n_line_data * sizeof(double));
     Flerrs_data = malloc(n_line_data * sizeof(double));
   }
 
-  if(parset.flag_dim == 2 || parset.flag_dim == -1)
+  if(parset.flag_dim == 2 || parset.flag_dim == -1 || parset.flag_dim == 5)
   {
     Vline_data_ext = malloc(n_vel_data_ext * sizeof(double));
     Vline_data = Vline_data_ext + n_vel_data_incr;
@@ -996,7 +997,7 @@ void allocate_memory_data()
     Flerrs2d_data = malloc(n_line_data * n_vel_data * sizeof(double *));
   }
 
-  if(parset.flag_InstRes > 0 && parset.flag_dim == 2)
+  if(parset.flag_InstRes > 0 && (parset.flag_dim == 2 || parset.flag_dim == 5))
   {
     instres_epoch = malloc(n_line_data * sizeof(double));
     instres_err_epoch = malloc(n_line_data * sizeof(double));
@@ -1021,21 +1022,21 @@ void allocate_memory_data()
  */
 void free_memory_data()
 {
-  if(parset.flag_dim >=-1)
+  if(parset.flag_dim >=-1 && parset.flag_dim != 3)
   {
     free(Tcon_data);
     free(Fcon_data);
     free(Fcerrs_data);
   }
 
-  if(parset.flag_dim == 1)
+  if(parset.flag_dim == 1 || parset.flag_dim == 4)
   {
     free(Tline_data);
     free(Fline_data);
     free(Flerrs_data);
   }
 
-  if(parset.flag_dim == 2 || parset.flag_dim == -1)
+  if(parset.flag_dim == 2 || parset.flag_dim == -1 || parset.flag_dim == 5)
   {
     free(Vline_data_ext);
     free(Tline_data);
@@ -1047,7 +1048,7 @@ void free_memory_data()
   }
 
 
-  if(parset.flag_InstRes > 0 && parset.flag_dim == 2)
+  if(parset.flag_InstRes > 0 && (parset.flag_dim == 2 || parset.flag_dim == 5))
   {
     free(instres_epoch); 
     free(instres_err_epoch);

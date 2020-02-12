@@ -29,8 +29,8 @@ void calculate_sa_from_blrmodel(const void *pm)
   cos_PA = cos(PA);
   sin_PA = sin(PA);
 
-  gen_cloud_sample(pm, 3, 0);
-  
+  gen_sa_cloud_sample(pm, 3, 0);
+
   dV = vel_sa_data[1] - vel_sa_data[0];
   
   for(i=0; i<n_vel_sa_data; i++)
@@ -86,13 +86,13 @@ void calculate_sa_from_blrmodel(const void *pm)
     beta_cent[j] =  (beta_cent[j]/(phase_norm[j]+EPS)) / DA;
   }
   
-  /* phi = 2*pi * f_line * B/lambda * X/DA */
+  /* phi = -2*pi * f_line * B/lambda * X/DA */
   for(k=0; k<n_base_sa_data; k++)
   {
     for(j=0; j<n_vel_sa_data; j++)
     { 
       phase = base_sa_data[k*2] * alpha_cent[j] + base_sa_data[k*2 + 1] * beta_cent[j];
-      phase_sa[k*n_vel_sa_data + j] = Fline_sa[j] * phase;
+      phase_sa[k*n_vel_sa_data + j] = -Fline_sa[j]/(1.0+Fline_sa[j]) * phase;
     }
   }
 
@@ -512,6 +512,34 @@ void set_sa_blr_range_model8()
   //inc
   sa_blr_range_model[i][0] = 0.0;   // cos(inc)
   sa_blr_range_model[i++][1] = 1.0;
+  //mbh
+  sa_blr_range_model[i][0] = log(mass_range[0]);
+  sa_blr_range_model[i++][1] = log(mass_range[1]);
+
+  return;
+}
+
+// model 9
+void set_sa_blr_range_model9()
+{
+  int i;
+
+  i = 0;
+  //mu
+  sa_blr_range_model[i][0] = log(1.0);
+  sa_blr_range_model[i++][1] = log(rcloud_max_set*0.5);
+  //beta
+  sa_blr_range_model[i][0] = 0.001;
+  sa_blr_range_model[i++][1] = 2.0;
+  //F
+  sa_blr_range_model[i][0] = 0.001;
+  sa_blr_range_model[i++][1] = 0.999;
+  //inc
+  sa_blr_range_model[i][0] = 0.0;  // in cosine
+  sa_blr_range_model[i++][1] = 90.0;
+  //opn
+  sa_blr_range_model[i][0] = 0.0;  // in rad
+  sa_blr_range_model[i++][1] = 90.0;
   //mbh
   sa_blr_range_model[i][0] = log(mass_range[0]);
   sa_blr_range_model[i++][1] = log(mass_range[1]);

@@ -103,6 +103,10 @@ void init()
       BLRmodel_size = sizeof(BLRmodel8);
       set_blr_range_model = set_blr_range_model8;
       break;
+    case 9:
+      BLRmodel_size = sizeof(BLRmodel9);
+      set_blr_range_model = set_blr_range_model9;
+      break;
     default:
       BLRmodel_size = sizeof(BLRmodel1);
       set_blr_range_model = set_blr_range_model1;
@@ -150,6 +154,10 @@ void init()
       case 8:
         SABLRmodel_size = sizeof(SABLRmodel8);
         set_sa_blr_range_model = set_sa_blr_range_model8;
+        break;
+      case 9:
+        SABLRmodel_size = sizeof(SABLRmodel9);
+        set_sa_blr_range_model = set_sa_blr_range_model9;
         break;
       default:
         SABLRmodel_size = sizeof(SABLRmodel1);
@@ -202,176 +210,178 @@ void init()
   mass_range[1] = 1.0e3;
 
   /* default rcloud_max_set */
-  rcloud_max_set = 1.0e3;
-
+  rcloud_max_set = 1.0e4;
+  
+  /* not RM */
   if(parset.flag_dim != 3)
   {
-  if(parset.flag_dim >=-1)
-  {
-    /* set Larr_data */
-    for(i=0;i<n_con_data;i++)
+    if(parset.flag_dim >=-1)
     {
-      Larr_data[i*nq + 0]=1.0;
-      for(j=1; j<nq; j++)
-        Larr_data[i*nq + j] = pow(Tcon_data[i], j);
-    }
-  }
-
-  Tcad_data = 1.0;
-  Tspan_data = 1.0e4;
-  if(parset.flag_dim == 0)
-  {
-    /* set cadence and time span of data */
-    Tspan_data = (Tcon_data[n_con_data -1] - Tcon_data[0]);
-    Tspan_data_con = Tspan_data;
-    if(Tspan_data < 0.0)
-    {
-      if(thistask == roottask)
+      /* set Larr_data */
+      for(i=0;i<n_con_data;i++)
       {
-        printf("# Incorrect epochs in continuum, please check the input data.\n");
-        exit(0);
+        Larr_data[i*nq + 0]=1.0;
+        for(j=1; j<nq; j++)
+          Larr_data[i*nq + j] = pow(Tcon_data[i], j);
       }
     }
-    Tcad_data = Tspan_data;
-    for(i=1; i< n_con_data; i++)
+  
+    Tcad_data = 1.0;
+    Tspan_data = 1.0e4;
+    if(parset.flag_dim == 0)
     {
-      if(Tcad_data > Tcon_data[i] - Tcon_data[i-1])
-        Tcad_data = Tcon_data[i] - Tcon_data[i-1];
-    }
-  }
-
-  if(parset.flag_dim > 0 || parset.flag_dim == -1)
-  {   
-    /* set cadence and time span of data */
-    Tspan_data_con = (Tcon_data[n_con_data -1] - Tcon_data[0]);
-    Tspan_data = (Tline_data[n_line_data -1] - Tcon_data[0]);
-    if(Tspan_data < 0.0)
-    {
-      if(thistask == roottask)
+      /* set cadence and time span of data */
+      Tspan_data = (Tcon_data[n_con_data -1] - Tcon_data[0]);
+      Tspan_data_con = Tspan_data;
+      if(Tspan_data < 0.0)
       {
-        printf("# Incorrect epochs in continuum and line, please check the input data.\n");
-        exit(0);
+        if(thistask == roottask)
+        {
+          printf("# Incorrect epochs in continuum, please check the input data.\n");
+          exit(0);
+        }
+      }
+      Tcad_data = Tspan_data;
+      for(i=1; i< n_con_data; i++)
+      {
+        if(Tcad_data > Tcon_data[i] - Tcon_data[i-1])
+          Tcad_data = Tcon_data[i] - Tcon_data[i-1];
       }
     }
-    Tcad_data = Tspan_data;
-    for(i=1; i< n_con_data; i++)
-    {
-      if(Tcad_data > Tcon_data[i] - Tcon_data[i-1])
-        Tcad_data = Tcon_data[i] - Tcon_data[i-1];
-    }
-    for(i=1; i< n_line_data; i++)
-    {
-      if(Tcad_data > Tline_data[i] - Tline_data[i-1])
-        Tcad_data = Tline_data[i] - Tline_data[i-1];
+  
+    if(parset.flag_dim > 0 || parset.flag_dim == -1)
+    {   
+      /* set cadence and time span of data */
+      Tspan_data_con = (Tcon_data[n_con_data -1] - Tcon_data[0]);
+      Tspan_data = (Tline_data[n_line_data -1] - Tcon_data[0]);
+      if(Tspan_data < 0.0)
+      {
+        if(thistask == roottask)
+        {
+          printf("# Incorrect epochs in continuum and line, please check the input data.\n");
+          exit(0);
+        }
+      }
+      Tcad_data = Tspan_data;
+      for(i=1; i< n_con_data; i++)
+      {
+        if(Tcad_data > Tcon_data[i] - Tcon_data[i-1])
+          Tcad_data = Tcon_data[i] - Tcon_data[i-1];
+      }
+      for(i=1; i< n_line_data; i++)
+      {
+        if(Tcad_data > Tline_data[i] - Tline_data[i-1])
+          Tcad_data = Tline_data[i] - Tline_data[i-1];
+      }
+  
+      /* set mediate time of continuum data */
+      Tmed_data = 0.5*(Tcon_data[0] + Tcon_data[n_con_data-1]);
+  
+      for(i=0; i<num_params_difftrend; i++)
+      {
+        pow_Tcon_data[i] = (pow(Tcon_data[n_con_data-1]-Tmed_data, i+2) 
+                          - pow(Tcon_data[0]-Tmed_data, i+2)) / (i+2) / Tspan_data_con;
+      }
+      
+      /* set time back for continuum reconstruction */
+      time_back_set = Tspan_data_con + (Tcon_data[0] - Tline_data[0]);
+      time_back_set = fmax(2.0*Tcad_data, time_back_set);
+  
+      /* make rcloud_max and time_back consistent with each other, rcloud_max has a higher priority */
+      double DT=Tcon_data[0] - time_back_set;
+      if(parset.rcloud_max > 0.0)
+      {
+        DT = fmin(DT, Tline_data[0] - parset.rcloud_max*2.0);
+      }
+      else if(parset.time_back > 0.0) /* neglect when parset.rcloud_max is set */
+      { 
+        DT = fmin(DT, Tcon_data[0] - parset.time_back);
+      }
+      time_back_set = Tcon_data[0] - DT;
+  
+      /* set the range of cloud radial distribution */
+      rcloud_min_set = 0.0;
+      rcloud_max_set = Tspan_data/2.0;
+      
+      /* rcloud_max should smaller than  (Tl0 - Tc0)/2 */
+      rcloud_max_set = fmin( rcloud_max_set,  (Tline_data[0] - Tcon_data[0] + time_back_set)/2.0 );
+  
+      if(parset.rcloud_max > 0.0)
+        rcloud_max_set = fmin(rcloud_max_set, parset.rcloud_max);
     }
 
-    /* set mediate time of continuum data */
-    Tmed_data = 0.5*(Tcon_data[0] + Tcon_data[n_con_data-1]);
-
+    if(thistask == roottask && parset.flag_dim >=-1)
+    {
+      printf("rcloud_min_max_set: %f %f\n", rcloud_min_set, rcloud_max_set);
+    }
+     
+    /* set the range of continuum variation  */
+    var_range_model[0][0] = log(1.0); /* systematic error in continuum */
+    var_range_model[0][1] = log(1.0+10.0);
+  
+    var_range_model[1][0] = -15.0; /* log(sigma) */
+    var_range_model[1][1] = -1.0; 
+  
+    var_range_model[2][0] = log(Tcad_data); /* log(tau) */
+    var_range_model[2][1] = log(Tspan_data); 
+  
+    var_range_model[3][0] = -10.0; /* mean value or trend parameter values */
+    var_range_model[3][1] =  10.0; 
+  
     for(i=0; i<num_params_difftrend; i++)
     {
-      pow_Tcon_data[i] = (pow(Tcon_data[n_con_data-1]-Tmed_data, i+2) 
-                        - pow(Tcon_data[0]-Tmed_data, i+2)) / (i+2) / Tspan_data_con;
+      var_range_model[4+i][0] = -1.0/pow(Tspan_data, i+1); /* slope of the trend in the differences between contiuum and line */
+      var_range_model[4+i][1] =  1.0/pow(Tspan_data, i+1); 
     }
-    
-    /* set time back for continuum reconstruction */
-    time_back_set = Tspan_data_con + (Tcon_data[0] - Tline_data[0]);
-    time_back_set = fmax(2.0*Tcad_data, time_back_set);
-
-    /* make rcloud_max and time_back consistent with each other, rcloud_max has a higher priority */
-    double DT=Tcon_data[0] - time_back_set;
-    if(parset.rcloud_max > 0.0)
-    {
-      DT = fmin(DT, Tline_data[0] - parset.rcloud_max*2.0);
-    }
-    else if(parset.time_back > 0.0) /* neglect when parset.rcloud_max is set */
-    { 
-      DT = fmin(DT, Tcon_data[0] - parset.time_back);
-    }
-    time_back_set = Tcon_data[0] - DT;
-
-    /* set the range of cloud radial distribution */
-    rcloud_min_set = 0.0;
-    rcloud_max_set = Tspan_data/2.0;
-    
-    /* rcloud_max should smaller than  (Tl0 - Tc0)/2 */
-    rcloud_max_set = fmin( rcloud_max_set,  (Tline_data[0] - Tcon_data[0] + time_back_set)/2.0 );
-
-    if(parset.rcloud_max > 0.0)
-      rcloud_max_set = fmin(rcloud_max_set, parset.rcloud_max);
-  }
-
-  if(thistask == roottask && parset.flag_dim >=-1)
-  {
-    printf("rcloud_min_max_set: %f %f\n", rcloud_min_set, rcloud_max_set);
-  }
-   
-  /* set the range of continuum variation  */
-  var_range_model[0][0] = log(1.0); /* systematic error in continuum */
-  var_range_model[0][1] = log(1.0+10.0);
-
-  var_range_model[1][0] = -15.0; /* log(sigma) */
-  var_range_model[1][1] = -1.0; 
-
-  var_range_model[2][0] = log(Tcad_data); /* log(tau) */
-  var_range_model[2][1] = log(Tspan_data); 
-
-  var_range_model[3][0] = -10.0; /* mean value or trend parameter values */
-  var_range_model[3][1] =  10.0; 
-
-  for(i=0; i<num_params_difftrend; i++)
-  {
-    var_range_model[4+i][0] = -1.0/pow(Tspan_data, i+1); /* slope of the trend in the differences between contiuum and line */
-    var_range_model[4+i][1] =  1.0/pow(Tspan_data, i+1); 
-  }
-
-  var_range_model[4+num_params_difftrend][0] = -10.0; /* light curve values */
-  var_range_model[4+num_params_difftrend][1] =  10.0; 
-
   
-  if(num_params_nlr > 1)
-  {
-    if(parset.flag_narrowline == 2) /* Gaussian prior */
+    var_range_model[4+num_params_difftrend][0] = -10.0; /* light curve values */
+    var_range_model[4+num_params_difftrend][1] =  10.0; 
+  
+    
+    if(num_params_nlr > 1)
     {
-      nlr_range_model[0][0] = -10.0;
-      nlr_range_model[0][1] =  10.0;
-
-      nlr_prior_model[0] = GAUSSIAN;
+      if(parset.flag_narrowline == 2) /* Gaussian prior */
+      {
+        nlr_range_model[0][0] = -10.0;
+        nlr_range_model[0][1] =  10.0;
+  
+        nlr_prior_model[0] = GAUSSIAN;
+      }
+      else
+      {
+        nlr_range_model[0][0] = log(1.0e-1); /* logrithmic prior */
+        nlr_range_model[0][1] = log(1.0e4);
+  
+        nlr_prior_model[0] = UNIFORM;
+      }
+  
+      nlr_range_model[1][0] = -10.0;
+      nlr_range_model[1][1] =  10.0;
+  
+      nlr_prior_model[1] = GAUSSIAN;
+  
+      nlr_range_model[2][0] = -10.0;
+      nlr_range_model[2][1] =  10.0;
+  
+      nlr_prior_model[2] = GAUSSIAN;
     }
-    else
-    {
-      nlr_range_model[0][0] = log(1.0e-1); /* logrithmic prior */
-      nlr_range_model[0][1] = log(1.0e4);
-
-      nlr_prior_model[0] = UNIFORM;
-    }
-
-    nlr_range_model[1][0] = -10.0;
-    nlr_range_model[1][1] =  10.0;
-
-    nlr_prior_model[1] = GAUSSIAN;
-
-    nlr_range_model[2][0] = -10.0;
-    nlr_range_model[2][1] =  10.0;
-
-    nlr_prior_model[2] = GAUSSIAN;
-  }
-
-  // range for systematic error
-  sys_err_line_range[0] = log(1.0);
-  sys_err_line_range[1] = log(1.0+10.0);
-
-  // response range
-  resp_range[0][0] = log(0.01);
-  resp_range[0][1] = log(10.0);
-
-  resp_range[1][0] = -1.0;
-  resp_range[1][1] =  3.0;
-
-  set_blr_range_model();
+  
+    // range for systematic error
+    sys_err_line_range[0] = log(1.0);
+    sys_err_line_range[1] = log(1.0+10.0);
+  
+    // response range
+    resp_range[0][0] = log(0.01);
+    resp_range[0][1] = log(10.0);
+  
+    resp_range[1][0] = -1.0;
+    resp_range[1][1] =  3.0;
+  
+    set_blr_range_model();
   }
 
 #ifdef SA
+  /* SA */
   if(parset.flag_dim > 2)
   {
     set_sa_blr_range_model();
@@ -396,40 +406,43 @@ void allocate_memory()
 {
   int i;
 
-  Tcon = malloc(parset.n_con_recon * sizeof(double));
-  Fcerrs = malloc(parset.n_con_recon * sizeof(double));
-
-  PSmat = malloc(parset.n_con_recon * parset.n_con_recon * sizeof(double));
-  PNmat = malloc(parset.n_con_recon * parset.n_con_recon * sizeof(double));
-  USmat = malloc(parset.n_con_recon * n_con_data * sizeof(double));
-  PSmat_data = malloc(n_con_data * n_con_data * sizeof(double));
-  PNmat_data = malloc(n_con_data * n_con_data * sizeof(double));
-  PCmat_data = malloc(n_con_data * n_con_data * sizeof(double));
-  IPCmat_data = malloc(n_con_data * n_con_data * sizeof(double));
-  PQmat = malloc(parset.n_con_recon * parset.n_con_recon * sizeof(double));
-  PEmat1 = malloc(parset.n_con_recon * n_con_data * sizeof(double));
-  PEmat2 = malloc(parset.n_con_recon * parset.n_con_recon * sizeof(double));
-  
-  blr_range_model = malloc(BLRmodel_size/sizeof(double) * sizeof(double *));
-  for(i=0; i<BLRmodel_size/sizeof(double); i++)
+  if(parset.flag_dim != 3)
   {
-    blr_range_model[i] = malloc(2*sizeof(double));
-  }
-
-  workspace = malloc((n_con_data*nq + 7*n_con_max + nq*nq + nq)*sizeof(double));
-  workspace_uv = malloc(2*parset.n_con_recon*sizeof(double));
-  Larr_data = malloc(n_con_data*nq*sizeof(double));
-  Larr_rec = malloc(parset.n_con_recon*nq*sizeof(double));
-  pow_Tcon_data = malloc(num_params_difftrend*sizeof(double));
+    Tcon = malloc(parset.n_con_recon * sizeof(double));
+    Fcerrs = malloc(parset.n_con_recon * sizeof(double));
   
-  var_param = malloc(num_params_var * sizeof(double));
-  var_param_std = malloc(num_params_var * sizeof(double));
-
-  for(i=0; i<num_params_var; i++)
-  {
-    var_param[i] = var_param_std[i] = 0.0;
+    PSmat = malloc(parset.n_con_recon * parset.n_con_recon * sizeof(double));
+    PNmat = malloc(parset.n_con_recon * parset.n_con_recon * sizeof(double));
+    USmat = malloc(parset.n_con_recon * n_con_data * sizeof(double));
+    PSmat_data = malloc(n_con_data * n_con_data * sizeof(double));
+    PNmat_data = malloc(n_con_data * n_con_data * sizeof(double));
+    PCmat_data = malloc(n_con_data * n_con_data * sizeof(double));
+    IPCmat_data = malloc(n_con_data * n_con_data * sizeof(double));
+    PQmat = malloc(parset.n_con_recon * parset.n_con_recon * sizeof(double));
+    PEmat1 = malloc(parset.n_con_recon * n_con_data * sizeof(double));
+    PEmat2 = malloc(parset.n_con_recon * parset.n_con_recon * sizeof(double));
+    
+    blr_range_model = malloc(BLRmodel_size/sizeof(double) * sizeof(double *));
+    for(i=0; i<BLRmodel_size/sizeof(double); i++)
+    {
+      blr_range_model[i] = malloc(2*sizeof(double));
+    }
+  
+    workspace = malloc((n_con_data*nq + 7*n_con_max + nq*nq + nq)*sizeof(double));
+    workspace_uv = malloc(2*parset.n_con_recon*sizeof(double));
+    Larr_data = malloc(n_con_data*nq*sizeof(double));
+    Larr_rec = malloc(parset.n_con_recon*nq*sizeof(double));
+    pow_Tcon_data = malloc(num_params_difftrend*sizeof(double));
+    
+    var_param = malloc(num_params_var * sizeof(double));
+    var_param_std = malloc(num_params_var * sizeof(double));
+  
+    for(i=0; i<num_params_var; i++)
+    {
+      var_param[i] = var_param_std[i] = 0.0;
+    }
   }
-
+  
 #ifdef SA
   if(parset.flag_dim > 2)
   {
@@ -458,36 +471,39 @@ void allocate_memory()
 void free_memory()
 {
   int i;
-
-  free(Tcon);
-  free(Fcerrs);
-
-  free(PSmat);
-  free(PNmat);
-  free(USmat);
-  free(PSmat_data);
-  free(PNmat_data);
-  free(PCmat_data);
-  free(IPCmat_data);
-  free(PQmat);
-  free(PEmat1);
-  free(PEmat2);
-
-  for(i=0; i<BLRmodel_size/sizeof(double); i++)
+  
+  if(parset.flag_dim != 3)
   {
-    free(blr_range_model[i]);
+    free(Tcon);
+    free(Fcerrs);
+  
+    free(PSmat);
+    free(PNmat);
+    free(USmat);
+    free(PSmat_data);
+    free(PNmat_data);
+    free(PCmat_data);
+    free(IPCmat_data);
+    free(PQmat);
+    free(PEmat1);
+    free(PEmat2);
+  
+    for(i=0; i<BLRmodel_size/sizeof(double); i++)
+    {
+      free(blr_range_model[i]);
+    }
+    free(blr_range_model);
+  
+    free(workspace);
+    free(workspace_uv);
+    free(Larr_data);
+    free(Larr_rec);
+    free(pow_Tcon_data);
+  
+    free(var_param);
+    free(var_param_std);
   }
-  free(blr_range_model);
-
-  free(workspace);
-  free(workspace_uv);
-  free(Larr_data);
-  free(Larr_rec);
-  free(pow_Tcon_data);
-
-  free(var_param);
-  free(var_param_std);
-
+  
 #ifdef SA
   if(parset.flag_dim > 2)
   {
@@ -1060,6 +1076,34 @@ void set_blr_range_model8()
   //mbh
   blr_range_model[i][0] = log(mass_range[0]);
   blr_range_model[i++][1] = log(mass_range[1]);
+
+  return;
+}
+
+// model 9
+void set_blr_range_model9()
+{
+  int i;
+
+  i = 0;
+  //mu
+  sa_blr_range_model[i][0] = log(0.1);
+  sa_blr_range_model[i++][1] = log(rcloud_max_set*0.5);
+  //beta
+  sa_blr_range_model[i][0] = 0.001;
+  sa_blr_range_model[i++][1] = 2.0;
+  //F
+  sa_blr_range_model[i][0] = 0.001;
+  sa_blr_range_model[i++][1] = 0.999;
+  //inc
+  sa_blr_range_model[i][0] = 0.0;  // in cosine
+  sa_blr_range_model[i++][1] = 1.0;
+  //opn
+  sa_blr_range_model[i][0] = 0.0;  // in rad
+  sa_blr_range_model[i++][1] = 90.0;
+  //mbh
+  sa_blr_range_model[i][0] = log(mass_range[0]);
+  sa_blr_range_model[i++][1] = log(mass_range[1]);
 
   return;
 }

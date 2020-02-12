@@ -24,7 +24,6 @@
 void *best_model_sa;      /*!< best model */
 void *best_model_std_sa;  /*!< standard deviation of the best model */
 
-
 /*!
  * postprocessing.
  */
@@ -245,8 +244,8 @@ void reconstruct_sa()
 
 void reconstruct_sa_init()
 {
-  int i;
-
+  int i, j;
+  
   sprintf(dnest_options_file, "%s/%s", parset.file_dir, "src/OPTIONSSA");
   if(thistask == roottask)
   {
@@ -270,10 +269,28 @@ void reconstruct_sa_init()
     Fline_sa_particles_perturb[i] = malloc(n_vel_sa_data * sizeof(double));
   }
 
+  /* cloud sample related */
   clouds_weight = malloc(parset.n_cloud_per_task * sizeof(double));
   clouds_alpha = malloc(parset.n_cloud_per_task * sizeof(double));
   clouds_beta = malloc(parset.n_cloud_per_task * sizeof(double));
   clouds_vel = malloc(parset.n_cloud_per_task * parset.n_vel_per_cloud * sizeof(double));
+
+  if(parset.flag_save_clouds && thistask == roottask)
+  {
+    if(parset.n_cloud_per_task <= 1000)
+      icr_cloud_save = 1;
+    else
+      icr_cloud_save = parset.n_cloud_per_task/1000;
+
+    char fname[200];
+    sprintf(fname, "%s/%s", parset.file_dir, parset.cloud_out_file);
+    fcloud_out = fopen(fname, "w");
+    if(fcloud_out == NULL)
+    {
+      fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+      exit(-1);
+    }
+  }
 
   return;
 }
@@ -307,14 +324,21 @@ void reconstruct_sa_end()
 
   free(par_fix);
   free(par_fix_val);
+  free(best_model_sa);
+  free(best_model_std_sa);
   
+  /* clouds sample related */
   free(clouds_weight);
   free(clouds_alpha);
   free(clouds_beta);
   free(clouds_vel);
 
+  if(parset.flag_save_clouds && thistask==roottask)
+  {
+    fclose(fcloud_out);
+  }
   return;
-}
+}  
 
 /*!
  * this function calculate probability.
@@ -331,7 +355,7 @@ double prob_sa(const void *model)
   which_particle_update = dnest_get_which_particle_update();
   phase_sa = phase_sa_particles_perturb[which_particle_update];
   Fline_sa = Fline_sa_particles_perturb[which_particle_update];
-
+  
   calculate_sa_from_blrmodel(model);
 
   for(i=0; i<n_vel_sa_data; i++)

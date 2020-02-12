@@ -236,6 +236,8 @@ extern gsl_interp  *gsl_linear;
 #ifdef SA
 extern double PhaseFactor;
 
+extern int num_params_blr_tot;
+extern int num_params_rm;
 extern int num_params_sa, num_params_sa_blr_model, num_params_sa_extpar;
 extern int n_epoch_sa_data, n_vel_sa_data, n_base_sa_data;
 extern double *vel_sa_data, *base_sa_data, *Fline_sa_data, *Flerrs_sa_data, *phase_sa_data, *pherrs_sa_data;

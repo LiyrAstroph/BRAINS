@@ -40,6 +40,7 @@ void set_blr_range_model5();
 void set_blr_range_model6();
 void set_blr_range_model7();
 void set_blr_range_model8();
+void set_blr_range_model9();
 
 /* continuum reconstruction */
 int dnest_con(int argc, char **argv);
@@ -103,6 +104,7 @@ void gen_cloud_sample_model5(const void *pm, int flag_type, int flag_save);
 void gen_cloud_sample_model6(const void *pm, int flag_type, int flag_save);
 void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save);
 void gen_cloud_sample_model8(const void *pm, int flag_type, int flag_save);
+void gen_cloud_sample_model9(const void *pm, int flag_type, int flag_save);
 
 void (*transfun_2d_cal)(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save);
 void transfun_2d_cal_cloud(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save);
@@ -131,8 +133,40 @@ int dnest_sa(int argc, char **argv);
 double prob_sa(const void *model);
 void set_par_range_sa();
 void print_par_names_sa();
+void set_par_range_sa1d();
+void print_par_names_sa1d();
+void set_par_range_sa2d();
+void print_par_names_sa2d();
 void calculate_sa_from_blrmodel(const void *pm);
 void postprocess_sa();
+
+void reconstruct_sa1d();
+void reconstruct_sa1d_init();
+void reconstruct_sa1d_end();
+
+int dnest_sa1d(int argc, char **argv);
+double prob_sa1d(const void *model);
+void set_par_range_sa1d();
+void print_par_names_sa1d();
+void set_par_range_sa1d();
+void print_par_names_sa1d();
+void calculate_sa1d_from_blrmodel(const void *pm);
+void postprocess_sa1d();
+
+void reconstruct_sa2d();
+void reconstruct_sa2d_init();
+void reconstruct_sa2d_end();
+
+int dnest_sa2d(int argc, char **argv);
+double prob_sa2d(const void *model);
+void set_par_range_sa2d();
+void print_par_names_sa2d();
+void set_par_range_sa2d();
+void print_par_names_sa2d();
+void calculate_sa2d_from_blrmodel(const void *pm);
+void postprocess_sa2d();
+
+void (*gen_sa_cloud_sample)(const void *pm, int flag_type, int flag_save);
 
 void (*set_sa_blr_range_model)();
 void set_sa_blr_range_model1();
@@ -143,6 +177,7 @@ void set_sa_blr_range_model5();
 void set_sa_blr_range_model6();
 void set_sa_blr_range_model7();
 void set_sa_blr_range_model8();
+void set_sa_blr_range_model9();
 
 #endif
 

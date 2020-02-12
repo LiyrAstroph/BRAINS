@@ -95,6 +95,24 @@ void begin_run()
     reconstruct_sa();
   }
 
+  if(parset.flag_dim == 4) /* SA + RM */
+  {
+    if(parset.flag_postprc == 0)
+    {
+      reconstruct_con();
+    }
+    reconstruct_sa1d();
+  }
+
+  if(parset.flag_dim == 5) /* SA + RM */
+  {
+    if(parset.flag_postprc == 0)
+    {
+      reconstruct_con();
+    }
+    reconstruct_sa2d();
+  }
+
   return;
 }
 

@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+ #include <stddef.h>
 #include <math.h>
 #include <float.h>
 #include <string.h>
@@ -35,62 +36,57 @@ int dnest_sa(int argc, char **argv)
   {
     case 0:
       num_params_sa_blr_model = num_params_MyBLRmodel2d;
-      gen_cloud_sample = gen_cloud_sample_mymodel;
-      transfun_2d_cal = transfun_2d_cal_cloud;
+      gen_sa_cloud_sample = gen_cloud_sample_mymodel;
       break;
 
     case 1:
       num_params_sa_blr_model = sizeof(BLRmodel1)/sizeof(double);
-      gen_cloud_sample = gen_cloud_sample_model1;
-      transfun_2d_cal = transfun_2d_cal_cloud;
+      gen_sa_cloud_sample = gen_cloud_sample_model1;
       break;
 
     case 2:
       num_params_sa_blr_model = sizeof(BLRmodel2)/sizeof(double);
-      gen_cloud_sample = gen_cloud_sample_model2;
-      transfun_2d_cal = transfun_2d_cal_cloud;
+      gen_sa_cloud_sample = gen_cloud_sample_model2;
       break;
 
     case 3:
       num_params_sa_blr_model = sizeof(BLRmodel3)/sizeof(double);
-      gen_cloud_sample = gen_cloud_sample_model3;
-      transfun_2d_cal = transfun_2d_cal_cloud;
+      gen_sa_cloud_sample = gen_cloud_sample_model3;
       break;
 
     case 4:
       num_params_sa_blr_model = sizeof(BLRmodel4)/sizeof(double);
-      gen_cloud_sample = gen_cloud_sample_model4;
-      transfun_2d_cal = transfun_2d_cal_cloud;
+      gen_sa_cloud_sample = gen_cloud_sample_model4;
       break;
 
     case 5:
       num_params_sa_blr_model = sizeof(BLRmodel5)/sizeof(double);
-      gen_cloud_sample = gen_cloud_sample_model5;
-      transfun_2d_cal = transfun_2d_cal_cloud;
+      gen_sa_cloud_sample = gen_cloud_sample_model5;
       break;
     
     case 6:
       num_params_sa_blr_model = sizeof(BLRmodel6)/sizeof(double);
-      gen_cloud_sample = gen_cloud_sample_model6;
-      transfun_2d_cal = transfun_2d_cal_cloud;
+      gen_sa_cloud_sample = gen_cloud_sample_model6;
       break;
     
     case 7:
       num_params_sa_blr_model = sizeof(BLRmodel7)/sizeof(double);
-      gen_cloud_sample = gen_cloud_sample_model7;
-      transfun_2d_cal = transfun_2d_cal_cloud;
+      gen_sa_cloud_sample = gen_cloud_sample_model7;
       break;
 
     case 8:
-      num_params_blr_model = sizeof(BLRmodel8)/sizeof(double);
-      gen_cloud_sample = gen_cloud_sample_model8;
-      transfun_2d_cal = transfun_2d_cal_cloud;
+      num_params_sa_blr_model = sizeof(BLRmodel8)/sizeof(double);
+      gen_sa_cloud_sample = gen_cloud_sample_model8;
+      break;
+    
+    case 9:
+      num_params_sa_blr_model = sizeof(BLRmodel9)/sizeof(double);
+      gen_sa_cloud_sample = gen_cloud_sample_model9;
       break;
 
     default:
       num_params_sa_blr_model = sizeof(BLRmodel1)/sizeof(double);
-      gen_cloud_sample = gen_cloud_sample_model1;
-      transfun_2d_cal = transfun_2d_cal_cloud;
+      gen_sa_cloud_sample = gen_cloud_sample_model1;
       break;
   }
   
@@ -124,14 +120,12 @@ int dnest_sa(int argc, char **argv)
 
   set_par_range_sa();
   print_par_names_sa();
-  
-  /* setup the remaining paramters */
-  for(i=0; i<num_params; i++)
-  {
-    par_fix[i] = 0;
-    par_fix_val[i] = -DBL_MAX;
-  }
-  
+  //set_par_fix_sa_blrmodel();
+
+  /* fix DA */
+  par_fix[num_params_sa_blr_model] = 1;
+  par_fix_val[num_params_sa_blr_model] = log(550.0);
+
   force_update = parset.flag_force_update;
   if(parset.flag_para_name != 1)
     logz_sa = dnest(argc, argv, fptrset_sa, num_params, dnest_options_file);
@@ -156,6 +150,7 @@ void set_par_range_sa()
     par_prior_gaussian[i][1] = 0.0;
   }
 
+  /* sa extra parameters */
   for(i=num_params_sa_blr_model; i<num_params_sa; i++)
   {
     par_range_model[i][0] = sa_extpar_range[i-num_params_sa_blr_model][0];
@@ -230,7 +225,7 @@ void from_prior_sa(void *model)
   }
 
   /* cope with fixed parameters */
-  for(i=0; i<num_params_blr + num_params_var; i++)
+  for(i=0; i<num_params; i++)
   {
     if(par_fix[i] == 1)
       pm[i] = par_fix_val[i];
@@ -330,29 +325,33 @@ double perturb_sa(void *model)
   /* level-dependent width */
   which_level_update = dnest_get_which_level_update();
   which_level = which_level_update > (size_levels-10)?(size_levels-10):which_level_update;
-
+  
   if( which_level > 0)
   {
     limit1 = limits[(which_level-1) * num_params *2 + which *2];
     limit2 = limits[(which_level-1) * num_params *2 + which *2 + 1];
-    width = limit2 - limit1;
+    width = (limit2 - limit1)/2.35;
   }
   else
   {
-    width = ( par_range_model[which][1] - par_range_model[which][0] );
+    limit1 = par_range_model[which][0];
+    limit2 = par_range_model[which][1];
+    width = (par_range_model[which][1] - par_range_model[which][0])/2.35;
   }
 
   if(par_prior_model[which] == GAUSSIAN)
   {
     logH -= (-0.5*pow((pm[which] - par_prior_gaussian[which][0])/par_prior_gaussian[which][1], 2.0) );
-    pm[which] += dnest_randh() * width;
-    dnest_wrap(&pm[which], par_range_model[which][0], par_range_model[which][1]);
+    pm[which] += dnest_randn() * width;
+    //dnest_wrap(&pm[which], par_range_model[which][0], par_range_model[which][1]);
+    dnest_wrap(&pm[which], limit1, limit2);
     logH += (-0.5*pow((pm[which] - par_prior_gaussian[which][0])/par_prior_gaussian[which][1], 2.0) );
   }
   else
   {
-    pm[which] += dnest_randh() * width;
-    dnest_wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
+    pm[which] += dnest_randn() * width;
+    //dnest_wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
+    dnest_wrap(&pm[which], limit1, limit2);
   }
 
   return logH;

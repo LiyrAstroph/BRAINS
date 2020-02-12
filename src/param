@@ -15,7 +15,7 @@ FlagBLRModel                6                           % 1, 2, 3, 4, 5, 6, 7, 8
 
 %========================================================================
 % data file
-Redshift                    0.158                     % redshift
+Redshift                    0.158399                  % redshift
 
 ContinuumFile               data/sim_con.txt          % file for continuum data
 LineFile                    data/sim_hb.txt           % file for line data
@@ -25,7 +25,7 @@ LineCenter                  4861.0                    %  rest frame, A
 
 SAFile                      data/3C273_sa.txt 
 SALineCenter                1.8750                   % reset frame, um          
-FlagSABLRModel              0                         % same as FlagBLRModel 
+FlagSABLRModel              9                         % same as FlagBLRModel 
 FlagSAParMutual             0                         % flag for mutual parameters with BLR model
                                                       % 0: all 
                                                       % 1: only BH mass and inclination

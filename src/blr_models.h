@@ -178,6 +178,16 @@ typedef struct
   double mbh;           /*!< \brief 13 */
 }BLRmodel8;
 
+typedef struct
+{
+  double mu;       /*!< \brief 1.  mean BLR radius, in light day */
+  double beta;     /*!< \brief 2.  shape parameter */ 
+  double F;        /*!< \brief 3.  inner edge */
+  double inc;      /*!< \brief 4.  inclination, in degree, 0-90 */
+  double opn;      /*!< \brief 5.  openning angle, in degere, 0-90 */
+  double mbh;      /*!< \brief 6.  black hole mass,  in 10e6 solar mass */ 
+}BLRmodel9;
+
 #ifdef SA
 
 typedef BLRmodel1 SABLRmodel1;
@@ -188,6 +198,7 @@ typedef BLRmodel5 SABLRmodel5;
 typedef BLRmodel6 SABLRmodel6;
 typedef BLRmodel7 SABLRmodel7;
 typedef BLRmodel8 SABLRmodel8;
+typedef BLRmodel9 SABLRmodel9;
 
 typedef struct 
 {
