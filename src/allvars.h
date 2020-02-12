@@ -47,6 +47,8 @@
 #define C             2.9979e10
 #define SEC_PER_YEAR  3.155e7
 #define CM_PER_LD    (C*8.64e4)
+#define CM_PER_PC    (3.08567758e+18)
+#define CM_PER_MPC   (3.08567758e+24)
 
 #define PI            M_PI
 #define BRAINS_MAX_STR_LENGTH  (256)
@@ -127,10 +129,13 @@ typedef struct
 
   int flag_help, flag_end;
   int flag_para_name;
-
+  
+  double redshift;
+  double linecenter;
 #ifdef SA
   char sa_file[BRAINS_MAX_STR_LENGTH];
   int flag_sa_blrmodel, flag_sa_par_mutual;
+  double sa_linecenter;
 #endif
 }PARSET;
 extern PARSET parset;
@@ -229,11 +234,25 @@ extern gsl_interp  *gsl_linear;
 
 
 #ifdef SA
-extern int num_params_sa, num_params_sa_blr_model;
+extern double PhaseFactor;
+
+extern int num_params_sa, num_params_sa_blr_model, num_params_sa_extpar;
 extern int n_epoch_sa_data, n_vel_sa_data, n_base_sa_data;
 extern double *vel_sa_data, *base_sa_data, *Fline_sa_data, *Flerrs_sa_data, *phase_sa_data, *pherrs_sa_data;
-extern double *phase_sa;
+extern double *wave_sa_data;
+
+extern double sa_flux_norm;
+
+extern double **phase_sa_particles, **Fline_sa_particles;
+extern double **phase_sa_particles_perturb, **Fline_sa_particles_perturb;
+extern double *phase_sa, *Fline_sa;
 
 extern double *clouds_alpha, *clouds_beta;
+
+extern double **sa_extpar_range, **sa_blr_range_model;
+
+extern int SABLRmodel_size;
+
+extern double *workspace_phase;
 #endif
 #endif

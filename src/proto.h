@@ -121,6 +121,31 @@ double second();
 double timediff(double t0, double t1);
 void get_hms(double dt, int *h, int *m, double *s);
 
+#ifdef SA
+
+void reconstruct_sa();
+void reconstruct_sa_init();
+void reconstruct_sa_end();
+
+int dnest_sa(int argc, char **argv);
+double prob_sa(const void *model);
+void set_par_range_sa();
+void print_par_names_sa();
+void calculate_sa_from_blrmodel(const void *pm);
+void postprocess_sa();
+
+void (*set_sa_blr_range_model)();
+void set_sa_blr_range_model1();
+void set_sa_blr_range_model2();
+void set_sa_blr_range_model3();
+void set_sa_blr_range_model4();
+void set_sa_blr_range_model5();
+void set_sa_blr_range_model6();
+void set_sa_blr_range_model7();
+void set_sa_blr_range_model8();
+
+#endif
+
 /* matrix operations */
 void inverse_mat(double *a, int n, int *info);
 double det_mat(double *a, int n, int *info);

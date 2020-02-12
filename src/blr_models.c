@@ -105,11 +105,12 @@ void gen_cloud_sample_model1(const void *pm, int flag_type, int flag_save)
     y = yb;
     z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
 
-    dis = r - x;
     weight = 0.5 + k*(x/r);
-    clouds_tau[i] = dis;
     clouds_weight[i] = weight;
 
+#ifndef SA
+    dis = r - x;
+    clouds_tau[i] = dis;
     if(flag_type == 1)
     {
       if(flag_save && thistask==roottask)
@@ -119,6 +120,48 @@ void gen_cloud_sample_model1(const void *pm, int flag_type, int flag_save)
       }
       continue;
     }
+#else
+  switch(flag_type) 
+  {
+    case 1:   /* 1D RM */
+      dis = r - x;
+      clouds_tau[i] = dis;
+      if(flag_save && thistask==roottask)
+      {
+        if(i%(icr_cloud_save) == 0)
+          fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+      }
+      continue;
+      break;
+    
+    case 2:  /* 2D RM */
+      dis = r - x;
+      clouds_tau[i] = dis;
+      break;
+
+    case 3: /* SA */
+      clouds_alpha[i] = y;
+      clouds_beta[i] = z;
+      break;
+    
+    case 4: /* 1D RM + SA */
+      dis = r - x;
+      clouds_tau[i] = dis;
+
+      clouds_alpha[i] = y;
+      clouds_beta[i] = z;
+      break;
+    
+    case 5: /* 2D RM + SA */
+      dis = r - x;
+      clouds_tau[i] = dis;
+
+      clouds_alpha[i] = y;
+      clouds_beta[i] = z;
+      break;
+  }
+  
+#endif
     
     /* velocity  
      * note that a cloud moves in its orbit plane, whose direction
@@ -272,11 +315,12 @@ void gen_cloud_sample_model2(const void *pm, int flag_type, int flag_save)
     y = yb;
     z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
 
-    dis = r - x;
     weight = 0.5 + k*(x/r);
-    clouds_tau[i] = dis;
     clouds_weight[i] = weight;
 
+#ifndef SA
+    dis = r - x;
+    clouds_tau[i] = dis;
     if(flag_type == 1)
     {
       if(flag_save && thistask==roottask)
@@ -286,6 +330,48 @@ void gen_cloud_sample_model2(const void *pm, int flag_type, int flag_save)
       }
       continue;
     }
+#else
+  switch(flag_type) 
+  {
+    case 1:   /* 1D RM */
+      dis = r - x;
+      clouds_tau[i] = dis;
+      if(flag_save && thistask==roottask)
+      {
+        if(i%(icr_cloud_save) == 0)
+          fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+      }
+      continue;
+      break;
+    
+    case 2:  /* 2D RM */
+      dis = r - x;
+      clouds_tau[i] = dis;
+      break;
+
+    case 3: /* SA */
+      clouds_alpha[i] = y;
+      clouds_beta[i] = z;
+      break;
+    
+    case 4: /* 1D RM + SA */
+      dis = r - x;
+      clouds_tau[i] = dis;
+
+      clouds_alpha[i] = y;
+      clouds_beta[i] = z;
+      break;
+    
+    case 5: /* 2D RM + SA */
+      dis = r - x;
+      clouds_tau[i] = dis;
+
+      clouds_alpha[i] = y;
+      clouds_beta[i] = z;
+      break;
+  }
+  
+#endif
     
     /* velocity  
      * note that a cloud moves in its orbit plane, whose direction
@@ -425,11 +511,12 @@ void gen_cloud_sample_model3(const void *pm, int flag_type, int flag_save)
     y = yb;
     z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
 
-    dis = r - x;
     weight = 0.5 + k*(x/r);
-    clouds_tau[i] = dis;
     clouds_weight[i] = weight;
 
+#ifndef SA
+    dis = r - x;
+    clouds_tau[i] = dis;
     if(flag_type == 1)
     {
       if(flag_save && thistask==roottask)
@@ -439,6 +526,48 @@ void gen_cloud_sample_model3(const void *pm, int flag_type, int flag_save)
       }
       continue;
     }
+#else
+  switch(flag_type) 
+  {
+    case 1:   /* 1D RM */
+      dis = r - x;
+      clouds_tau[i] = dis;
+      if(flag_save && thistask==roottask)
+      {
+        if(i%(icr_cloud_save) == 0)
+          fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+      }
+      continue;
+      break;
+    
+    case 2:  /* 2D RM */
+      dis = r - x;
+      clouds_tau[i] = dis;
+      break;
+
+    case 3: /* SA */
+      clouds_alpha[i] = y;
+      clouds_beta[i] = z;
+      break;
+    
+    case 4: /* 1D RM + SA */
+      dis = r - x;
+      clouds_tau[i] = dis;
+
+      clouds_alpha[i] = y;
+      clouds_beta[i] = z;
+      break;
+    
+    case 5: /* 2D RM + SA */
+      dis = r - x;
+      clouds_tau[i] = dis;
+
+      clouds_alpha[i] = y;
+      clouds_beta[i] = z;
+      break;
+  }
+  
+#endif
     
 // velocity  
 // note that a cloud moves in its orbit plane, whose direction
@@ -570,11 +699,12 @@ void gen_cloud_sample_model4(const void *pm, int flag_type, int flag_save)
     y = yb;
     z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
 
-    dis = r - x;
     weight = 0.5 + k*(x/r);
-    clouds_tau[i] = dis;
     clouds_weight[i] = weight;
 
+#ifndef SA
+    dis = r - x;
+    clouds_tau[i] = dis;
     if(flag_type == 1)
     {
       if(flag_save && thistask==roottask)
@@ -584,6 +714,48 @@ void gen_cloud_sample_model4(const void *pm, int flag_type, int flag_save)
       }
       continue;
     }
+#else
+  switch(flag_type) 
+  {
+    case 1:   /* 1D RM */
+      dis = r - x;
+      clouds_tau[i] = dis;
+      if(flag_save && thistask==roottask)
+      {
+        if(i%(icr_cloud_save) == 0)
+          fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+      }
+      continue;
+      break;
+    
+    case 2:  /* 2D RM */
+      dis = r - x;
+      clouds_tau[i] = dis;
+      break;
+
+    case 3: /* SA */
+      clouds_alpha[i] = y;
+      clouds_beta[i] = z;
+      break;
+    
+    case 4: /* 1D RM + SA */
+      dis = r - x;
+      clouds_tau[i] = dis;
+
+      clouds_alpha[i] = y;
+      clouds_beta[i] = z;
+      break;
+    
+    case 5: /* 2D RM + SA */
+      dis = r - x;
+      clouds_tau[i] = dis;
+
+      clouds_alpha[i] = y;
+      clouds_beta[i] = z;
+      break;
+  }
+  
+#endif
     
 // velocity  
 // note that a cloud moves in its orbit plane, whose direction
@@ -759,11 +931,12 @@ void gen_cloud_sample_model5(const void *pm, int flag_type, int flag_save)
     y = yb;
     z =-xb * sin_inc_cmp + zb * cos_inc_cmp;
 
-    dis = r - x;
     weight = 0.5 + k*(x/r);
-    clouds_tau[i] = dis;
     clouds_weight[i] = weight;
 
+#ifndef SA
+    dis = r - x;
+    clouds_tau[i] = dis;
     if(flag_type == 1)
     {
       if(flag_save && thistask==roottask)
@@ -773,6 +946,48 @@ void gen_cloud_sample_model5(const void *pm, int flag_type, int flag_save)
       }
       continue;
     }
+#else
+  switch(flag_type) 
+  {
+    case 1:   /* 1D RM */
+      dis = r - x;
+      clouds_tau[i] = dis;
+      if(flag_save && thistask==roottask)
+      {
+        if(i%(icr_cloud_save) == 0)
+          fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+      }
+      continue;
+      break;
+    
+    case 2:  /* 2D RM */
+      dis = r - x;
+      clouds_tau[i] = dis;
+      break;
+
+    case 3: /* SA */
+      clouds_alpha[i] = y;
+      clouds_beta[i] = z;
+      break;
+    
+    case 4: /* 1D RM + SA */
+      dis = r - x;
+      clouds_tau[i] = dis;
+
+      clouds_alpha[i] = y;
+      clouds_beta[i] = z;
+      break;
+    
+    case 5: /* 2D RM + SA */
+      dis = r - x;
+      clouds_tau[i] = dis;
+
+      clouds_alpha[i] = y;
+      clouds_beta[i] = z;
+      break;
+  }
+  
+#endif
 
     Vkep = sqrt(mbh/r);
 
@@ -957,11 +1172,12 @@ void gen_cloud_sample_model6(const void *pm, int flag_type, int flag_save)
     y = yb;
     z =-xb * sin_inc_cmp + zb * cos_inc_cmp;
 
-    dis = r - x;
     weight = 0.5 + k*(x/r);
-    clouds_tau[i] = dis;
     clouds_weight[i] = weight;
 
+#ifndef SA
+    dis = r - x;
+    clouds_tau[i] = dis;
     if(flag_type == 1)
     {
       if(flag_save && thistask==roottask)
@@ -971,6 +1187,48 @@ void gen_cloud_sample_model6(const void *pm, int flag_type, int flag_save)
       }
       continue;
     }
+#else
+  switch(flag_type) 
+  {
+    case 1:   /* 1D RM */
+      dis = r - x;
+      clouds_tau[i] = dis;
+      if(flag_save && thistask==roottask)
+      {
+        if(i%(icr_cloud_save) == 0)
+          fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+      }
+      continue;
+      break;
+    
+    case 2:  /* 2D RM */
+      dis = r - x;
+      clouds_tau[i] = dis;
+      break;
+
+    case 3: /* SA */
+      clouds_alpha[i] = y;
+      clouds_beta[i] = z;
+      break;
+    
+    case 4: /* 1D RM + SA */
+      dis = r - x;
+      clouds_tau[i] = dis;
+
+      clouds_alpha[i] = y;
+      clouds_beta[i] = z;
+      break;
+    
+    case 5: /* 2D RM + SA */
+      dis = r - x;
+      clouds_tau[i] = dis;
+
+      clouds_alpha[i] = y;
+      clouds_beta[i] = z;
+      break;
+  }
+  
+#endif
 
     Vkep = sqrt(mbh/r);
     
@@ -1158,11 +1416,12 @@ void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save)
     y = yb;
     z =-xb * sin_inc_cmp + zb * cos_inc_cmp;
 
-    dis = r - x;
     weight = 0.5 + k*(x/r);
-    clouds_tau[i] = dis;
     clouds_weight[i] = weight;
 
+#ifndef SA
+    dis = r - x;
+    clouds_tau[i] = dis;
     if(flag_type == 1)
     {
       if(flag_save && thistask==roottask)
@@ -1172,6 +1431,48 @@ void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save)
       }
       continue;
     }
+#else
+  switch(flag_type) 
+  {
+    case 1:   /* 1D RM */
+      dis = r - x;
+      clouds_tau[i] = dis;
+      if(flag_save && thistask==roottask)
+      {
+        if(i%(icr_cloud_save) == 0)
+          fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+      }
+      continue;
+      break;
+    
+    case 2:  /* 2D RM */
+      dis = r - x;
+      clouds_tau[i] = dis;
+      break;
+
+    case 3: /* SA */
+      clouds_alpha[i] = y;
+      clouds_beta[i] = z;
+      break;
+    
+    case 4: /* 1D RM + SA */
+      dis = r - x;
+      clouds_tau[i] = dis;
+
+      clouds_alpha[i] = y;
+      clouds_beta[i] = z;
+      break;
+    
+    case 5: /* 2D RM + SA */
+      dis = r - x;
+      clouds_tau[i] = dis;
+
+      clouds_alpha[i] = y;
+      clouds_beta[i] = z;
+      break;
+  }
+  
+#endif
 
     Vkep = sqrt(mbh/r);
 
@@ -1311,11 +1612,12 @@ void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save)
     y = yb;
     z =-xb * sin_inc_cmp + zb * cos_inc_cmp;
 
-    dis = r - x;
     weight = 0.5 + k*(x/r);
-    clouds_tau[i] = dis;
     clouds_weight[i] = weight;
     
+#ifndef SA
+    dis = r - x;
+    clouds_tau[i] = dis;
     if(flag_type == 1)
     {
       if(flag_save && thistask==roottask)
@@ -1325,6 +1627,48 @@ void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save)
       }
       continue;
     }
+#else
+  switch(flag_type) 
+  {
+    case 1:   /* 1D RM */
+      dis = r - x;
+      clouds_tau[i] = dis;
+      if(flag_save && thistask==roottask)
+      {
+        if(i%(icr_cloud_save) == 0)
+          fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+      }
+      continue;
+      break;
+    
+    case 2:  /* 2D RM */
+      dis = r - x;
+      clouds_tau[i] = dis;
+      break;
+
+    case 3: /* SA */
+      clouds_alpha[i] = y;
+      clouds_beta[i] = z;
+      break;
+    
+    case 4: /* 1D RM + SA */
+      dis = r - x;
+      clouds_tau[i] = dis;
+
+      clouds_alpha[i] = y;
+      clouds_beta[i] = z;
+      break;
+    
+    case 5: /* 2D RM + SA */
+      dis = r - x;
+      clouds_tau[i] = dis;
+
+      clouds_alpha[i] = y;
+      clouds_beta[i] = z;
+      break;
+  }
+  
+#endif
 
     Vkep = sqrt(mbh/r);
 
@@ -1471,10 +1815,11 @@ void gen_cloud_sample_model8(const void *pm, int flag_type, int flag_save)
 
     R = sqrt(r*r + zb*zb);
     weight = 0.5 + k*(x/R);
-    dis = R - x;
-    clouds_tau[i] = dis;
     clouds_weight[i] = weight * density;
 
+#ifndef SA
+    dis = r - x;
+    clouds_tau[i] = dis;
     if(flag_type == 1)
     {
       if(flag_save && thistask==roottask)
@@ -1484,6 +1829,48 @@ void gen_cloud_sample_model8(const void *pm, int flag_type, int flag_save)
       }
       continue;
     }
+#else
+  switch(flag_type) 
+  {
+    case 1:   /* 1D RM */
+      dis = R - x;
+      clouds_tau[i] = dis;
+      if(flag_save && thistask==roottask)
+      {
+        if(i%(icr_cloud_save) == 0)
+          fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+      }
+      continue;
+      break;
+    
+    case 2:  /* 2D RM */
+      dis = R - x;
+      clouds_tau[i] = dis;
+      break;
+
+    case 3: /* SA */
+      clouds_alpha[i] = y;
+      clouds_beta[i] = z;
+      break;
+    
+    case 4: /* 1D RM + SA */
+      dis = R - x;
+      clouds_tau[i] = dis;
+
+      clouds_alpha[i] = y;
+      clouds_beta[i] = z;
+      break;
+    
+    case 5: /* 2D RM + SA */
+      dis = R - x;
+      clouds_tau[i] = dis;
+
+      clouds_alpha[i] = y;
+      clouds_beta[i] = z;
+      break;
+  }
+  
+#endif
 
     Vr = vl * sin(theta);
     vzb = vl * cos(theta);
@@ -1549,3 +1936,10 @@ void restart_action_2d(int iflag)
 {
   restart_action_1d(iflag);
 }
+
+#ifdef SA
+void restart_action_sa(int iflag)
+{
+  restart_action_1d(iflag);
+}
+#endif

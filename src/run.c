@@ -26,6 +26,10 @@ void begin_run()
    */
   VelUnit = sqrt( GRAVITY * 1.0e6 * SOLAR_MASS / CM_PER_LD ) / 1.0e5; 
 
+#ifdef SA
+  PhaseFactor = (1.0/360.0 * CM_PER_PC/CM_PER_LD);
+#endif
+
   /* dimensionless speed of light */
   C_Unit = C/1.0e5/VelUnit;
 
@@ -84,6 +88,11 @@ void begin_run()
       reconstruct_con();
     }
     reconstruct_line2d();
+  }
+
+  if(parset.flag_dim == 3) /* SA */
+  {
+    reconstruct_sa();
   }
 
   return;

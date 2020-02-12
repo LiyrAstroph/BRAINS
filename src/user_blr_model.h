@@ -19,4 +19,9 @@ extern const int num_params_MyBLRmodel2d;  /*!< number of parameters for 2D mode
 void set_blr_range_mymodel();
 void gen_cloud_sample_mymodel(const void *pm, int flag_type, int flag_save);
 void set_par_value_mymodel_sim(double *pm);
+
+#ifdef SA
+void set_sa_blr_range_mymodel();
+void set_sa_par_value_mymodel_sim(double *pm);
+#endif
 #endif

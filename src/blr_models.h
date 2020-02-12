@@ -193,6 +193,7 @@ typedef struct
 {
   double DA;
   double PA;
+  double FA;
 }SAExtPar;
 
 #endif

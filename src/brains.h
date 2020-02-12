@@ -23,7 +23,10 @@
 #include "command_line.h"
 #include "user_blr_model.h"
 #include "user_transfun.h"
-#include "specastro.h"
+
+#ifdef SA
+#include "dnest_sa.h"
+#endif
 
 /* header files for CDNest */
 #include "dnestvars.h"

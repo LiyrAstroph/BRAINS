@@ -109,6 +109,56 @@ void init()
       break;
   }
 
+#ifdef SA
+  if(parset.flag_dim > 2)
+  {
+    num_params_sa_extpar = sizeof(SAExtPar)/sizeof(double);
+    switch(parset.flag_sa_blrmodel)
+    {
+      case 0:
+        SABLRmodel_size = num_params_MyBLRmodel2d * sizeof(double);
+        set_sa_blr_range_model = set_sa_blr_range_mymodel;
+        break;
+      case 1:
+        SABLRmodel_size = sizeof(SABLRmodel1);
+        set_sa_blr_range_model = set_sa_blr_range_model1;
+        break;
+      case 2:
+        SABLRmodel_size = sizeof(SABLRmodel2);
+        set_sa_blr_range_model = set_sa_blr_range_model2;
+        break;
+      case 3:
+        SABLRmodel_size = sizeof(SABLRmodel3);
+        set_sa_blr_range_model = set_sa_blr_range_model3;
+        break;
+      case 4:
+        SABLRmodel_size = sizeof(SABLRmodel4);
+        set_sa_blr_range_model = set_sa_blr_range_model4;
+        break;
+      case 5:
+        SABLRmodel_size = sizeof(SABLRmodel5);
+        set_sa_blr_range_model = set_sa_blr_range_model5;
+        break;
+      case 6:
+        SABLRmodel_size = sizeof(SABLRmodel6);
+        set_sa_blr_range_model = set_sa_blr_range_model6;
+        break;
+      case 7:
+        SABLRmodel_size = sizeof(SABLRmodel7);
+        set_sa_blr_range_model = set_sa_blr_range_model7;
+        break;
+      case 8:
+        SABLRmodel_size = sizeof(SABLRmodel8);
+        set_sa_blr_range_model = set_sa_blr_range_model8;
+        break;
+      default:
+        SABLRmodel_size = sizeof(SABLRmodel1);
+        set_sa_blr_range_model = set_sa_blr_range_model1;
+        break;
+    }
+  }
+#endif 
+
   /* set maximum continuum point */
   n_con_max = parset.n_con_recon;
   if(parset.flag_dim >=-1)
@@ -154,7 +204,8 @@ void init()
   /* default rcloud_max_set */
   rcloud_max_set = 1.0e3;
 
-
+  if(parset.flag_dim != 3)
+  {
   if(parset.flag_dim >=-1)
   {
     /* set Larr_data */
@@ -318,6 +369,24 @@ void init()
   resp_range[1][1] =  3.0;
 
   set_blr_range_model();
+  }
+
+#ifdef SA
+  if(parset.flag_dim > 2)
+  {
+    set_sa_blr_range_model();
+
+    sa_extpar_range[0][0] = log(100.0);
+    sa_extpar_range[0][1] = log(1000.0); 
+
+    sa_extpar_range[1][0] = 0.0;
+    sa_extpar_range[1][1] = 360.0;
+
+    sa_extpar_range[2][0] = log(0.1);
+    sa_extpar_range[2][1] = log(10.0);
+
+  }
+#endif 
 }
 
 /*!
@@ -361,6 +430,25 @@ void allocate_memory()
     var_param[i] = var_param_std[i] = 0.0;
   }
 
+#ifdef SA
+  if(parset.flag_dim > 2)
+  {
+    sa_extpar_range = malloc(num_params_sa_extpar * sizeof(double *));
+    for(i=0; i<num_params_sa_extpar; i++)
+    {
+      sa_extpar_range[i]=malloc(2*sizeof(double));
+    }
+
+    sa_blr_range_model = malloc(SABLRmodel_size/sizeof(double) * sizeof(double *));
+    for(i=0; i<SABLRmodel_size/sizeof(double); i++)
+    {
+      sa_blr_range_model[i] = malloc(2*sizeof(double));
+    }
+
+    workspace_phase = malloc( (3*n_vel_sa_data)* sizeof(double));
+  }
+#endif  
+
   return;
 }
 
@@ -399,7 +487,25 @@ void free_memory()
 
   free(var_param);
   free(var_param_std);
-  
+
+#ifdef SA
+  if(parset.flag_dim > 2)
+  {
+    for(i=0; i<num_params_sa_extpar; i++)
+    {
+      free(sa_extpar_range[i]);
+    }
+    free(sa_extpar_range);
+
+    for(i=0; i<SABLRmodel_size/sizeof(double); i++)
+    {
+      free(sa_blr_range_model[i]);
+    }
+    free(sa_blr_range_model);
+
+    free(workspace_phase);
+  }
+#endif  
   return;
 }
 

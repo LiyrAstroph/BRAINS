@@ -220,6 +220,14 @@ void read_parset()
     addr[nt] = &parset.flag_nonlinear;
     id[nt++] = INT;
 
+    strcpy(tag[nt], "LineCenter");
+    addr[nt] = &parset.linecenter;
+    id[nt++] = DOUBLE;
+
+    strcpy(tag[nt], "Redshift");
+    addr[nt] = &parset.redshift;
+    id[nt++] = DOUBLE;
+
 #ifdef SA
     strcpy(tag[nt], "SAFile");
     addr[nt] = &parset.sa_file;
@@ -232,6 +240,10 @@ void read_parset()
     strcpy(tag[nt], "FlagSAParMutual");
     addr[nt] = &parset.flag_sa_par_mutual;
     id[nt++] = INT;
+
+    strcpy(tag[nt], "SALineCenter");
+    addr[nt] = &parset.sa_linecenter;
+    id[nt++] = DOUBLE;
 #endif
 
 
@@ -251,6 +263,8 @@ void read_parset()
     parset.flag_InstRes = 0;
     parset.InstRes = 0.0;
     parset.InstRes_err = 0.0;
+    parset.redshift = 0.0;
+    parset.linecenter = 4861.0;
 
     strcpy(parset.continuum_file, "");
     strcpy(parset.line_file, "");
@@ -268,6 +282,7 @@ void read_parset()
 #ifdef SA
     parset.flag_sa_blrmodel = 1;
     parset.flag_sa_par_mutual = 0;
+    parset.sa_linecenter = 1.875; 
 
     strcpy(parset.sa_file, "");
 #endif 
@@ -894,29 +909,56 @@ void read_data()
       {
         for(i=0; i<n_vel_sa_data; i++)
         {
-          fscanf(fp, "%lf %lf\n", &vel_sa_data[i], 
-          &Fline_sa_data[i+j*n_vel_sa_data], &Flerrs_sa_data[i+j*n_vel_sa_data]);
+          fscanf(fp, "%lf %lf %lf\n", &wave_sa_data[i], 
+                     &Fline_sa_data[i+j*n_vel_sa_data], &Flerrs_sa_data[i+j*n_vel_sa_data]);
         }
         fscanf(fp, "\n");
       }
       
       for(j=0; j<n_base_sa_data; j++)
       {
-        fscanf(fp, "# %d %d\n", &base_sa_data[j*2+0], &base_sa_data[j*2+1]);
-  
+        fscanf(fp, "# %lf %lf\n", &base_sa_data[j*2+0], &base_sa_data[j*2+1]);
         for(i=0; i<n_vel_sa_data; i++)
         {
-          fscanf(fp, "%lf %lf %lf\n", &vel_sa_data[i], &phase_sa_data[i+j*n_vel_sa_data], 
-          &pherrs_sa_data[i+j*n_vel_sa_data]);
+          fscanf(fp, "%lf %lf %lf\n", &wave_sa_data[i], &phase_sa_data[i+j*n_vel_sa_data], 
+                      &pherrs_sa_data[i+j*n_vel_sa_data]);
         }
         fscanf(fp, "\n");
       }
       fclose(fp);
     }
-    MPI_Bcast(vel_sa_data, n_vel_sa_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+
+    MPI_Bcast(wave_sa_data, n_vel_sa_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
     MPI_Bcast(base_sa_data, n_base_sa_data*2, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
     MPI_Bcast(phase_sa_data, n_vel_sa_data*n_base_sa_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
     MPI_Bcast(pherrs_sa_data, n_vel_sa_data*n_base_sa_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(Fline_sa_data, n_vel_sa_data * n_epoch_sa_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(Flerrs_sa_data, n_vel_sa_data * n_epoch_sa_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+
+    /* convert wavelength to velocity */
+    for(i=0; i<n_vel_sa_data; i++)
+    {
+      vel_sa_data[i] = (wave_sa_data[i]/(1.0+parset.redshift) - parset.sa_linecenter)/parset.sa_linecenter;
+      vel_sa_data[i] *= C/1.0e5/VelUnit;
+    }
+
+    /* normalize phase */
+    for(j=0; j<n_base_sa_data; j++)
+    {
+      for(i=0; i<n_vel_sa_data; i++)
+      {
+        phase_sa_data[i+j*n_vel_sa_data] *= (PhaseFactor * wave_sa_data[i]);
+        pherrs_sa_data[i+j*n_vel_sa_data] *= (PhaseFactor * wave_sa_data[i]);
+      }
+    }
+
+    /* calculate sa flux norm */
+    sa_flux_norm = 0.0;
+    for(i=0; i<n_vel_sa_data; i++)
+    {
+      sa_flux_norm += Fline_sa_data[i];
+    }
+    sa_flux_norm /= n_vel_sa_data;
   }
 #endif  
 
@@ -963,6 +1005,7 @@ void allocate_memory_data()
 #ifdef SA
   if(parset.flag_dim > 2 || parset.flag_dim == -1)
   {
+    wave_sa_data = malloc(n_vel_sa_data*sizeof(double));
     vel_sa_data = malloc(n_vel_sa_data*sizeof(double));
     base_sa_data = malloc(n_base_sa_data * 2 * sizeof(double));
     Fline_sa_data = malloc(n_vel_sa_data*n_epoch_sa_data*sizeof(double));
@@ -1013,6 +1056,7 @@ void free_memory_data()
 #ifdef SA
   if(parset.flag_dim > 2 || parset.flag_dim == -1)
   {
+    free(wave_sa_data);
     free(vel_sa_data);
     free(base_sa_data);
     free(Fline_sa_data);
