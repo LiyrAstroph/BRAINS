@@ -206,11 +206,11 @@ void init()
   gsl_linear = gsl_interp_alloc(gsl_interp_linear, parset.n_con_recon);
 
   /* default BH mass range */
-  mass_range[0] = 0.1;
-  mass_range[1] = 1.0e3;
+  mass_range[0] = 1.0;
+  mass_range[1] = 1.0e4;
 
   /* default rcloud_max_set */
-  rcloud_max_set = 1.0e4;
+  rcloud_max_set = 1.0e6;
   
   /* not RM */
   if(parset.flag_dim != 3)
@@ -386,15 +386,17 @@ void init()
   {
     set_sa_blr_range_model();
 
-    sa_extpar_range[0][0] = log(100.0);
+    sa_extpar_range[0][0] = log(100.0);  /* DA */
     sa_extpar_range[0][1] = log(1000.0); 
 
-    sa_extpar_range[1][0] = 0.0;
-    sa_extpar_range[1][1] = 360.0;
+    sa_extpar_range[1][0] = 0.0;         /* PA */
+    sa_extpar_range[1][1] = 180.0;
 
-    sa_extpar_range[2][0] = log(0.1);
-    sa_extpar_range[2][1] = log(10.0);
+    sa_extpar_range[2][0] = log(0.5);    /* FA  */
+    sa_extpar_range[2][1] = log(2.0);
 
+    sa_extpar_range[3][0] = -(wave_sa_data[1]-wave_sa_data[0]);    /* CO  */
+    sa_extpar_range[3][1] =  (wave_sa_data[1]-wave_sa_data[0]);
   }
 #endif 
 }
@@ -457,6 +459,11 @@ void allocate_memory()
     {
       sa_blr_range_model[i] = malloc(2*sizeof(double));
     }
+    
+    if(parset.flag_sa_par_mutual != 0)
+    {
+      idx_sa_par_mutual = malloc(2*sizeof(int)); 
+    }
 
     workspace_phase = malloc( (3*n_vel_sa_data)* sizeof(double));
   }
@@ -518,6 +525,11 @@ void free_memory()
       free(sa_blr_range_model[i]);
     }
     free(sa_blr_range_model);
+
+    if(parset.flag_sa_par_mutual != 0)
+    {
+      free(idx_sa_par_mutual);
+    }
 
     free(workspace_phase);
   }
@@ -1105,5 +1117,167 @@ void set_blr_range_model9()
   sa_blr_range_model[i][0] = log(mass_range[0]);
   sa_blr_range_model[i++][1] = log(mass_range[1]);
 
+  return;
+}
+
+/*
+ * set 1D BLR model and functions.
+ */
+void set_blr_model1d()
+{
+  switch(parset.flag_blrmodel)
+  {
+    case -1:
+      num_params_blr_model = num_params_MyTransfun1d;
+      transfun_1d_cal = transfun_1d_cal_mytransfun;
+      break;
+
+    case 0: 
+      num_params_blr_model = num_params_MyBLRmodel1d;
+      gen_cloud_sample = gen_cloud_sample_mymodel;
+      transfun_1d_cal = transfun_1d_cal_cloud;
+      break;
+
+    case 1:
+      num_params_blr_model = 6;
+      gen_cloud_sample = gen_cloud_sample_model1;
+      transfun_1d_cal = transfun_1d_cal_cloud;
+      break;
+
+    case 2:
+      num_params_blr_model = 6;
+      gen_cloud_sample = gen_cloud_sample_model1;
+      transfun_1d_cal = transfun_1d_cal_cloud;
+      break;
+
+    case 3:
+      num_params_blr_model = 6;
+      gen_cloud_sample = gen_cloud_sample_model3;
+      transfun_1d_cal = transfun_1d_cal_cloud;
+      break;
+
+    case 4:
+      num_params_blr_model = 6;
+      gen_cloud_sample = gen_cloud_sample_model3;
+      transfun_1d_cal = transfun_1d_cal_cloud;
+      break;
+
+    case 5:
+      num_params_blr_model = 9;
+      gen_cloud_sample = gen_cloud_sample_model5;
+      transfun_1d_cal = transfun_1d_cal_cloud;
+      break;
+
+    case 6:
+      num_params_blr_model = 8;
+      gen_cloud_sample = gen_cloud_sample_model6;
+      transfun_1d_cal = transfun_1d_cal_cloud;
+      break;
+
+    case 7:
+      num_params_blr_model = 13;
+      gen_cloud_sample = gen_cloud_sample_model7;
+      transfun_1d_cal = transfun_1d_cal_cloud;
+      break;
+
+    case 8:
+      num_params_blr_model = 13;
+      gen_cloud_sample = gen_cloud_sample_model8;
+      transfun_1d_cal = transfun_1d_cal_cloud;
+      break;
+    
+    case 9:
+      num_params_blr_model = 5;
+      gen_cloud_sample = gen_cloud_sample_model9;
+      transfun_1d_cal = transfun_1d_cal_cloud;
+      break;
+
+    default:
+      num_params_blr_model = 6;
+      gen_cloud_sample = gen_cloud_sample_model1;
+      transfun_1d_cal = transfun_1d_cal_cloud;
+      break;
+  }
+  return;
+}
+
+/*
+ * set 2D BLR model and functions.
+ */
+void set_blr_model2d()
+{
+  switch(parset.flag_blrmodel)
+  {
+    case -1:
+      num_params_blr_model = num_params_MyTransfun2d;
+      transfun_2d_cal = transfun_2d_cal_mytransfun;
+      break;
+
+    case 0:
+      num_params_blr_model = num_params_MyBLRmodel2d;
+      gen_cloud_sample = gen_cloud_sample_mymodel;
+      transfun_2d_cal = transfun_2d_cal_cloud;
+      break;
+
+    case 1:
+      num_params_blr_model = sizeof(BLRmodel1)/sizeof(double);
+      gen_cloud_sample = gen_cloud_sample_model1;
+      transfun_2d_cal = transfun_2d_cal_cloud;
+      break;
+
+    case 2:
+      num_params_blr_model = sizeof(BLRmodel2)/sizeof(double);
+      gen_cloud_sample = gen_cloud_sample_model2;
+      transfun_2d_cal = transfun_2d_cal_cloud;
+      break;
+
+    case 3:
+      num_params_blr_model = sizeof(BLRmodel3)/sizeof(double);
+      gen_cloud_sample = gen_cloud_sample_model3;
+      transfun_2d_cal = transfun_2d_cal_cloud;
+      break;
+
+    case 4:
+      num_params_blr_model = sizeof(BLRmodel4)/sizeof(double);
+      gen_cloud_sample = gen_cloud_sample_model4;
+      transfun_2d_cal = transfun_2d_cal_cloud;
+      break;
+
+    case 5:
+      num_params_blr_model = sizeof(BLRmodel5)/sizeof(double);
+      gen_cloud_sample = gen_cloud_sample_model5;
+      transfun_2d_cal = transfun_2d_cal_cloud;
+      break;
+    
+    case 6:
+      num_params_blr_model = sizeof(BLRmodel6)/sizeof(double);
+      gen_cloud_sample = gen_cloud_sample_model6;
+      transfun_2d_cal = transfun_2d_cal_cloud;
+      break;
+    
+    case 7:
+      num_params_blr_model = sizeof(BLRmodel7)/sizeof(double);
+      gen_cloud_sample = gen_cloud_sample_model7;
+      transfun_2d_cal = transfun_2d_cal_cloud;
+      break;
+
+    case 8:
+      num_params_blr_model = sizeof(BLRmodel8)/sizeof(double);
+      gen_cloud_sample = gen_cloud_sample_model8;
+      transfun_2d_cal = transfun_2d_cal_cloud;
+      break;
+    
+    case 9:
+      num_params_blr_model = sizeof(BLRmodel9)/sizeof(double);
+      gen_cloud_sample = gen_cloud_sample_model9;
+      transfun_2d_cal = transfun_2d_cal_cloud;
+      break;
+
+    default:
+      num_params_blr_model = sizeof(BLRmodel1)/sizeof(double);
+      gen_cloud_sample = gen_cloud_sample_model1;
+      transfun_2d_cal = transfun_2d_cal_cloud;
+      break;
+  }
   return;
 }

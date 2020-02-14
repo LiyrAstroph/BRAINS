@@ -6,14 +6,14 @@
  */
 
 /*!
- *  \file dnest_sa.h
+ *  \file dnest_sa2d.h
  *  \brief header file.
  */
 
 #ifdef SA
 
-#ifndef _DNEST_SA_H
-#define _DNEST_SA_H
+#ifndef _DNEST_SA2D_H
+#define _DNEST_SA2D_H
 
 #include <stdbool.h>
 

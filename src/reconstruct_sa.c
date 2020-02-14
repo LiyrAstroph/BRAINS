@@ -228,6 +228,54 @@ void reconstruct_sa()
   if(parset.flag_exam_prior != 1 && parset.flag_para_name != 1)
   {
     postprocess_sa();
+
+    if(thistask == roottask)
+    {
+      FILE *fp;
+      char fname[200];
+      int j, k;
+
+      force_update = 1;
+      which_parameter_update = -1; // force to update the transfer function
+      which_particle_update = 0;
+
+      Fline_sa = Fline_sa_particles[which_particle_update];
+      phase_sa = phase_sa_particles[which_particle_update];
+      
+      calculate_sa_from_blrmodel(best_model_sa);
+
+      sprintf(fname, "%s/%s", parset.file_dir, "data/psa_line.txt");
+      fp = fopen(fname, "w");
+      if(fp == NULL)
+      {
+        fprintf(stderr, "# Error: Cannot open file %s.\n", fname);
+        exit(0);
+      }
+      // output sa line
+      for(j=0; j<n_vel_sa_data; j++)
+      {
+        fprintf(fp, "%e %e\n", wave_sa_data[j], Fline_sa[j]);
+      }
+      fclose(fp);
+
+      //file for phase
+      sprintf(fname, "%s/%s", parset.file_dir, "data/psa_phase.txt");
+      fp = fopen(fname, "w");
+      if(fp == NULL)
+      {
+        fprintf(stderr, "# Error: Cannot open file %s.\n", fname);
+        exit(0);
+      }
+      for(k=0; k<n_base_sa_data; k++)
+      {
+        for(j=0; j<n_vel_sa_data; j++)
+        {
+          fprintf(fp, "%e %e\n", wave_sa_data[j], phase_sa[k*n_vel_sa_data + j]/(PhaseFactor * wave_sa_data[j]) );
+        }
+        fprintf(fp, "\n");
+      }
+      fclose(fp);
+    }
   }
 
   reconstruct_sa_end();

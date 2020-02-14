@@ -2054,14 +2054,14 @@ void gen_cloud_sample_model9(const void *pm, int flag_type, int flag_save)
       V = -vx;  //note the definition of the line-of-sight velocity. positive means a receding 
                 // velocity relative to the observer.
       
-      /* a uniform broadening */
-      V += gsl_ran_ugaussian(gsl_r) * 235.0/VelUnit;
-      
       if(fabs(V) >= C_Unit) // make sure that the velocity is smaller than speed of light
         V = 0.9999*C_Unit * (V>0.0?1.0:-1.0);
 
-      g = sqrt( (1.0 + V/C_Unit) / (1.0 - V/C_Unit) ) / sqrt(1.0 - Rs/r); //relativistic effects
+      g = (1.0 + V/C_Unit) / sqrt( (1.0 - V*V/C_Unit/C_Unit) ) / sqrt(1.0 - Rs/r); //relativistic effects
       V = (g-1.0)*C_Unit;
+
+      /* a uniform broadening */
+      V += gsl_ran_ugaussian(gsl_r) * 235.0/VelUnit;
       
       clouds_vel[i*parset.n_vel_per_cloud + j] = V;
 

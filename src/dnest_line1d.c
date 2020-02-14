@@ -31,73 +31,7 @@ int dnest_line1d(int argc, char **argv)
 {
   int i;
   
-  switch(parset.flag_blrmodel)
-  {
-    case -1:
-      num_params_blr_model = num_params_MyTransfun1d;
-      transfun_1d_cal = transfun_1d_cal_mytransfun;
-      break;
-
-    case 0: 
-      num_params_blr_model = num_params_MyBLRmodel1d;
-      gen_cloud_sample = gen_cloud_sample_mymodel;
-      transfun_1d_cal = transfun_1d_cal_cloud;
-      break;
-
-    case 1:
-      num_params_blr_model = 6;
-      gen_cloud_sample = gen_cloud_sample_model1;
-      transfun_1d_cal = transfun_1d_cal_cloud;
-      break;
-
-    case 2:
-      num_params_blr_model = 6;
-      gen_cloud_sample = gen_cloud_sample_model1;
-      transfun_1d_cal = transfun_1d_cal_cloud;
-      break;
-
-    case 3:
-      num_params_blr_model = 6;
-      gen_cloud_sample = gen_cloud_sample_model3;
-      transfun_1d_cal = transfun_1d_cal_cloud;
-      break;
-
-    case 4:
-      num_params_blr_model = 6;
-      gen_cloud_sample = gen_cloud_sample_model3;
-      transfun_1d_cal = transfun_1d_cal_cloud;
-      break;
-
-    case 5:
-      num_params_blr_model = 9;
-      gen_cloud_sample = gen_cloud_sample_model5;
-      transfun_1d_cal = transfun_1d_cal_cloud;
-      break;
-
-    case 6:
-      num_params_blr_model = 8;
-      gen_cloud_sample = gen_cloud_sample_model6;
-      transfun_1d_cal = transfun_1d_cal_cloud;
-      break;
-
-    case 7:
-      num_params_blr_model = 13;
-      gen_cloud_sample = gen_cloud_sample_model7;
-      transfun_1d_cal = transfun_1d_cal_cloud;
-      break;
-
-    case 8:
-      num_params_blr_model = 13;
-      gen_cloud_sample = gen_cloud_sample_model8;
-      transfun_1d_cal = transfun_1d_cal_cloud;
-      break;
-
-    default:
-      num_params_blr_model = 6;
-      gen_cloud_sample = gen_cloud_sample_model1;
-      transfun_1d_cal = transfun_1d_cal_cloud;
-      break;
-  }
+  set_blr_model1d();
   
   num_params_blr = num_params_blr_model + 2 + 1; /* include A, Ag, and line sys err */
   num_params = parset.n_con_recon + num_params_var + num_params_blr;
@@ -142,7 +76,7 @@ int dnest_line1d(int argc, char **argv)
   print_par_names_model1d();
   set_par_fix_blrmodel();
 
-  for(i=num_params_blr; i<num_params; i++)
+  for(i=num_params_blr_model; i<num_params; i++)
     par_fix[i] = 0;
 
   /* fix continuum variation parameter sigma and tau if flag_fixvar is true */

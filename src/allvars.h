@@ -53,7 +53,7 @@
 #define PI            M_PI
 #define BRAINS_MAX_STR_LENGTH  (256)
 
-#define EPS (DBL_MIN)
+#define EPS (DBL_MIN)  /* epsilon of the machine as in Matlab */
 
 enum PRIOR_TYPE {GAUSSIAN=1, UNIFORM=2};
 
@@ -238,7 +238,7 @@ extern double PhaseFactor;
 
 extern int num_params_blr_tot;
 extern int num_params_rm;
-extern int num_params_sa, num_params_sa_blr_model, num_params_sa_extpar;
+extern int num_params_sa, num_params_sa_blr_model, num_params_sa_extpar, num_params_sa_blr;
 extern int n_epoch_sa_data, n_vel_sa_data, n_base_sa_data;
 extern double *vel_sa_data, *base_sa_data, *Fline_sa_data, *Flerrs_sa_data, *phase_sa_data, *pherrs_sa_data;
 extern double *wave_sa_data;
@@ -254,6 +254,8 @@ extern double *clouds_alpha, *clouds_beta;
 extern double **sa_extpar_range, **sa_blr_range_model;
 
 extern int SABLRmodel_size;
+
+extern int *idx_sa_par_mutual;
 
 extern double *workspace_phase;
 #endif

@@ -202,9 +202,10 @@ typedef BLRmodel9 SABLRmodel9;
 
 typedef struct 
 {
-  double DA;
-  double PA;
-  double FA;
+  double DA; /* angular size distance */
+  double PA; /* position angle */
+  double FA; /* line flux scaling factor */
+  double CO; /* line center offset */
 }SAExtPar;
 
 #endif

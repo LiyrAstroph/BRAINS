@@ -8,23 +8,35 @@
 #ifdef SA
 
 #include <math.h>
+#include <stddef.h>
 
 #include "brains.h"
 
+/* 
+ * calculate SA phase and line profile.
+ */
 void calculate_sa_from_blrmodel(const void *pm)
 {
   int i, j, k, idV;
   double V, dV, y, z, alpha, beta, flux_norm, phase, *phase_norm, *alpha_cent, *beta_cent;
-  double DA, PA, FA, cos_PA, sin_PA;
+  double DA, PA, FA, CO, cos_PA, sin_PA;
   double *pmodel = (double *)pm;
 
   phase_norm = workspace_phase;
   alpha_cent = phase_norm + n_vel_sa_data;
   beta_cent = alpha_cent + n_vel_sa_data;
 
-  DA = exp(pmodel[num_params_sa_blr_model]);
-  PA = pmodel[num_params_sa_blr_model + 1]/180.0 * PI;
-  FA = exp(pmodel[num_params_sa_blr_model+2]);
+  /* angular size distance */
+  DA = exp(pmodel[num_params_sa_blr_model]);   
+  /* position angle */         
+  PA = pmodel[num_params_sa_blr_model + 1]/180.0 * PI;  
+  /* line flux scaling center */
+  FA = exp(pmodel[num_params_sa_blr_model+2]);   
+  /* 
+   * line center offset: V+dV = (w-(w0+dw0))/(w0+dw0) ==> dV = - dw0/w0 
+   * equivalent to redshift offset:  dz = -(1+z) dw0/w0
+   */       
+  CO = -pmodel[num_params_sa_blr_model+3]/parset.sa_linecenter * C_Unit;  
 
   cos_PA = cos(PA);
   sin_PA = sin(PA);
@@ -35,7 +47,6 @@ void calculate_sa_from_blrmodel(const void *pm)
   
   for(i=0; i<n_vel_sa_data; i++)
   {
-    Fline_sa[i] = 0.0;
     for(k=0; k<n_base_sa_data; k++)
     {
       phase_sa[k*n_vel_sa_data + i] = 0.0;
@@ -56,12 +67,11 @@ void calculate_sa_from_blrmodel(const void *pm)
 
     for(j=0; j< parset.n_vel_per_cloud; j++)
     {
-      V = clouds_vel[i*parset.n_vel_per_cloud + j];
+      V = clouds_vel[i*parset.n_vel_per_cloud + j] + CO;
       if(V<vel_sa_data[0] || V >= vel_sa_data[n_vel_sa_data-1]+dV)
-          continue;
+        continue;
       idV = (V - vel_sa_data[0])/dV;
-      Fline_sa[idV] += clouds_weight[i];
-
+      
       phase_norm[idV] += clouds_weight[i];
       alpha_cent[idV] += alpha * clouds_weight[i];
       beta_cent[idV] += beta * clouds_weight[i];
@@ -72,12 +82,12 @@ void calculate_sa_from_blrmodel(const void *pm)
   flux_norm = 0.0;
   for(j=0; j<n_vel_sa_data; j++)
   {
-    flux_norm += Fline_sa[j];
+    flux_norm += phase_norm[j];
   }
   flux_norm /= (sa_flux_norm * n_vel_sa_data);
   for(j=0; j<n_vel_sa_data; j++)
   {
-    Fline_sa[j] = FA * Fline_sa[j]/(flux_norm + EPS);
+    Fline_sa[j] = FA * phase_norm[j]/(flux_norm + EPS);
   }
 
   for(j=0; j<n_vel_sa_data; j++)
@@ -96,6 +106,126 @@ void calculate_sa_from_blrmodel(const void *pm)
     }
   }
 
+  return;
+}
+
+void set_sa_blr_model()
+{
+  switch(parset.flag_sa_blrmodel)
+  {
+    case 0:
+      num_params_sa_blr_model = num_params_MyBLRmodel2d;
+      gen_sa_cloud_sample = gen_cloud_sample_mymodel;
+      break;
+
+    case 1:
+      num_params_sa_blr_model = sizeof(BLRmodel1)/sizeof(double);
+      gen_sa_cloud_sample = gen_cloud_sample_model1;
+      break;
+
+    case 2:
+      num_params_sa_blr_model = sizeof(BLRmodel2)/sizeof(double);
+      gen_sa_cloud_sample = gen_cloud_sample_model2;
+      break;
+
+    case 3:
+      num_params_sa_blr_model = sizeof(BLRmodel3)/sizeof(double);
+      gen_sa_cloud_sample = gen_cloud_sample_model3;
+      break;
+
+    case 4:
+      num_params_sa_blr_model = sizeof(BLRmodel4)/sizeof(double);
+      gen_sa_cloud_sample = gen_cloud_sample_model4;
+      break;
+
+    case 5:
+      num_params_sa_blr_model = sizeof(BLRmodel5)/sizeof(double);
+      gen_sa_cloud_sample = gen_cloud_sample_model5;
+      break;
+    
+    case 6:
+      num_params_sa_blr_model = sizeof(BLRmodel6)/sizeof(double);
+      gen_sa_cloud_sample = gen_cloud_sample_model6;
+      break;
+    
+    case 7:
+      num_params_sa_blr_model = sizeof(BLRmodel7)/sizeof(double);
+      gen_sa_cloud_sample = gen_cloud_sample_model7;
+      break;
+
+    case 8:
+      num_params_sa_blr_model = sizeof(BLRmodel8)/sizeof(double);
+      gen_sa_cloud_sample = gen_cloud_sample_model8;
+      break;
+    
+    case 9:
+      num_params_sa_blr_model = sizeof(BLRmodel9)/sizeof(double);
+      gen_sa_cloud_sample = gen_cloud_sample_model9;
+      break;
+
+    default:
+      num_params_sa_blr_model = sizeof(BLRmodel1)/sizeof(double);
+      gen_sa_cloud_sample = gen_cloud_sample_model1;
+      break;
+  }
+
+  return;
+}
+
+void set_idx_sa_par_mutual()
+{
+  switch(parset.flag_sa_blrmodel)
+  {
+    case 0:
+      idx_sa_par_mutual[0] = offsetof(MyBLRmodel, mbh);
+      idx_sa_par_mutual[1] = offsetof(MyBLRmodel, inc);
+      break;
+
+    case 1:
+      idx_sa_par_mutual[0] = offsetof(SABLRmodel1, mbh);
+      idx_sa_par_mutual[1] = offsetof(SABLRmodel1, inc);
+      break;
+
+    case 2:
+      idx_sa_par_mutual[0] = offsetof(SABLRmodel2, mbh);
+      idx_sa_par_mutual[1] = offsetof(SABLRmodel2, inc);
+      break;
+    
+    case 3:
+      idx_sa_par_mutual[0] = offsetof(SABLRmodel3, mbh);
+      idx_sa_par_mutual[1] = offsetof(SABLRmodel3, inc);
+      break;
+
+    case 4:
+      idx_sa_par_mutual[0] = offsetof(SABLRmodel4, mbh);
+      idx_sa_par_mutual[1] = offsetof(SABLRmodel4, inc);
+      break;
+    
+    case 5:
+      idx_sa_par_mutual[0] = offsetof(SABLRmodel5, mbh);
+      idx_sa_par_mutual[1] = offsetof(SABLRmodel5, inc);
+      break;
+
+    case 6:
+      idx_sa_par_mutual[0] = offsetof(SABLRmodel6, mbh);
+      idx_sa_par_mutual[1] = offsetof(SABLRmodel6, inc);
+      break;
+    
+    case 7:
+      idx_sa_par_mutual[0] = offsetof(SABLRmodel7, mbh);
+      idx_sa_par_mutual[1] = offsetof(SABLRmodel7, inc);
+      break;
+    
+    case 8:
+      idx_sa_par_mutual[0] = offsetof(SABLRmodel8, mbh);
+      idx_sa_par_mutual[1] = offsetof(SABLRmodel8, inc);
+      break;
+    
+    case 9:
+      idx_sa_par_mutual[0] = offsetof(SABLRmodel9, mbh);
+      idx_sa_par_mutual[1] = offsetof(SABLRmodel9, inc);
+      break;
+  }
   return;
 }
 
@@ -526,8 +656,8 @@ void set_sa_blr_range_model9()
 
   i = 0;
   //mu
-  sa_blr_range_model[i][0] = log(1.0);
-  sa_blr_range_model[i++][1] = log(rcloud_max_set*0.5);
+  sa_blr_range_model[i][0] = log(3.0);
+  sa_blr_range_model[i++][1] = log(3.0e4);
   //beta
   sa_blr_range_model[i][0] = 0.001;
   sa_blr_range_model[i++][1] = 2.0;

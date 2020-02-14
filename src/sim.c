@@ -188,6 +188,16 @@ void sim()
       pm[i++] = cos(30.0/180.0*PI);     // inc
       pm[i++] = log(4.0); // mbh
       break;
+    
+    case 9:
+      i=0;
+      pm[i++] = log(4.0);   //theta_min
+      pm[i++] = 1.0;
+      pm[i++] = 0.2;
+      pm[i++] = 30.0;     // inc
+      pm[i++] = 30.0;
+      pm[i++] = log(4.0); // mbh
+      break;
   }
 
   pm[num_params_blr_model + num_params_nlr ] = 0.0; // spectral broadening
@@ -426,6 +436,13 @@ void sim_init()
     case 8:
       num_params_blr_model = sizeof(BLRmodel8)/sizeof(double);
       gen_cloud_sample = gen_cloud_sample_model8;
+      transfun_1d_cal = transfun_1d_cal_cloud;
+      transfun_2d_cal = transfun_2d_cal_cloud;
+      break;
+    
+    case 9:
+      num_params_blr_model = sizeof(BLRmodel9)/sizeof(double);
+      gen_cloud_sample = gen_cloud_sample_model9;
       transfun_1d_cal = transfun_1d_cal_cloud;
       transfun_2d_cal = transfun_2d_cal_cloud;
       break;

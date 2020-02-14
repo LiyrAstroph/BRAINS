@@ -31,66 +31,11 @@ int dnest_sa(int argc, char **argv)
 {
   int i;
   double logz_sa;
-  
-  switch(parset.flag_sa_blrmodel)
-  {
-    case 0:
-      num_params_sa_blr_model = num_params_MyBLRmodel2d;
-      gen_sa_cloud_sample = gen_cloud_sample_mymodel;
-      break;
 
-    case 1:
-      num_params_sa_blr_model = sizeof(BLRmodel1)/sizeof(double);
-      gen_sa_cloud_sample = gen_cloud_sample_model1;
-      break;
+  set_sa_blr_model();
 
-    case 2:
-      num_params_sa_blr_model = sizeof(BLRmodel2)/sizeof(double);
-      gen_sa_cloud_sample = gen_cloud_sample_model2;
-      break;
-
-    case 3:
-      num_params_sa_blr_model = sizeof(BLRmodel3)/sizeof(double);
-      gen_sa_cloud_sample = gen_cloud_sample_model3;
-      break;
-
-    case 4:
-      num_params_sa_blr_model = sizeof(BLRmodel4)/sizeof(double);
-      gen_sa_cloud_sample = gen_cloud_sample_model4;
-      break;
-
-    case 5:
-      num_params_sa_blr_model = sizeof(BLRmodel5)/sizeof(double);
-      gen_sa_cloud_sample = gen_cloud_sample_model5;
-      break;
-    
-    case 6:
-      num_params_sa_blr_model = sizeof(BLRmodel6)/sizeof(double);
-      gen_sa_cloud_sample = gen_cloud_sample_model6;
-      break;
-    
-    case 7:
-      num_params_sa_blr_model = sizeof(BLRmodel7)/sizeof(double);
-      gen_sa_cloud_sample = gen_cloud_sample_model7;
-      break;
-
-    case 8:
-      num_params_sa_blr_model = sizeof(BLRmodel8)/sizeof(double);
-      gen_sa_cloud_sample = gen_cloud_sample_model8;
-      break;
-    
-    case 9:
-      num_params_sa_blr_model = sizeof(BLRmodel9)/sizeof(double);
-      gen_sa_cloud_sample = gen_cloud_sample_model9;
-      break;
-
-    default:
-      num_params_sa_blr_model = sizeof(BLRmodel1)/sizeof(double);
-      gen_sa_cloud_sample = gen_cloud_sample_model1;
-      break;
-  }
-  
-  num_params_sa = num_params_sa_blr_model + num_params_sa_extpar;
+  num_params_sa_blr = num_params_sa_blr_model + num_params_sa_extpar;
+  num_params_sa = num_params_sa_blr;
   num_params = num_params_sa;
 
   par_fix = (int *) malloc(num_params * sizeof(int));
@@ -126,6 +71,11 @@ int dnest_sa(int argc, char **argv)
   par_fix[num_params_sa_blr_model] = 1;
   par_fix_val[num_params_sa_blr_model] = log(550.0);
 
+  /* fix FA */
+  par_fix[num_params_sa_blr_model+2] = 1;
+  par_fix_val[num_params_sa_blr_model+2] = log(1.0);
+
+  
   force_update = parset.flag_force_update;
   if(parset.flag_para_name != 1)
     logz_sa = dnest(argc, argv, fptrset_sa, num_params, dnest_options_file);
@@ -308,8 +258,8 @@ void read_particle_sa(FILE *fp, void *model)
 double perturb_sa(void *model)
 {
   double *pm = (double *)model;
-  double logH = 0.0, limit1, limit2, width, rnd;
-  int which, which_level; 
+  double logH = 0.0, limit1, limit2, width;
+  int which, which_level, count_saves; 
 
   /* 
    * fixed parameters need not to update 
@@ -323,35 +273,39 @@ double perturb_sa(void *model)
   which_parameter_update = which;
   
   /* level-dependent width */
+  count_saves = dnest_get_count_saves();
   which_level_update = dnest_get_which_level_update();
   which_level = which_level_update > (size_levels-10)?(size_levels-10):which_level_update;
-  
-  if( which_level > 0)
+
+  if( which_level > 0 && count_saves > 1000)
   {
     limit1 = limits[(which_level-1) * num_params *2 + which *2];
     limit2 = limits[(which_level-1) * num_params *2 + which *2 + 1];
-    width = (limit2 - limit1)/2.35;
+    width = (limit2 - limit1);
+    width /= (3*2.35);
   }
   else
   {
     limit1 = par_range_model[which][0];
     limit2 = par_range_model[which][1];
-    width = (par_range_model[which][1] - par_range_model[which][0])/2.35;
+    width = (par_range_model[which][1] - par_range_model[which][0]);
+    width /= (2.35);
   }
+  
 
   if(par_prior_model[which] == GAUSSIAN)
   {
     logH -= (-0.5*pow((pm[which] - par_prior_gaussian[which][0])/par_prior_gaussian[which][1], 2.0) );
-    pm[which] += dnest_randn() * width;
-    //dnest_wrap(&pm[which], par_range_model[which][0], par_range_model[which][1]);
-    dnest_wrap(&pm[which], limit1, limit2);
+    pm[which] += dnest_randh() * width;
+    (&pm[which], par_range_model[which][0], par_range_model[which][1]);
+    //dnest_wrap(&pm[which], limit1, limit2);
     logH += (-0.5*pow((pm[which] - par_prior_gaussian[which][0])/par_prior_gaussian[which][1], 2.0) );
   }
   else
   {
-    pm[which] += dnest_randn() * width;
-    //dnest_wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
-    dnest_wrap(&pm[which], limit1, limit2);
+    pm[which] += dnest_randh() * width;
+    dnest_wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
+    //dnest_wrap(&pm[which], limit1, limit2);
   }
 
   return logH;
@@ -368,7 +322,7 @@ double log_likelihoods_cal_sa_exam(const void *model)
 
 void accept_action_sa()
 {
-  int param;
+  /*int param;
   double *ptemp;
 
   // the parameter previously updated
@@ -380,7 +334,7 @@ void accept_action_sa()
 
   ptemp = Fline_sa_particles[which_particle_update];
   Fline_sa_particles[which_particle_update] = Fline_sa_particles_perturb[which_particle_update];
-  Fline_sa_particles_perturb[which_particle_update] = ptemp;
+  Fline_sa_particles_perturb[which_particle_update] = ptemp;*/
   
   return;
 }

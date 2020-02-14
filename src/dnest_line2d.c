@@ -33,74 +33,8 @@ int dnest_line2d(int argc, char **argv)
 {
   int i;
 
-  switch(parset.flag_blrmodel)
-  {
-    case -1:
-      num_params_blr_model = num_params_MyTransfun2d;
-      transfun_2d_cal = transfun_2d_cal_mytransfun;
-      break;
-
-    case 0:
-      num_params_blr_model = num_params_MyBLRmodel2d;
-      gen_cloud_sample = gen_cloud_sample_mymodel;
-      transfun_2d_cal = transfun_2d_cal_cloud;
-      break;
-
-    case 1:
-      num_params_blr_model = sizeof(BLRmodel1)/sizeof(double);
-      gen_cloud_sample = gen_cloud_sample_model1;
-      transfun_2d_cal = transfun_2d_cal_cloud;
-      break;
-
-    case 2:
-      num_params_blr_model = sizeof(BLRmodel2)/sizeof(double);
-      gen_cloud_sample = gen_cloud_sample_model2;
-      transfun_2d_cal = transfun_2d_cal_cloud;
-      break;
-
-    case 3:
-      num_params_blr_model = sizeof(BLRmodel3)/sizeof(double);
-      gen_cloud_sample = gen_cloud_sample_model3;
-      transfun_2d_cal = transfun_2d_cal_cloud;
-      break;
-
-    case 4:
-      num_params_blr_model = sizeof(BLRmodel4)/sizeof(double);
-      gen_cloud_sample = gen_cloud_sample_model4;
-      transfun_2d_cal = transfun_2d_cal_cloud;
-      break;
-
-    case 5:
-      num_params_blr_model = sizeof(BLRmodel5)/sizeof(double);
-      gen_cloud_sample = gen_cloud_sample_model5;
-      transfun_2d_cal = transfun_2d_cal_cloud;
-      break;
+  set_blr_model2d();
     
-    case 6:
-      num_params_blr_model = sizeof(BLRmodel6)/sizeof(double);
-      gen_cloud_sample = gen_cloud_sample_model6;
-      transfun_2d_cal = transfun_2d_cal_cloud;
-      break;
-    
-    case 7:
-      num_params_blr_model = sizeof(BLRmodel7)/sizeof(double);
-      gen_cloud_sample = gen_cloud_sample_model7;
-      transfun_2d_cal = transfun_2d_cal_cloud;
-      break;
-
-    case 8:
-      num_params_blr_model = sizeof(BLRmodel8)/sizeof(double);
-      gen_cloud_sample = gen_cloud_sample_model8;
-      transfun_2d_cal = transfun_2d_cal_cloud;
-      break;
-
-    default:
-      num_params_blr_model = sizeof(BLRmodel1)/sizeof(double);
-      gen_cloud_sample = gen_cloud_sample_model1;
-      transfun_2d_cal = transfun_2d_cal_cloud;
-      break;
-  }
-  
   num_params_blr = num_params_blr_model + num_params_nlr 
                  + num_params_res + num_params_linecenter + 2 + 1; /* include A, Ag, and line sys err */
   num_params = parset.n_con_recon + num_params_blr + num_params_var;
@@ -145,7 +79,7 @@ int dnest_line2d(int argc, char **argv)
   set_par_fix_blrmodel();
 
   /* setup the remaining paramters */
-  for(i=num_params_blr; i<num_params; i++)
+  for(i=num_params_blr_model; i<num_params; i++)
   {
     par_fix[i] = 0;
     par_fix_val[i] = -DBL_MAX;

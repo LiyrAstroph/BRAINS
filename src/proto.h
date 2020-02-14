@@ -62,6 +62,8 @@ void postprocess_con();
 void set_par_range_con();
 void print_par_names_con();
 
+void set_blr_model1d();
+void set_blr_model2d();
 
 /* 1d line reconstruction */
 int dnest_line1d(int argc, char **argv);
@@ -125,6 +127,10 @@ void get_hms(double dt, int *h, int *m, double *s);
 
 #ifdef SA
 
+void set_sa_blr_model();
+void set_idx_sa_par_mutual();
+
+/* SA */
 void reconstruct_sa();
 void reconstruct_sa_init();
 void reconstruct_sa_end();
@@ -140,6 +146,7 @@ void print_par_names_sa2d();
 void calculate_sa_from_blrmodel(const void *pm);
 void postprocess_sa();
 
+/* SA + 1D RM */
 void reconstruct_sa1d();
 void reconstruct_sa1d_init();
 void reconstruct_sa1d_end();
@@ -153,6 +160,7 @@ void print_par_names_sa1d();
 void calculate_sa1d_from_blrmodel(const void *pm);
 void postprocess_sa1d();
 
+/* SA + 2D RM */
 void reconstruct_sa2d();
 void reconstruct_sa2d_init();
 void reconstruct_sa2d_end();

@@ -5,9 +5,32 @@
  * Thu, Aug 4, 2016
  */
 
+/*! \file dnest_sa1d.c
+ *  \brief run dnest sampling for sa and 2d rm analysis.
+ */
+
 #ifdef SA
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <math.h>
+#include <float.h>
+#include <string.h>
+#include <gsl/gsl_rng.h>
+#include <gsl/gsl_randist.h>
+#include <gsl/gsl_interp.h>
+#include <mpi.h>
+
 #include "brains.h"
+
+DNestFptrSet *fptrset_sa2d;
+
+int dnest_sa2d(int argc, char **argv)
+{
+  return 0;
+}
 
 void set_par_range_sa2d()
 {

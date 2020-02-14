@@ -940,7 +940,7 @@ void read_data()
     for(i=0; i<n_vel_sa_data; i++)
     {
       vel_sa_data[i] = (wave_sa_data[i]/(1.0+parset.redshift) - parset.sa_linecenter)/parset.sa_linecenter;
-      vel_sa_data[i] *= C/1.0e5/VelUnit;
+      vel_sa_data[i] *= C_Unit;
     }
 
     /* normalize phase */
