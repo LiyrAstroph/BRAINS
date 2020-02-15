@@ -432,6 +432,12 @@ void set_idx_par_mutual()
       idx_sa_par_mutual[1] = offsetof(SABLRmodel9, inc);
       break;
   }
+
+  idx_sa_par_mutual[0] /= sizeof(double);
+  idx_sa_par_mutual[1] /= sizeof(double);
+  idx_rm_par_mutual[0] /= sizeof(double);
+  idx_rm_par_mutual[1] /= sizeof(double);
+
   return;
 }
 
