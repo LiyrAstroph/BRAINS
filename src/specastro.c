@@ -35,7 +35,7 @@ void calculate_sa_transfun2d_from_blrmodel(const void *pm, double *transv, doubl
     transfun_2d_cal_with_sample(transv, trans2d, n_vel);
 
     gen_sa_cloud_sample((void *)sa_model, 3, flag_save);
-    calculate_sa_with_sample((void *)sa_model);
+    calculate_sa_with_sample(pm);
   }
 }
 
@@ -60,7 +60,7 @@ void calculate_sa_transfun_from_blrmodel(const void *pm, int flag_save)
     transfun_1d_cal_with_sample();
 
     gen_sa_cloud_sample((void *)sa_model, 3, flag_save);
-    calculate_sa_with_sample((void *)sa_model);
+    calculate_sa_with_sample(pm);
   }
 }
 
