@@ -37,6 +37,7 @@ int dnest_line2d(int argc, char **argv)
     
   num_params_blr = num_params_blr_model + num_params_nlr 
                  + num_params_res + num_params_linecenter + 2 + 1; /* include A, Ag, and line sys err */
+  num_params_blr_tot = num_params_blr;
   num_params = parset.n_con_recon + num_params_blr + num_params_var;
   par_fix = (int *) malloc(num_params * sizeof(int));
   par_fix_val = (double *) malloc(num_params * sizeof(double));

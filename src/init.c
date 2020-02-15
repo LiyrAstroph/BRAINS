@@ -371,7 +371,7 @@ void init()
     sys_err_line_range[1] = log(1.0+10.0);
   
     // response range
-    resp_range[0][0] = log(0.01);
+    resp_range[0][0] = log(0.1);
     resp_range[0][1] = log(10.0);
   
     resp_range[1][0] = -1.0;
@@ -463,6 +463,7 @@ void allocate_memory()
     if(parset.flag_sa_par_mutual != 0)
     {
       idx_sa_par_mutual = malloc(2*sizeof(int)); 
+      idx_rm_par_mutual = malloc(2*sizeof(int));
     }
 
     workspace_phase = malloc( (3*n_vel_sa_data)* sizeof(double));
@@ -529,6 +530,7 @@ void free_memory()
     if(parset.flag_sa_par_mutual != 0)
     {
       free(idx_sa_par_mutual);
+      free(idx_rm_par_mutual);
     }
 
     free(workspace_phase);

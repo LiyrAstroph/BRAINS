@@ -188,6 +188,7 @@ extern int BLRmodel_size;
 extern int *par_fix, npar_fix;
 extern double *par_fix_val;
 
+extern int num_params_blr_tot;
 extern int num_params, num_params_blr, num_params_blr_model, num_params_var, num_params_difftrend, num_params_nlr, num_params_res;
 extern int num_params_drw, num_params_trend;
 extern int num_params_linecenter;
@@ -236,7 +237,6 @@ extern gsl_interp  *gsl_linear;
 #ifdef SA
 extern double PhaseFactor;
 
-extern int num_params_blr_tot;
 extern int num_params_rm;
 extern int num_params_sa, num_params_sa_blr_model, num_params_sa_extpar, num_params_sa_blr;
 extern int n_epoch_sa_data, n_vel_sa_data, n_base_sa_data;
@@ -255,7 +255,9 @@ extern double **sa_extpar_range, **sa_blr_range_model;
 
 extern int SABLRmodel_size;
 
-extern int *idx_sa_par_mutual;
+extern int *idx_sa_par_mutual, *idx_rm_par_mutual;
+
+extern double *prob_sa_particles, *prob_sa_particles_perturb;
 
 extern double *workspace_phase;
 #endif

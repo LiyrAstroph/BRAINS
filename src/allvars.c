@@ -88,6 +88,7 @@ double mass_range[2];
 double sys_err_line_range[2];
 double resp_range[2][2];
 
+int num_params_blr_tot;
 int num_params, num_params_blr, num_params_blr_model, num_params_var, num_params_difftrend, num_params_nlr, num_params_res;
 int num_params_drw, num_params_trend;
 int num_params_linecenter;
@@ -131,7 +132,6 @@ gsl_interp  *gsl_linear;
 double PhaseFactor;
 
 int num_params_rm;
-int num_params_blr_tot;
 int num_params_sa, num_params_sa_blr_model, num_params_sa_extpar, num_params_sa_blr;
 int n_epoch_sa_data, n_vel_sa_data, n_base_sa_data;
 double *vel_sa_data, *base_sa_data, *Fline_sa_data, *Flerrs_sa_data, *phase_sa_data, *pherrs_sa_data;
@@ -149,7 +149,9 @@ double **sa_extpar_range, **sa_blr_range_model;
 
 int SABLRmodel_size;
 
-int *idx_sa_par_mutual;
+int *idx_sa_par_mutual, *idx_rm_par_mutual;
+
+double *prob_sa_particles, *prob_sa_particles_perturb;
 
 double *workspace_phase;
 #endif

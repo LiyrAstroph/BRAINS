@@ -12,6 +12,126 @@
 
 #include "brains.h"
 
+void calculate_sa_transfun_from_blrmodel(const void *pm)
+{
+  double *sa_model, *rm_model;
+
+  if(parset.flag_sa_par_mutual == 0)
+  {
+    gen_cloud_sample(pm, 4, 0);
+    transfun_1d_cal_with_sample();
+    calculate_sa_with_sample(pm);
+  }
+  else
+  {
+    rm_model = (double *)pm;
+    sa_model = rm_model + num_params_blr;
+    sa_model[idx_sa_par_mutual[0]] = rm_model[idx_rm_par_mutual[0]];
+    sa_model[idx_sa_par_mutual[1]] = rm_model[idx_rm_par_mutual[1]];
+
+    gen_cloud_sample(pm, 1, 0);
+    transfun_1d_cal_with_sample();
+
+    gen_sa_cloud_sample((void *)sa_model, 3, 0);
+    calculate_sa_with_sample((void *)sa_model);
+  }
+}
+
+/* 
+ * calculate SA phase and line profile.
+ */
+void calculate_sa_with_sample(const void *pm)
+{
+  int i, j, k, idV;
+  double V, dV, y, z, alpha, beta, flux_norm, phase, *phase_norm, *alpha_cent, *beta_cent;
+  double DA, PA, FA, CO, cos_PA, sin_PA;
+  double *pmodel = (double *)pm;
+
+  phase_norm = workspace_phase;
+  alpha_cent = phase_norm + n_vel_sa_data;
+  beta_cent = alpha_cent + n_vel_sa_data;
+
+  /* angular size distance */
+  DA = exp(pmodel[num_params_blr + num_params_sa_blr_model]);   
+  /* position angle */         
+  PA = pmodel[num_params_blr + num_params_sa_blr_model + 1]/180.0 * PI;  
+  /* line flux scaling center */
+  FA = exp(pmodel[num_params_blr + num_params_sa_blr_model+2]);   
+  /* 
+   * line center offset: V+dV = (w-(w0+dw0))/(w0+dw0) ==> dV = - dw0/w0 
+   * equivalent to redshift offset:  dz = -(1+z) dw0/w0
+   */       
+  CO = -pmodel[num_params_blr + num_params_sa_blr_model+3]/parset.sa_linecenter * C_Unit;  
+
+  cos_PA = cos(PA);
+  sin_PA = sin(PA);
+
+  dV = vel_sa_data[1] - vel_sa_data[0];
+  
+  for(i=0; i<n_vel_sa_data; i++)
+  {
+    for(k=0; k<n_base_sa_data; k++)
+    {
+      phase_sa[k*n_vel_sa_data + i] = 0.0;
+    }
+    phase_norm[i] = 0.0;
+    alpha_cent[i] = 0.0;
+    beta_cent[i] = 0.0;
+  }
+
+  
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    y = clouds_alpha[i];
+    z = clouds_beta[i];
+    
+    alpha = y * cos_PA + z * sin_PA;
+    beta = -y * sin_PA + z * cos_PA;
+
+    for(j=0; j< parset.n_vel_per_cloud; j++)
+    {
+      V = clouds_vel[i*parset.n_vel_per_cloud + j] + CO;
+      if(V<vel_sa_data[0] || V >= vel_sa_data[n_vel_sa_data-1]+dV)
+        continue;
+      idV = (V - vel_sa_data[0])/dV;
+      
+      phase_norm[idV] += clouds_weight[i];
+      alpha_cent[idV] += alpha * clouds_weight[i];
+      beta_cent[idV] += beta * clouds_weight[i];
+    }
+  }
+  
+  /* normalize line spectrum */
+  flux_norm = 0.0;
+  for(j=0; j<n_vel_sa_data; j++)
+  {
+    flux_norm += phase_norm[j];
+  }
+  flux_norm /= (sa_flux_norm * n_vel_sa_data);
+  for(j=0; j<n_vel_sa_data; j++)
+  {
+    Fline_sa[j] = FA * phase_norm[j]/(flux_norm + EPS);
+  }
+
+  for(j=0; j<n_vel_sa_data; j++)
+  {
+    alpha_cent[j] = (alpha_cent[j]/(phase_norm[j]+EPS)) / DA;
+    beta_cent[j] =  (beta_cent[j]/(phase_norm[j]+EPS)) / DA;
+  }
+  
+  /* phi = -2*pi * f_line * B/lambda * X/DA */
+  for(k=0; k<n_base_sa_data; k++)
+  {
+    for(j=0; j<n_vel_sa_data; j++)
+    { 
+      phase = base_sa_data[k*2] * alpha_cent[j] + base_sa_data[k*2 + 1] * beta_cent[j];
+      phase_sa[k*n_vel_sa_data + j] = -Fline_sa[j]/(1.0+Fline_sa[j]) * phase;
+    }
+  }
+
+  return;
+}
+
 /* 
  * calculate SA phase and line profile.
  */
@@ -27,16 +147,16 @@ void calculate_sa_from_blrmodel(const void *pm)
   beta_cent = alpha_cent + n_vel_sa_data;
 
   /* angular size distance */
-  DA = exp(pmodel[num_params_sa_blr_model]);   
+  DA = exp(pmodel[num_params_blr + num_params_sa_blr_model]);   
   /* position angle */         
-  PA = pmodel[num_params_sa_blr_model + 1]/180.0 * PI;  
+  PA = pmodel[num_params_blr + num_params_sa_blr_model + 1]/180.0 * PI;  
   /* line flux scaling center */
-  FA = exp(pmodel[num_params_sa_blr_model+2]);   
+  FA = exp(pmodel[num_params_blr + num_params_sa_blr_model+2]);   
   /* 
    * line center offset: V+dV = (w-(w0+dw0))/(w0+dw0) ==> dV = - dw0/w0 
    * equivalent to redshift offset:  dz = -(1+z) dw0/w0
    */       
-  CO = -pmodel[num_params_sa_blr_model+3]/parset.sa_linecenter * C_Unit;  
+  CO = -pmodel[num_params_blr + num_params_sa_blr_model+3]/parset.sa_linecenter * C_Unit;  
 
   cos_PA = cos(PA);
   sin_PA = sin(PA);
@@ -172,8 +292,61 @@ void set_sa_blr_model()
   return;
 }
 
-void set_idx_sa_par_mutual()
+void set_idx_par_mutual()
 {
+  switch(parset.flag_blrmodel)
+  {
+    case 0:
+      idx_rm_par_mutual[0] = offsetof(MyBLRmodel, mbh);
+      idx_rm_par_mutual[1] = offsetof(MyBLRmodel, inc);
+      break;
+
+    case 1:
+      idx_rm_par_mutual[0] = offsetof(BLRmodel1, mbh);
+      idx_rm_par_mutual[1] = offsetof(BLRmodel1, inc);
+      break;
+
+    case 2:
+      idx_rm_par_mutual[0] = offsetof(BLRmodel2, mbh);
+      idx_rm_par_mutual[1] = offsetof(BLRmodel2, inc);
+      break;
+    
+    case 3:
+      idx_rm_par_mutual[0] = offsetof(BLRmodel3, mbh);
+      idx_rm_par_mutual[1] = offsetof(BLRmodel3, inc);
+      break;
+
+    case 4:
+      idx_rm_par_mutual[0] = offsetof(BLRmodel4, mbh);
+      idx_rm_par_mutual[1] = offsetof(BLRmodel4, inc);
+      break;
+    
+    case 5:
+      idx_rm_par_mutual[0] = offsetof(BLRmodel5, mbh);
+      idx_rm_par_mutual[1] = offsetof(BLRmodel5, inc);
+      break;
+
+    case 6:
+      idx_rm_par_mutual[0] = offsetof(BLRmodel6, mbh);
+      idx_rm_par_mutual[1] = offsetof(BLRmodel6, inc);
+      break;
+    
+    case 7:
+      idx_rm_par_mutual[0] = offsetof(BLRmodel7, mbh);
+      idx_rm_par_mutual[1] = offsetof(BLRmodel7, inc);
+      break;
+    
+    case 8:
+      idx_rm_par_mutual[0] = offsetof(BLRmodel8, mbh);
+      idx_rm_par_mutual[1] = offsetof(BLRmodel8, inc);
+      break;
+    
+    case 9:
+      idx_rm_par_mutual[0] = offsetof(BLRmodel9, mbh);
+      idx_rm_par_mutual[1] = offsetof(BLRmodel9, inc);
+      break;
+  }
+
   switch(parset.flag_sa_blrmodel)
   {
     case 0:

@@ -34,6 +34,7 @@ int dnest_line1d(int argc, char **argv)
   set_blr_model1d();
   
   num_params_blr = num_params_blr_model + 2 + 1; /* include A, Ag, and line sys err */
+  num_params_blr_tot = num_params_blr;
   num_params = parset.n_con_recon + num_params_var + num_params_blr;
 
   par_fix = (int *) malloc(num_params * sizeof(int));

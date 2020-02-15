@@ -89,7 +89,7 @@ void postprocess2d()
     //file for transfer function
     sprintf(fname, "%s/%s", parset.file_dir, "data/tran2d_rec.txt");
     ftran = fopen(fname, "w");
-    if(fline == NULL)
+    if(ftran == NULL)
     {
       fprintf(stderr, "# Error: Cannot open file %s.\n", fname);
       exit(0);

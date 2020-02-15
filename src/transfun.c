@@ -49,7 +49,7 @@ void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl
     tmp = 0.0;
     for(m=1; m<num_params_difftrend+1; m++)
     {
-      tmp += pmodel[num_params_blr + num_params_drw + num_params_trend + m-1] * pow_Tcon_data[m-1];
+      tmp += pmodel[num_params_blr_tot + num_params_drw + num_params_trend + m-1] * pow_Tcon_data[m-1];
     }
     a0 = -tmp;
   }
@@ -88,7 +88,7 @@ void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl
         for(m=1; m<num_params_difftrend+1; m++)
         {
           tmp *= (tc - Tmed_data);
-          ftrend += pmodel[num_params_blr + num_params_drw + num_params_trend + m-1] * tmp;
+          ftrend += pmodel[num_params_blr_tot + num_params_drw + num_params_trend + m-1] * tmp;
         }
         fcon += ftrend;
       }
@@ -123,7 +123,7 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
     tmp = 0.0;
     for(m=1; m<num_params_difftrend+1; m++)
     {
-      tmp += pmodel[num_params_blr + num_params_drw + num_params_trend + m-1] * pow_Tcon_data[m-1];
+      tmp += pmodel[num_params_blr_tot + num_params_drw + num_params_trend + m-1] * pow_Tcon_data[m-1];
     }
     a0 = -tmp;
   }
@@ -164,7 +164,7 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
         for(m=1; m<num_params_difftrend+1; m++)
         {
           tmp *= (tc - Tmed_data);
-          ftrend += pmodel[num_params_blr + num_params_drw + num_params_trend + m-1] * tmp;
+          ftrend += pmodel[num_params_blr_tot + num_params_drw + num_params_trend + m-1] * tmp;
         }
         fcon += ftrend;
       }
@@ -267,23 +267,64 @@ void transfun_1d_cal_cloud(const void *pm, int flag_save)
     Anorm += Trans1D[i];
   }
   Anorm *= dTransTau;
-  /* check if we get a zero transfer function */
-  if(Anorm > 0.0)
+
+  Anorm += EPS;
+
+  for(i=0; i<parset.n_tau; i++)
   {
-    for(i=0; i<parset.n_tau; i++)
-    {
-      Trans1D[i] /= Anorm;
-    }
+    Trans1D[i] /= Anorm;
   }
-  else
+  return;
+}
+
+/*!
+ * This function calculates 1d transfer function.
+ */
+void transfun_1d_cal_with_sample()
+{
+  int i, idt;
+  double tau_min, tau_max, dTransTau;
+  double Anorm, dis;
+
+  tau_min = clouds_tau[0];
+  tau_max = clouds_tau[0];
+  for(i=0; i<parset.n_cloud_per_task; i++)
   {
-    printf(" Warning, zero 1d transfer function at task %d.\n", thistask);
-    for(i=0; i<parset.n_tau; i++)
-    {
-      Trans1D[i] = 0.0;
-    }
+    if(tau_min > clouds_tau[i])
+      tau_min = clouds_tau[i];
+    if(tau_max < clouds_tau[i])
+      tau_max = clouds_tau[i];
   }
 
+  dTransTau = (tau_max - tau_min)/(parset.n_tau - 1);
+  for(i=0; i<parset.n_tau; i++)
+  {
+    TransTau[i] = tau_min + dTransTau * i;
+    Trans1D[i] = 0.0;
+  }
+
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    dis = clouds_tau[i];
+    idt = (dis - tau_min)/dTransTau;
+    //Trans1D[idt] += pow(1.0/r, 2.0*(1 + gam)) * weight;
+    Trans1D[idt] += clouds_weight[i];
+  }
+
+  /* normalize transfer function */
+  Anorm = 0.0;
+  for(i=0;i<parset.n_tau;i++)
+  {
+    Anorm += Trans1D[i];
+  }
+  Anorm *= dTransTau;
+
+  Anorm += EPS;
+
+  for(i=0; i<parset.n_tau; i++)
+  {
+    Trans1D[i] /= Anorm;
+  }
   return;
 }
 
@@ -346,26 +387,78 @@ void transfun_2d_cal_cloud(const void *pm, double *transv, double *trans2d, int 
     }
   Anorm *= (dV * dTransTau);
 
-  /* check if we get a zero transfer function */
-  if(Anorm > 0.0)
+  Anorm += EPS;
+  for(i=0; i<parset.n_tau; i++)
   {
-    for(i=0; i<parset.n_tau; i++)
+    for(j=0; j<n_vel; j++)
     {
-      for(j=0; j<n_vel; j++)
-      {
-        trans2d[i*n_vel+j] /= Anorm;
-      }
+      trans2d[i*n_vel+j] /= Anorm;
     }
   }
-  else
+  return;
+}
+
+/*!
+ * This function calculates 2d transfer function.
+ */
+void transfun_2d_cal_with_sample(double *transv, double *trans2d, int n_vel)
+{
+  int i, j, idt, idV;
+  double tau_min, tau_max, dTransTau;
+  double Anorm, dis, V, dV;
+
+  tau_min = clouds_tau[0];
+  tau_max = clouds_tau[0];
+  for(i=0; i<parset.n_cloud_per_task; i++)
   {
-    printf(" Warning, zero 2d transfer function at task %d.\n", thistask);
-    for(i=0; i<parset.n_tau; i++)
+    if(tau_min > clouds_tau[i])
+      tau_min = clouds_tau[i];
+    if(tau_max < clouds_tau[i])
+      tau_max = clouds_tau[i];
+  }
+
+  dTransTau = (tau_max - tau_min)/(parset.n_tau - 1);
+  for(i=0; i<parset.n_tau; i++)
+  {
+    TransTau[i] = tau_min + dTransTau * i;
+  }
+
+  dV =(transv[1] - transv[0]); /* velocity grid width */
+  for(i=0; i<parset.n_tau; i++)
+    for(j=0;j<n_vel;j++)
+      trans2d[i*n_vel+j]=0.0;   /* cleanup of transfer function */
+
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    dis = clouds_tau[i];
+    idt = (dis - tau_min)/dTransTau;
+
+    for(j=0; j<parset.n_vel_per_cloud; j++)
     {
-      for(j=0; j<n_vel; j++)
-      {
-        trans2d[i*n_vel+j] = 0.0;
-      }
+      V = clouds_vel[i*parset.n_vel_per_cloud + j];
+      if(V<transv[0] || V >= transv[n_vel-1]+dV)
+        continue;
+      idV = (V - transv[0])/dV;
+      //trans2d[idt*n_vel + idV] += pow(1.0/r, 2.0*(1 + gam)) * weight;
+      trans2d[idt*n_vel + idV] += clouds_weight[i];
+    }
+  }
+
+  /* normalize transfer function */
+  Anorm = 0.0;
+  for(i=0; i<parset.n_tau; i++)
+    for(j=0; j<n_vel; j++)
+    {
+      Anorm += trans2d[i*n_vel+j];
+    }
+  Anorm *= (dV * dTransTau);
+  
+  Anorm += EPS;
+  for(i=0; i<parset.n_tau; i++)
+  {
+    for(j=0; j<n_vel; j++)
+    {
+      trans2d[i*n_vel+j] /= Anorm;
     }
   }
   return;

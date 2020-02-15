@@ -77,6 +77,7 @@ double prob_restart_line1d(const void *model);
 void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl);
 void (*transfun_1d_cal)(const void *pm, int flag_save);
 void transfun_1d_cal_cloud(const void *pm, int flag_save);
+void transfun_1d_cal_with_sample();
 
 void postprocess1d();
 void set_par_range_model1d();
@@ -128,7 +129,7 @@ void get_hms(double dt, int *h, int *m, double *s);
 #ifdef SA
 
 void set_sa_blr_model();
-void set_idx_sa_par_mutual();
+void set_idx_par_mutual();
 
 /* SA */
 void reconstruct_sa();
@@ -158,7 +159,10 @@ void print_par_names_sa1d();
 void set_par_range_sa1d();
 void print_par_names_sa1d();
 void calculate_sa1d_from_blrmodel(const void *pm);
+void calculate_sa_with_sample(const void *pm);
 void postprocess_sa1d();
+
+void calculate_sa_transfun_from_blrmodel(const void *pm);
 
 /* SA + 2D RM */
 void reconstruct_sa2d();

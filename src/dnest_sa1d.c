@@ -83,8 +83,6 @@ int dnest_sa1d(int argc, char **argv)
   print_par_names_sa1d();
   set_par_fix_blrmodel();
 
-  exit(0);
-
   /* the rest parameters */
   for(i=num_params_blr_model; i<num_params; i++)
   {
@@ -109,7 +107,7 @@ int dnest_sa1d(int argc, char **argv)
   if(parset.flag_sa_par_mutual != 0)
   {
     /* get the index for mbh and inclination parameters */
-    set_idx_sa_par_mutual();
+    set_idx_par_mutual();
     /* mbh */
     par_fix[num_params_blr + idx_sa_par_mutual[0]] = 1;
     par_fix_val[num_params_blr + idx_sa_par_mutual[0]] = 0.0;
@@ -120,8 +118,8 @@ int dnest_sa1d(int argc, char **argv)
   }
 
   /* fix FA */
-  par_fix[num_params_blr_tot-1] = 1;
-  par_fix_val[num_params_blr_tot-1] = log(1.0);
+  par_fix[num_params_blr + num_params_sa_blr_model+2] = 1;
+  par_fix_val[num_params_blr + num_params_sa_blr_model+2] = log(1.0);
 
   /* fix systematic error of continuum */
   if(parset.flag_con_sys_err != 1)
@@ -392,7 +390,7 @@ void from_prior_sa1d(void *model)
 double log_likelihoods_cal_initial_sa1d(const void *model)
 {
   double logL;
-  logL = prob_sa(model);
+  logL = prob_sa1d(model);
   return logL;
 }
 
@@ -402,7 +400,7 @@ double log_likelihoods_cal_initial_sa1d(const void *model)
 double log_likelihoods_cal_restart_sa1d(const void *model)
 {
   double logL;
-  logL = prob_sa(model);
+  logL = prob_sa1d(model);
   return logL;
 }
 
@@ -412,7 +410,7 @@ double log_likelihoods_cal_restart_sa1d(const void *model)
 double log_likelihoods_cal_sa1d(const void *model)
 {
   double logL;
-  logL = prob_sa(model);
+  logL = prob_sa1d(model);
   return logL;
 }
 
@@ -467,7 +465,12 @@ double perturb_sa1d(void *model)
    */
   do
   {
-    which = dnest_rand_int(num_params);
+    rnd = dnest_rand();
+    if(rnd < fmax(0.2, 1.0*(num_params_blr_tot+num_params_var)/num_params))
+      which = dnest_rand_int(num_params_blr_tot + num_params_var);
+    else
+      which = dnest_rand_int(parset.n_con_recon) + num_params_blr_tot + num_params_var;
+
   }while(par_fix[which] == 1);
   
   which_parameter_update = which;
@@ -475,9 +478,9 @@ double perturb_sa1d(void *model)
   /* level-dependent width */
   count_saves = dnest_get_count_saves();
   which_level_update = dnest_get_which_level_update();
-  which_level = which_level_update > (size_levels-5)?(size_levels-5):which_level_update;
+  which_level = which_level_update > (size_levels-10)?(size_levels-10):which_level_update;
 
-  if( which_level > 0 && count_saves > 1000)
+  if( which_level > 0)
   {
     limit1 = limits[(which_level-1) * num_params *2 + which *2];
     limit2 = limits[(which_level-1) * num_params *2 + which *2 + 1];
@@ -489,21 +492,21 @@ double perturb_sa1d(void *model)
     limit2 = par_range_model[which][1];
     width = (par_range_model[which][1] - par_range_model[which][0]);
   }
-  width /= (5.0*2.35);
+  width /= (2.35);
 
   if(par_prior_model[which] == GAUSSIAN)
   {
     logH -= (-0.5*pow((pm[which] - par_prior_gaussian[which][0])/par_prior_gaussian[which][1], 2.0) );
-    pm[which] += dnest_randn() * width;
-    //(&pm[which], par_range_model[which][0], par_range_model[which][1]);
-    dnest_wrap(&pm[which], limit1, limit2);
+    pm[which] += dnest_randh() * width;
+    dnest_wrap(&pm[which], par_range_model[which][0], par_range_model[which][1]);
+    //dnest_wrap(&pm[which], limit1, limit2);
     logH += (-0.5*pow((pm[which] - par_prior_gaussian[which][0])/par_prior_gaussian[which][1], 2.0) );
   }
   else
   {
-    pm[which] += dnest_randn() * width;
-    //dnest_wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
-    dnest_wrap(&pm[which], limit1, limit2);
+    pm[which] += dnest_randh() * width;
+    dnest_wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
+    //dnest_wrap(&pm[which], limit1, limit2);
   }
 
   return logH;
@@ -520,27 +523,85 @@ double log_likelihoods_cal_sa1d_exam(const void *model)
 
 void accept_action_sa1d()
 {
-  /*int param;
+  int param;
   double *ptemp;
 
   // the parameter previously updated
   param = which_parameter_update;
-  
-  ptemp = phase_sa_particles[which_particle_update];
-  phase_sa_particles[which_particle_update] = phase_sa_particles_perturb[which_particle_update];
-  phase_sa_particles_perturb[which_particle_update] = ptemp;
 
-  ptemp = Fline_sa_particles[which_particle_update];
-  Fline_sa_particles[which_particle_update] = Fline_sa_particles_perturb[which_particle_update];
-  Fline_sa_particles_perturb[which_particle_update] = ptemp;*/
+  /* continuum parameter is updated */
+  if( param >= num_params_blr_tot )
+  {
+    /* 
+     *note that (response) Fline is also changed as long as Fcon is changed.
+     *num_params_blr-the parameter is the systematic error of continuum.
+     *the change of this parameter also changes continuum reconstruction.
+     */
+
+    ptemp = Fcon_particles[which_particle_update];
+    Fcon_particles[which_particle_update] = Fcon_particles_perturb[which_particle_update];
+    Fcon_particles_perturb[which_particle_update] = ptemp;
+
+    ptemp = con_q_particles[which_particle_update];
+    con_q_particles[which_particle_update] = con_q_particles_perturb[which_particle_update];
+    con_q_particles_perturb[which_particle_update] = ptemp;
+
+    if(force_update != 1)
+    {
+      ptemp = Fline_at_data_particles[which_particle_update];
+      Fline_at_data_particles[which_particle_update] = Fline_at_data_particles_perturb[which_particle_update];
+      Fline_at_data_particles_perturb[which_particle_update] = ptemp;
+    }
+  }
+  else if( param != num_params_blr-1 && force_update != 1)
+  {
+    /* BLR parameter is updated 
+     * Note a) that the (num_par_blr-1)-th parameter is systematic error of line.
+     * when this parameter is updated, Trans1D and Fline are unchanged.
+     *      b) Fline is always changed, except param = num_params_blr-1.
+     */
+    
+    {
+      ptemp = TransTau_particles[which_particle_update];
+      TransTau_particles[which_particle_update] = TransTau_particles_perturb[which_particle_update];
+      TransTau_particles_perturb[which_particle_update] = ptemp;
+
+      ptemp = Trans1D_particles[which_particle_update];
+      Trans1D_particles[which_particle_update] = Trans1D_particles_perturb[which_particle_update];
+      Trans1D_particles_perturb[which_particle_update] = ptemp;
+
+      ptemp = Fline_at_data_particles[which_particle_update];
+      Fline_at_data_particles[which_particle_update] = Fline_at_data_particles_perturb[which_particle_update];
+      Fline_at_data_particles_perturb[which_particle_update] = ptemp;
+    
+
+      ptemp = phase_sa_particles[which_particle_update];
+      phase_sa_particles[which_particle_update] = phase_sa_particles_perturb[which_particle_update];
+      phase_sa_particles_perturb[which_particle_update] = ptemp;
+
+      ptemp = Fline_sa_particles[which_particle_update];
+      Fline_sa_particles[which_particle_update] = Fline_sa_particles_perturb[which_particle_update];
+      Fline_sa_particles_perturb[which_particle_update] = ptemp;
+
+      prob_sa_particles[which_particle_update] = prob_sa_particles_perturb[which_particle_update];
+    }
+  }
   
   return;
 }
 
 void kill_action_sa1d(int i, int i_copy)
 {
+  memcpy(Fcon_particles[i], Fcon_particles[i_copy], parset.n_con_recon * sizeof(double));
+  memcpy(Fline_at_data_particles[i], Fline_at_data_particles[i_copy], n_line_data * sizeof(double));
+  memcpy(con_q_particles[i], con_q_particles[i_copy], nq * sizeof(double));
+  memcpy(TransTau_particles[i], TransTau_particles[i_copy], parset.n_tau*sizeof(double));
+  memcpy(Trans1D_particles[i], Trans1D_particles[i_copy], parset.n_tau * sizeof(double));
+
   memcpy(phase_sa_particles[i], phase_sa_particles[i_copy], n_vel_sa_data * n_base_sa_data * sizeof(double));
   memcpy(Fline_sa_particles[i], Fline_sa_particles[i_copy], n_vel_sa_data * n_epoch_sa_data * sizeof(double));
+  prob_sa_particles[i] = prob_sa_particles_perturb[i_copy];
+
   return;
 }
 
