@@ -2059,9 +2059,6 @@ void gen_cloud_sample_model9(const void *pm, int flag_type, int flag_save)
 
       g = (1.0 + V/C_Unit) / sqrt( (1.0 - V*V/C_Unit/C_Unit) ) / sqrt(1.0 - Rs/r); //relativistic effects
       V = (g-1.0)*C_Unit;
-
-      /* a uniform broadening */
-      V += gsl_ran_ugaussian(gsl_r) * 235.0/VelUnit;
       
       clouds_vel[i*parset.n_vel_per_cloud + j] = V;
 

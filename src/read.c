@@ -244,6 +244,10 @@ void read_parset()
     strcpy(tag[nt], "SALineCenter");
     addr[nt] = &parset.sa_linecenter;
     id[nt++] = DOUBLE;
+    
+    strcpy(tag[nt], "SAInstRes");
+    addr[nt] = &parset.sa_InstRes;
+    id[nt++] = DOUBLE;
 #endif
 
 
@@ -283,7 +287,7 @@ void read_parset()
     parset.flag_sa_blrmodel = 1;
     parset.flag_sa_par_mutual = 0;
     parset.sa_linecenter = 1.875; 
-
+    parset.sa_InstRes = 0.0;
     strcpy(parset.sa_file, "");
 #endif 
 
@@ -564,6 +568,14 @@ void read_parset()
           "# Please specify a positive value.\n", parset.sa_linecenter);
           error_flag = 1;
       }
+
+      /* check sa InstRes */
+      if(parset.sa_InstRes < 0.0 && (parset.flag_dim > 2))
+      {
+        fprintf(stderr, "# Error in SAInstResErr: value %f is not allowed.\n# Please specify a non-negative value.\n", 
+                parset.sa_InstRes);
+        error_flag = 1;
+      }
       
       /* SA + 1D RM, must have the same BLR */
       if(parset.flag_dim == 4)
@@ -591,7 +603,14 @@ void read_parset()
           }
         }
       }
-
+      
+      if(error_flag == 0)
+      {
+        if(parset.flag_dim > 2)
+        {
+          parset.sa_InstRes /= VelUnit;
+        }
+      }
 #endif
     }
   }  

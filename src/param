@@ -4,7 +4,7 @@
 
 FileDir                     /home/liyropt/Projects/GIT/BRAINS      % directory for where all the output files are stored
 
-FlagDim                     4                           % -2, generate fully random lc; -1, mock lc based on input data; 
+FlagDim                     5                           % -2, generate fully random lc; -1, mock lc based on input data; 
                                                         % 0, only continuum modeling; 1, 1d line RM; 2, 2d line RM
                                                         % if -DSA, 3: only SA; 4: SA+1d line RM; 5: SA+2d line RM 
 
@@ -17,24 +17,24 @@ FlagBLRModel                6                           % 1, 2, 3, 4, 5, 6, 7, 8
 % data file
 Redshift                    0.158399                  % redshift
 
-ContinuumFile               data/sim_con.txt          % file for continuum data
-LineFile                    data/sim_hb.txt           % file for line data
-Line2DFile                  data/sim_hb2d.txt         % file for line 2d data
+ContinuumFile               data/3C273_con.txt          % file for continuum data
+LineFile                    data/3C273_hb.txt           % file for line data
+Line2DFile                  data/3C273_hb2d.txt         % file for line 2d data
 LineCenter                  4861.0                    %  rest frame, A
 
 
 SAFile                      data/3C273_sa.txt 
-SALineCenter                1.875                   % reset frame, um          
+SALineCenter                1.875                     % reset frame, um          
 FlagSABLRModel              9                         % same as FlagBLRModel 
-FlagSAParMutual             0                         % flag for mutual parameters with BLR model
+FlagSAParMutual             1                         % flag for mutual parameters with BLR model
                                                       % 0: all 
                                                       % 1: only BH mass and inclination
-
+SAInstRes                   235.0                     % km/s, fixed
 %========================================================================
 % reconstruction
 NConRecon                   200                         % number of points for continuum reconstruction
 FlagTrend                   0                           % 0, mean; 1, first-order trend
-FlagTrendDiff               0                           % 0, no difference; 1 or larger, add difference in the long-term trends between continuum and line
+FlagTrendDiff               1                           % 0, no difference; 1 or larger, add difference in the long-term trends between continuum and line
                                                         % the different trend is modelled by a polynomical with the order set by the value of FlagTrendDiff.
 
 ConConstructFileOut         data/pcon.txt               % output filename for continuum reconstruction
@@ -50,7 +50,7 @@ Line2DDataConstructFileOut  data/pline2d_data.txt       % output filename for 2d
 Tran2DFileOut               data/tran2d.txt             % output filename for 2d transfer function
 Tran2DDataFileOut           data/tran2d_data.txt        % output filename for 2d transfer function at velocity points same with data
 
-NCloudPerCore               10000                        % number of clouds per task
+NCloudPerCore               5000                        % number of clouds per task
 NVPerCloud                  1                           % number of velocities per cloud
 
 NTau                        200                         % number of time-lag points calculated in transfer function
@@ -62,12 +62,12 @@ CloudsFileOut               data/clouds.txt             % output filename for cl
 
 %========================================================================
 %
-FlagCloudsForceUpdate       0                           % default 0; 
+FlagCloudsForceUpdate       1                           % default 0; 
                                                         % 0, only update when BLR parameters are updated 
                                                         % 1, update every MCMC perturb (continuum + BLR)
 
-FlagConSysErr               0                           % 0, not include systematic error of contininuum; 1, include
-FlagLineSysErr              0                           % 0, not include systematic error of line; 1, include
+FlagConSysErr               1                           % 0, not include systematic error of contininuum; 1, include
+FlagLineSysErr              1                           % 0, not include systematic error of line; 1, include
 
 FlagNonlinear               1                           % 0, linear response; 1, non-linear response
 %========================================================================
@@ -88,7 +88,7 @@ InstResFile                 data/sim_broaden.txt       % file for storing epoch-
 % narrow-line component
 % use a gaussian to model the narrow-line component
 
-FlagNarrowLine              0                           % 0, no narrow line; 
+FlagNarrowLine              3                           % 0, no narrow line; 
                                                         % 1, add fixed narrow line; 
                                                         % 2, add Gaussian priors of the flux for narrow line; 
                                                         % 3, add logarithmic prior of the flux for narrow line
@@ -103,7 +103,7 @@ ShiftNarrowLineErr          0.0                         % shift error
 %========================================================================
 % 
 
-FlagLineCenter              0                          % -1, epoch-dependent; 0, not included; 1, uniform
+FlagLineCenter              -1                          % -1, epoch-dependent; 0, not included; 1, uniform
 LineCenterErr               50.0                        % km/s
 
 

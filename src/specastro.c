@@ -9,6 +9,8 @@
 
 #include <math.h>
 #include <stddef.h>
+#include <gsl/gsl_rng.h>
+#include <gsl/gsl_randist.h>
 
 #include "brains.h"
 
@@ -69,7 +71,7 @@ void calculate_sa_with_sample(const void *pm)
 {
   int i, j, k, idV;
   double V, dV, y, z, alpha, beta, flux_norm, phase, *phase_norm, *alpha_cent, *beta_cent;
-  double DA, PA, FA, CO, cos_PA, sin_PA;
+  double DA, PA, FA, CO, cos_PA, sin_PA, Vres;
   double *pmodel = (double *)pm;
 
   phase_norm = workspace_phase;
@@ -87,6 +89,9 @@ void calculate_sa_with_sample(const void *pm)
    * equivalent to redshift offset:  dz = -(1+z) dw0/w0
    */       
   CO = -pmodel[num_params_blr + num_params_sa_blr_model+3]/parset.sa_linecenter * C_Unit;  
+
+  /* instrument broadening */
+  Vres = parset.sa_InstRes; 
 
   cos_PA = cos(PA);
   sin_PA = sin(PA);
@@ -115,7 +120,7 @@ void calculate_sa_with_sample(const void *pm)
 
     for(j=0; j< parset.n_vel_per_cloud; j++)
     {
-      V = clouds_vel[i*parset.n_vel_per_cloud + j] + CO;
+      V = clouds_vel[i*parset.n_vel_per_cloud + j] + CO + Vres * gsl_ran_ugaussian(gsl_r);
       if(V<vel_sa_data[0] || V >= vel_sa_data[n_vel_sa_data-1]+dV)
         continue;
       idV = (V - vel_sa_data[0])/dV;
@@ -164,7 +169,7 @@ void calculate_sa_from_blrmodel(const void *pm, int flag_save)
 {
   int i, j, k, idV;
   double V, dV, y, z, alpha, beta, flux_norm, phase, *phase_norm, *alpha_cent, *beta_cent;
-  double DA, PA, FA, CO, cos_PA, sin_PA;
+  double DA, PA, FA, CO, cos_PA, sin_PA, Vres;
   double *pmodel = (double *)pm;
 
   phase_norm = workspace_phase;
@@ -182,6 +187,9 @@ void calculate_sa_from_blrmodel(const void *pm, int flag_save)
    * equivalent to redshift offset:  dz = -(1+z) dw0/w0
    */       
   CO = -pmodel[num_params_blr + num_params_sa_blr_model+3]/parset.sa_linecenter * C_Unit;  
+
+  /* instrument broadening */
+  Vres = parset.sa_InstRes; 
 
   cos_PA = cos(PA);
   sin_PA = sin(PA);
@@ -212,7 +220,7 @@ void calculate_sa_from_blrmodel(const void *pm, int flag_save)
 
     for(j=0; j< parset.n_vel_per_cloud; j++)
     {
-      V = clouds_vel[i*parset.n_vel_per_cloud + j] + CO;
+      V = clouds_vel[i*parset.n_vel_per_cloud + j] + CO + Vres * gsl_ran_ugaussian(gsl_r);
       if(V<vel_sa_data[0] || V >= vel_sa_data[n_vel_sa_data-1]+dV)
         continue;
       idV = (V - vel_sa_data[0])/dV;
