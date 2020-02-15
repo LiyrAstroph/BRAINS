@@ -450,7 +450,7 @@ double log_likelihoods_cal_initial_sa2d(const void *model)
 double log_likelihoods_cal_restart_sa2d(const void *model)
 {
   double logL;
-  logL = prob_sa2d(model);
+  logL = prob_initial_sa2d(model);
   return logL;
 }
 

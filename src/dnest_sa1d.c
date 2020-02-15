@@ -390,7 +390,7 @@ void from_prior_sa1d(void *model)
 double log_likelihoods_cal_initial_sa1d(const void *model)
 {
   double logL;
-  logL = prob_sa1d(model);
+  logL = prob_initial_sa1d(model);
   return logL;
 }
 
@@ -400,7 +400,7 @@ double log_likelihoods_cal_initial_sa1d(const void *model)
 double log_likelihoods_cal_restart_sa1d(const void *model)
 {
   double logL;
-  logL = prob_sa1d(model);
+  logL = prob_initial_sa1d(model);
   return logL;
 }
 

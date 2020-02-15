@@ -733,4 +733,67 @@ double prob_sa1d(const void *model)
 
   return prob_sa + prob_line;
 }
+
+/*!
+ * this function calculate probability.
+ * 
+ * At each MCMC step, only one parameter is updated, which only changes some values; thus,
+ * optimization that reuses the unchanged values can improve computation efficiency.
+ */
+double prob_initial_sa1d(const void *model)
+{
+  double prob_sa = 0.0, prob_line=0.0, var2, dy, var2_se;
+  int i, j;
+  double *pm = (double *)model;
+  
+  which_particle_update = dnest_get_which_particle_update();
+
+  con_q = con_q_particles[which_particle_update];
+  Fcon = Fcon_particles[which_particle_update];
+  //calculate_con_from_model(model + num_params_blr*sizeof(double));
+  calculate_con_from_model_semiseparable(model + num_params_blr_tot*sizeof(double));
+  gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
+  
+  TransTau = TransTau_particles[which_particle_update];
+  Trans1D = Trans1D_particles[which_particle_update]; 
+    
+  phase_sa = phase_sa_particles[which_particle_update];
+  Fline_sa = Fline_sa_particles[which_particle_update];
+
+  calculate_sa_transfun_from_blrmodel(model, 0);
+
+  /* caclulate prob_sa */
+  for(i=0; i<n_vel_sa_data; i++)
+  {
+    dy = Fline_sa[i] - Fline_sa_data[i];
+    var2 = Flerrs_sa_data[i]*Flerrs_sa_data[i];
+    prob_sa += -0.5 * (dy*dy)/var2 - 0.5*log(var2 * 2.0*PI);
+  }
+  for(j=0; j<n_base_sa_data; j++)
+  {
+    for(i=0; i<n_vel_sa_data; i++)
+    {
+      dy = phase_sa[j*n_vel_sa_data + i] - phase_sa_data[j*n_vel_sa_data + i];
+      var2 = pherrs_sa_data[j*n_vel_sa_data + i] * pherrs_sa_data[j*n_vel_sa_data + i];
+      prob_sa += -0.5 * (dy*dy)/var2 - 0.5*log(var2 * 2.0*PI);
+    }
+  }
+  prob_sa_particles[which_particle_update] = prob_sa;
+  
+  Fline_at_data = Fline_at_data_particles_perturb[which_particle_update];
+  calculate_line_from_blrmodel(model, Tline_data, Fline_at_data, n_line_data);
+  var2_se = (exp(pm[num_params_blr-1])-1.0) * (exp(pm[num_params_blr-1])-1.0) * line_error_mean*line_error_mean;
+  for(i=0; i<n_line_data; i++)
+  {
+    //note mask with error < 0.0
+    if(Flerrs_data[i] > 0.0)
+    {
+      dy = Fline_data[i] - Fline_at_data[i] ;
+      var2 = Flerrs_data[i]*Flerrs_data[i] + var2_se;
+      prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
+    }
+  }
+  
+  return prob_sa + prob_line;
+}
 #endif
