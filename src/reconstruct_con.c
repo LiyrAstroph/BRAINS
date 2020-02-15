@@ -98,7 +98,7 @@ void postprocess_con()
       {
         for(j=0; j<parset.n_con_recon; j++)
         {
-          fprintf(fcon, "%e %e %f\n", Tcon[j], Fcon[j]/con_scale, Fcerrs[j]/con_scale);
+          fprintf(fcon, "%e %e %f\n", Tcon[j]*(1.0+parset.redshift), Fcon[j]/con_scale, Fcerrs[j]/con_scale);
         }
         fprintf(fcon, "\n");
       }
@@ -223,7 +223,7 @@ void reconstruct_con()
  
         for(i=0; i<parset.n_con_recon; i++)
         {
-          fprintf(fp, "%e %e %e\n", Tcon[i], Fcon[i] / con_scale, Fcerrs[i]/con_scale);
+          fprintf(fp, "%e %e %e\n", Tcon[i]*(1.0+parset.redshift), Fcon[i] / con_scale, Fcerrs[i]/con_scale);
         }
         fclose(fp);
  

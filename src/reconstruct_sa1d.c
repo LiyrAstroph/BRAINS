@@ -134,20 +134,20 @@ void postprocess_sa1d()
       calculate_con_from_model_semiseparable(post_model + num_params_blr_tot *sizeof(double));
       gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
 
-      calculate_sa_transfun_from_blrmodel(post_model);
+      calculate_sa_transfun_from_blrmodel(post_model, 0);
       calculate_line_from_blrmodel(post_model, Tline, Fline, parset.n_line_recon);
       
       //if( i % (num_ps/10+1) == 0)  
       {
         for(j=0; j<parset.n_con_recon; j++)
         {
-          fprintf(fcon, "%e %e\n", Tcon[j], Fcon[j]/con_scale);
+          fprintf(fcon, "%e %e\n", Tcon[j]*(1.0+parset.redshift), Fcon[j]/con_scale);
         }
         fprintf(fcon, "\n");
 
         for(j=0; j<parset.n_line_recon; j++)
         {
-          fprintf(fline, "%e %e\n", Tline[j], Fline[j]/line_scale);
+          fprintf(fline, "%e %e\n", Tline[j]*(1.0+parset.redshift), Fline[j]/line_scale);
         }
         fprintf(fline, "\n");
 
@@ -293,7 +293,7 @@ void reconstruct_sa1d()
       calculate_con_from_model_semiseparable(best_model_sa1d + num_params_blr_tot *sizeof(double));
       gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
 
-      calculate_sa_transfun_from_blrmodel(best_model_sa1d);
+      calculate_sa_transfun_from_blrmodel(best_model_sa1d, 1);
       calculate_line_from_blrmodel(best_model_sa1d, Tline, Fline, parset.n_line_recon);
       
       // output continuum light curve
@@ -306,7 +306,7 @@ void reconstruct_sa1d()
       }
       for(i=0; i<parset.n_con_recon; i++)
       {
-        fprintf(fp, "%e %e\n", Tcon[i], Fcon[i] / con_scale);
+        fprintf(fp, "%e %e\n", Tcon[i]*(1.0+parset.redshift), Fcon[i] / con_scale);
       }
       fclose(fp);
 
@@ -320,7 +320,7 @@ void reconstruct_sa1d()
       }
       for(i=0; i<parset.n_line_recon; i++)
       {
-        fprintf(fp, "%e %e\n", Tline[i], Fline[i] / line_scale);
+        fprintf(fp, "%e %e\n", Tline[i]*(1.0+parset.redshift), Fline[i] / line_scale);
       }
       fclose(fp);
 
@@ -660,7 +660,7 @@ double prob_sa1d(const void *model)
     phase_sa = phase_sa_particles_perturb[which_particle_update];
     Fline_sa = Fline_sa_particles_perturb[which_particle_update];
 
-    calculate_sa_transfun_from_blrmodel(model);
+    calculate_sa_transfun_from_blrmodel(model, 0);
 
     /* caclulate prob_sa */
     for(i=0; i<n_vel_sa_data; i++)

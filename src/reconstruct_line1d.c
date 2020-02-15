@@ -144,13 +144,13 @@ void postprocess1d()
       {
         for(j=0; j<parset.n_con_recon; j++)
         {
-          fprintf(fcon, "%e %e\n", Tcon[j], Fcon[j]/con_scale);
+          fprintf(fcon, "%e %e\n", Tcon[j]*(1.0+parset.redshift), Fcon[j]/con_scale);
         }
         fprintf(fcon, "\n");
 
         for(j=0; j<parset.n_line_recon; j++)
         {
-          fprintf(fline, "%e %e\n", Tline[j], Fline[j]/line_scale);
+          fprintf(fline, "%e %e\n", Tline[j]*(1.0+parset.redshift), Fline[j]/line_scale);
         }
         fprintf(fline, "\n");
 
@@ -304,7 +304,7 @@ void reconstruct_line1d()
 
       for(i=0; i<parset.n_con_recon; i++)
       {
-        fprintf(fp, "%e %e\n", Tcon[i], Fcon[i] / con_scale);
+        fprintf(fp, "%e %e\n", Tcon[i]*(1.0+parset.redshift), Fcon[i] / con_scale);
       }
       fclose(fp);
 
@@ -322,7 +322,7 @@ void reconstruct_line1d()
 
       for(i=0; i<parset.n_line_recon; i++)
       {
-        fprintf(fp, "%e %e\n", Tline[i], Fline[i] / line_scale);
+        fprintf(fp, "%e %e\n", Tline[i]*(1.0+parset.redshift), Fline[i] / line_scale);
       }
       fclose(fp);
 

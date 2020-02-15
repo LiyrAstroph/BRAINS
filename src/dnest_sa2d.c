@@ -29,6 +29,123 @@ DNestFptrSet *fptrset_sa2d;
 
 int dnest_sa2d(int argc, char **argv)
 {
+  int i;
+  double logz_sa2d;
+  
+  if(parset.flag_sa_par_mutual == 0) /* SA and RM have the same BLR */
+  {
+    set_blr_model2d();
+    num_params_sa_blr_model = 0;
+  }
+  else /* SA and RM have different BLRs but have the same mbh and inc. */
+  {
+    set_blr_model2d();
+    set_sa_blr_model();
+  }
+  
+  /* parameter order: RM BLR, SA BLR, RM continuum */
+  /* RM */
+  num_params_blr = num_params_blr_model + num_params_nlr 
+                 + num_params_res + num_params_linecenter + 2 + 1; /* include A, Ag, and line sys err */
+  num_params_rm = parset.n_con_recon + num_params_blr + num_params_var;
+  
+  /* SA */
+  num_params_sa_blr = num_params_sa_blr_model + num_params_sa_extpar;
+  num_params_sa = num_params_sa_blr;
+  
+  /* total */
+  num_params_blr_tot = num_params_blr + num_params_sa_blr;
+  num_params = num_params_sa + num_params_rm;
+
+  par_fix = (int *) malloc(num_params * sizeof(int));
+  par_fix_val = (double *) malloc(num_params * sizeof(double));
+  par_range_model = malloc( num_params * sizeof(double *));
+  par_prior_gaussian = malloc( num_params * sizeof(double *));
+  for(i=0; i<num_params; i++)
+  {
+    par_range_model[i] = malloc(2*sizeof(double));
+    par_prior_gaussian[i] = malloc(2*sizeof(double));
+  }
+  par_prior_model = malloc( num_params * sizeof(int));
+  
+  fptrset_sa2d = dnest_malloc_fptrset();
+  /* setup functions used for dnest*/
+  fptrset_sa2d->from_prior = from_prior_sa2d;
+  fptrset_sa2d->print_particle = print_particle_sa2d;
+  fptrset_sa2d->restart_action = restart_action_sa;
+  fptrset_sa2d->accept_action = accept_action_sa2d;
+  fptrset_sa2d->kill_action = kill_action_sa2d;
+  fptrset_sa2d->perturb = perturb_sa2d;
+  fptrset_sa2d->read_particle = read_particle_sa2d;
+
+  fptrset_sa2d->log_likelihoods_cal_initial = log_likelihoods_cal_initial_sa2d;
+  fptrset_sa2d->log_likelihoods_cal_restart = log_likelihoods_cal_restart_sa2d;
+  fptrset_sa2d->log_likelihoods_cal = log_likelihoods_cal_sa2d;
+
+  set_par_range_sa2d();
+  print_par_names_sa2d();
+  set_par_fix_blrmodel();
+
+  /* the rest parameters */
+  for(i=num_params_blr_model; i<num_params; i++)
+  {
+    par_fix[i] = 0;
+  }
+  
+  /* fix non-linear response */
+  if(parset.flag_nonlinear !=1)
+  {
+    par_fix[num_params_blr-2] = 1;
+    par_fix_val[num_params_blr-2] = 0.0;
+  }
+
+  /* fix systematic error of line */
+  if(parset.flag_line_sys_err != 1)
+  {
+    par_fix[num_params_blr-1] = 1;
+    par_fix_val[num_params_blr-1] = log(1.0);
+  }
+
+  /* fix mbh and inc of SA BLR if SA and RM have different BLR */
+  if(parset.flag_sa_par_mutual != 0)
+  {
+    /* get the index for mbh and inclination parameters */
+    set_idx_par_mutual();
+    /* mbh */
+    par_fix[num_params_blr + idx_sa_par_mutual[0]] = 1;
+    par_fix_val[num_params_blr + idx_sa_par_mutual[0]] = 0.0;
+    
+    /* inc */
+    par_fix[num_params_blr + idx_sa_par_mutual[1]] = 1;
+    par_fix_val[num_params_blr + idx_sa_par_mutual[1]] = 0.0;
+  }
+
+  /* fix FA */
+  par_fix[num_params_blr + num_params_sa_blr_model+2] = 1;
+  par_fix_val[num_params_blr + num_params_sa_blr_model+2] = log(1.0);
+
+  /* fix systematic error of continuum */
+  if(parset.flag_con_sys_err != 1)
+  {
+    par_fix[num_params_blr_tot] = 1;
+    par_fix_val[num_params_blr_tot] = log(1.0);
+  }
+
+  /* fix continuum variation parameter sigma and tau if flag_fixvar is true */
+  if(parset.flag_fixvar == 1)
+  {
+    par_fix[num_params_blr_tot + 1] = 1;
+    par_fix_val[num_params_blr_tot + 1] = var_param[1];
+    par_fix[num_params_blr_tot + 2] = 1;
+    par_fix_val[num_params_blr_tot + 2] = var_param[2];
+  }
+  
+  force_update = parset.flag_force_update;
+  if(parset.flag_para_name != 1)
+    logz_sa2d = dnest(argc, argv, fptrset_sa2d, num_params, dnest_options_file);
+  
+  dnest_free_fptrset(fptrset_sa2d);
+
   return 0;
 }
 
@@ -97,9 +214,30 @@ void set_par_range_sa2d()
   par_prior_gaussian[i][0] = 0.0;
   par_prior_gaussian[i][1] = 0.0;
 
+  /* SA BLR parameters */
+  for(i=num_params_blr; i<num_params_blr + num_params_sa_blr_model; i++)
+  {
+    par_range_model[i][0] = sa_blr_range_model[i-num_params_blr][0];
+    par_range_model[i][1] = sa_blr_range_model[i-num_params_blr][1];
+
+    par_prior_model[i] = UNIFORM;
+    par_prior_gaussian[i][0] = 0.0;
+    par_prior_gaussian[i][1] = 0.0;
+  }
+  /* SA extra parameters */
+  for(i=num_params_blr + num_params_sa_blr_model; i<num_params_blr_tot; i++)
+  {
+    par_range_model[i][0] = sa_extpar_range[i-(num_params_blr + num_params_sa_blr_model)][0];
+    par_range_model[i][1] = sa_extpar_range[i-(num_params_blr + num_params_sa_blr_model)][1];
+
+    par_prior_model[i] = UNIFORM;
+    par_prior_gaussian[i][0] = 0.0;
+    par_prior_gaussian[i][1] = 0.0;
+  }
+
   /* variability parameters */
    /* first systematic error */
-  i = num_params_blr;
+  i = num_params_blr_tot;
   par_range_model[i][0] = var_range_model[0][0];
   par_range_model[i][1] = var_range_model[0][1];
 
@@ -107,25 +245,25 @@ void set_par_range_sa2d()
   par_prior_gaussian[i][0] = 0.0;
   par_prior_gaussian[i][1] = 0.0;
 
-  for(i=num_params_blr+1; i<num_params_drw + num_params_blr; i++)
+  for(i=num_params_blr_tot+1; i<num_params_drw + num_params_blr_tot; i++)
   {
-    if(var_param_std[i-num_params_blr] > 0.0)
+    if(var_param_std[i-num_params_blr_tot] > 0.0)
     {
-      par_range_model[i][0] = var_param[i-num_params_blr] - 5.0 * var_param_std[i-num_params_blr];
-      par_range_model[i][1] = var_param[i-num_params_blr] + 5.0 * var_param_std[i-num_params_blr];
+      par_range_model[i][0] = var_param[i-num_params_blr_tot] - 5.0 * var_param_std[i-num_params_blr_tot];
+      par_range_model[i][1] = var_param[i-num_params_blr_tot] + 5.0 * var_param_std[i-num_params_blr_tot];
 
       /* make sure that the range lies within the initial range */
-      par_range_model[i][0] = fmax(par_range_model[i][0], var_range_model[i-num_params_blr][0]);
-      par_range_model[i][1] = fmin(par_range_model[i][1], var_range_model[i-num_params_blr][1]);
+      par_range_model[i][0] = fmax(par_range_model[i][0], var_range_model[i-num_params_blr_tot][0]);
+      par_range_model[i][1] = fmin(par_range_model[i][1], var_range_model[i-num_params_blr_tot][1]);
 
       par_prior_model[i] = GAUSSIAN;
-      par_prior_gaussian[i][0] = var_param[i-num_params_blr];
-      par_prior_gaussian[i][1] = var_param_std[i-num_params_blr];
+      par_prior_gaussian[i][0] = var_param[i-num_params_blr_tot];
+      par_prior_gaussian[i][1] = var_param_std[i-num_params_blr_tot];
     }
     else
     {
-      par_range_model[i][0] = var_range_model[i-num_params_blr][0];
-      par_range_model[i][1] = var_range_model[i-num_params_blr][1];
+      par_range_model[i][0] = var_range_model[i-num_params_blr_tot][0];
+      par_range_model[i][1] = var_range_model[i-num_params_blr_tot][1];
 
       par_prior_model[i] = UNIFORM;
       par_prior_gaussian[i][0] = 0.0;
@@ -133,7 +271,7 @@ void set_par_range_sa2d()
     }
   }
   /* long-term trend of continuum */
-  for(i=num_params_drw + num_params_blr; i< num_params_drw + num_params_trend + num_params_blr; i++)
+  for(i=num_params_drw + num_params_blr_tot; i< num_params_drw + num_params_trend + num_params_blr_tot; i++)
   {
     par_range_model[i][0] = var_range_model[3][0];
     par_range_model[i][1] = var_range_model[3][1];
@@ -143,10 +281,10 @@ void set_par_range_sa2d()
     par_prior_gaussian[i][1] = 1.0;
   }
   /* different trend in continuum and line */
-  for(i=num_params_drw + num_params_trend + num_params_blr; i< num_params_var + num_params_blr; i++)
+  for(i=num_params_drw + num_params_trend + num_params_blr_tot; i< num_params_var + num_params_blr_tot; i++)
   {
-    par_range_model[i][0] = var_range_model[4 + i - (num_params_drw + num_params_trend + num_params_blr)][0];
-    par_range_model[i][1] = var_range_model[4 + i - (num_params_drw + num_params_trend + num_params_blr)][1];
+    par_range_model[i][0] = var_range_model[4 + i - (num_params_drw + num_params_trend + num_params_blr_tot)][0];
+    par_range_model[i][1] = var_range_model[4 + i - (num_params_drw + num_params_trend + num_params_blr_tot)][1];
 
     par_prior_model[i] = UNIFORM;
     par_prior_gaussian[i][0] = 0.0;
@@ -154,7 +292,7 @@ void set_par_range_sa2d()
   }
 
   /* continuum ligth curve values */
-  for(i=num_params_blr+num_params_var; i<num_params; i++)
+  for(i=num_params_blr_tot+num_params_var; i<num_params; i++)
   {
     par_range_model[i][0] = var_range_model[4+num_params_difftrend][0];
     par_range_model[i][1] = var_range_model[4+num_params_difftrend][1];
@@ -180,7 +318,7 @@ void print_par_names_sa2d()
   FILE *fp;
   char fname[BRAINS_MAX_STR_LENGTH];
 
-  sprintf(fname, "%s/%s", parset.file_dir, "data/para_names_model2d.txt");
+  sprintf(fname, "%s/%s", parset.file_dir, "data/para_names_sa2d.txt");
   fp = fopen(fname, "w");
   if(fp == NULL)
   {
@@ -223,6 +361,18 @@ void print_par_names_sa2d()
   i++;
   fprintf(fp, "%4d %-15s %f %f %d\n", i, "sys_err_line", par_range_model[i][0], par_range_model[i][1], par_prior_model[i]);
 
+  for(j=0; j<num_params_sa_blr_model; j++)
+  {
+    i++;
+    fprintf(fp, "%4d %-15s %f %f %d\n", i, "SA BLR model", par_range_model[i][0], par_range_model[i][1], par_prior_model[i]);
+  }
+
+  for(j=0; j<num_params_sa_extpar; j++)
+  {
+    i++;
+    fprintf(fp, "%4d %-15s %f %f %d\n", i, "SA Extra Par", par_range_model[i][0], par_range_model[i][1], par_prior_model[i]);
+  }
+
   i++;
   fprintf(fp, "%4d %-15s %f %f %d\n", i, "sys_err_con", par_range_model[i][0], par_range_model[i][1], par_prior_model[i]);
   i++;
@@ -250,4 +400,260 @@ void print_par_names_sa2d()
   
   fclose(fp);
 }
+
+/*!
+ * this function generates a sample from prior.
+ */
+void from_prior_sa2d(void *model)
+{
+  int i;
+  double *pm = (double *)model;
+
+  for(i=0; i<num_params; i++)
+  {
+    if(par_prior_model[i] == GAUSSIAN)
+    {
+      pm[i] = dnest_randn()*par_prior_gaussian[i][1] + par_prior_gaussian[i][0];
+      dnest_wrap(&pm[i], par_range_model[i][0], par_range_model[i][1]);
+    }
+    else
+    {
+      pm[i] = par_range_model[i][0] + dnest_rand() * (par_range_model[i][1] - par_range_model[i][0]);
+    }
+  }
+
+  /* cope with fixed parameters */
+  for(i=0; i<num_params; i++)
+  {
+    if(par_fix[i] == 1)
+      pm[i] = par_fix_val[i];
+  }
+
+  which_parameter_update = -1;
+
+  return;
+}
+
+/*!
+ * this function calculates likelihood at initial step.
+ */
+double log_likelihoods_cal_initial_sa2d(const void *model)
+{
+  double logL;
+  logL = prob_initial_sa2d(model);
+  return logL;
+}
+
+/*!
+ * this function calculates likelihood at initial step.
+ */
+double log_likelihoods_cal_restart_sa2d(const void *model)
+{
+  double logL;
+  logL = prob_sa2d(model);
+  return logL;
+}
+
+/*!
+ * this function calculates likelihood.
+ */
+double log_likelihoods_cal_sa2d(const void *model)
+{
+  double logL;
+  logL = prob_sa2d(model);
+  return logL;
+}
+
+/*!
+ * this function prints out parameters.
+ */
+void print_particle_sa2d(FILE *fp, const void *model)
+{
+  int i;
+  double *pm = (double *)model;
+
+  for(i=0; i<num_params; i++)
+  {
+    fprintf(fp, "%e ", pm[i] );
+  }
+  fprintf(fp, "\n");
+  return;
+}
+
+/*!
+ * This function read the particle from the file.
+ */
+void read_particle_sa2d(FILE *fp, void *model)
+{
+  int j;
+  double *psample = (double *)model;
+
+  for(j=0; j < dnest_num_params; j++)
+  {
+    if(fscanf(fp, "%lf", psample+j) < 1)
+    {
+      printf("%f\n", *psample);
+      fprintf(stderr, "#Error: Cannot read file %s.\n", options.sample_file);
+      exit(0);
+    }
+  }
+  return;
+}
+
+/*!
+ * this function perturbs parameters.
+ */
+double perturb_sa2d(void *model)
+{
+  double *pm = (double *)model;
+  double logH = 0.0, limit1, limit2, width, rnd;
+  int which, which_level, count_saves; 
+
+  /* 
+   * fixed parameters need not to update 
+   * perturb important parameters more frequently
+   */
+  do
+  {
+    rnd = dnest_rand();
+    if(rnd < fmax(0.2, 1.0*(num_params_blr_tot+num_params_var)/num_params))
+      which = dnest_rand_int(num_params_blr_tot + num_params_var);
+    else
+      which = dnest_rand_int(parset.n_con_recon) + num_params_blr_tot + num_params_var;
+
+  }while(par_fix[which] == 1);
+  
+  which_parameter_update = which;
+  
+  /* level-dependent width */
+  count_saves = dnest_get_count_saves();
+  which_level_update = dnest_get_which_level_update();
+  which_level = which_level_update > (size_levels-10)?(size_levels-10):which_level_update;
+
+  if( which_level > 0)
+  {
+    limit1 = limits[(which_level-1) * num_params *2 + which *2];
+    limit2 = limits[(which_level-1) * num_params *2 + which *2 + 1];
+    width = (limit2 - limit1);
+  }
+  else
+  {
+    limit1 = par_range_model[which][0];
+    limit2 = par_range_model[which][1];
+    width = (par_range_model[which][1] - par_range_model[which][0]);
+  }
+  width /= (2.35);
+
+  if(par_prior_model[which] == GAUSSIAN)
+  {
+    logH -= (-0.5*pow((pm[which] - par_prior_gaussian[which][0])/par_prior_gaussian[which][1], 2.0) );
+    pm[which] += dnest_randh() * width;
+    dnest_wrap(&pm[which], par_range_model[which][0], par_range_model[which][1]);
+    //dnest_wrap(&pm[which], limit1, limit2);
+    logH += (-0.5*pow((pm[which] - par_prior_gaussian[which][0])/par_prior_gaussian[which][1], 2.0) );
+  }
+  else
+  {
+    pm[which] += dnest_randh() * width;
+    dnest_wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
+    //dnest_wrap(&pm[which], limit1, limit2);
+  }
+
+  return logH;
+}
+
+
+/*!
+ * this function calculates likelihood.
+ */
+double log_likelihoods_cal_sa2d_exam(const void *model)
+{
+  return 0.0;
+}
+
+void accept_action_sa2d()
+{
+  int param;
+  double *ptemp;
+
+  // the parameter previously updated
+  param = which_parameter_update;
+
+  /* continuum parameter is updated */
+  if( param >= num_params_blr_tot )
+  {
+    /* 
+     *note that (response) Fline is also changed as long as Fcon is changed.
+     *num_params_blr-the parameter is the systematic error of continuum.
+     *the change of this parameter also changes continuum reconstruction.
+     */
+
+    ptemp = Fcon_particles[which_particle_update];
+    Fcon_particles[which_particle_update] = Fcon_particles_perturb[which_particle_update];
+    Fcon_particles_perturb[which_particle_update] = ptemp;
+
+    ptemp = con_q_particles[which_particle_update];
+    con_q_particles[which_particle_update] = con_q_particles_perturb[which_particle_update];
+    con_q_particles_perturb[which_particle_update] = ptemp;
+
+    if(force_update != 1)
+    {
+      ptemp = Fline_at_data_particles[which_particle_update];
+      Fline_at_data_particles[which_particle_update] = Fline_at_data_particles_perturb[which_particle_update];
+      Fline_at_data_particles_perturb[which_particle_update] = ptemp;
+    }
+  }
+  else if( param != num_params_blr-1 && force_update != 1)
+  {
+    /* BLR parameter is updated 
+     * Note a) that the (num_par_blr-1)-th parameter is systematic error of line.
+     * when this parameter is updated, Trans1D and Fline are unchanged.
+     *      b) Fline is always changed, except param = num_params_blr-1.
+     */
+    
+    {
+      ptemp = TransTau_particles[which_particle_update];
+      TransTau_particles[which_particle_update] = TransTau_particles_perturb[which_particle_update];
+      TransTau_particles_perturb[which_particle_update] = ptemp;
+
+      ptemp = Trans2D_at_veldata_particles[which_particle_update];
+      Trans2D_at_veldata_particles[which_particle_update] = Trans2D_at_veldata_particles_perturb[which_particle_update];
+      Trans2D_at_veldata_particles_perturb[which_particle_update] = ptemp;
+
+      ptemp = Fline_at_data_particles[which_particle_update];
+      Fline_at_data_particles[which_particle_update] = Fline_at_data_particles_perturb[which_particle_update];
+      Fline_at_data_particles_perturb[which_particle_update] = ptemp;
+    
+
+      ptemp = phase_sa_particles[which_particle_update];
+      phase_sa_particles[which_particle_update] = phase_sa_particles_perturb[which_particle_update];
+      phase_sa_particles_perturb[which_particle_update] = ptemp;
+
+      ptemp = Fline_sa_particles[which_particle_update];
+      Fline_sa_particles[which_particle_update] = Fline_sa_particles_perturb[which_particle_update];
+      Fline_sa_particles_perturb[which_particle_update] = ptemp;
+
+      prob_sa_particles[which_particle_update] = prob_sa_particles_perturb[which_particle_update];
+    }
+  }
+  
+  return;
+}
+
+void kill_action_sa2d(int i, int i_copy)
+{
+  memcpy(Fcon_particles[i], Fcon_particles[i_copy], parset.n_con_recon * sizeof(double));
+  memcpy(Fline_at_data_particles[i], Fline_at_data_particles[i_copy], n_line_data * sizeof(double));
+  memcpy(con_q_particles[i], con_q_particles[i_copy], nq * sizeof(double));
+  memcpy(TransTau_particles[i], TransTau_particles[i_copy], parset.n_tau*sizeof(double));
+  memcpy(Trans2D_at_veldata_particles[i], Trans2D_at_veldata_particles[i_copy], parset.n_tau * n_vel_data * sizeof(double));
+
+  memcpy(phase_sa_particles[i], phase_sa_particles[i_copy], n_vel_sa_data * n_base_sa_data * sizeof(double));
+  memcpy(Fline_sa_particles[i], Fline_sa_particles[i_copy], n_vel_sa_data * n_epoch_sa_data * sizeof(double));
+  prob_sa_particles[i] = prob_sa_particles_perturb[i_copy];
+
+  return;
+}
+
+
 #endif

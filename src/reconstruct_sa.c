@@ -110,7 +110,7 @@ void postprocess_sa()
       //store model
       memcpy(posterior_sample+i*size_of_modeltype, post_model, size_of_modeltype);
     
-      calculate_sa_from_blrmodel(post_model);
+      calculate_sa_from_blrmodel(post_model, 0);
       
       //if( i % (num_ps/10+1) == 0)  
       {
@@ -242,7 +242,7 @@ void reconstruct_sa()
       Fline_sa = Fline_sa_particles[which_particle_update];
       phase_sa = phase_sa_particles[which_particle_update];
       
-      calculate_sa_from_blrmodel(best_model_sa);
+      calculate_sa_from_blrmodel(best_model_sa, 1);
 
       sprintf(fname, "%s/%s", parset.file_dir, "data/psa_line.txt");
       fp = fopen(fname, "w");
@@ -404,7 +404,7 @@ double prob_sa(const void *model)
   phase_sa = phase_sa_particles_perturb[which_particle_update];
   Fline_sa = Fline_sa_particles_perturb[which_particle_update];
   
-  calculate_sa_from_blrmodel(model);
+  calculate_sa_from_blrmodel(model, 0);
 
   for(i=0; i<n_vel_sa_data; i++)
   {

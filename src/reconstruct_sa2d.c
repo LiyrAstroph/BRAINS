@@ -22,6 +22,257 @@ void *best_model_std_sa2d;  /*!< standard deviation of the best model */
  */
 void postprocess_sa2d()
 {
+  char posterior_sample_file[BRAINS_MAX_STR_LENGTH];
+  int num_ps, i, j, k, nc;
+  double *pm, *pmstd;
+  double *lag;
+  void *posterior_sample, *post_model;
+  double mean_lag, mean_lag_std, sum1, sum2;
+  int size_of_modeltype = num_params * sizeof(double);
+  
+  best_model_sa2d = malloc(size_of_modeltype);
+  best_model_std_sa2d = malloc(size_of_modeltype);
+
+  if(thistask == roottask)
+  {
+    // initialize smoothing workspace
+    smooth_init(n_vel_data_ext, Vline_data_ext);
+
+    char fname[200];
+    FILE *fp, *fline, *fline1d, *fsa, *fsaline, *ftran, *fcon;
+    double *Fline1d, dV;
+    
+    // velocity grid width, in term of wavelength of Hbeta.
+    dV = (Vline_data[n_vel_data-1]-Vline_data[0])/(n_vel_data-1) * VelUnit * 4861.0/3.0e5; 
+    Fline1d = malloc(n_line_data * sizeof(double));
+
+    // get number of lines in posterior sample file
+    get_posterior_sample_file(dnest_options_file, posterior_sample_file);
+
+    //file for posterior sample
+    fp = fopen(posterior_sample_file, "r");
+    if(fp == NULL)
+    {
+      fprintf(stderr, "# Error: Cannot open file %s.\n", posterior_sample_file);
+      exit(0);
+    }
+    fcon = fopen("data/con_rec.txt", "w");
+    if(fcon == NULL)
+    {
+      fprintf(stderr, "# Error: Cannot open file data/con_rec.txt.\n");
+      exit(0);
+    }
+
+    //file for line reconstruction
+    sprintf(fname, "%s/%s", parset.file_dir, "data/line2d_rec.txt");
+    fline = fopen(fname, "w");
+    if(fline == NULL)
+    {
+      fprintf(stderr, "# Error: Cannot open file %s.\n", fname);
+      exit(0);
+    }
+
+    //file for line reconstruction
+    sprintf(fname, "%s/%s", parset.file_dir, "data/line_rec.txt");
+    fline1d = fopen(fname, "w");
+    if(fline1d == NULL)
+    {
+      fprintf(stderr, "# Error: Cannot open file %s.\n", fname);
+      exit(0);
+    }
+
+    //file for transfer function
+    sprintf(fname, "%s/%s", parset.file_dir, "data/tran2d_rec.txt");
+    ftran = fopen(fname, "w");
+    if(ftran == NULL)
+    {
+      fprintf(stderr, "# Error: Cannot open file %s.\n", fname);
+      exit(0);
+    }
+
+    //file for sa line reconstruction
+    sprintf(fname, "%s/%s", parset.file_dir, "data/sa_line_rec.txt");
+    fsaline = fopen(fname, "w");
+    if(fsaline == NULL)
+    {
+      fprintf(stderr, "# Error: Cannot open file %s.\n", fname);
+      exit(0);
+    }
+
+    //file for phase
+    sprintf(fname, "%s/%s", parset.file_dir, "data/sa_phase_rec.txt");
+    fsa = fopen(fname, "w");
+    if(fsa == NULL)
+    {
+      fprintf(stderr, "# Error: Cannot open file %s.\n", fname);
+      exit(0);
+    }
+    
+    // read number of lines
+    if(fscanf(fp, "# %d", &num_ps) < 1)
+    {
+      fprintf(stderr, "# Error: Cannot read file %s.\n", posterior_sample_file);
+      exit(0);
+    }
+    printf("# Number of points in posterior sample: %d\n", num_ps);
+
+    post_model = malloc(size_of_modeltype);
+    posterior_sample = malloc(num_ps * size_of_modeltype);
+
+    force_update = 1;
+    which_parameter_update = -1; // force to update the transfer function
+    which_particle_update = 0;
+    nc = 0;
+
+    con_q = con_q_particles[which_particle_update];
+    Fcon = Fcon_particles[which_particle_update];
+    TransTau = TransTau_particles[which_particle_update];
+    Trans2D_at_veldata = Trans2D_at_veldata_particles[which_particle_update];
+    Fline2d_at_data = Fline_at_data_particles[which_particle_update];
+    
+    Fline_sa = Fline_sa_particles[which_particle_update];
+    phase_sa = phase_sa_particles[which_particle_update];
+    
+    for(i=0; i<num_ps; i++)
+    {
+      // read lines
+      for(j=0; j<num_params; j++)
+      {
+        if(fscanf(fp, "%lf", (double *)post_model + j) < 1)
+        {
+          fprintf(stderr, "# Error: Cannot read file %s.\n", posterior_sample_file);
+          exit(0);
+        }
+      }
+      fscanf(fp, "\n");
+
+      //store model
+      memcpy(posterior_sample+i*size_of_modeltype, post_model, size_of_modeltype);
+
+      //calculate_con_from_model(post_model + num_params_blr *sizeof(double));
+      calculate_con_from_model_semiseparable(post_model + num_params_blr_tot *sizeof(double));
+      gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
+
+      calculate_sa_transfun2d_from_blrmodel(post_model, Vline_data_ext, Trans2D_at_veldata, n_vel_data_ext, 0);
+      calculate_line2d_from_blrmodel(post_model, Tline_data, Vline_data_ext, Trans2D_at_veldata, 
+                                      Fline2d_at_data, n_line_data, n_vel_data_ext);
+      
+      
+      // calculate integrated line fluxes
+      for(j = 0; j < n_line_data; j++)
+      {
+        Fline1d[j] = 0.0;
+        for(k=0; k<n_vel_data; k++)
+        {
+          Fline1d[j] += Fline2d_at_data[j * n_vel_data_ext + (k+n_vel_data_incr)] * dV /line_scale;
+        }
+      }
+
+      //if( i % (num_ps/10+1) == 0)  
+      {
+        // output continuum
+        for(j=0; j<parset.n_con_recon; j++)
+        {
+          fprintf(fcon, "%e %e\n", Tcon[j]*(1.0+parset.redshift), Fcon[j]/con_scale);
+        }
+        fprintf(fcon, "\n");
+
+        // output 2d line
+        for(j=0; j<n_line_data; j++)
+        {
+          for(k=0; k<n_vel_data; k++)
+          {
+            fprintf(fline, "%e ", Fline2d_at_data[j * n_vel_data_ext + (k+n_vel_data_incr)]/line_scale);
+          }
+          fprintf(fline, "\n");
+        }
+        fprintf(fline, "\n");
+
+        // output transfer function
+        for(j=0; j<parset.n_tau; j++)
+        {
+          fprintf(ftran, "%e ", TransTau[j]);
+          
+          for(k=0; k<n_vel_data; k++)
+          {
+            fprintf(ftran, "%e ", Trans2D_at_veldata[j * n_vel_data_ext + (k+n_vel_data_incr)]);
+          }
+          fprintf(ftran, "\n");
+        }
+        fprintf(ftran, "\n");
+
+        // output 1d line 
+        for(j = 0; j<n_line_data; j++)
+        {
+          fprintf(fline1d, "%e %e\n", Tline_data[j]*(1.0+parset.redshift), Fline1d[j]);
+        }
+        fprintf(fline1d, "\n");
+
+        // output sa line
+        for(j=0; j<n_vel_sa_data; j++)
+        {
+          fprintf(fsaline, "%e %e\n", wave_sa_data[j], Fline_sa[j]);
+        }
+        fprintf(fsaline, "\n");
+
+        // output sa phase
+        for(k=0; k<n_base_sa_data; k++)
+        {
+          for(j=0; j<n_vel_sa_data; j++)
+          {
+            fprintf(fsa, "%e %e\n", wave_sa_data[j], phase_sa[k*n_vel_sa_data + j]/(PhaseFactor * wave_sa_data[j]) );
+          }
+        }
+        fprintf(fsa, "\n");
+      }
+    }
+
+    smooth_end();
+    fclose(fp);
+    fclose(fcon);
+    fclose(fline);
+    fclose(fline1d);
+    fclose(ftran);
+    fclose(fsaline);
+    fclose(fsa);
+    
+    pm = (double *)best_model_sa2d;
+    pmstd = (double *)best_model_std_sa2d;
+    for(j=0; j<num_params; j++)
+    {
+      pm[j] = pmstd[j] = 0.0;
+    }
+    for(i=0; i<num_ps; i++)
+    {
+      for(j =0; j<num_params; j++)
+        pm[j] += *((double *)posterior_sample + i*num_params + j );
+    }
+
+    for(j=0; j<num_params; j++)
+      pm[j] /= num_ps;
+
+    for(i=0; i<num_ps; i++)
+    {
+      for(j=0; j<num_params; j++)
+        pmstd[j] += pow( *((double *)posterior_sample + i*num_params + j ) - pm[j], 2.0 );
+    }
+
+    for(j=0; j<num_params; j++)
+    {
+      if(num_ps > 1)
+        pmstd[j] = sqrt(pmstd[j]/(num_ps-1.0));
+      else
+        pmstd[j] = 0.0;
+    }
+
+    for(j = 0; j<num_params_blr_tot + num_params_var; j++)
+      printf("Best params %d %f +- %f\n", j, *((double *)best_model_sa2d + j), 
+                                             *((double *)best_model_std_sa2d+j) ); 
+
+    free(post_model);
+    free(posterior_sample);
+    free(Fline1d);
+  }
 }
 
 void reconstruct_sa2d()
@@ -68,13 +319,219 @@ void reconstruct_sa2d()
   
   reconstruct_sa2d_init();
   
-  dnest_sa1d(argc, argv);
-
+  smooth_init(n_vel_data_ext, Vline_data_ext);
+  dnest_sa2d(argc, argv);
+  smooth_end();
+ 
   if(parset.flag_exam_prior != 1 && parset.flag_para_name != 1)
   {
     postprocess_sa2d();
-  }
+    if(thistask == roottask)
+    {
+      FILE *fp;
+      char fname[200];
+      int j, k;
 
+      force_update = 1;
+      which_parameter_update = -1; // force to update the transfer function
+      which_particle_update = 0;
+
+      con_q = con_q_particles[which_particle_update];
+      Fcon = Fcon_particles[which_particle_update];
+      TransTau = TransTau_particles[which_particle_update];
+      Trans2D_at_veldata = Trans2D_at_veldata_particles[which_particle_update];
+      Fline2d_at_data = Fline_at_data_particles[which_particle_update];
+      
+      Fline_sa = Fline_sa_particles[which_particle_update];
+      phase_sa = phase_sa_particles[which_particle_update];
+
+      //calculate_con_from_model(best_model_line2d + num_params_blr *sizeof(double));
+      calculate_con_from_model_semiseparable(best_model_sa2d + num_params_blr_tot *sizeof(double));
+      gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
+
+      sprintf(fname, "%s/%s", parset.file_dir, parset.pcon_out_file);
+      fp = fopen(fname, "w");
+      if(fp == NULL)
+      {
+        fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+        exit(-1);
+      }
+
+      for(i=0; i<parset.n_con_recon; i++)
+      {
+        fprintf(fp, "%e %e\n", Tcon[i]*(1.0+parset.redshift), Fcon[i] / con_scale);
+      }
+      fclose(fp);
+      
+      smooth_init(n_vel_data_ext, Vline_data_ext);
+
+      calculate_sa_transfun2d_from_blrmodel(best_model_sa2d, Vline_data_ext, Trans2D_at_veldata, n_vel_data_ext, 0);
+      calculate_line2d_from_blrmodel(best_model_sa2d, Tline_data, Vline_data_ext, Trans2D_at_veldata, 
+                                      Fline2d_at_data, n_line_data, n_vel_data_ext);
+      
+      sprintf(fname, "%s/%s", parset.file_dir, parset.pline2d_data_out_file);
+      fp = fopen(fname, "w");
+      if(fp == NULL)
+      {
+        fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+        exit(-1);
+      }
+    
+      for(i=0; i<n_line_data; i++)
+      {
+        for(j=0; j<n_vel_data; j++)
+        {
+          fprintf(fp, "%e %e %e\n", Vline_data[j]*VelUnit, Tline_data[i]*(1.0+parset.redshift),  
+                            Fline2d_at_data[i*n_vel_data_ext + (j+n_vel_data_incr)] / line_scale);
+        }
+        fprintf(fp, "\n");
+      }
+      fclose(fp);
+
+      sprintf(fname, "%s/%s", parset.file_dir, parset.tran2d_data_out_file);
+      fp = fopen(fname, "w");
+      if(fp == NULL)
+      {
+        fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+        exit(-1);
+      }
+    
+      fprintf(fp, "# %d %d\n", parset.n_tau, n_vel_data);
+      for(i=0; i<parset.n_tau; i++)
+      {
+        for(j=0; j<n_vel_data; j++)
+        {
+          fprintf(fp, "%e %e %e\n", Vline_data[j]*VelUnit, TransTau[i],  Trans2D_at_veldata[i*n_vel_data_ext + (j+n_vel_data_incr)]);
+        }
+        fprintf(fp, "\n");
+      }
+      fclose(fp);
+
+      // output sa line 
+      sprintf(fname, "%s/%s", parset.file_dir, "data/psa_line.txt");
+      fp = fopen(fname, "w");
+      if(fp == NULL)
+      {
+        fprintf(stderr, "# Error: Cannot open file %s.\n", fname);
+        exit(0);
+      }
+      for(j=0; j<n_vel_sa_data; j++)
+      {
+        fprintf(fp, "%e %e\n", wave_sa_data[j], Fline_sa[j]);
+      }
+      fclose(fp);
+
+      //output sa phase
+      sprintf(fname, "%s/%s", parset.file_dir, "data/psa_phase.txt");
+      fp = fopen(fname, "w");
+      if(fp == NULL)
+      {
+        fprintf(stderr, "# Error: Cannot open file %s.\n", fname);
+        exit(0);
+      }
+      for(k=0; k<n_base_sa_data; k++)
+      {
+        for(j=0; j<n_vel_sa_data; j++)
+        {
+          fprintf(fp, "%e %e\n", wave_sa_data[j], phase_sa[k*n_vel_sa_data + j]/(PhaseFactor * wave_sa_data[j]) );
+        }
+        fprintf(fp, "\n");
+      }
+      fclose(fp);
+
+      smooth_end();
+
+      // recovered line2d at specified points
+      smooth_init(parset.n_vel_recon, TransV);
+
+      which_parameter_update = -1;
+      which_particle_update = 0;
+
+      transfun_2d_cal(best_model_sa2d, TransV, Trans2D, parset.n_vel_recon, 0);
+
+      /* there is no data for spectral broadening at given specified epoch, using the mean value
+       * and set InstRes_err=0.0.
+       */ 
+      double *pm = (double *)best_model_sa2d;
+      if(parset.flag_InstRes > 0) 
+      {
+        parset.flag_InstRes = 0; /* force to be uniform prior */
+        double instres_mean = 0.0;
+        for(i=0; i<n_line_data; i++)
+        {
+          instres_mean += instres_epoch[i];
+        }
+        parset.InstRes = instres_mean/n_line_data;
+        parset.InstRes_err = 0.0;
+        
+        instres_mean = 0.0;
+        for(i=0; i<n_line_data; i++)
+        {
+          instres_mean += pm[num_params_blr_model+num_params_nlr+i];
+        }
+        pm[num_params_blr_model + num_params_nlr ] = instres_mean/n_line_data;
+      }
+
+      /* similarly, there is no data for line center information at given specified epoch,
+       * using the mean value
+       */
+      if(parset.flag_linecenter < 0)
+      {
+        parset.flag_linecenter = 1; /* force to be uniform prior, note num_params_linecenter is still unchanged */
+        double linecenter_mean = 0.0;
+        for(i=0; i<n_line_data; i++)
+        {
+          linecenter_mean += pm[num_params_blr - num_params_linecenter - 3 + i];
+        }
+        pm[num_params_blr - num_params_linecenter - 3] = linecenter_mean/n_line_data;
+      }
+      
+      calculate_line2d_from_blrmodel(best_model_sa2d, Tline, TransV, 
+          Trans2D, Fline2d, parset.n_line_recon, parset.n_vel_recon);
+
+      sprintf(fname, "%s/%s", parset.file_dir, parset.pline2d_out_file);
+      fp = fopen(fname, "w");
+      if(fp == NULL)
+      {
+        fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+        exit(-1);
+      }
+
+      for(i=0; i<parset.n_line_recon; i++)
+      {
+        for(j=0; j<parset.n_vel_recon; j++)
+        {
+          fprintf(fp, "%e %e %e\n", TransV[j]*VelUnit, Tline[i]*(1.0+parset.redshift),  Fline2d[i*parset.n_vel_recon + j] / line_scale);
+        }
+
+        fprintf(fp, "\n");
+      }
+      fclose(fp);
+
+      // output 2d transfer function
+      sprintf(fname, "%s/%s", parset.file_dir, parset.tran2d_out_file);
+      fp = fopen(fname, "w");
+      if(fp == NULL)
+      {
+        fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+        exit(-1);
+      }
+      fprintf(fp, "# %d %d\n", parset.n_tau, parset.n_vel_recon);
+      for(i=0; i<parset.n_tau; i++)
+      {
+        for(j=0; j<parset.n_vel_recon; j++)
+        {
+          fprintf(fp, "%e %e %e\n", TransV[j]*VelUnit, TransTau[i], Trans2D[i*parset.n_vel_recon + j]);
+        }
+
+        fprintf(fp, "\n");
+      }
+      fclose(fp);
+
+      smooth_end();
+    }
+  }
+  
   reconstruct_sa2d_end();
 
   //clear up argv
@@ -126,7 +583,6 @@ void reconstruct_sa2d_init()
   Trans2D = malloc(parset.n_tau * parset.n_vel_recon * sizeof(double));
   Tline = malloc(parset.n_line_recon * sizeof(double));
   Fline2d = malloc(parset.n_line_recon * parset.n_vel_recon * sizeof(double));
-
   
   Tline_min = Tline_data[0] - fmin(0.1*(Tline_data[n_line_data - 1] - Tline_data[0]), 10);
   if(parset.time_back <= 0.0)
@@ -324,7 +780,204 @@ void reconstruct_sa2d_end()
 
   if(thistask == roottask)
   {
-    printf("Ends reconstruct_line2d.\n");
+    printf("Ends reconstruct_sa2d.\n");
   }
 }
+
+/*!
+ * this function calculate probability.
+ * 
+ * At each MCMC step, only one parameter is updated, which only changes some values; thus,
+ * optimization that reuses the unchanged values can improve computation efficiency.
+ */
+double prob_sa2d(const void *model)
+{
+  double prob_sa = 0.0, prob_line=0.0, var2, dy, var2_se;
+  int i, j;
+  double *pm = (double *)model;
+  
+  which_particle_update = dnest_get_which_particle_update();
+
+  // only update continuum reconstruction when the corresponding parameters are updated
+  if( which_parameter_update >= num_params_blr_tot )
+  {
+    con_q = con_q_particles_perturb[which_particle_update];
+    Fcon = Fcon_particles_perturb[which_particle_update];
+    //calculate_con_from_model(model + num_params_blr*sizeof(double));
+    calculate_con_from_model_semiseparable(model + num_params_blr_tot*sizeof(double));
+
+    gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
+  }
+  else /* continuum has no change, use the previous values */
+  {
+    con_q = con_q_particles[which_particle_update];
+    Fcon = Fcon_particles[which_particle_update];
+    gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
+  }
+
+  /* only update transfer function when BLR model is changed
+   * or forced to update (force_update = 1)
+   * Trans1D is a pointer to the transfer function
+   */
+  if(     ((which_parameter_update < num_params_blr_tot)
+        && (which_parameter_update != num_params_blr-1)) 
+        || force_update == 1)
+  {
+    /* re-point */
+    TransTau = TransTau_particles_perturb[which_particle_update];
+    Trans2D_at_veldata = Trans2D_at_veldata_particles_perturb[which_particle_update];
+    
+    phase_sa = phase_sa_particles_perturb[which_particle_update];
+    Fline_sa = Fline_sa_particles_perturb[which_particle_update];
+
+    calculate_sa_transfun2d_from_blrmodel(model, Vline_data_ext, Trans2D_at_veldata, n_vel_data_ext, 0);
+    
+    /* caclulate prob_sa */
+    for(i=0; i<n_vel_sa_data; i++)
+    {
+      dy = Fline_sa[i] - Fline_sa_data[i];
+      var2 = Flerrs_sa_data[i]*Flerrs_sa_data[i];
+      prob_sa += -0.5 * (dy*dy)/var2 - 0.5*log(var2 * 2.0*PI);
+    }
+
+    for(j=0; j<n_base_sa_data; j++)
+    {
+      for(i=0; i<n_vel_sa_data; i++)
+      {
+        dy = phase_sa[j*n_vel_sa_data + i] - phase_sa_data[j*n_vel_sa_data + i];
+        var2 = pherrs_sa_data[j*n_vel_sa_data + i] * pherrs_sa_data[j*n_vel_sa_data + i];
+        prob_sa += -0.5 * (dy*dy)/var2 - 0.5*log(var2 * 2.0*PI);
+      }
+    }
+    prob_sa_particles_perturb[which_particle_update] = prob_sa;
+  }
+  else
+  {
+    /* re-point */
+    TransTau = TransTau_particles[which_particle_update];
+    Trans2D_at_veldata = Trans2D_at_veldata_particles[which_particle_update];
+
+    phase_sa = phase_sa_particles[which_particle_update];
+    Fline_sa = Fline_sa_particles[which_particle_update];
+
+    prob_sa = prob_sa_particles[which_particle_update];
+  }
+  
+  /* no need to calculate line when only systematic error parameter of line are updated.
+   * otherwise, always need to calculate line.
+   */
+  if( which_parameter_update != num_params_blr-1 || force_update == 1 )
+  {
+    /* re-point */
+    Fline2d_at_data = Fline_at_data_particles_perturb[which_particle_update];
+    calculate_line2d_from_blrmodel(model, Tline_data, Vline_data_ext, Trans2D_at_veldata, Fline2d_at_data, n_line_data, n_vel_data_ext);
+    
+    var2_se = (exp(pm[num_params_blr-1])-1.0) * (exp(pm[num_params_blr-1])-1.0) * line_error_mean*line_error_mean;
+    for(i=0; i<n_line_data; i++)
+    {
+      for(j=0; j<n_vel_data; j++)
+      {
+        //note mask with error < 0.0
+        if(Flerrs2d_data[i] > 0.0)
+        {
+          dy = Fline2d_data[i*n_vel_data + j] - Fline2d_at_data[i * n_vel_data_ext + (j+n_vel_data_incr)];
+          var2 = Flerrs2d_data[i*n_vel_data+j]*Flerrs2d_data[i*n_vel_data+j] + var2_se;
+          prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
+        }
+      }
+    }
+  }
+  else
+  {
+    /* re-point */
+    Fline2d_at_data = Fline_at_data_particles[which_particle_update];
+    var2_se = (exp(pm[num_params_blr-1])-1.0) * (exp(pm[num_params_blr-1])-1.0) * line_error_mean*line_error_mean;
+    for(i=0; i<n_line_data; i++)
+    {
+      for(j=0; j<n_vel_data; j++)
+      {
+        //note mask with error < 0.0
+        if(Flerrs2d_data[i] > 0.0)
+        {
+          dy = Fline2d_data[i*n_vel_data + j] - Fline2d_at_data[i * n_vel_data_ext + (j+n_vel_data_incr)];
+          var2 = Flerrs2d_data[i*n_vel_data+j]*Flerrs2d_data[i*n_vel_data+j] + var2_se;
+          prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
+        }
+      }
+    }
+  }
+
+  return prob_sa + prob_line;
+}
+
+/*!
+ * this function calculate probability.
+ * 
+ * At each MCMC step, only one parameter is updated, which only changes some values; thus,
+ * optimization that reuses the unchanged values can improve computation efficiency.
+ */
+double prob_initial_sa2d(const void *model)
+{
+  double prob_sa = 0.0, prob_line=0.0, var2, dy, var2_se;
+  int i, j;
+  double *pm = (double *)model;
+  
+  which_particle_update = dnest_get_which_particle_update();
+
+  con_q = con_q_particles[which_particle_update];
+  Fcon = Fcon_particles[which_particle_update];
+  //calculate_con_from_model(model + num_params_blr*sizeof(double));
+  calculate_con_from_model_semiseparable(model + num_params_blr_tot*sizeof(double));
+
+  gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
+  
+
+  /* re-point */
+  TransTau = TransTau_particles[which_particle_update];
+  Trans2D_at_veldata = Trans2D_at_veldata_particles[which_particle_update];
+    
+  phase_sa = phase_sa_particles[which_particle_update];
+  Fline_sa = Fline_sa_particles[which_particle_update];
+
+  calculate_sa_transfun2d_from_blrmodel(model, Vline_data_ext, Trans2D_at_veldata, n_vel_data_ext, 0);
+    
+  /* caclulate prob_sa */
+  for(i=0; i<n_vel_sa_data; i++)
+  {
+    dy = Fline_sa[i] - Fline_sa_data[i];
+    var2 = Flerrs_sa_data[i]*Flerrs_sa_data[i];
+    prob_sa += -0.5 * (dy*dy)/var2 - 0.5*log(var2 * 2.0*PI);
+  }
+  for(j=0; j<n_base_sa_data; j++)
+  {
+    for(i=0; i<n_vel_sa_data; i++)
+    {
+      dy = phase_sa[j*n_vel_sa_data + i] - phase_sa_data[j*n_vel_sa_data + i];
+      var2 = pherrs_sa_data[j*n_vel_sa_data + i] * pherrs_sa_data[j*n_vel_sa_data + i];
+      prob_sa += -0.5 * (dy*dy)/var2 - 0.5*log(var2 * 2.0*PI);
+    }
+  }
+  prob_sa_particles[which_particle_update] = prob_sa;
+  
+  Fline2d_at_data = Fline_at_data_particles_perturb[which_particle_update];
+  calculate_line2d_from_blrmodel(model, Tline_data, Vline_data_ext, Trans2D_at_veldata, Fline2d_at_data, n_line_data, n_vel_data_ext);
+  
+  var2_se = (exp(pm[num_params_blr-1])-1.0) * (exp(pm[num_params_blr-1])-1.0) * line_error_mean*line_error_mean;
+  for(i=0; i<n_line_data; i++)
+  {
+    for(j=0; j<n_vel_data; j++)
+    {
+      //note mask with error < 0.0
+      if(Flerrs2d_data[i] > 0.0)
+      {
+        dy = Fline2d_data[i*n_vel_data + j] - Fline2d_at_data[i * n_vel_data_ext + (j+n_vel_data_incr)];
+        var2 = Flerrs2d_data[i*n_vel_data+j]*Flerrs2d_data[i*n_vel_data+j] + var2_se;
+        prob_line += (-0.5 * (dy*dy)/var2) - 0.5*log(var2 * 2.0*PI);
+      }
+    }
+  }
+
+  return prob_sa + prob_line;
+}
+
 #endif

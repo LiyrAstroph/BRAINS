@@ -111,6 +111,7 @@ void gen_cloud_sample_model9(const void *pm, int flag_type, int flag_save);
 
 void (*transfun_2d_cal)(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save);
 void transfun_2d_cal_cloud(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save);
+void transfun_2d_cal_with_sample(double *transv, double *trans2d, int n_vel);
 
 void smooth_init(int nv, const double *transv);
 void smooth_end();
@@ -144,7 +145,7 @@ void set_par_range_sa1d();
 void print_par_names_sa1d();
 void set_par_range_sa2d();
 void print_par_names_sa2d();
-void calculate_sa_from_blrmodel(const void *pm);
+void calculate_sa_from_blrmodel(const void *pm, int flag_save);
 void postprocess_sa();
 
 /* SA + 1D RM */
@@ -154,6 +155,7 @@ void reconstruct_sa1d_end();
 
 int dnest_sa1d(int argc, char **argv);
 double prob_sa1d(const void *model);
+double prob_initial_sa1d(const void *model);
 void set_par_range_sa1d();
 void print_par_names_sa1d();
 void set_par_range_sa1d();
@@ -162,7 +164,7 @@ void calculate_sa1d_from_blrmodel(const void *pm);
 void calculate_sa_with_sample(const void *pm);
 void postprocess_sa1d();
 
-void calculate_sa_transfun_from_blrmodel(const void *pm);
+void calculate_sa_transfun_from_blrmodel(const void *pm, int flag_save);
 
 /* SA + 2D RM */
 void reconstruct_sa2d();
@@ -171,6 +173,7 @@ void reconstruct_sa2d_end();
 
 int dnest_sa2d(int argc, char **argv);
 double prob_sa2d(const void *model);
+double prob_initial_sa2d(const void *model);
 void set_par_range_sa2d();
 void print_par_names_sa2d();
 void set_par_range_sa2d();
@@ -178,6 +181,9 @@ void print_par_names_sa2d();
 void calculate_sa2d_from_blrmodel(const void *pm);
 void postprocess_sa2d();
 
+void calculate_sa_transfun2d_from_blrmodel(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save);
+
+/* SA general */
 void (*gen_sa_cloud_sample)(const void *pm, int flag_type, int flag_save);
 
 void (*set_sa_blr_range_model)();

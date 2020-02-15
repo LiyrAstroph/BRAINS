@@ -365,7 +365,7 @@ void init()
   
       nlr_prior_model[2] = GAUSSIAN;
     }
-  
+    
     // range for systematic error
     sys_err_line_range[0] = log(1.0);
     sys_err_line_range[1] = log(1.0+10.0);
@@ -376,10 +376,11 @@ void init()
   
     resp_range[1][0] = -1.0;
     resp_range[1][1] =  3.0;
-  
+    
     set_blr_range_model();
+    
   }
-
+  
 #ifdef SA
   /* SA */
   if(parset.flag_dim > 2)
@@ -1101,23 +1102,23 @@ void set_blr_range_model9()
 
   i = 0;
   //mu
-  sa_blr_range_model[i][0] = log(0.1);
-  sa_blr_range_model[i++][1] = log(rcloud_max_set*0.5);
+  blr_range_model[i][0] = log(0.1);
+  blr_range_model[i++][1] = log(rcloud_max_set*0.5);
   //beta
-  sa_blr_range_model[i][0] = 0.001;
-  sa_blr_range_model[i++][1] = 2.0;
+  blr_range_model[i][0] = 0.001;
+  blr_range_model[i++][1] = 2.0;
   //F
-  sa_blr_range_model[i][0] = 0.001;
-  sa_blr_range_model[i++][1] = 0.999;
+  blr_range_model[i][0] = 0.001;
+  blr_range_model[i++][1] = 0.999;
   //inc
-  sa_blr_range_model[i][0] = 0.0;  // in cosine
-  sa_blr_range_model[i++][1] = 1.0;
+  blr_range_model[i][0] = 0.0;  // in cosine
+  blr_range_model[i++][1] = 90.0;
   //opn
-  sa_blr_range_model[i][0] = 0.0;  // in rad
-  sa_blr_range_model[i++][1] = 90.0;
+  blr_range_model[i][0] = 0.0;  // in rad
+  blr_range_model[i++][1] = 90.0;
   //mbh
-  sa_blr_range_model[i][0] = log(mass_range[0]);
-  sa_blr_range_model[i++][1] = log(mass_range[1]);
+  blr_range_model[i][0] = log(mass_range[0]);
+  blr_range_model[i++][1] = log(mass_range[1]);
 
   return;
 }

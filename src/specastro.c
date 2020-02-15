@@ -12,13 +12,38 @@
 
 #include "brains.h"
 
-void calculate_sa_transfun_from_blrmodel(const void *pm)
+void calculate_sa_transfun2d_from_blrmodel(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
   double *sa_model, *rm_model;
 
   if(parset.flag_sa_par_mutual == 0)
   {
-    gen_cloud_sample(pm, 4, 0);
+    gen_cloud_sample(pm, 5, 0);
+    transfun_2d_cal_with_sample(transv, trans2d, n_vel);
+    calculate_sa_with_sample(pm);
+  }
+  else
+  {
+    rm_model = (double *)pm;
+    sa_model = rm_model + num_params_blr;
+    sa_model[idx_sa_par_mutual[0]] = rm_model[idx_rm_par_mutual[0]];
+    sa_model[idx_sa_par_mutual[1]] = rm_model[idx_rm_par_mutual[1]];
+
+    gen_cloud_sample(pm, 2, flag_save);
+    transfun_2d_cal_with_sample(transv, trans2d, n_vel);
+
+    gen_sa_cloud_sample((void *)sa_model, 3, flag_save);
+    calculate_sa_with_sample((void *)sa_model);
+  }
+}
+
+void calculate_sa_transfun_from_blrmodel(const void *pm, int flag_save)
+{
+  double *sa_model, *rm_model;
+
+  if(parset.flag_sa_par_mutual == 0)
+  {
+    gen_cloud_sample(pm, 4, flag_save);
     transfun_1d_cal_with_sample();
     calculate_sa_with_sample(pm);
   }
@@ -29,10 +54,10 @@ void calculate_sa_transfun_from_blrmodel(const void *pm)
     sa_model[idx_sa_par_mutual[0]] = rm_model[idx_rm_par_mutual[0]];
     sa_model[idx_sa_par_mutual[1]] = rm_model[idx_rm_par_mutual[1]];
 
-    gen_cloud_sample(pm, 1, 0);
+    gen_cloud_sample(pm, 1, flag_save);
     transfun_1d_cal_with_sample();
 
-    gen_sa_cloud_sample((void *)sa_model, 3, 0);
+    gen_sa_cloud_sample((void *)sa_model, 3, flag_save);
     calculate_sa_with_sample((void *)sa_model);
   }
 }
@@ -135,7 +160,7 @@ void calculate_sa_with_sample(const void *pm)
 /* 
  * calculate SA phase and line profile.
  */
-void calculate_sa_from_blrmodel(const void *pm)
+void calculate_sa_from_blrmodel(const void *pm, int flag_save)
 {
   int i, j, k, idV;
   double V, dV, y, z, alpha, beta, flux_norm, phase, *phase_norm, *alpha_cent, *beta_cent;
@@ -829,8 +854,8 @@ void set_sa_blr_range_model9()
 
   i = 0;
   //mu
-  sa_blr_range_model[i][0] = log(3.0);
-  sa_blr_range_model[i++][1] = log(3.0e4);
+  sa_blr_range_model[i][0] = log(0.1);
+  sa_blr_range_model[i++][1] = log(rcloud_max_set*0.5);
   //beta
   sa_blr_range_model[i][0] = 0.001;
   sa_blr_range_model[i++][1] = 2.0;

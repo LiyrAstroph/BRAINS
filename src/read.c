@@ -359,12 +359,28 @@ void read_parset()
       error_flag = 1;
     }
 
-    if(parset.flag_blrmodel > 8 || parset.flag_blrmodel < -1)
+    if(parset.flag_blrmodel > 9 || parset.flag_blrmodel < -1)
     {
-      fprintf(stderr, "# Error in FlagBLRModel: value %d is not allowed.\n# Please specify a value in [-1-8].\n", parset.flag_blrmodel);
+      fprintf(stderr, "# Error in FlagBLRModel: value %d is not allowed.\n# Please specify a value in [-1-9].\n", parset.flag_blrmodel);
       error_flag = 1;
     }
+    
+    /* check linecenter */
+    if(parset.linecenter <= 0.0)
+    {
+      fprintf(stderr, "# Error in LineCenter: value %d is not allowed.\n"
+        "# Please specify a positive value.\n", parset.linecenter);
+        error_flag = 1;
+    }
 
+    /* check redshift */
+    if(parset.redshift < 0.0)
+    {
+      fprintf(stderr, "# Error in redshift: value %d is not allowed.\n"
+        "# Please specify a non-negative value.\n", parset.redshift);
+        error_flag = 1;
+    }
+      
     if((parset.flag_narrowline > 3 || parset.flag_narrowline < 0) && parset.flag_dim == 2)
     {
       fprintf(stderr, "# Error in FlagNarrowLine: value %d is not allowed.\n# Please specify a value in [0-3].\n", parset.flag_narrowline);
@@ -524,6 +540,59 @@ void read_parset()
       {
         parset.linecenter_err /= VelUnit;
       }
+#ifdef SA
+      /* check flag_sa_blrmodel */
+      if(parset.flag_sa_blrmodel > 9 || parset.flag_sa_blrmodel < -1)
+      {
+        fprintf(stderr, "# Error in FlagSABLRModel: value %d is not allowed.\n"
+          "# Please specify a value in [-1-9].\n", parset.flag_sa_blrmodel);
+          error_flag = 1;
+      }
+
+      /* check flag_sa_par_mutual */
+      if(parset.flag_sa_par_mutual > 1 || parset.flag_sa_par_mutual < 0)
+      {
+        fprintf(stderr, "# Error in FlagSAParMutual: value %d is not allowed.\n"
+          "# Please specify a value either 0 or 1.\n", parset.flag_sa_par_mutual);
+          error_flag = 1;
+      }
+
+      /* check flag_sa_linecenter */
+      if(parset.sa_linecenter <= 0.0)
+      {
+        fprintf(stderr, "# Error in SALineCenter: value %d is not allowed.\n"
+          "# Please specify a positive value.\n", parset.sa_linecenter);
+          error_flag = 1;
+      }
+      
+      /* SA + 1D RM, must have the same BLR */
+      if(parset.flag_dim == 4)
+      {
+        parset.flag_sa_par_mutual = 0;
+        if(parset.flag_blrmodel != parset.flag_sa_blrmodel)
+        {
+          fprintf(stderr, "# Error in FlagBLRModel = %d and FlagSABLRModel = %d.\n"
+          "# For FlagDim = 4, FlagBLRModel and FlagSABLRModel must be identical.\n",
+          parset.flag_blrmodel, parset.flag_sa_blrmodel);
+          error_flag = 1;
+        }
+      }
+
+      if(parset.flag_dim > 3)
+      {
+        if(parset.flag_sa_par_mutual == 0)
+        {
+          if(parset.flag_blrmodel != parset.flag_sa_blrmodel)
+          {
+            fprintf(stderr, "# Error in FlagBLRModel = %d and FlagSABLRModel = %d.\n"
+            "# For FlagSAParMutual = 0, FlagBLRModel and FlagSABLRModel must be identical.\n",
+            parset.flag_blrmodel, parset.flag_sa_blrmodel);
+            error_flag = 1;
+          }
+        }
+      }
+
+#endif
     }
   }  
     
@@ -625,7 +694,7 @@ void read_data()
     }
 
 #ifdef SA
-    if(parset.flag_dim > 2 || parset.flag_dim == -1)
+    if( (parset.flag_dim > 2 || parset.flag_dim == -1) && error_flag == 0 )
     {
       sprintf(fname, "%s/%s", parset.file_dir, parset.sa_file);
       fp = fopen(fname, "r");
@@ -696,6 +765,12 @@ void read_data()
       }
       fclose(fp);
 
+      /* convert time to rest frame */
+      for(i=0; i<n_con_data; i++)
+      {
+        Tcon_data[i] /= (1.0+parset.redshift);
+      }
+
       /* cal mean continuum error */
       con_error_mean = 0.0;
       for(i=0; i<n_con_data; i++)
@@ -710,6 +785,7 @@ void read_data()
     MPI_Bcast(Fcon_data, n_con_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
     MPI_Bcast(Fcerrs_data, n_con_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
     MPI_Bcast(&con_error_mean, 1, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+    
   }
 
   // read line
@@ -725,6 +801,12 @@ void read_data()
         fscanf(fp, "%lf %lf %lf \n", &Tline_data[i], &Fline_data[i], &Flerrs_data[i]);
       }
       fclose(fp);
+
+      /* convert time to rest frame */
+      for(i=0; i<n_line_data; i++)
+      {
+        Tline_data[i] /= (1.0+parset.redshift);
+      }
 
       if(Tline_data[0] - Tcon_data[n_con_data-1] > 0.0)
       {
@@ -785,6 +867,12 @@ void read_data()
         fscanf(fp, "\n");
       }
       fclose(fp);
+
+      /* convert time to rest frame */
+      for(i=0; i<n_line_data; i++)
+      {
+        Tline_data[i] /= (1.0+parset.redshift);
+      }
 
       if(Tline_data[0] - Tcon_data[n_con_data-1] > 0.0)
       {
@@ -927,6 +1015,14 @@ void read_data()
         fscanf(fp, "\n");
       }
       fclose(fp);
+    }
+    
+    MPI_Bcast(&error_flag, 1, MPI_INT, roottask, MPI_COMM_WORLD);
+    if(error_flag != 0)
+    {
+      MPI_Finalize();
+      free_memory_data();
+      exit(0);
     }
 
     MPI_Bcast(wave_sa_data, n_vel_sa_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);

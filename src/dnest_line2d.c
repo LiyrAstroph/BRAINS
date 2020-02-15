@@ -75,7 +75,6 @@ int dnest_line2d(int argc, char **argv)
   
   set_par_range_model2d();
   print_par_names_model2d();
-
   /* setup the fixed parameters */
   set_par_fix_blrmodel();
 

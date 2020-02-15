@@ -182,7 +182,7 @@ void postprocess2d()
         // output continuum
         for(j=0; j<parset.n_con_recon; j++)
         {
-          fprintf(fcon, "%e %e\n", Tcon[j], Fcon[j]/con_scale);
+          fprintf(fcon, "%e %e\n", Tcon[j]*(1.0+parset.redshift), Fcon[j]/con_scale);
         }
         fprintf(fcon, "\n");
 
@@ -213,7 +213,7 @@ void postprocess2d()
         // output 1d line 
         for(j = 0; j<n_line_data; j++)
         {
-          fprintf(fline1d, "%e %e\n", Tline_data[j], Fline1d[j]);
+          fprintf(fline1d, "%e %e\n", Tline_data[j]*(1.0+parset.redshift), Fline1d[j]);
         }
         fprintf(fline1d, "\n");
       }
@@ -367,7 +367,7 @@ void reconstruct_line2d()
 
       for(i=0; i<parset.n_con_recon; i++)
       {
-        fprintf(fp, "%e %e\n", Tcon[i], Fcon[i] / con_scale);
+        fprintf(fp, "%e %e\n", Tcon[i]*(1.0+parset.redshift), Fcon[i] / con_scale);
       }
       fclose(fp);
 
@@ -390,7 +390,8 @@ void reconstruct_line2d()
       {
         for(j=0; j<n_vel_data; j++)
         {
-          fprintf(fp, "%e %e %e\n", Vline_data[j]*VelUnit, Tline_data[i],  Fline2d_at_data[i*n_vel_data_ext + (j+n_vel_data_incr)] / line_scale);
+          fprintf(fp, "%e %e %e\n", Vline_data[j]*VelUnit, Tline_data[i]*(1.0+parset.redshift),  
+                            Fline2d_at_data[i*n_vel_data_ext + (j+n_vel_data_incr)] / line_scale);
         }
         fprintf(fp, "\n");
       }
