@@ -385,6 +385,10 @@ void reconstruct_sa_end()
   {
     fclose(fcloud_out);
   }
+  if(thistask == roottask)
+  {
+    printf("Ends reconstruct_sa.\n");
+  }
   return;
 }  
 

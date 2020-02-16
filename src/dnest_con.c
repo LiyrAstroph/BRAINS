@@ -156,7 +156,7 @@ void print_par_names_con()
   
   int i, j;
   FILE *fp;
-  char fname[BRAINS_MAX_STR_LENGTH];
+  char fname[BRAINS_MAX_STR_LENGTH], str_fmt[BRAINS_MAX_STR_LENGTH];
 
   sprintf(fname, "%s/%s", parset.file_dir, "data/para_names_con.txt");
   fp = fopen(fname, "w");
@@ -166,31 +166,39 @@ void print_par_names_con()
     exit(0);
   }
   
+  strcpy(str_fmt, "%4d %-15s %10.6f %10.6f %4d %4d %10.6f\n");
+
   printf("# Print parameter name in %s\n", fname);
 
   i=0;
-  fprintf(fp, "%4d %-15s %f %f %d\n", i, "sys_err_con", par_range_model[i][0], par_range_model[i][1], par_prior_model[i]);
+  fprintf(fp, str_fmt, i, "sys_err_con", par_range_model[i][0], par_range_model[i][1], par_prior_model[i],
+                            par_fix[i], par_fix_val[i]);
   i++;
-  fprintf(fp, "%4d %-15s %f %f %d\n", i, "sigmad", par_range_model[i][0], par_range_model[i][1], par_prior_model[i]);
+  fprintf(fp, str_fmt, i, "sigmad", par_range_model[i][0], par_range_model[i][1], par_prior_model[i],
+                            par_fix[i], par_fix_val[i]);
   i++;
-  fprintf(fp, "%4d %-15s %f %f %d\n", i, "taud", par_range_model[i][0], par_range_model[i][1], par_prior_model[i]);
+  fprintf(fp, str_fmt, i, "taud", par_range_model[i][0], par_range_model[i][1], par_prior_model[i],
+                            par_fix[i], par_fix_val[i]);
   
   for(j=0; j<num_params_trend; j++)
   {
     i++;
-    fprintf(fp, "%4d %-15s %f %f %d\n", i, "trend", par_range_model[i][0], par_range_model[i][1], par_prior_model[i]);
+    fprintf(fp, str_fmt, i, "trend", par_range_model[i][0], par_range_model[i][1], par_prior_model[i],
+                            par_fix[i], par_fix_val[i]);
   }
 
   for(j=0; j<num_params_difftrend; j++)
   {
     i++;
-    fprintf(fp, "%4d %-15s %f %f %d\n", i, "diff trend", par_range_model[i][0], par_range_model[i][1], par_prior_model[i]);
+    fprintf(fp, str_fmt, i, "diff trend", par_range_model[i][0], par_range_model[i][1], par_prior_model[i],
+                            par_fix[i], par_fix_val[i]);
   }
 
   for(j=0; j<parset.n_con_recon; j++)
   {
     i++;
-    fprintf(fp, "%4d %-15s %f %f %d\n", i, "time series", par_range_model[i][0], par_range_model[i][1], par_prior_model[i]);
+    fprintf(fp, str_fmt, i, "time series", par_range_model[i][0], par_range_model[i][1], par_prior_model[i],
+                            par_fix[i], par_fix_val[i]);
   }
   
   fclose(fp);

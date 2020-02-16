@@ -611,6 +611,10 @@ void reconstruct_sa1d_end()
   {
     fclose(fcloud_out);
   }
+  if(thistask == roottask)
+  {
+    printf("Ends reconstruct_sa1d.\n");
+  }
   return;
 }
 
