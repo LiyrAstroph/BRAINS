@@ -66,8 +66,13 @@ int dnest_sa(int argc, char **argv)
   fptrset_sa->log_likelihoods_cal = log_likelihoods_cal_sa;
 
   set_par_range_sa();
-  print_par_names_sa();
   //set_par_fix_sa_blrmodel();
+
+  for(i=0; i<num_params; i++)
+  {
+    par_fix[i] = 0;
+    par_fix_val[i] = -DBL_MAX;
+  }
 
   /* fix DA */
   par_fix[num_params_sa_blr_model] = 1;
@@ -77,7 +82,8 @@ int dnest_sa(int argc, char **argv)
   par_fix[num_params_sa_blr_model+2] = 1;
   par_fix_val[num_params_sa_blr_model+2] = log(1.0);
 
-  
+  print_par_names_sa();
+
   force_update = parset.flag_force_update;
   if(parset.flag_para_name != 1)
     logz_sa = dnest(argc, argv, fptrset_sa, num_params, dnest_options_file);
@@ -136,9 +142,11 @@ void print_par_names_sa()
     exit(0);
   }
   
-  strcpy(str_fmt, "%4d %-15s %10.6f %10.6f %4d %4d %10.6f\n");
+  strcpy(str_fmt, "%4d %-15s %10.6f %10.6f %4d %4d %15.6e\n");
 
   printf("# Print parameter name in %s\n", fname);
+
+  fprintf(fp, "%4s %-15s %10s %10s %4s %4s %15s\n", "#", "Par", "Min", "Max", "Prior", "Fix", "Val");
 
   i=-1;
   for(j=0; j<num_params_sa_blr_model; j++)

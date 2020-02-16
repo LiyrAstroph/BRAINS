@@ -74,11 +74,13 @@ int dnest_line1d(int argc, char **argv)
   }
   
   set_par_range_model1d();
-  print_par_names_model1d();
   set_par_fix_blrmodel();
 
   for(i=num_params_blr_model; i<num_params; i++)
+  {
     par_fix[i] = 0;
+    par_fix_val[i] = -DBL_MAX;
+  }
 
   /* fix continuum variation parameter sigma and tau if flag_fixvar is true */
   if(parset.flag_fixvar == 1)
@@ -110,8 +112,9 @@ int dnest_line1d(int argc, char **argv)
     par_fix_val[num_params_blr-2] = 0.0;
   }
   
-  force_update = parset.flag_force_update;
+  print_par_names_model1d();
 
+  force_update = parset.flag_force_update;
   if(parset.flag_para_name != 1)
     logz_line = dnest(argc, argv, fptrset_line1d, num_params, dnest_options_file);
 
@@ -245,9 +248,11 @@ void print_par_names_model1d()
     exit(0);
   }
   
-  strcpy(str_fmt, "%4d %-15s %10.6f %10.6f %4d %4d %10.6f\n");
-  
+  strcpy(str_fmt, "%4d %-15s %10.6f %10.6f %4d %4d %15.6e\n");
+
   printf("# Print parameter name in %s\n", fname);
+  
+  fprintf(fp, "%4s %-15s %10s %10s %4s %4s %15s\n", "#", "Par", "Min", "Max", "Prior", "Fix", "Val");
 
   i=-1;
   for(j=0; j<num_params_blr_model; j++)

@@ -71,11 +71,13 @@ int dnest_con(int argc, char **argv)
   }
   
   set_par_range_con();
-  print_par_names_con();
   
   /* setup fixed parameters */
   for(i=0; i<num_params; i++)
+  {
     par_fix[i] = 0;
+    par_fix_val[i] = -DBL_MAX;
+  }
 
   /* fix systematic error of continuum */
   if(parset.flag_con_sys_err != 1)
@@ -83,6 +85,8 @@ int dnest_con(int argc, char **argv)
     par_fix[0] = 1;
     par_fix_val[0] = log(1.0);
   }
+
+  print_par_names_con();
 
   /* if not only print parameter name */
   if(parset.flag_para_name != 1)
@@ -166,10 +170,11 @@ void print_par_names_con()
     exit(0);
   }
   
-  strcpy(str_fmt, "%4d %-15s %10.6f %10.6f %4d %4d %10.6f\n");
+  strcpy(str_fmt, "%4d %-15s %10.6f %10.6f %4d %4d %15.6e\n");
 
   printf("# Print parameter name in %s\n", fname);
 
+  fprintf(fp, "%4s %-15s %10s %10s %4s %4s %15s\n", "#", "Par", "Min", "Max", "Prior", "Fix", "Val");
   i=0;
   fprintf(fp, str_fmt, i, "sys_err_con", par_range_model[i][0], par_range_model[i][1], par_prior_model[i],
                             par_fix[i], par_fix_val[i]);

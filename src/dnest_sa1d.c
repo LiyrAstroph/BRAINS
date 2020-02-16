@@ -83,13 +83,13 @@ int dnest_sa1d(int argc, char **argv)
   fptrset_sa1d->log_likelihoods_cal = log_likelihoods_cal_sa1d;
 
   set_par_range_sa1d();
-  print_par_names_sa1d();
   set_par_fix_blrmodel();
 
   /* the rest parameters */
   for(i=num_params_blr_model; i<num_params; i++)
   {
     par_fix[i] = 0;
+    par_fix_val[i] = -DBL_MAX;
   }
   
   /* fix non-linear response */
@@ -139,6 +139,8 @@ int dnest_sa1d(int argc, char **argv)
     par_fix[num_params_blr_tot + 2] = 1;
     par_fix_val[num_params_blr_tot + 2] = var_param[2];
   }
+  
+  print_par_names_sa1d();
 
   force_update = parset.flag_force_update;
   if(parset.flag_para_name != 1)
@@ -296,9 +298,11 @@ void print_par_names_sa1d()
     exit(0);
   }
   
-  strcpy(str_fmt, "%4d %-15s %10.6f %10.6f %4d %4d %10.6f\n");
-  
+  strcpy(str_fmt, "%4d %-15s %10.6f %10.6f %4d %4d %15.6e\n");
+
   printf("# Print parameter name in %s\n", fname);
+
+  fprintf(fp, "%4s %-15s %10s %10s %4s %4s %15s\n", "#", "Par", "Min", "Max", "Prior", "Fix", "Val");
 
   i=-1;
   for(j=0; j<num_params_blr_model; j++)
