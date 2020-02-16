@@ -28,8 +28,8 @@ void calculate_sa_transfun2d_from_blrmodel(const void *pm, double *transv, doubl
   {
     rm_model = (double *)pm;
     sa_model = rm_model + num_params_blr;
-    sa_model[idx_sa_par_mutual[0]] = rm_model[idx_rm_par_mutual[0]];
-    sa_model[idx_sa_par_mutual[1]] = rm_model[idx_rm_par_mutual[1]];
+    sa_model[idx_sa_par_mutual[0]] = rm_model[idx_rm_par_mutual[0]]; //mbh
+    sa_model[idx_sa_par_mutual[1]] = rm_model[idx_rm_par_mutual[1]]; //inc
 
     gen_cloud_sample(pm, 2, flag_save);
     transfun_2d_cal_with_sample(transv, trans2d, n_vel);
@@ -53,8 +53,7 @@ void calculate_sa_transfun_from_blrmodel(const void *pm, int flag_save)
   {
     rm_model = (double *)pm;
     sa_model = rm_model + num_params_blr;
-    sa_model[idx_sa_par_mutual[0]] = rm_model[idx_rm_par_mutual[0]];
-    sa_model[idx_sa_par_mutual[1]] = rm_model[idx_rm_par_mutual[1]];
+    sa_model[idx_sa_par_mutual[1]] = rm_model[idx_rm_par_mutual[1]]; // inc
 
     gen_cloud_sample(pm, 1, flag_save);
     transfun_1d_cal_with_sample();

@@ -36,6 +36,7 @@ int dnest_sa(int argc, char **argv)
   
   num_params_blr = 0;  /* RM parameter numbers */
   num_params_sa_blr = num_params_sa_blr_model + num_params_sa_extpar;
+  num_params_blr_tot = num_params_sa_blr;
   num_params_sa = num_params_sa_blr;
   num_params = num_params_sa;
 

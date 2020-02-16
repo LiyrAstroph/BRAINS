@@ -40,19 +40,22 @@ int dnest_sa1d(int argc, char **argv)
     set_blr_model2d();
     num_params_sa_blr_model = 0;
   }
-  else /* SA and RM have different BLRs but have the same mbh and inc. */
+  else /* SA and RM have different BLRs but share the same mbh and inc. */
   {
     set_blr_model1d();
     set_sa_blr_model();
   }
+  /* RM */
   num_params_blr = num_params_blr_model + 2 + 1; /* include A, Ag, and line sys err */
   num_params_rm = parset.n_con_recon + num_params_var + num_params_blr;
-
+  
+  /* SA */
   num_params_sa_blr = num_params_sa_blr_model + num_params_sa_extpar;
   num_params_sa = num_params_sa_blr;
-  num_params = num_params_sa + num_params_rm;
 
+  /* total */
   num_params_blr_tot = num_params_blr + num_params_sa_blr;
+  num_params = num_params_sa + num_params_rm;
 
   par_fix = (int *) malloc(num_params * sizeof(int));
   par_fix_val = (double *) malloc(num_params * sizeof(double));

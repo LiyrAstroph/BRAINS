@@ -37,7 +37,7 @@ int dnest_sa2d(int argc, char **argv)
     set_blr_model2d();
     num_params_sa_blr_model = 0;
   }
-  else /* SA and RM have different BLRs but have the same mbh and inc. */
+  else /* SA and RM have different BLRs but share the same mbh and inc. */
   {
     set_blr_model2d();
     set_sa_blr_model();

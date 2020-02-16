@@ -597,7 +597,7 @@ void scale_con_line()
       Flerrs_data[i] *= line_scale;
     }
 
-    if(parset.flag_dim==2 || parset.flag_dim == -1)
+    if(parset.flag_dim==2 || parset.flag_dim == -1 || parset.flag_dim == 5)
       for(j=0; j<n_vel_data; j++)
       {
         // note mask with error < 0.0
@@ -610,7 +610,7 @@ void scale_con_line()
   }
   line_error_mean *= line_scale;
 
-  if( (parset.flag_dim==2 || parset.flag_dim == -1) && parset.flag_narrowline!=0)
+  if( (parset.flag_dim==2 || parset.flag_dim == -1 || parset.flag_dim == 5) && parset.flag_narrowline!=0)
   {
     parset.flux_narrowline *= line_scale;
     parset.flux_narrowline_err *= line_scale;

@@ -772,6 +772,7 @@ void reconstruct_sa2d_end()
   free(clouds_alpha);
   free(clouds_beta);
   free(clouds_tau);
+  free(clouds_vel);
 
   if(parset.flag_save_clouds && thistask==roottask)
   {

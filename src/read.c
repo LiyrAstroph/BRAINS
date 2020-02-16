@@ -385,7 +385,7 @@ void read_parset()
         error_flag = 1;
     }
       
-    if((parset.flag_narrowline > 3 || parset.flag_narrowline < 0) && parset.flag_dim == 2)
+    if((parset.flag_narrowline > 3 || parset.flag_narrowline < 0) && (parset.flag_dim == 2 || parset.flag_dim == 5))
     {
       fprintf(stderr, "# Error in FlagNarrowLine: value %d is not allowed.\n# Please specify a value in [0-3].\n", parset.flag_narrowline);
       error_flag = 1;
@@ -397,25 +397,25 @@ void read_parset()
       error_flag = 1;
     }
 
-    if((parset.flag_InstRes < 0 || parset.flag_InstRes > 2) && (parset.flag_dim == 2 || parset.flag_dim < 0))
+    if((parset.flag_InstRes < 0 || parset.flag_InstRes > 2) && (parset.flag_dim == 2 || parset.flag_dim == 5|| parset.flag_dim < 0))
     {
       fprintf(stderr, "# Error in FlagInstRes: value %d is not allowed.\n# Please specify a value in [0-2].\n", parset.flag_InstRes);
       error_flag = 1;
     }
 
-    if((parset.flag_linecenter < -1 || parset.flag_linecenter > 1) && parset.flag_dim == 2)
+    if((parset.flag_linecenter < -1 || parset.flag_linecenter > 1) && (parset.flag_dim == 2 || parset.flag_dim == 5))
     {
       fprintf(stderr, "# Error in FlagLineCenter: value %d is not allowed.\n# Please specify a value in [-1-1].\n", parset.flag_linecenter);
       error_flag = 1;
     }
   
-    if(parset.InstRes < 0.0 && (parset.flag_dim == 2 || parset.flag_dim < 0) )
+    if(parset.InstRes < 0.0 && (parset.flag_dim == 2 || parset.flag_dim == 5 || parset.flag_dim < 0) )
     {
       fprintf(stderr, "# Error in InstRes: value %f is not allowed.\n# Please specify a positive value.\n", parset.InstRes);
       error_flag = 1;
     }
 
-    if(parset.InstRes_err < 0.0 && (parset.flag_dim == 2 || parset.flag_dim < 0))
+    if(parset.InstRes_err < 0.0 && (parset.flag_dim == 2 || parset.flag_dim == 5 || parset.flag_dim < 0))
     {
       fprintf(stderr, "# Error in InstResErr: value %f is not allowed.\n# Please specify a positive value.\n", parset.InstRes_err);
       error_flag = 1;
@@ -438,7 +438,7 @@ void read_parset()
         error_flag = 4;
       }
     }
-    if(parset.flag_dim == -1 || parset.flag_dim == 2)
+    if(parset.flag_dim == -1 || parset.flag_dim == 2 || parset.flag_dim == 5)
     {
       if(strlen(parset.line2d_file) == 0)
       {
@@ -456,7 +456,7 @@ void read_parset()
         parset.flag_linecenter = 0;
         parset.flag_InstRes = 0;
       }
-      if(parset.flag_dim ==2)
+      if(parset.flag_dim ==2 || parset.flag_dim == 5)
       {
         if(parset.flag_narrowline == 0)
         {
@@ -601,6 +601,15 @@ void read_parset()
             parset.flag_blrmodel, parset.flag_sa_blrmodel);
             error_flag = 1;
           }
+        }
+      }
+
+      if(parset.flag_dim > 2 )
+      {
+        if(strlen(parset.sa_file) == 0)
+        {
+          fprintf(stderr, "# Please specify SA data file in parameter file.\n");
+          error_flag = 4;
         }
       }
       
