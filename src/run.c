@@ -90,6 +90,7 @@ void begin_run()
     reconstruct_line2d();
   }
 
+#ifdef SA
   if(parset.flag_dim == 3) /* SA */
   {
     reconstruct_sa();
@@ -112,6 +113,7 @@ void begin_run()
     }
     reconstruct_sa2d();
   }
+#endif
 
   return;
 }
