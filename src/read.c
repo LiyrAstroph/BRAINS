@@ -372,7 +372,7 @@ void read_parset()
     /* check linecenter */
     if(parset.linecenter <= 0.0)
     {
-      fprintf(stderr, "# Error in LineCenter: value %d is not allowed.\n"
+      fprintf(stderr, "# Error in LineCenter: value %f is not allowed.\n"
         "# Please specify a positive value.\n", parset.linecenter);
         error_flag = 1;
     }
@@ -380,7 +380,7 @@ void read_parset()
     /* check redshift */
     if(parset.redshift < 0.0)
     {
-      fprintf(stderr, "# Error in redshift: value %d is not allowed.\n"
+      fprintf(stderr, "# Error in redshift: value %f is not allowed.\n"
         "# Please specify a non-negative value.\n", parset.redshift);
         error_flag = 1;
     }
@@ -788,25 +788,40 @@ void read_data()
       sprintf(fname, "%s/%s", parset.file_dir, parset.continuum_file);
       fp = fopen(fname, "r");
       for(i=0; i<n_con_data; i++)
-      {
-        fscanf(fp, "%lf %lf %lf \n", &Tcon_data[i], &Fcon_data[i], &Fcerrs_data[i]);
+      {      
+        if(fscanf(fp, "%lf %lf %lf \n", &Tcon_data[i], &Fcon_data[i], &Fcerrs_data[i])<3)
+        {
+          fprintf(stderr, "# Error in continuum data file %s.\n"
+            "# Too few columns in line %d.\n", fname, i);
+          error_flag = 5;
+          break;
+        }
       }
       fclose(fp);
-
-      /* convert time to rest frame */
-      for(i=0; i<n_con_data; i++)
+      
+      if(error_flag == 0)
       {
-        Tcon_data[i] /= (1.0+parset.redshift);
+        /* convert time to rest frame */
+        for(i=0; i<n_con_data; i++)
+        {
+          Tcon_data[i] /= (1.0+parset.redshift);
+        }
+  
+        /* cal mean continuum error */
+        con_error_mean = 0.0;
+        for(i=0; i<n_con_data; i++)
+        {
+          con_error_mean += Fcerrs_data[i];
+        }
+        con_error_mean /= n_con_data;
       }
-
-      /* cal mean continuum error */
-      con_error_mean = 0.0;
-      for(i=0; i<n_con_data; i++)
-      {
-        con_error_mean += Fcerrs_data[i];
-      }
-      con_error_mean /= n_con_data;
-
+    }
+    MPI_Bcast(&error_flag, 1, MPI_INT, roottask, MPI_COMM_WORLD);
+    if(error_flag != 0)
+    {
+      MPI_Finalize();
+      free_memory_data();
+      exit(0);
     }
 
     MPI_Bcast(Tcon_data, n_con_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
@@ -826,34 +841,43 @@ void read_data()
       fp = fopen(fname, "r");
       for(i=0; i<n_line_data; i++)
       {
-        fscanf(fp, "%lf %lf %lf \n", &Tline_data[i], &Fline_data[i], &Flerrs_data[i]);
+        if(fscanf(fp, "%lf %lf %lf \n", &Tline_data[i], &Fline_data[i], &Flerrs_data[i]) < 3)
+        {
+          fprintf(stderr, "# Error in line data file %s.\n"
+            "# Too few columns in line %d.\n", fname, i);
+          error_flag = 5;
+          break;
+        }
       }
       fclose(fp);
-
-      /* convert time to rest frame */
-      for(i=0; i<n_line_data; i++)
+      
+      if(error_flag == 0)
       {
-        Tline_data[i] /= (1.0+parset.redshift);
+        /* convert time to rest frame */
+        for(i=0; i<n_line_data; i++)
+        {
+          Tline_data[i] /= (1.0+parset.redshift);
+        }
+  
+        if(Tline_data[0] - Tcon_data[n_con_data-1] > 0.0)
+        {
+          fprintf(stderr, "# Error: No time overlap between ontinuum and line time series.\n");
+          fprintf(stderr, "# Error: continuum, %f-%f; line, %f-%f.\n", Tcon_data[0], Tcon_data[n_con_data-1], 
+            Tline_data[0], Tline_data[n_line_data-1]);
+          error_flag = 4;
+        }
+  
+        /* cal mean line error */
+        line_error_mean = 0.0;
+        for(i=0; i<n_line_data;i++)
+        {
+          // note mask with error < 0.0
+          if(Flerrs_data[i] > 0.0)
+            line_error_mean += Flerrs_data[i];
+        }
+        line_error_mean /= n_line_data;
       }
-
-      if(Tline_data[0] - Tcon_data[n_con_data-1] > 0.0)
-      {
-        fprintf(stderr, "# Error: No time overlap between ontinuum and line time series.\n");
-        fprintf(stderr, "# Error: continuum, %f-%f; line, %f-%f.\n", Tcon_data[0], Tcon_data[n_con_data-1], 
-          Tline_data[0], Tline_data[n_line_data-1]);
-        error_flag = 4;
-      }
-
-      /* cal mean line error */
-      line_error_mean = 0.0;
-      for(i=0; i<n_line_data;i++)
-      {
-        // note mask with error < 0.0
-        if(Flerrs_data[i] > 0.0)
-          line_error_mean += Flerrs_data[i];
-      }
-      line_error_mean /= n_line_data;
-    }
+    }  
 
     MPI_Bcast(&error_flag, 1, MPI_INT, roottask, MPI_COMM_WORLD);
     if(error_flag != 0)
@@ -886,41 +910,49 @@ void read_data()
       {
         for(j=0; j<n_vel_data; j++)
         {
-          fscanf(fp, "%lf%lf%lf%lf\n", &Vline_data[j], &Tline_data[i], 
-                 &Fline2d_data[i*n_vel_data + j], &Flerrs2d_data[i*n_vel_data + j]);
-
+          if(fscanf(fp, "%lf%lf%lf%lf\n", &Vline_data[j], &Tline_data[i], 
+                 &Fline2d_data[i*n_vel_data + j], &Flerrs2d_data[i*n_vel_data + j]) < 4)
+          {
+            fprintf(stderr, "# Error in line2d data file %s.\n"
+            "# Too few columns.\n", fname);
+            error_flag = 5; 
+            break;
+          }
           Vline_data[j] /= VelUnit;
         }
 
         fscanf(fp, "\n");
       }
       fclose(fp);
-
-      /* convert time to rest frame */
-      for(i=0; i<n_line_data; i++)
-      {
-        Tline_data[i] /= (1.0+parset.redshift);
-      }
-
-      if(Tline_data[0] - Tcon_data[n_con_data-1] > 0.0)
-      {
-        fprintf(stderr, "# Error: No time overlap between ontinuum and line time series.\n");
-        fprintf(stderr, "# Error: continuum, %f-%f; line, %f-%f.\n", Tcon_data[0], Tcon_data[n_con_data-1], 
-          Tline_data[0], Tline_data[n_line_data-1]);
-        error_flag = 4;
-      }
       
-      // cal mean line error
-      line_error_mean = 0.0;
-      for(i=0; i<n_line_data;i++)
-        for(j=0; j<n_vel_data; j++)
+      if(error_flag == 0)
+      {
+        /* convert time to rest frame */
+        for(i=0; i<n_line_data; i++)
         {
-          // note mask with error < 0.0
-          if(Flerrs2d_data[i*n_vel_data + j] > 0.0)
-            line_error_mean += Flerrs2d_data[i*n_vel_data + j];
+          Tline_data[i] /= (1.0+parset.redshift);
         }
-
-      line_error_mean /= (n_line_data*n_vel_data);
+  
+        if(Tline_data[0] - Tcon_data[n_con_data-1] > 0.0)
+        {
+          fprintf(stderr, "# Error: No time overlap between ontinuum and line time series.\n");
+          fprintf(stderr, "# Error: continuum, %f-%f; line, %f-%f.\n", Tcon_data[0], Tcon_data[n_con_data-1], 
+            Tline_data[0], Tline_data[n_line_data-1]);
+          error_flag = 4;
+        }
+        
+        // cal mean line error
+        line_error_mean = 0.0;
+        for(i=0; i<n_line_data;i++)
+          for(j=0; j<n_vel_data; j++)
+          {
+            // note mask with error < 0.0
+            if(Flerrs2d_data[i*n_vel_data + j] > 0.0)
+              line_error_mean += Flerrs2d_data[i*n_vel_data + j];
+          }
+  
+        line_error_mean /= (n_line_data*n_vel_data);
+      }
     }
     
     MPI_Bcast(&error_flag, 1, MPI_INT, roottask, MPI_COMM_WORLD);
@@ -972,6 +1004,8 @@ void read_data()
           if(fscanf(fp, "%lf %lf\n", &instres_epoch[i], &instres_err_epoch[i]) < 2)
           {
             fprintf(stderr, "Error: Cannot read file %s.\n", fname);
+            error_flag = 5;
+            break;
           }
           //printf("%d %f %f\n", i, instres_epoch[i], instres_err_epoch[i]);
           instres_epoch[i] /= VelUnit;
@@ -981,7 +1015,8 @@ void read_data()
           {
             printf("# Error narrow line width %f should be smaller than InstRes %f at %d epoch.\n",
               parset.width_narrowline*VelUnit, parset.InstRes*VelUnit, i);    
-            error_flag = 1;      
+            error_flag = 1;   
+            break;   
           }
         }
         fclose(fp);
@@ -1026,19 +1061,38 @@ void read_data()
       {
         for(i=0; i<n_vel_sa_data; i++)
         {
-          fscanf(fp, "%lf %lf %lf\n", &wave_sa_data[i], 
-                     &Fline_sa_data[i+j*n_vel_sa_data], &Flerrs_sa_data[i+j*n_vel_sa_data]);
+          if(fscanf(fp, "%lf %lf %lf\n", &wave_sa_data[i], 
+                     &Fline_sa_data[i+j*n_vel_sa_data], &Flerrs_sa_data[i+j*n_vel_sa_data]) < 3)
+          {
+            fprintf(stderr, "# Error in SA data file %s.\n"
+            "# Too few columns.\n", fname);
+            error_flag = 5;
+            break;
+          }
         }
         fscanf(fp, "\n");
       }
       
       for(j=0; j<n_base_sa_data; j++)
       {
-        fscanf(fp, "# %lf %lf\n", &base_sa_data[j*2+0], &base_sa_data[j*2+1]);
+        if(fscanf(fp, "# %lf %lf\n", &base_sa_data[j*2+0], &base_sa_data[j*2+1]) < 2)
+        {
+          fprintf(stderr, "# Error in SA data file %s.\n"
+            "# Too few columns in base %d.\n", fname, i);
+          error_flag = 5;
+          break;
+        }
+
         for(i=0; i<n_vel_sa_data; i++)
         {
-          fscanf(fp, "%lf %lf %lf\n", &wave_sa_data[i], &phase_sa_data[i+j*n_vel_sa_data], 
-                      &pherrs_sa_data[i+j*n_vel_sa_data]);
+          if(fscanf(fp, "%lf %lf %lf\n", &wave_sa_data[i], &phase_sa_data[i+j*n_vel_sa_data], 
+                      &pherrs_sa_data[i+j*n_vel_sa_data]) < 3)
+          {
+            fprintf(stderr, "# Error in SA data file %s.\n"
+            "# Too few columns.\n", fname);
+            error_flag = 5;
+            break;
+          }
         }
         fscanf(fp, "\n");
       }
