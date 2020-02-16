@@ -1907,13 +1907,13 @@ void gen_cloud_sample_model9(const void *pm, int flag_type, int flag_save)
   double x, y, z, xb, yb, zb, vx, vy, vz, vxb, vyb, vzb;
   double inc, F, beta, mu, a, s, rin, sig;
   double Lphi, Lthe, Vkep, Rs, g;
-  double V, weight, rnd;
+  double V, weight, rnd, sin_inc_cmp, cos_inc_cmp;
   BLRmodel9 *model = (BLRmodel9 *)pm;
   double Vr, Vph, mbh;
   
   //Lopn_cos = cos(model->opn*PI/180.0);
   Lopn = model->opn*PI/180.0;
-  inc = model->inc/180.0*PI;
+  inc = acos(model->inc);
   beta = model->beta;
   F = model->F;
   mu = exp(model->mu);
@@ -1926,6 +1926,9 @@ void gen_cloud_sample_model9(const void *pm, int flag_type, int flag_save)
   rin = mu*F + Rs;
   sig = (1.0-F)*s;
 
+  sin_inc_cmp = cos(inc); //sin(PI/2.0 - inc);
+  cos_inc_cmp = sin(inc); //cos(PI/2.0 - inc);
+  
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
 // generate a direction of the angular momentum     
@@ -1962,9 +1965,12 @@ void gen_cloud_sample_model9(const void *pm, int flag_type, int flag_save)
     zb =  sin(Lthe) * x;
 
     /* counter-rotate around y */
-    x = xb * cos(PI/2.0-inc) + zb * sin(PI/2.0-inc);
+    //x = xb * cos(PI/2.0-inc) + zb * sin(PI/2.0-inc);
+    //y = yb;
+    //z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
+    x = xb * cos_inc_cmp + zb * sin_inc_cmp;
     y = yb;
-    z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
+    z =-xb * sin_inc_cmp + zb * cos_inc_cmp;
 
     weight = 1.0;
     clouds_weight[i] = weight;
@@ -2047,9 +2053,12 @@ void gen_cloud_sample_model9(const void *pm, int flag_type, int flag_save)
       vyb =-cos(Lthe)*sin(Lphi) * vx + cos(Lphi) * vy;
       vzb = sin(Lthe) * vx;
     
-      vx = vxb * cos(PI/2.0-inc) + vzb * sin(PI/2.0-inc);
+      //vx = vxb * cos(PI/2.0-inc) + vzb * sin(PI/2.0-inc);
+      //vy = vyb;
+      //vz =-vxb * sin(PI/2.0-inc) + vzb * cos(PI/2.0-inc);
+      vx = vxb * cos_inc_cmp + vzb * sin_inc_cmp;
       vy = vyb;
-      vz =-vxb * sin(PI/2.0-inc) + vzb * cos(PI/2.0-inc);
+      vz =-vxb * sin_inc_cmp + vzb * cos_inc_cmp;
 
       V = -vx;  //note the definition of the line-of-sight velocity. positive means a receding 
                 // velocity relative to the observer.

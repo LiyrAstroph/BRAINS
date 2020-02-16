@@ -878,9 +878,9 @@ void set_sa_blr_range_model9()
   sa_blr_range_model[i++][1] = 0.999;
   //inc
   sa_blr_range_model[i][0] = 0.0;  // in cosine
-  sa_blr_range_model[i++][1] = 90.0;
+  sa_blr_range_model[i++][1] = 1.0;
   //opn
-  sa_blr_range_model[i][0] = 0.0;  // in rad
+  sa_blr_range_model[i][0] = 0.0;  // in degree
   sa_blr_range_model[i++][1] = 90.0;
   //mbh
   sa_blr_range_model[i][0] = log(mass_range[0]);

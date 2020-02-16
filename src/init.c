@@ -1112,7 +1112,7 @@ void set_blr_range_model9()
   blr_range_model[i++][1] = 0.999;
   //inc
   blr_range_model[i][0] = 0.0;  // in cosine
-  blr_range_model[i++][1] = 90.0;
+  blr_range_model[i++][1] = 1.0;
   //opn
   blr_range_model[i][0] = 0.0;  // in rad
   blr_range_model[i++][1] = 90.0;

@@ -236,14 +236,14 @@ void reconstruct_sa1d()
   strcpy(argv[argc++], "dnest");
   strcpy(argv[argc++], "-s");
   strcpy(argv[argc], parset.file_dir);
-  strcat(argv[argc++], "/data/restartsa_dnest.txt");
+  strcat(argv[argc++], "/data/restartsa1d_dnest.txt");
 
   if(parset.flag_restart == 1)
   {
     strcpy(argv[argc++], "-r");
     strcpy(argv[argc], parset.file_dir);
     strcat(argv[argc], "/");
-    strcat(argv[argc++], "data/restartsa_dnest.txt");
+    strcat(argv[argc++], "data/restartsa1d_dnest.txt");
   }
   if(parset.flag_postprc == 1)
   {

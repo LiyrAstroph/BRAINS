@@ -194,7 +194,7 @@ void sim()
       pm[i++] = log(4.0);   //theta_min
       pm[i++] = 1.0;
       pm[i++] = 0.2;
-      pm[i++] = 30.0;     // inc
+      pm[i++] = cos(30.0/180.0*PI);     // inc
       pm[i++] = 30.0;
       pm[i++] = log(4.0); // mbh
       break;
