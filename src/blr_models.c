@@ -30,10 +30,6 @@
  * dynamics: elliptical orbits
  *================================================================
  */
-/*! 
- * This function calculate 2d transfer function at velocity grid "transv" and time grid "TransTau" . 
- * Note that time-lag grid is already set by parset.n_tau.
- */
 void gen_cloud_sample_model1(const void *pm, int flag_type, int flag_save)
 {
   int i, j, nc;
@@ -239,10 +235,6 @@ void gen_cloud_sample_model1(const void *pm, int flag_type, int flag_save)
  * dynamics: elliptical orbits (Gaussian around circular orbits)
  *================================================================
  */
-/*! 
- * This function calculate 2d transfer function at velocity grid "transv" and time grid "TransTau" . 
- * Note that time-lag grid is already set by parset.n_tau.
- */
 void gen_cloud_sample_model2(const void *pm, int flag_type, int flag_save)
 {
   int i, j, nc;
@@ -434,11 +426,6 @@ void gen_cloud_sample_model2(const void *pm, int flag_type, int flag_save)
  * dynamics: 
  *====================================================================
  */
-
-/*! 
- * This function calculate 2d transfer function at velocity grid "transv" and time grid "TransTau" . 
- * Note that time-lag grid is already set by parset.n_tau.
- */
 void gen_cloud_sample_model3(const void *pm, int flag_type, int flag_save)
 {
   int i, j, nc;
@@ -624,8 +611,8 @@ void gen_cloud_sample_model3(const void *pm, int flag_type, int flag_save)
 }
 
 /*! 
- * This function calculate 2d transfer function at velocity grid "transv" and time grid "TransTau" . 
- * Note that time-lag grid is already set by parset.n_tau.
+ * model 4.
+ * generate cloud sample.
  */
 void gen_cloud_sample_model4(const void *pm, int flag_type, int flag_save)
 {
@@ -817,10 +804,6 @@ void gen_cloud_sample_model4(const void *pm, int flag_type, int flag_save)
  * geometry: double power-law 
  * dynamics: elliptical orbits and inflow/outflow as in Pancoast's model
  *====================================================================
- */
-
-/* 
- * This function caclulate 1d transfer function.
  */
 void gen_cloud_sample_model5(const void *pm, int flag_type, int flag_save)
 {
@@ -1069,9 +1052,6 @@ void gen_cloud_sample_model5(const void *pm, int flag_type, int flag_save)
  * dynamics: ellipitcal orbits and inflow/outflow 
  *================================================================
  */
-/* 
- * This function caclulate 2d transfer function.
- */
 void gen_cloud_sample_model6(const void *pm, int flag_type, int flag_save)
 {
   int i, j, nc;
@@ -1313,9 +1293,6 @@ void gen_cloud_sample_model6(const void *pm, int flag_type, int flag_save)
  * geometry: radial Gamma distribution
  * dynamics: elliptical orbits and inflow/outflow as in Pancoast'model
  *================================================================
- */
-/* 
- * This function caclulate 2d transfer function.
  */
 void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save)
 {
@@ -1743,7 +1720,8 @@ void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save)
 
 
 /* 
- * This function caclulate 2d transfer function.
+ * model 8, generate cloud sample.
+ * a disk wind model.
  */
 void gen_cloud_sample_model8(const void *pm, int flag_type, int flag_save)
 {
@@ -1900,6 +1878,12 @@ void gen_cloud_sample_model8(const void *pm, int flag_type, int flag_save)
   return;
 }
 
+/* 
+ * model 9, generate cloud sample.
+ * same with the Graivty Collaboration's model about 3C 273 published in Nature (2018, 563, 657),
+ * except that the prior of inclination is uniform in cosine.
+ * 
+ */
 void gen_cloud_sample_model9(const void *pm, int flag_type, int flag_save)
 {
   int i, j, nc;
