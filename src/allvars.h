@@ -163,8 +163,7 @@ extern double *limits;  // external from dnest
 extern int nq;
 extern double *Tcon, *Fcon, *Fcerrs;
 extern double Tcon_min, Tcon_max;
-extern double *PSmat, *PNmat, *USmat, *PSmat_data;
-extern double *PNmat_data;
+extern double *PSmat, *USmat, *PSmat_data;
 extern double *PCmat_data, *IPCmat_data, *PQmat, *PEmat1, *PEmat2;
 extern double *workspace, *workspace_uv;
 extern double *var_param, *var_param_std;

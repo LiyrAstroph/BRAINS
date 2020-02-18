@@ -819,7 +819,7 @@ void set_covar_Pmat(double sigma, double tau, double alpha)
  */
 void set_covar_Pmat_data(double sigma, double tau, double alpha, double syserr)
 {
-  double t1, t2;
+  double t1, t2, err2;
   int i, j;
  
   for(i=0; i<n_con_data; i++)
@@ -832,14 +832,16 @@ void set_covar_Pmat_data(double sigma, double tau, double alpha, double syserr)
       PSmat_data[i*n_con_data+j] = sigma*sigma* exp (- pow (fabs(t1-t2) / tau, alpha));
       PSmat_data[j*n_con_data+i] = PSmat_data[i*n_con_data+j];
 
-      PNmat_data[i*n_con_data+j] = PNmat_data[j*n_con_data+i] = 0.0;
+      //PNmat_data[i*n_con_data+j] = PNmat_data[j*n_con_data+i] = 0.0;
 
       PCmat_data[i*n_con_data+j] = PCmat_data[j*n_con_data+i] = PSmat_data[i*n_con_data+j];
     }
 
     PSmat_data[i*n_con_data+i] = sigma * sigma;
-    PNmat_data[i*n_con_data+i] = Fcerrs_data[i]*Fcerrs_data[i] + syserr*syserr;
-    PCmat_data[i*n_con_data+i] = PSmat_data[i*n_con_data+i] + PNmat_data[i*n_con_data+i];
+    //PNmat_data[i*n_con_data+i] = Fcerrs_data[i]*Fcerrs_data[i] + syserr*syserr;
+    //PCmat_data[i*n_con_data+i] = PSmat_data[i*n_con_data+i] + PNmat_data[i*n_con_data+i];
+    err2 = Fcerrs_data[i]*Fcerrs_data[i] + syserr*syserr;
+    PCmat_data[i*n_con_data+i] = PSmat_data[i*n_con_data+i] + err2;
   }
   return;
 }

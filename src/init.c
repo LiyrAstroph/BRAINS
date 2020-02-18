@@ -415,10 +415,10 @@ void allocate_memory()
     Fcerrs = malloc(parset.n_con_recon * sizeof(double));
   
     PSmat = malloc(parset.n_con_recon * parset.n_con_recon * sizeof(double));
-    PNmat = malloc(parset.n_con_recon * parset.n_con_recon * sizeof(double));
+    //PNmat = malloc(parset.n_con_recon * parset.n_con_recon * sizeof(double));
     USmat = malloc(parset.n_con_recon * n_con_data * sizeof(double));
     PSmat_data = malloc(n_con_data * n_con_data * sizeof(double));
-    PNmat_data = malloc(n_con_data * n_con_data * sizeof(double));
+    //PNmat_data = malloc(n_con_data * n_con_data * sizeof(double));
     PCmat_data = malloc(n_con_data * n_con_data * sizeof(double));
     IPCmat_data = malloc(n_con_data * n_con_data * sizeof(double));
     PQmat = malloc(parset.n_con_recon * parset.n_con_recon * sizeof(double));
@@ -487,10 +487,10 @@ void free_memory()
     free(Fcerrs);
   
     free(PSmat);
-    free(PNmat);
+    //(PNmat);
     free(USmat);
     free(PSmat_data);
-    free(PNmat_data);
+    //free(PNmat_data);
     free(PCmat_data);
     free(IPCmat_data);
     free(PQmat);

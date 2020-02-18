@@ -52,8 +52,7 @@ int which_level_update;      /*!< which level of the particle */
 int nq;
 double *Tcon, *Fcon, *Fcerrs;
 double Tcon_min, Tcon_max;
-double *PSmat, *PNmat, *USmat, *PSmat_data;
-double *PNmat_data;
+double *PSmat, *USmat, *PSmat_data;
 double *PCmat_data, *IPCmat_data, *PQmat, *PEmat1, *PEmat2;
 double *workspace, *workspace_uv;
 double *var_param, *var_param_std;
