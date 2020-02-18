@@ -66,9 +66,9 @@ int dnest_sa(int argc, char **argv)
   fptrset_sa->log_likelihoods_cal = log_likelihoods_cal_sa;
 
   set_par_range_sa();
-  //set_par_fix_sa_blrmodel();
+  set_par_fix_sa_blrmodel();
 
-  for(i=0; i<num_params; i++)
+  for(i=num_params_sa_blr_model; i<num_params; i++)
   {
     par_fix[i] = 0;
     par_fix_val[i] = -DBL_MAX;

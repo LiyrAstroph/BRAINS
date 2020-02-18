@@ -84,9 +84,15 @@ int dnest_sa1d(int argc, char **argv)
 
   set_par_range_sa1d();
   set_par_fix_blrmodel();
+  set_par_fix_sa_blrmodel();
 
   /* the rest parameters */
-  for(i=num_params_blr_model; i<num_params; i++)
+  for(i=num_params_blr_model; i<num_params_blr; i++)
+  {
+    par_fix[i] = 0;
+    par_fix_val[i] = -DBL_MAX;
+  }
+  for(i=num_params_blr + num_params_sa_blr_model; i<num_params; i++)
   {
     par_fix[i] = 0;
     par_fix_val[i] = -DBL_MAX;

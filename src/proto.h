@@ -131,6 +131,7 @@ void get_hms(double dt, int *h, int *m, double *s);
 
 void set_sa_blr_model();
 void set_idx_par_mutual();
+void set_par_fix_sa_blrmodel();
 
 /* SA */
 void reconstruct_sa();

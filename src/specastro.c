@@ -888,4 +888,60 @@ void set_sa_blr_range_model9()
   return;
 }
 
+/*!
+ * This function copes with parameter fixing.\n
+ * Only fix BLR model parameters. 
+ */
+void set_par_fix_sa_blrmodel()
+{
+  int i;
+  char *pstr;
+  
+  npar_fix = 0;
+
+  if(thistask == roottask)
+  {
+    pstr = parset.sa_str_par_fix_val;
+    // set the default value if not provided.
+    for(i=strlen(parset.sa_str_par_fix); i<num_params_sa_blr_model; i++)
+      parset.sa_str_par_fix[i] = '0';
+
+    for(i=0; i<num_params_sa_blr_model; i++)
+    {
+      if(parset.sa_str_par_fix[i] == '0')
+      {
+        par_fix[num_params_blr + i] = 0;
+        par_fix_val[num_params_blr + i] = -DBL_MAX;  /* set to be the smallest value */
+      }
+      else if(parset.sa_str_par_fix[i] == '1')
+      {
+        if(pstr == NULL)
+        {
+          printf("# %d-th SA BLR parameter value is not provided (counting from 0).\n", i);
+          exit(0);
+        }
+        par_fix[num_params_blr + i] = 1;
+        sscanf(pstr, "%lf", &par_fix_val[num_params_blr + i]);
+        npar_fix++;
+        printf("# %d-th SA BLR parameter fixed, value= %f.\n", i, par_fix_val[num_params_blr + i]);
+        pstr = strchr(pstr, ':'); /* values are separated by ":" */
+        if(pstr!=NULL)
+        {
+          pstr++;
+        }
+      }
+      else   // default value
+      {
+        par_fix[num_params_blr + i] = 0;
+        par_fix_val[num_params_blr + i] = -DBL_MAX;
+      }
+    }
+  }
+
+  MPI_Bcast(par_fix + num_params_blr, num_params_sa_blr_model, MPI_INT, roottask, MPI_COMM_WORLD);
+  MPI_Bcast(par_fix_val + num_params_blr, num_params_sa_blr_model, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+
+  return;
+}
+
 #endif

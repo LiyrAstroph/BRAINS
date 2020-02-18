@@ -653,7 +653,7 @@ void set_par_fix_blrmodel()
         par_fix[i] = 1;
         sscanf(pstr, "%lf", &par_fix_val[i]);
         npar_fix++;
-        printf("# %d-th parameter fixed, value= %f.\n", i, par_fix_val[i]);
+        printf("# %d-th BLR parameter fixed, value= %f.\n", i, par_fix_val[i]);
         pstr = strchr(pstr, ':'); /* values are separated by ":" */
         if(pstr!=NULL)
         {

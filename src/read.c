@@ -248,6 +248,14 @@ void read_parset()
     strcpy(tag[nt], "SAInstRes");
     addr[nt] = &parset.sa_InstRes;
     id[nt++] = DOUBLE;
+
+    strcpy(tag[nt], "SABLRParFix");
+    addr[nt] = &parset.sa_str_par_fix;
+    id[nt++] = STRING;
+
+    strcpy(tag[nt], "SABLRParFixVal");
+    addr[nt] = &parset.sa_str_par_fix_val;
+    id[nt++] = STRING;
 #endif
 
 
@@ -282,6 +290,8 @@ void read_parset()
     strcpy(parset.tran_out_file, "data/tran.txt");
     strcpy(parset.tran2d_out_file, "data/tran2d.txt");
     strcpy(parset.tran2d_data_out_file, "data/tran2d_data.txt");
+    strcpy(parset.str_par_fix,"");
+    strcpy(parset.str_par_fix_val,"");
 
 #ifdef SA
     parset.flag_sa_blrmodel = 1;
@@ -289,6 +299,8 @@ void read_parset()
     parset.sa_linecenter = 1.875; 
     parset.sa_InstRes = 0.0;
     strcpy(parset.sa_file, "");
+    strcpy(parset.sa_str_par_fix,"");
+    strcpy(parset.sa_str_par_fix_val,"");
 #endif 
 
     char fname[200];

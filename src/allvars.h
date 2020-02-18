@@ -137,6 +137,7 @@ typedef struct
   int flag_sa_blrmodel, flag_sa_par_mutual;
   double sa_linecenter;
   double sa_InstRes;
+  char sa_str_par_fix[BRAINS_MAX_STR_LENGTH], sa_str_par_fix_val[BRAINS_MAX_STR_LENGTH];
 #endif
 }PARSET;
 extern PARSET parset;

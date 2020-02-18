@@ -9,7 +9,7 @@ Redshift                    0.158399                               % redshift of
 
 FileDir                     /home/liyropt/Projects/GIT/BRAINS      % directory for where all the output files are stored
 
-FlagDim                     2                           % -2, generate fully random lc; -1, mock lc based on input data; 
+FlagDim                     5                           % -2, generate fully random lc; -1, mock lc based on input data; 
                                                         % 0, only continuum modeling; 1, 1d line RM; 2, 2d line RM
                                                         % if -DSA, 3: only SA; 4: SA+1d line RM; 5: SA+2d line RM 
 
@@ -46,7 +46,7 @@ LineCenter                  4861.0                      %  rest frame, A
 FlagLineCenter              0                           % -1, epoch-dependent offset; 0, not included; 1, uniform offset
 LineCenterErr               50.0                        % km/s
 
-NCloudPerCore               100000                        % number of clouds per task
+NCloudPerCore               10000                        % number of clouds per task
 NVPerCloud                  1                           % number of velocities per cloud
 
 NTau                        200                         % number of time-lag points calculated in transfer function
@@ -128,5 +128,8 @@ ShiftNarrowLineErr          0.0                         % shift error
 % 1: fixed; 0: not fixed; values are separated by ":"
 %
 
-BLRParFix                   0000000000
-BLRParFixVal                2.0:1.0           
+BLRParFix                   1000000000
+BLRParFixVal                2.0:1.0  
+
+SABLRParFix                   1100000000
+SABLRParFixVal                2.0:1.0
