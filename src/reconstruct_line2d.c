@@ -47,7 +47,7 @@ void postprocess2d()
     double *Fline1d, dV;
 
     // velocity grid width, in term of wavelength of Hbeta.
-    dV = (Vline_data[n_vel_data-1]-Vline_data[0])/(n_vel_data-1) * VelUnit * 4861.0/3.0e5; 
+    dV = (Vline_data[n_vel_data-1]-Vline_data[0])/(n_vel_data-1) * parset.linecenter/C_Unit; 
     Fline1d = malloc(n_line_data * sizeof(double));
 
     // get number of lines in posterior sample file
