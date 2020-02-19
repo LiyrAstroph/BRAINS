@@ -1,0 +1,28 @@
+% parameter file
+% lines beginning with '%' are regarded as comments and are neglected
+% 
+% an example parameter file for only continuum reconstruction.
+
+Redshift                    0.158399                               % redshift of the object
+
+FileDir                     /home/liyropt/Projects/GIT/BRAINS      % directory for where all the output files are stored
+
+FlagDim                     3                           % -2, generate fully random lc; -1, mock lc based on input data; 
+                                                        % 0, only continuum modeling; 1, 1d line RM; 2, 2d line RM
+                                                        
+SALineCenter                1.875                       % reset frame, um     
+     
+FlagSABLRModel              9                           % BLRModel 
+                                                      
+SAInstRes                   235.0                       % km/s, fixed
+
+SAFile                      data/3C273_sa.txt 
+
+NCloudPerCore               10000                        % number of clouds per task
+
+NVPerCloud                  1  
+
+SABLRParFix                 000000000
+SABLRParFixVal              2.0:1.0                       
+
+

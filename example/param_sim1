@@ -3,6 +3,8 @@
 % 
 % an example parameter file for generating mock data based on input data.
 
+Redshift                    0.0                               % redshift of the object
+
 FileDir                     /home/liyropt/Projects/GIT/BRAINS      % directory for where all the output files are stored
 
 FlagDim                     -1                          % -2, generate fully random lc; -1, mock lc based on input data; 

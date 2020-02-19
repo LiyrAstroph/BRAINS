@@ -3,28 +3,33 @@
 % 
 % an example parameter file for 2D analysis.
 
-Redshift                    0.0                               % redshift of the object
+Redshift                    0.158399                               % redshift of the object
 
 FileDir                     /home/liyropt/Projects/GIT/BRAINS      % directory for where all the output files are stored
 
 FlagDim                     2                          % -2, generate fully random lc; -1, mock lc based on input data; 
                                                         % 0, only continuum modeling; 1, 1d line RM; 2, 2d line RM
 
-FlagBLRModel                6                           % 1, 2, 3, 4, 5, 6, 7, 8; BLR model type
+FlagBLRModel                9                           % 1, 2, 3, 4, 5, 6, 7, 8; BLR model type
                                                         % 5 is double power-law model; 6 is Pancoast's model; 7 is two-zone model
                                                         % 0 is user defined
                                                         % -1 is user defined, analytical transfer function
-
-LineCenter                  4861.0                      %  rest frame, A
-
-FlagLineCenter              0                           % -1, epoch-dependent; 0, not included; 1, uniform
-LineCenterErr               50.0                        % km/s
 
 %========================================================================
 % data file
 
 ContinuumFile               data/sim_con.txt          % file for continuum data
 Line2DFile                  data/sim_hb2d.txt         % file for line 2d data
+
+%========================================================================
+% SA data
+SALineCenter                1.875                       % reset frame, um       
+FlagSABLRModel              9                           % BLRModel                                                     
+SAInstRes                   235.0                       % km/s, fixed
+SAFile                      data/3C273_sa.txt 
+FlagSAParMutual             1                         % flag for mutual parameters with BLR model
+                                                      % 0: all 
+                                                      % 1: only BH mass and inclination                 
 
 %========================================================================
 % reconstruction
@@ -97,10 +102,20 @@ ShiftNarrowLine             0.0                        % shift, km/s, with respe
 ShiftNarrowLineErr          0.0                         % shift error
 
 %========================================================================
+% 
+
+FlagLineCenter              0                          % -1, epoch-dependent; 0, not included; 1, uniform
+LineCenterErr               50.0                        % km/s
+
+
+%========================================================================
 % set fixed BLR parameters and their fixed values
 % do not put sapce in the strings
 % 1: fixed; 0: not fixed;
 % values are separated by ":"
 
 BLRParFix                   0000000000
-BLRParFixVal                2.0:1.0           
+BLRParFixVal                2.0:1.0  
+
+SABLRParFix                 000000000
+SABLRParFixVal              2.0:1.0          
