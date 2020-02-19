@@ -38,8 +38,8 @@ int n_vel_data_incr=5, n_vel_data_ext;
 int n_con_max;
 double *Tcon_data, *Fcon_data,  *Fcerrs_data;
 double *Tline_data, *Fline_data, *Flerrs_data;
-double *Vline_data, *Fline2d_data, *Flerrs2d_data;
-double *Vline_data_ext;
+double *Vline_data, *Fline2d_data, *Flerrs2d_data, *Wline_data;
+double *Vline_data_ext, *Wline_data_ext;
 double con_scale, line_scale;
 
 double con_error_mean, line_error_mean;

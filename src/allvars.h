@@ -163,8 +163,8 @@ extern double VelUnit, C_Unit;
 extern int n_con_data, n_line_data, n_vel_data, n_vel_data_incr, n_vel_data_ext, n_con_max;
 extern double *Tcon_data, *Fcon_data,  *Fcerrs_data;
 extern double *Tline_data, *Fline_data, *Flerrs_data;
-extern double *Vline_data, *Fline2d_data, *Flerrs2d_data;
-extern double *Vline_data_ext;
+extern double *Vline_data, *Fline2d_data, *Flerrs2d_data, *Wline_data;
+extern double *Vline_data_ext, *Wline_data_ext;
 extern double con_scale, line_scale;
 
 extern double con_error_mean, line_error_mean;

@@ -978,19 +978,27 @@ void read_data()
 
       for(i=0; i<n_line_data; i++)
       {
+        /* read date */
+        if(fscanf(fp, "# %lf\n", &Tline_data[i]) < 1)
+        {
+          fprintf(stderr, "# Error in line2d data file %s.\n"
+            "# Too few columns.\n", fname);
+            error_flag = 5; 
+            break;
+        }
+        
+        /* read spectrum */
         for(j=0; j<n_vel_data; j++)
         {
-          if(fscanf(fp, "%lf%lf%lf%lf\n", &Vline_data[j], &Tline_data[i], 
-                 &Fline2d_data[i*n_vel_data + j], &Flerrs2d_data[i*n_vel_data + j]) < 4)
+          if(fscanf(fp, "%lf%lf%lf\n", &Wline_data[j], 
+                 &Fline2d_data[i*n_vel_data + j], &Flerrs2d_data[i*n_vel_data + j]) < 3)
           {
             fprintf(stderr, "# Error in line2d data file %s.\n"
             "# Too few columns.\n", fname);
             error_flag = 5; 
             break;
           }
-          Vline_data[j] /= VelUnit;
         }
-
         fscanf(fp, "\n");
       }
       fclose(fp);
@@ -1009,6 +1017,12 @@ void read_data()
           fprintf(stderr, "# Error: continuum, %f-%f; line, %f-%f.\n", Tcon_data[0], Tcon_data[n_con_data-1], 
             Tline_data[0], Tline_data[n_line_data-1]);
           error_flag = 4;
+        }
+
+        /* convert wavelength to velocity */
+        for(j=0; j<n_vel_data; j++)
+        {
+          Vline_data[j] = (Wline_data[j]/(1.0+parset.redshift) - parset.linecenter)/parset.linecenter * C_Unit;
         }
         
         // cal mean line error
@@ -1236,7 +1250,9 @@ void allocate_memory_data()
   if(parset.flag_dim == 2 || parset.flag_dim == -1 || parset.flag_dim == 5)
   {
     Vline_data_ext = malloc(n_vel_data_ext * sizeof(double));
+    Wline_data_ext = malloc(n_vel_data_ext * sizeof(double));
     Vline_data = Vline_data_ext + n_vel_data_incr;
+    Wline_data = Wline_data_ext + n_vel_data_incr;
     Tline_data = malloc(n_line_data * sizeof(double));
     Fline_data = malloc(n_line_data * sizeof(double));
     Flerrs_data = malloc(n_line_data * sizeof(double));
@@ -1287,6 +1303,7 @@ void free_memory_data()
   if(parset.flag_dim == 2 || parset.flag_dim == -1 || parset.flag_dim == 5)
   {
     free(Vline_data_ext);
+    free(Wline_data_ext);
     free(Tline_data);
     free(Fline_data);
     free(Flerrs_data);
