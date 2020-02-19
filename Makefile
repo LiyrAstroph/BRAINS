@@ -17,11 +17,14 @@ OPTIMIZE += -DSA
 # get GIT description
 GITCHECK := $(shell git 2>/dev/null)
 ifneq ($(strip $(GITCHECK)),)
-	GIT_VERSION := $(shell git describe --abbrev=4 --dirty --always --tags)
-	OPTIMIZE += -DGITVERSION=\"$(GIT_VERSION)\"
+	GITREPO := $(shell git rev-parse --is-inside-work-tree 2>/dev/null)
+	ifneq ($(findstring true, $(GITREPO)),)
+		GIT_VERSION := $(shell git describe --abbrev=6 --dirty --always --tags)
+		OPTIMIZE += -DGITVERSION=\"$(GIT_VERSION)\"
 	    
-	GIT_DATE := $(firstword $(shell git --no-pager show --date=short --format="%ad" --name-only))
-	OPTIMIZE += -DGITDATE=\"$(GIT_DATE)\"
+		GIT_DATE := $(firstword $(shell git --no-pager show --date=short --format="%ad" --name-only))
+		OPTIMIZE += -DGITDATE=\"$(GIT_DATE)\"
+	endif
 endif
 
 #------------target system---------
