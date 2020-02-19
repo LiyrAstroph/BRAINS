@@ -11,7 +11,18 @@ CC       = mpicc
 OPTIMIZE = -O2 -Wall -finline-functions
 #OPTIMIZE += -DDebug
 
+# include spectro-astrometry analysis
 OPTIMIZE += -DSA
+
+# get GIT description
+GITCHECK := $(shell git 2>/dev/null)
+ifneq ($(strip $(GITCHECK)),)
+	GIT_VERSION := $(shell git describe --abbrev=4 --dirty --always --tags)
+	OPTIMIZE += -DGITVERSION=\"$(GIT_VERSION)\"
+	    
+	GIT_DATE := $(firstword $(shell git --no-pager show --date=short --format="%ad" --name-only))
+	OPTIMIZE += -DGITDATE=\"$(GIT_DATE)\"
+endif
 
 #------------target system---------
 #SYSTEM="Darwin"

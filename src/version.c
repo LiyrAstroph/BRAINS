@@ -12,7 +12,16 @@
 
 void print_version()
 {
-  printf("\e[1;35m" "BRAINS Version: %d.%d.%d\n" "\e[0m", BRAINS_MAJOR_VERSION, BRAINS_MINOR_VERSION, BRAINS_PATCH_VERSION);
+  printf("\n");
+  printf("\e[1;35m" "%-14s: %d.%d.%d\n" "\e[0m", "BRAINS Version", BRAINS_MAJOR_VERSION, BRAINS_MINOR_VERSION, BRAINS_PATCH_VERSION);
+#ifdef GITVERSION
+  printf("\e[1;35m" "%-14s: %s\n" "\e[0m", "git log", GITVERSION);
+#endif
+#ifdef GITDATE
+  printf("\e[1;35m" "%-14s: %s\n" "\e[0m", "git date", GITDATE);
+#endif
+  printf("\e[1;35m" "%-14s: %s %s\n" "\e[0m", "compiling date", __DATE__, __TIME__);
+  printf("\n");
   printf("Yan-Rong Li, liyanrong@ihep.ac.cn\n");
   return;
 }
