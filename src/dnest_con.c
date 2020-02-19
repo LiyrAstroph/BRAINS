@@ -174,6 +174,10 @@ void print_par_names_con()
 
   printf("# Print parameter name in %s\n", fname);
 
+  fprintf(fp, "#*************************************************\n");
+  fprint_version(fp);
+  fprintf(fp, "#*************************************************\n");
+
   fprintf(fp, "%4s %-15s %10s %10s %4s %4s %15s\n", "#", "Par", "Min", "Max", "Prior", "Fix", "Val");
   i=0;
   fprintf(fp, str_fmt, i, "sys_err_con", par_range_model[i][0], par_range_model[i][1], par_prior_model[i],

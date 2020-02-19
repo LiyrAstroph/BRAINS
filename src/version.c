@@ -34,14 +34,14 @@ void print_version()
  */
 void fprint_version(FILE *fp)
 {
-  fprintf(fp, "%-14s: %d.%d.%d\n", "BRAINS Version", BRAINS_MAJOR_VERSION, BRAINS_MINOR_VERSION, BRAINS_PATCH_VERSION);
+  fprintf(fp, "# %-14s: %d.%d.%d\n", "BRAINS Version", BRAINS_MAJOR_VERSION, BRAINS_MINOR_VERSION, BRAINS_PATCH_VERSION);
 #ifdef GITVERSION
-  fprintf(fp, "%-14s: %s\n", "git log", GITVERSION);
+  fprintf(fp, "# %-14s: %s\n", "git log", GITVERSION);
 #endif
 #ifdef GITDATE
-  fprintf(fp, "%-14s: %s\n", "git date", GITDATE);
+  fprintf(fp, "# %-14s: %s\n", "git date", GITDATE);
 #endif
-  fprintf(fp, "%-14s: %s %s\n", "compiling date", __DATE__, __TIME__);
+  fprintf(fp, "# %-14s: %s %s\n", "compiling date", __DATE__, __TIME__);
 
   return;
 }

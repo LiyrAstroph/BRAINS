@@ -166,13 +166,16 @@ void init()
     }
   }
 #endif 
-
-  /* set maximum continuum point */
-  n_con_max = parset.n_con_recon;
-  if(parset.flag_dim >=-1)
+  
+  if(parset.flag_dim != 3)
   {
-    if(n_con_data > n_con_max)
-      n_con_max = n_con_data;
+    /* set maximum continuum point */
+    n_con_max = parset.n_con_recon;
+    if(parset.flag_dim >=-1)
+    {
+      if(n_con_data > n_con_max)
+        n_con_max = n_con_data;
+    }
   }
 
   allocate_memory();
@@ -202,9 +205,6 @@ void init()
   }
 #endif
 
-  gsl_acc = gsl_interp_accel_alloc();
-  gsl_linear = gsl_interp_alloc(gsl_interp_linear, parset.n_con_recon);
-
   /* default BH mass range */
   mass_range[0] = 1.0;
   mass_range[1] = 1.0e4;
@@ -215,6 +215,9 @@ void init()
   /* not RM */
   if(parset.flag_dim != 3)
   {
+    gsl_acc = gsl_interp_accel_alloc();
+    gsl_linear = gsl_interp_alloc(gsl_interp_linear, parset.n_con_recon);
+
     if(parset.flag_dim >=-1)
     {
       /* set Larr_data */

@@ -55,6 +55,12 @@
 
 #define EPS (DBL_MIN)  /* epsilon of the machine as in Matlab */
 
+/* for PARDICT */
+#define MAXTAGS 300
+#define DOUBLE 1
+#define STRING 2
+#define INT 3
+
 enum PRIOR_TYPE {GAUSSIAN=1, UNIFORM=2};
 
 /* variables for MPICH */
@@ -141,6 +147,16 @@ typedef struct
 #endif
 }PARSET;
 extern PARSET parset;
+
+typedef struct
+{
+  int id;
+  void *addr;
+  char tag[50];
+  int isset;
+}PARDICT;
+extern PARDICT pardict[MAXTAGS];
+extern int num_pardict;
 
 extern double VelUnit, C_Unit;
 

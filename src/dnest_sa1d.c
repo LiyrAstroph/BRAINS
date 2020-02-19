@@ -308,6 +308,10 @@ void print_par_names_sa1d()
 
   printf("# Print parameter name in %s\n", fname);
 
+  fprintf(fp, "#*************************************************\n");
+  fprint_version(fp);
+  fprintf(fp, "#*************************************************\n");
+
   fprintf(fp, "%4s %-15s %10s %10s %4s %4s %15s\n", "#", "Par", "Min", "Max", "Prior", "Fix", "Val");
 
   i=-1;

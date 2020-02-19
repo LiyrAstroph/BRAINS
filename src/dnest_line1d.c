@@ -251,6 +251,10 @@ void print_par_names_model1d()
   strcpy(str_fmt, "%4d %-15s %10.6f %10.6f %4d %4d %15.6e\n");
 
   printf("# Print parameter name in %s\n", fname);
+
+  fprintf(fp, "#*************************************************\n");
+  fprint_version(fp);
+  fprintf(fp, "#*************************************************\n");
   
   fprintf(fp, "%4s %-15s %10s %10s %4s %4s %15s\n", "#", "Par", "Min", "Max", "Prior", "Fix", "Val");
 

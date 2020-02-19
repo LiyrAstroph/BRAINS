@@ -29,6 +29,7 @@ void get_posterior_sample_file(char *fname, char *samplefile);
 void set_par_fix_blrmodel();
 
 void print_help();
+void fprint_param();
 
 void (*set_blr_range_model)();
 void set_blr_range_model1();
