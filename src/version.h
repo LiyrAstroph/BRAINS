@@ -13,4 +13,6 @@
 #define BRAINS_MINOR_VERSION 1
 #define BRAINS_PATCH_VERSION 4
 
+void print_version();
+void fprint_version(FILE *fp);
 #endif
