@@ -380,7 +380,7 @@ void reconstruct_sa2d()
       fprintf(fp, "# %d %d\n", n_line_data, n_vel_data);
       for(i=0; i<n_line_data; i++)
       {
-        fprintf(fp, "%f\n", Tline_data[i]*(1.0+parset.redshift));
+        fprintf(fp, "# %f\n", Tline_data[i]*(1.0+parset.redshift));
         for(j=0; j<n_vel_data; j++)
         {
           fprintf(fp, "%e %e\n", Wline_data[j],   
