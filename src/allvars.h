@@ -155,7 +155,7 @@ typedef struct
   char tag[50];
   int isset;
 }PARDICT;
-extern PARDICT pardict[MAXTAGS];
+extern PARDICT *pardict;
 extern int num_pardict;
 
 extern double VelUnit, C_Unit;

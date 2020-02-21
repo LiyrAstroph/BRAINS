@@ -35,10 +35,6 @@ void begin_run()
 
   /* read parameter file */
   read_parset();
-  if(thistask == roottask)
-  {
-    fprint_param();
-  }
 
   if(parset.flag_dim != -2) /* if not randomly create mock data */
   {

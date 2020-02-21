@@ -24,7 +24,7 @@ char proc_name[MPI_MAX_PROCESSOR_NAME];
 
 PARSET parset;
 
-PARDICT pardict[MAXTAGS];
+PARDICT *pardict;
 int num_pardict;
 
 double VelUnit, C_Unit;    /*!< Velocity unit = \f$\sqrt{\frac{G\cdot 10^6M_\odot}{1~\rm light-day}}/10^5\f$km/s, 

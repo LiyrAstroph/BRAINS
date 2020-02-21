@@ -31,6 +31,8 @@ void read_parset()
     int i, j, nt;
     char str[200], buf1[200], buf2[200], buf3[200];
 
+    pardict = malloc(MAXTAGS * sizeof(PARDICT));
+
     nt = 0;
     strcpy(pardict[nt].tag, "FileDir");
     pardict[nt].addr = &parset.file_dir;
@@ -401,6 +403,9 @@ void read_parset()
       }
     }
     fclose(fparam);
+  
+    fprint_param();
+    free(pardict);
 
     /* check input options */
 #ifndef SA
