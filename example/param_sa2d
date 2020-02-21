@@ -14,7 +14,7 @@ FlagBLRModel                9                           % 1, 2, 3, 4, 5, 6, 7, 8
                                                         % 5 is double power-law model; 6 is Pancoast's model; 7 is two-zone model
                                                         % 0 is user defined
                                                         % -1 is user defined, analytical transfer function
-
+LineCenter                  4861.0                      %  rest frame, A
 %========================================================================
 % data file
 
