@@ -232,7 +232,7 @@ void sim()
   
   for(i=0; i<parset.n_con_recon; i++)
   {
-    fprintf(fp, "%e %e %e\n", Tcon[i], Fcon[i]/con_scale, Fcerrs[i]/con_scale);
+    fprintf(fp, "%e %e %e\n", Tcon[i]*(1.0+parset.redshift), Fcon[i]/con_scale, Fcerrs[i]/con_scale);
   }
   fclose(fp);
 
@@ -250,14 +250,15 @@ void sim()
     {
       //fprintf(fp, "%f %f %f\n", Tcon[i], Fcon[i]/con_scale, Fcerrs[i]/con_scale);
       fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, Tcon_data[i], gsl_acc);
-      fprintf(fp, "%e %e %e\n", Tcon_data[i], (fcon+gsl_ran_ugaussian(gsl_r)*con_error_mean)/con_scale, con_error_mean/con_scale);
+      fprintf(fp, "%e %e %e\n", Tcon_data[i]*(1.0+parset.redshift), 
+            (fcon+gsl_ran_ugaussian(gsl_r)*con_error_mean)/con_scale, con_error_mean/con_scale);
     }
   }
   else
   {
     for(i=0; i<parset.n_con_recon; i++)
     {
-      fprintf(fp, "%e %e %e\n", Tcon[i], Fcon[i]/con_scale, Fcerrs[i]/con_scale);
+      fprintf(fp, "%e %e %e\n", Tcon[i]*(1.0+parset.redshift), Fcon[i]/con_scale, Fcerrs[i]/con_scale);
     }
   }
   fclose(fp);
@@ -285,7 +286,7 @@ void sim()
   }
   for(i=0; i<parset.n_line_recon; i++)
   {
-    fprintf(fp, "%e %e %e\n", Tline[i], Fline[i]/line_scale + gsl_ran_ugaussian(gsl_r)*error/line_scale, 
+    fprintf(fp, "%e %e %e\n", Tline[i]*(1.0+parset.redshift), Fline[i]/line_scale + gsl_ran_ugaussian(gsl_r)*error/line_scale, 
       error/line_scale);
   }
 
@@ -320,9 +321,10 @@ void sim()
   fprintf(fp, "# %d %d\n", parset.n_line_recon, parset.n_vel_recon);
   for(i=0; i<parset.n_line_recon; i++)
   {
+    fprintf(fp, "# %f\n", Tline[i]*(1.0+parset.redshift));
     for(j=0; j<parset.n_vel_recon; j++)
     {
-      fprintf(fp, "%e %e %e %e\n", TransV[j]*VelUnit, Tline[i],  
+      fprintf(fp, "%e %e %e\n", TransW[j],  
         (Fline2d[i*parset.n_vel_recon + j] + gsl_ran_ugaussian(gsl_r)*line_error_mean*0.3)/line_scale, line_error_mean/line_scale);
     }
 
@@ -549,6 +551,7 @@ void sim_init()
 
   TransTau = malloc(parset.n_tau * sizeof(double));
   TransV = malloc(parset.n_vel_recon * sizeof(double));
+  TransW = malloc(parset.n_vel_recon * sizeof(double));
   Trans1D = malloc(parset.n_tau * sizeof(double));
   Trans2D = malloc(parset.n_tau * parset.n_vel_recon * sizeof(double));
   Tline = malloc(parset.n_line_recon * sizeof(double));
@@ -559,6 +562,7 @@ void sim_init()
   {
     memcpy(Tline, Tline_data, n_line_data * sizeof(double));
     memcpy(TransV, Vline_data, n_vel_data * sizeof(double));
+    memcpy(TransW, Wline_data, n_vel_data * sizeof(double));
   }
   else
   {
@@ -581,6 +585,7 @@ void sim_init()
     for(i=0; i<parset.n_vel_recon; i++)
     {
       TransV[i] = vel_min_set + dVel*i;
+      TransW[i] = (1.0 + TransV[i]/C_Unit) * parset.linecenter * (1.0+parset.redshift);
     }
   }
   
@@ -618,6 +623,7 @@ void sim_end()
 
   free(TransTau);
   free(TransV);
+  free(TransW);
   free(Tline);
   free(Fline);
   free(Fline2d);

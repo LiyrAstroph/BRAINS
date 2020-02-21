@@ -101,7 +101,7 @@ double var_range_model[15][2]; /*!< define the range of variability parameters *
 double *instres_epoch, *instres_err_epoch;
 
 /* transfer function / velocity-delay map */
-double *TransTau, *TransV, *Trans1D, *Trans2D_at_veldata, *Trans2D;
+double *TransTau, *TransV, *TransW, *Trans1D, *Trans2D_at_veldata, *Trans2D;
 double rcloud_min_set, rcloud_max_set, time_back_set;
 
 double **Fcon_particles, **Fcon_particles_perturb;
