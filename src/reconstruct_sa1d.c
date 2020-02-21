@@ -667,13 +667,15 @@ double prob_sa1d(const void *model)
     calculate_sa_transfun_from_blrmodel(model, 0);
 
     /* caclulate prob_sa */
-    for(i=0; i<n_vel_sa_data; i++)
+    for(j=0; j<n_epoch_sa_data; j++)
     {
-      dy = Fline_sa[i] - Fline_sa_data[i];
-      var2 = Flerrs_sa_data[i]*Flerrs_sa_data[i];
-      prob_sa += -0.5 * (dy*dy)/var2 - 0.5*log(var2 * 2.0*PI);
+      for(i=0; i<n_vel_sa_data; i++)
+      {
+        dy = Fline_sa[i] - Fline_sa_data[i + j*n_vel_sa_data];
+        var2 = Flerrs_sa_data[i+j*n_vel_sa_data]*Flerrs_sa_data[i+j*n_vel_sa_data];
+        prob_sa += -0.5 * (dy*dy)/var2 - 0.5*log(var2 * 2.0*PI);
+      }
     }
-
     for(j=0; j<n_base_sa_data; j++)
     {
       for(i=0; i<n_vel_sa_data; i++)
@@ -767,11 +769,14 @@ double prob_initial_sa1d(const void *model)
   calculate_sa_transfun_from_blrmodel(model, 0);
 
   /* caclulate prob_sa */
-  for(i=0; i<n_vel_sa_data; i++)
+  for(j=0; j<n_epoch_sa_data; j++)
   {
-    dy = Fline_sa[i] - Fline_sa_data[i];
-    var2 = Flerrs_sa_data[i]*Flerrs_sa_data[i];
-    prob_sa += -0.5 * (dy*dy)/var2 - 0.5*log(var2 * 2.0*PI);
+    for(i=0; i<n_vel_sa_data; i++)
+    {
+      dy = Fline_sa[i] - Fline_sa_data[i + j*n_vel_sa_data];
+      var2 = Flerrs_sa_data[i+j*n_vel_sa_data]*Flerrs_sa_data[i+j*n_vel_sa_data];
+      prob_sa += -0.5 * (dy*dy)/var2 - 0.5*log(var2 * 2.0*PI);
+    }
   }
   for(j=0; j<n_base_sa_data; j++)
   {
