@@ -710,6 +710,7 @@ void read_parset()
 #endif
     }
 
+    /* print out input parameters into a file */
     if(error_flag == 0)
     {
       fprint_param();
@@ -1528,6 +1529,10 @@ int search_pardict(char *tag)
   return num_pardict+1;
 }
 
+/* 
+ * check whether all the necessary parameters are set.
+ * 
+ */
 int check_parset_isset()
 {
   int i, error_flag = 0, idx, n_this_tag;

@@ -1895,8 +1895,8 @@ void gen_cloud_sample_model9(const void *pm, int flag_type, int flag_save)
   BLRmodel9 *model = (BLRmodel9 *)pm;
   double Vr, Vph, mbh;
   
-  //Lopn_cos = cos(model->opn*PI/180.0);
-  Lopn = model->opn*PI/180.0;
+  Lopn_cos = cos(model->opn*PI/180.0);
+  //Lopn = model->opn*PI/180.0;
   inc = acos(model->inc);
   beta = model->beta;
   F = model->F;
@@ -1917,8 +1917,8 @@ void gen_cloud_sample_model9(const void *pm, int flag_type, int flag_save)
   {
 // generate a direction of the angular momentum     
     Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    //Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
-    Lthe = gsl_rng_uniform(gsl_r) * Lopn;
+    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
+    //Lthe = gsl_rng_uniform(gsl_r) * Lopn;
 
     nc = 0;
     r = rcloud_max_set+1.0;
