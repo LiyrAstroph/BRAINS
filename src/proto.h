@@ -30,6 +30,8 @@ void set_par_fix_blrmodel();
 
 void print_help();
 void fprint_param();
+int search_pardict(char *tag);
+int check_parset_isset();
 
 void (*set_blr_range_model)();
 void set_blr_range_model1();

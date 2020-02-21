@@ -362,166 +362,178 @@ void read_parset()
       fprintf(stderr, "# Error: Cannot open file %s\n", fname);
       error_flag = 2;
     }
-
-    while(!feof(fparam))
+    
+    if(error_flag == 0)
     {
-      sprintf(str,"empty");
-
-      fgets(str, 200, fparam);
-      if(sscanf(str, "%s%s%s", buf1, buf2, buf3)<2)
-        continue;
-      if(buf1[0]=='%')
-        continue;
-      for(i=0, j=-1; i<nt; i++)
-        if(strcmp(buf1, pardict[i].tag) == 0 && pardict[i].isset == 0)
-        {
-          j = i;
-          pardict[i].isset = 1;
-          //printf("%s %s\n", buf1, buf2);
-          break;
-        }
-      if(j >=0)
+      while(!feof(fparam))
       {
-        switch(pardict[j].id)
+        sprintf(str,"empty");
+  
+        fgets(str, 200, fparam);
+        if(sscanf(str, "%s%s%s", buf1, buf2, buf3)<2)
+          continue;
+        if(buf1[0]=='%')
+          continue;
+        for(i=0, j=-1; i<nt; i++)
+          if(strcmp(buf1, pardict[i].tag) == 0 && pardict[i].isset == 0)
+          {
+            j = i;
+            pardict[i].isset = 1;
+            //printf("%s %s\n", buf1, buf2);
+            break;
+          }
+        if(j >=0)
         {
-          case DOUBLE:
-            *((double *) pardict[j].addr) = atof(buf2);
-            break;
-          case STRING:
-            strcpy(pardict[j].addr, buf2);
-            break;
-          case INT:
-            *((int *)pardict[j].addr) = (int) atof(buf2);
-            break;
+          switch(pardict[j].id)
+          {
+            case DOUBLE:
+              *((double *) pardict[j].addr) = atof(buf2);
+              break;
+            case STRING:
+              strcpy(pardict[j].addr, buf2);
+              break;
+            case INT:
+              *((int *)pardict[j].addr) = (int) atof(buf2);
+              break;
+          }
+        }
+        else
+        {
+          fprintf(stderr, "# Error in file %s: Tag '%s' is not allowed or multiple defined.\n", 
+                        parset.param_file, buf1);
+          error_flag = 3;
         }
       }
-      else
+      fclose(fparam);
+    }
+
+    if(error_flag == 0)
+    {
+      /* check whether all the necessary parameters are set */
+      if(check_parset_isset() != EXIT_SUCCESS)
       {
-        fprintf(stderr, "# Error in file %s: Tag '%s' is not allowed or multiple defined.\n", 
-                      parset.param_file, buf1);
-        error_flag = 3;
+        error_flag = 6;
       }
     }
-    fclose(fparam);
-  
-    fprint_param();
-    free(pardict);
 
     /* check input options */
+    if(error_flag == 0)
+    {
 #ifndef SA
-    if(parset.flag_dim > 2 || parset.flag_dim < -2)
-    {
-      fprintf(stderr, "# Error in FlagDim: value %d is not allowed.\n# Please specify a value in [-2-2].\n", parset.flag_dim);
-      error_flag = 1;
-    }
+      if(parset.flag_dim > 2 || parset.flag_dim < -2)
+      {
+        fprintf(stderr, "# Error in FlagDim: value %d is not allowed.\n# Please specify a value in [-2-2].\n", parset.flag_dim);
+        error_flag = 1;
+      }
 #else 
-    if(parset.flag_dim > 5 || parset.flag_dim < -2)
-    {
-      fprintf(stderr, "# Error in FlagDim: value %d is not allowed.\n# Please specify a value in [-2-5].\n", parset.flag_dim);
-      error_flag = 1;
-    }
+      if(parset.flag_dim > 5 || parset.flag_dim < -2)
+      {
+        fprintf(stderr, "# Error in FlagDim: value %d is not allowed.\n# Please specify a value in [-2-5].\n", parset.flag_dim);
+        error_flag = 1;
+      }
 #endif
 
-    if(parset.flag_trend > 2 || parset.flag_trend < 0)
-    {
-      fprintf(stderr, "# Error in FlagTrend: value %d is not allowed.\n# Please specify a value in [0-1].\n", parset.flag_trend);
-      error_flag = 1;
-    }
-
-    if(parset.flag_blrmodel > 9 || parset.flag_blrmodel < -1)
-    {
-      fprintf(stderr, "# Error in FlagBLRModel: value %d is not allowed.\n# Please specify a value in [-1-9].\n", parset.flag_blrmodel);
-      error_flag = 1;
+      if(parset.flag_trend > 2 || parset.flag_trend < 0)
+      {
+        fprintf(stderr, "# Error in FlagTrend: value %d is not allowed.\n# Please specify a value in [0-1].\n", parset.flag_trend);
+        error_flag = 1;
+      }
+  
+      if(parset.flag_blrmodel > 9 || parset.flag_blrmodel < -1)
+      {
+        fprintf(stderr, "# Error in FlagBLRModel: value %d is not allowed.\n# Please specify a value in [-1-9].\n", parset.flag_blrmodel);
+        error_flag = 1;
+      }
+      
+      /* check linecenter */
+      if(parset.linecenter <= 0.0)
+      {
+        fprintf(stderr, "# Error in LineCenter: value %f is not allowed.\n"
+          "# Please specify a positive value.\n", parset.linecenter);
+          error_flag = 1;
+      }
+  
+      /* check redshift */
+      if(parset.redshift < 0.0)
+      {
+        fprintf(stderr, "# Error in redshift: value %f is not allowed.\n"
+          "# Please specify a non-negative value.\n", parset.redshift);
+          error_flag = 1;
+      }
+        
+      if((parset.flag_narrowline > 3 || parset.flag_narrowline < 0) && (parset.flag_dim == 2 || parset.flag_dim == 5))
+      {
+        fprintf(stderr, "# Error in FlagNarrowLine: value %d is not allowed.\n# Please specify a value in [0-3].\n", parset.flag_narrowline);
+        error_flag = 1;
+      }
+  
+      if((parset.flag_trend_diff < 0 || parset.flag_trend_diff > 10) && parset.flag_dim > 0)
+      {
+        fprintf(stderr, "# Error in FlagTrendDiff: value %d is not allowed.\n# Please specify a value in [0-10].\n", parset.flag_trend_diff);
+        error_flag = 1;
+      }
+  
+      if((parset.flag_InstRes < 0 || parset.flag_InstRes > 2) && (parset.flag_dim == 2 || parset.flag_dim == 5|| parset.flag_dim < 0))
+      {
+        fprintf(stderr, "# Error in FlagInstRes: value %d is not allowed.\n# Please specify a value in [0-2].\n", parset.flag_InstRes);
+        error_flag = 1;
+      }
+  
+      if((parset.flag_linecenter < -1 || parset.flag_linecenter > 1) && (parset.flag_dim == 2 || parset.flag_dim == 5))
+      {
+        fprintf(stderr, "# Error in FlagLineCenter: value %d is not allowed.\n# Please specify a value in [-1-1].\n", parset.flag_linecenter);
+        error_flag = 1;
+      }
+    
+      if(parset.InstRes < 0.0 && (parset.flag_dim == 2 || parset.flag_dim == 5 || parset.flag_dim < 0) )
+      {
+        fprintf(stderr, "# Error in InstRes: value %f is not allowed.\n# Please specify a positive value.\n", parset.InstRes);
+        error_flag = 1;
+      }
+  
+      if(parset.InstRes_err < 0.0 && (parset.flag_dim == 2 || parset.flag_dim == 5 || parset.flag_dim < 0))
+      {
+        fprintf(stderr, "# Error in InstResErr: value %f is not allowed.\n# Please specify a positive value.\n", parset.InstRes_err);
+        error_flag = 1;
+      }
+  
+      /* check whether necessary files provided */
+      if(parset.flag_dim >= -1 && parset.flag_dim != 3)
+      {
+        if(strlen(parset.continuum_file) == 0)
+        {
+          fprintf(stderr, "# Please specify continuum data file in parameter file.\n");
+          error_flag = 4;
+        }
+      }
+      if(parset.flag_dim == 1)
+      {
+        if(strlen(parset.line_file) == 0)
+        {
+          fprintf(stderr, "# Please specify 1D line data file in parameter file.\n");
+          error_flag = 4;
+        }
+      }
+      if(parset.flag_dim == -1 || parset.flag_dim == 2 || parset.flag_dim == 5)
+      {
+        if(strlen(parset.line2d_file) == 0)
+        {
+          fprintf(stderr, "# Please specify 2D line data file in parameter file.\n");
+          error_flag = 4;
+        }
+      }
+  
+      if(parset.flag_dim > 0)
+      {
+        if(parset.n_cloud_per_task <= 1)
+        {
+          fprintf(stderr, "# Error in NCloudPerCore: value %d is not allowed.\n# Please specify a larger number.\n", 
+                            parset.n_cloud_per_task);
+          error_flag = 1;
+        }
+      }
     }
     
-    /* check linecenter */
-    if(parset.linecenter <= 0.0)
-    {
-      fprintf(stderr, "# Error in LineCenter: value %f is not allowed.\n"
-        "# Please specify a positive value.\n", parset.linecenter);
-        error_flag = 1;
-    }
-
-    /* check redshift */
-    if(parset.redshift < 0.0)
-    {
-      fprintf(stderr, "# Error in redshift: value %f is not allowed.\n"
-        "# Please specify a non-negative value.\n", parset.redshift);
-        error_flag = 1;
-    }
-      
-    if((parset.flag_narrowline > 3 || parset.flag_narrowline < 0) && (parset.flag_dim == 2 || parset.flag_dim == 5))
-    {
-      fprintf(stderr, "# Error in FlagNarrowLine: value %d is not allowed.\n# Please specify a value in [0-3].\n", parset.flag_narrowline);
-      error_flag = 1;
-    }
-
-    if((parset.flag_trend_diff < 0 || parset.flag_trend_diff > 10) && parset.flag_dim > 0)
-    {
-      fprintf(stderr, "# Error in FlagTrendDiff: value %d is not allowed.\n# Please specify a value in [0-10].\n", parset.flag_trend_diff);
-      error_flag = 1;
-    }
-
-    if((parset.flag_InstRes < 0 || parset.flag_InstRes > 2) && (parset.flag_dim == 2 || parset.flag_dim == 5|| parset.flag_dim < 0))
-    {
-      fprintf(stderr, "# Error in FlagInstRes: value %d is not allowed.\n# Please specify a value in [0-2].\n", parset.flag_InstRes);
-      error_flag = 1;
-    }
-
-    if((parset.flag_linecenter < -1 || parset.flag_linecenter > 1) && (parset.flag_dim == 2 || parset.flag_dim == 5))
-    {
-      fprintf(stderr, "# Error in FlagLineCenter: value %d is not allowed.\n# Please specify a value in [-1-1].\n", parset.flag_linecenter);
-      error_flag = 1;
-    }
-  
-    if(parset.InstRes < 0.0 && (parset.flag_dim == 2 || parset.flag_dim == 5 || parset.flag_dim < 0) )
-    {
-      fprintf(stderr, "# Error in InstRes: value %f is not allowed.\n# Please specify a positive value.\n", parset.InstRes);
-      error_flag = 1;
-    }
-
-    if(parset.InstRes_err < 0.0 && (parset.flag_dim == 2 || parset.flag_dim == 5 || parset.flag_dim < 0))
-    {
-      fprintf(stderr, "# Error in InstResErr: value %f is not allowed.\n# Please specify a positive value.\n", parset.InstRes_err);
-      error_flag = 1;
-    }
-
-    /* check whether necessary files provided */
-    if(parset.flag_dim >= -1 && parset.flag_dim != 3)
-    {
-      if(strlen(parset.continuum_file) == 0)
-      {
-        fprintf(stderr, "# Please specify continuum data file in parameter file.\n");
-        error_flag = 4;
-      }
-    }
-    if(parset.flag_dim == 1)
-    {
-      if(strlen(parset.line_file) == 0)
-      {
-        fprintf(stderr, "# Please specify 1D line data file in parameter file.\n");
-        error_flag = 4;
-      }
-    }
-    if(parset.flag_dim == -1 || parset.flag_dim == 2 || parset.flag_dim == 5)
-    {
-      if(strlen(parset.line2d_file) == 0)
-      {
-        fprintf(stderr, "# Please specify 2D line data file in parameter file.\n");
-        error_flag = 4;
-      }
-    }
-
-    if(parset.flag_dim > 0)
-    {
-      if(parset.n_cloud_per_task <= 1)
-      {
-        fprintf(stderr, "# Error in NCloudPerCore: value %d is not allowed.\n# Please specify a larger number.\n", 
-                          parset.n_cloud_per_task);
-        error_flag = 1;
-      }
-    }
-  
     if( error_flag == 0 )
     {
       /* narrow line, line center, and InstRes only apply in 2D RM */
@@ -697,6 +709,12 @@ void read_parset()
       }
 #endif
     }
+
+    if(error_flag == 0)
+    {
+      fprint_param();
+    }
+    free(pardict);
   }  
     
   MPI_Bcast(&error_flag, 1, MPI_INT, roottask, MPI_COMM_WORLD);
@@ -1493,4 +1511,145 @@ void fprint_param()
   }
 
   fclose(fp);
+}
+
+int search_pardict(char *tag)
+{
+  int i;
+  for(i=0; i<num_pardict; i++)
+  {
+    if(strcmp(pardict[i].tag, tag) == 0)
+    {
+      return i;
+    }
+  }
+
+  fprintf(stderr, "# no match of tag %s.\n", tag);
+  return num_pardict+1;
+}
+
+int check_parset_isset()
+{
+  int i, error_flag = 0, idx, n_this_tag;
+  char *pub_tag[50] = {"FileDir", "FlagDim", "Redshift"};
+  char this_tag[MAXTAGS][50];
+  
+
+  for(i=0; i<3; i++)
+  {
+    idx = search_pardict(pub_tag[i]);
+    if(pardict[idx].isset == 0)
+    {
+      fprintf(stderr, "# %s is not set.\n", pub_tag[i]);
+      error_flag = 1;
+    }
+  }
+  
+  n_this_tag = 0;
+  if(parset.flag_dim == -2)
+  {
+    strcpy(this_tag[n_this_tag++], "FlagBLRModel");
+    strcpy(this_tag[n_this_tag++], "NConRecon");
+    strcpy(this_tag[n_this_tag++], "LineCenter");
+    strcpy(this_tag[n_this_tag++], "NLineRecon");
+    strcpy(this_tag[n_this_tag++], "NVelRecon");
+  }
+  else if(parset.flag_dim == -1)
+  {
+
+  }
+  else if(parset.flag_dim == 0)
+  {
+    strcpy(this_tag[n_this_tag++], "ContinuumFile");
+    strcpy(this_tag[n_this_tag++], "NConRecon");
+    strcpy(this_tag[n_this_tag++], "ConConstructFileOut");
+  }
+  else if(parset.flag_dim == 1)
+  {
+    strcpy(this_tag[n_this_tag++], "ContinuumFile");
+    strcpy(this_tag[n_this_tag++], "LineFile");
+    strcpy(this_tag[n_this_tag++], "NConRecon");
+    strcpy(this_tag[n_this_tag++], "NLineRecon");
+    strcpy(this_tag[n_this_tag++], "NCloudPerCore");
+    strcpy(this_tag[n_this_tag++], "ConConstructFileOut");
+    strcpy(this_tag[n_this_tag++], "LineConstructFileOut");
+    strcpy(this_tag[n_this_tag++], "NTau");
+  }
+  else if(parset.flag_dim == 2)
+  {
+    strcpy(this_tag[n_this_tag++], "ContinuumFile");
+    strcpy(this_tag[n_this_tag++], "Line2DFile");
+    strcpy(this_tag[n_this_tag++], "LineCenter");
+    strcpy(this_tag[n_this_tag++], "NConRecon");
+    strcpy(this_tag[n_this_tag++], "NLineRecon");
+    strcpy(this_tag[n_this_tag++], "NVelRecon");
+    strcpy(this_tag[n_this_tag++], "NCloudPerCore");
+    strcpy(this_tag[n_this_tag++], "NVPerCloud");
+    strcpy(this_tag[n_this_tag++], "ConConstructFileOut");
+    strcpy(this_tag[n_this_tag++], "Line2DDataConstructFileOut");
+    strcpy(this_tag[n_this_tag++], "NTau");
+    strcpy(this_tag[n_this_tag++], "FlagInstRes");
+
+  }
+  else if(parset.flag_dim == 3)
+  {
+    strcpy(this_tag[n_this_tag++], "SALineCenter");
+    strcpy(this_tag[n_this_tag++], "FlagSABLRModel");
+    strcpy(this_tag[n_this_tag++], "SAInstRes");
+    strcpy(this_tag[n_this_tag++], "SAFile");
+    strcpy(this_tag[n_this_tag++], "NCloudPerCore");
+    strcpy(this_tag[n_this_tag++], "NVPerCloud");
+  }
+#ifdef SA
+  else if(parset.flag_dim == 4)
+  {
+    strcpy(this_tag[n_this_tag++], "ContinuumFile");
+    strcpy(this_tag[n_this_tag++], "LineFile");
+    strcpy(this_tag[n_this_tag++], "NConRecon");
+    strcpy(this_tag[n_this_tag++], "NLineRecon");
+    strcpy(this_tag[n_this_tag++], "ConConstructFileOut");
+
+    strcpy(this_tag[n_this_tag++], "SALineCenter");
+    strcpy(this_tag[n_this_tag++], "FlagSABLRModel");
+    strcpy(this_tag[n_this_tag++], "SAInstRes");
+    strcpy(this_tag[n_this_tag++], "SAFile");
+    strcpy(this_tag[n_this_tag++], "NCloudPerCore");
+    strcpy(this_tag[n_this_tag++], "NVPerCloud");
+  }
+  else if(parset.flag_dim == 5)
+  {
+    strcpy(this_tag[n_this_tag++], "ContinuumFile");
+    strcpy(this_tag[n_this_tag++], "Line2DFile");
+    strcpy(this_tag[n_this_tag++], "LineCenter");
+    strcpy(this_tag[n_this_tag++], "NConRecon");
+    strcpy(this_tag[n_this_tag++], "NLineRecon");
+    strcpy(this_tag[n_this_tag++], "NVelRecon");
+    strcpy(this_tag[n_this_tag++], "ConConstructFileOut");
+    strcpy(this_tag[n_this_tag++], "Line2DDataConstructFileOut");
+    strcpy(this_tag[n_this_tag++], "NTau");
+    strcpy(this_tag[n_this_tag++], "FlagInstRes");
+
+    strcpy(this_tag[n_this_tag++], "SALineCenter");
+    strcpy(this_tag[n_this_tag++], "FlagSABLRModel");
+    strcpy(this_tag[n_this_tag++], "SAInstRes");
+    strcpy(this_tag[n_this_tag++], "SAFile");
+    strcpy(this_tag[n_this_tag++], "NCloudPerCore");
+    strcpy(this_tag[n_this_tag++], "NVPerCloud");
+  }
+#endif
+
+  for(i=0; i<n_this_tag; i++)
+  {
+    idx = search_pardict(this_tag[i]);
+    if(pardict[idx].isset == 0)
+    {
+      fprintf(stderr, "# %s is not set.\n", this_tag[i]);
+      error_flag = 1;
+    }
+  }
+
+  if(error_flag == 0)
+    return EXIT_SUCCESS;
+  else 
+    return EXIT_FAILURE;
 }
