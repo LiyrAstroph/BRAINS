@@ -442,7 +442,7 @@ void calculate_con_from_model_semiseparable(const void *model)
   */
   
   compute_inverse_semiseparable_plus_diag(Tcon, parset.n_con_recon, sigma2, 1.0/tau, 
-                                          Fcerrs, syserr, u, v, W, D, phi, workspace_uv);
+                                          Fcerrs, 0.0, u, v, W, D, phi, workspace_uv);
   multiply_matvec_semiseparable_uv(&pm[num_params_var], u, W, D, phi, parset.n_con_recon, y);
 
   // add back long-term trend of continuum
