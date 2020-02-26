@@ -469,8 +469,6 @@ void allocate_memory()
       idx_sa_par_mutual = malloc(2*sizeof(int)); 
       idx_rm_par_mutual = malloc(2*sizeof(int));
     }
-
-    workspace_phase = malloc( (3*n_vel_sa_data)* sizeof(double));
   }
 #endif  
 
@@ -536,8 +534,6 @@ void free_memory()
       free(idx_sa_par_mutual);
       free(idx_rm_par_mutual);
     }
-
-    free(workspace_phase);
   }
 #endif  
   return;

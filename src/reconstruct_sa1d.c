@@ -513,6 +513,8 @@ void reconstruct_sa1d_init()
   clouds_vel = malloc(parset.n_cloud_per_task * parset.n_vel_per_cloud * sizeof(double));
   clouds_tau = malloc(parset.n_cloud_per_task * sizeof(double));
 
+  workspace_phase = malloc( (3*n_vel_sa_data)* sizeof(double));
+
   if(parset.flag_save_clouds && thistask == roottask)
   {
     if(parset.n_cloud_per_task <= 1000)
@@ -606,6 +608,8 @@ void reconstruct_sa1d_end()
   free(clouds_alpha);
   free(clouds_beta);
   free(clouds_tau);
+
+  free(workspace_phase);
 
   if(parset.flag_save_clouds && thistask==roottask)
   {
