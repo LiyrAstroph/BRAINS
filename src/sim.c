@@ -523,14 +523,23 @@ void sim_init()
   }
 
 #ifdef SA
-  
-  sa_flux_norm = 1.0;
+
   parset.sa_InstRes /= VelUnit;
   parset.flag_sa_par_mutual = 1;
 
-  parset.n_sa_vel_recon = 40;
-  parset.n_sa_base_recon = 20;
-  
+  if(parset.flag_dim == -1)
+  {
+    parset.n_sa_vel_recon = n_vel_sa_data;
+    parset.n_sa_base_recon = n_base_sa_data;
+  }
+  else
+  {
+    sa_flux_norm = 1.0;
+      
+    parset.n_sa_vel_recon = 40;
+    parset.n_sa_base_recon = 20;
+  }
+    
   vel_sa = malloc(parset.n_sa_vel_recon * sizeof(double));
   wave_sa = malloc(parset.n_sa_vel_recon * sizeof(double));
   Fline_sa = malloc(parset.n_sa_vel_recon * sizeof(double));
@@ -541,25 +550,34 @@ void sim_init()
   clouds_beta = malloc(parset.n_cloud_per_task * sizeof(double));
 
   workspace_phase = malloc(parset.n_sa_vel_recon * 3 * sizeof(double));
+  
+  if(parset.flag_dim == -1)
+  {
+    memcpy(vel_sa, vel_sa_data, parset.n_sa_vel_recon * sizeof(double));
+    memcpy(wave_sa, wave_sa_data, parset.n_sa_vel_recon * sizeof(double));
 
-  double vel_max_set, vel_min_set;
-  vel_max_set = 3000.0/VelUnit;
-  vel_min_set = - vel_max_set;
-  double dVel = (vel_max_set- vel_min_set)/(parset.n_sa_vel_recon -1.0);
-  for(i=0; i<parset.n_sa_vel_recon; i++)
-  {
-    vel_sa[i] = vel_min_set + dVel*i;
-    wave_sa[i] = (1.0 + vel_sa[i]/C_Unit) * parset.sa_linecenter * (1.0+parset.redshift);
+    memcpy(base_sa, base_sa_data, parset.n_sa_base_recon * 2 * sizeof(double));
   }
-  
-  double phi;
-  for(i=0; i<parset.n_sa_base_recon; i++)
+  else
   {
-    phi = -PI/2.0 + PI/parset.n_sa_base_recon * i;
-    base_sa[i*2+0] = 100.0*cos(phi);
-    base_sa[i*2+1] = 100.0*sin(phi);
+    double vel_max_set, vel_min_set;
+    vel_max_set = 3000.0/VelUnit;
+    vel_min_set = - vel_max_set;
+    double dVel = (vel_max_set- vel_min_set)/(parset.n_sa_vel_recon -1.0);
+    for(i=0; i<parset.n_sa_vel_recon; i++)
+    {
+      vel_sa[i] = vel_min_set + dVel*i;
+      wave_sa[i] = (1.0 + vel_sa[i]/C_Unit) * parset.sa_linecenter * (1.0+parset.redshift);
+    }
+    
+    double phi;
+    for(i=0; i<parset.n_sa_base_recon; i++)
+    {
+      phi = -PI/2.0 + PI/parset.n_sa_base_recon * i;
+      base_sa[i*2+0] = 100.0*cos(phi);
+      base_sa[i*2+1] = 100.0*sin(phi);
+    }
   }
-  
 #endif
 
   return;
