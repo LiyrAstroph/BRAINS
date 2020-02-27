@@ -37,169 +37,15 @@ void sim()
   
   double *pm = (double *)model, error, fcon;
   
-  switch(parset.flag_blrmodel)
+  if(parset.flag_blrmodel == -1)
   {
-    case -1:
-      set_par_value_mytransfun_sim(pm);
-      break;
-
-    case 0:
-      set_par_value_mymodel_sim(pm);
-      break;
-
-    case 1:
-      i=0;
-      pm[i++] = log(4.0);
-      pm[i++] = 0.9;
-      pm[i++] = 0.2;
-      pm[i++] = cos(20.0/180.0*PI);
-      pm[i++] = 40.0;
-      pm[i++] = 0.0;
-      pm[i++] = log(3.0);
-      pm[i++] = 0.1;
-      pm[i++] = 0.5;
-      break;
-
-    case 2:
-      i=0;
-      pm[i++] = log(4.0);
-      pm[i++] = 0.9;
-      pm[i++] = 0.2;
-      pm[i++] = cos(20.0/180.0*PI);
-      pm[i++] = 40.0;
-      pm[i++] = 0.0;
-      pm[i++] = log(3.0);
-      pm[i++] = log(0.01);
-      pm[i++] = log(0.1);
-      break;
-
-    case 3:
-      i=0;
-      pm[i++] = -1.0;
-      pm[i++] = log(3.0);
-      pm[i++] = log(5.0);
-      pm[i++] = cos(20.0/180.0*PI);
-      pm[i++] = 40.0;
-      pm[i++] = 0.0;
-      pm[i++] = log(3.0);
-      pm[i++] = 0.5;
-      pm[i++] = 0.5;
-      break;
-
-    case 4:
-      i=0;
-      pm[i++] = -1.0;
-      pm[i++] = log(3.0);
-      pm[i++] = log(5.0);
-      pm[i++] = cos(20.0/180.0*PI);
-      pm[i++] = 40.0;
-      pm[i++] = 0.0;
-      pm[i++] = log(3.0);
-      pm[i++] = 0.5;
-      pm[i++] = 0.5;
-      break;
-
-    case 5:
-      i=0;
-      pm[i++] = log(4.0);  //mu
-      pm[i++] = 0.5;       //Fin
-      pm[i++] = log(2.0);  //Fout
-      pm[i++] = 1.5;       //alpha
-      pm[i++] = cos(20.0/180.0*PI);      //inc
-      pm[i++] = 40.0;      //opn
-      pm[i++] = 0.5;       //k
-      pm[i++] = 2.0;       //gam
-      pm[i++] = 0.5;      //xi
-      pm[i++] = log(2.0); //mbh
-      pm[i++] = 0.5;      //fellip
-      pm[i++] = 0.5;      //fflow
-      pm[i++] = log(0.01);
-      pm[i++] = log(0.1);
-      pm[i++] = log(0.01);
-      pm[i++] = log(0.1);
-      pm[i++] = 0.0;      //theta_rot
-      pm[i++] = log(0.001); //sig_turb
-      break;
-
-    case 6:
-      i=0;
-      pm[i++] = log(4.0);   // mu
-      pm[i++] = 1.0;        // beta
-      pm[i++] = 0.25;        // F
-      pm[i++] = cos(20.0/180.0*PI); // inc
-      pm[i++] = 40.0;       // opn
-      pm[i++] = -0.4;        // kappa
-      pm[i++] = 5.0;        // gamma
-      pm[i++] = 0.5;        // obscuration
-      pm[i++] = log(2.0);  //mbh
-      pm[i++] = 0.5;       //fellip
-      pm[i++] = 0.4;       //fflow
-      pm[i++] = log(0.01); //
-      pm[i++] = log(0.1);  //
-      pm[i++] = log(0.01); //
-      pm[i++] = log(0.1);  //
-      pm[i++] = 0.0;       // theta_rot
-      pm[i++] = log(0.001);  // sig_turb
-      break;
-
-    case 7:
-      i=0;
-      pm[i++] = log(4.0);  //mu
-      pm[i++] = 0.8;       //beta
-      pm[i++] = 0.1;       //F
-      pm[i++] = cos(20.0/180.0*PI);//inc
-      pm[i++] = 40.0;      //opn
-      pm[i++] = 0.0;       //kappa
-      pm[i++] = 1.0;       //gamma
-      pm[i++] = 0.0;       //xi
-
-      pm[i++] = 0.5;      //fsh
-      pm[i++] = log(8.0); //mu_un
-      pm[i++] = 1.2;      //beta_un
-      pm[i++] = 0.1;      //F_un
-      pm[i++] = 20.0;     //opn_un
-
-      pm[i++] = log(2.0); //mbh
-      pm[i++] = 0.5;      //fellip
-      pm[i++] = 0.4;      //fflow
-      pm[i++] = log(0.01); 
-      pm[i++] = log(0.1);
-      pm[i++] = log(0.01);
-      pm[i++] = log(0.1);
-      pm[i++] = 0.0;      //theta_rot
-      pm[i++] = 0.5;      //fellip_un
-      pm[i++] = 0.4;      //fflow_un
-      pm[i++] = log(0.001); // sig_turb
-      break;
-
-    case 8:
-      i=0;
-      pm[i++] = 50.0;   //theta_min
-      pm[i++] = 20.0;   //dtheta_max
-      pm[i++] = log(1.0); // r_min
-      pm[i++] = 4.0;      // fr_max
-      pm[i++] = 1.0;      // gamma
-      pm[i++] = 1.0;      // alpha
-      pm[i++] = -2.0;      // lambda
-      pm[i++] = -0.5;      // k
-      pm[i++] = 0.0;      // xi
-      pm[i++] = log(30.0);     // Rv
-      pm[i++] = log(20.0);     // Rblr, should larger than r_max=r_max * fr_max
-      pm[i++] = cos(30.0/180.0*PI);     // inc
-      pm[i++] = log(4.0); // mbh
-      break;
-    
-    case 9:
-      i=0;
-      pm[i++] = log(4.0);   //theta_min
-      pm[i++] = 1.0;
-      pm[i++] = 0.2;
-      pm[i++] = cos(30.0/180.0*PI);     // inc
-      pm[i++] = 30.0;
-      pm[i++] = log(4.0); // mbh
-      break;
+    set_par_value_mytransfun_sim(pm);
   }
-
+  else 
+  {
+    set_par_value_sim(pm, parset.flag_blrmodel);
+  }
+  
   pm[num_params_blr_model + num_params_nlr ] = 0.0; // spectral broadening
 
   pm[num_params_blr-3] = log(1.0); //A
@@ -208,14 +54,7 @@ void sim()
 #ifdef SA
   double *sa_model = pm + num_params_blr;
   set_idx_par_mutual();
-  
-  i=0;
-  sa_model[i++] = log(4.0);   //theta_min
-  sa_model[i++] = 1.0;
-  sa_model[i++] = 0.2;
-  sa_model[i++] = cos(30.0/180.0*PI);     // inc
-  sa_model[i++] = 30.0;
-  sa_model[i++] = log(4.0); // mbh
+  set_par_value_sim(sa_model, parset.flag_sa_blrmodel);
 
   /* set the same mbh and inc */
   sa_model[idx_sa_par_mutual[0]] = pm[idx_rm_par_mutual[0]]; //mbh
@@ -764,4 +603,168 @@ void sim_end()
   
   free(workspace_phase);
 #endif
+}
+
+void set_par_value_sim(double *pm, int flag_model)
+{
+  int i;
+  switch(flag_model)
+  {
+    case 0:
+      set_par_value_mymodel_sim(pm);
+      break;
+
+    case 1:
+      i=0;
+      pm[i++] = log(4.0);
+      pm[i++] = 0.9;
+      pm[i++] = 0.2;
+      pm[i++] = cos(20.0/180.0*PI);
+      pm[i++] = 40.0;
+      pm[i++] = 0.0;
+      pm[i++] = log(3.0);
+      pm[i++] = 0.1;
+      pm[i++] = 0.5;
+      break;
+
+    case 2:
+      i=0;
+      pm[i++] = log(4.0);
+      pm[i++] = 0.9;
+      pm[i++] = 0.2;
+      pm[i++] = cos(20.0/180.0*PI);
+      pm[i++] = 40.0;
+      pm[i++] = 0.0;
+      pm[i++] = log(3.0);
+      pm[i++] = log(0.01);
+      pm[i++] = log(0.1);
+      break;
+
+    case 3:
+      i=0;
+      pm[i++] = -1.0;
+      pm[i++] = log(3.0);
+      pm[i++] = log(5.0);
+      pm[i++] = cos(20.0/180.0*PI);
+      pm[i++] = 40.0;
+      pm[i++] = 0.0;
+      pm[i++] = log(3.0);
+      pm[i++] = 0.5;
+      pm[i++] = 0.5;
+      break;
+
+    case 4:
+      i=0;
+      pm[i++] = -1.0;
+      pm[i++] = log(3.0);
+      pm[i++] = log(5.0);
+      pm[i++] = cos(20.0/180.0*PI);
+      pm[i++] = 40.0;
+      pm[i++] = 0.0;
+      pm[i++] = log(3.0);
+      pm[i++] = 0.5;
+      pm[i++] = 0.5;
+      break;
+
+    case 5:
+      i=0;
+      pm[i++] = log(4.0);  //mu
+      pm[i++] = 0.5;       //Fin
+      pm[i++] = log(2.0);  //Fout
+      pm[i++] = 1.5;       //alpha
+      pm[i++] = cos(20.0/180.0*PI);      //inc
+      pm[i++] = 40.0;      //opn
+      pm[i++] = 0.5;       //k
+      pm[i++] = 2.0;       //gam
+      pm[i++] = 0.5;      //xi
+      pm[i++] = log(2.0); //mbh
+      pm[i++] = 0.5;      //fellip
+      pm[i++] = 0.5;      //fflow
+      pm[i++] = log(0.01);
+      pm[i++] = log(0.1);
+      pm[i++] = log(0.01);
+      pm[i++] = log(0.1);
+      pm[i++] = 0.0;      //theta_rot
+      pm[i++] = log(0.001); //sig_turb
+      break;
+
+    case 6:
+      i=0;
+      pm[i++] = log(4.0);   // mu
+      pm[i++] = 1.0;        // beta
+      pm[i++] = 0.25;        // F
+      pm[i++] = cos(20.0/180.0*PI); // inc
+      pm[i++] = 40.0;       // opn
+      pm[i++] = 0.0;        // kappa
+      pm[i++] = 1.0;        // gamma
+      pm[i++] = 1.0;        // obscuration
+      pm[i++] = log(2.0);  //mbh
+      pm[i++] = 0.5;       //fellip
+      pm[i++] = 0.4;       //fflow
+      pm[i++] = log(0.01); //
+      pm[i++] = log(0.1);  //
+      pm[i++] = log(0.01); //
+      pm[i++] = log(0.1);  //
+      pm[i++] = 0.0;       // theta_rot
+      pm[i++] = log(0.001);  // sig_turb
+      break;
+
+    case 7:
+      i=0;
+      pm[i++] = log(4.0);  //mu
+      pm[i++] = 0.8;       //beta
+      pm[i++] = 0.1;       //F
+      pm[i++] = cos(20.0/180.0*PI);//inc
+      pm[i++] = 40.0;      //opn
+      pm[i++] = 0.0;       //kappa
+      pm[i++] = 1.0;       //gamma
+      pm[i++] = 0.0;       //xi
+
+      pm[i++] = 0.5;      //fsh
+      pm[i++] = log(8.0); //mu_un
+      pm[i++] = 1.2;      //beta_un
+      pm[i++] = 0.1;      //F_un
+      pm[i++] = 20.0;     //opn_un
+
+      pm[i++] = log(2.0); //mbh
+      pm[i++] = 0.5;      //fellip
+      pm[i++] = 0.4;      //fflow
+      pm[i++] = log(0.01); 
+      pm[i++] = log(0.1);
+      pm[i++] = log(0.01);
+      pm[i++] = log(0.1);
+      pm[i++] = 0.0;      //theta_rot
+      pm[i++] = 0.5;      //fellip_un
+      pm[i++] = 0.4;      //fflow_un
+      pm[i++] = log(0.001); // sig_turb
+      break;
+
+    case 8:
+      i=0;
+      pm[i++] = 50.0;   //theta_min
+      pm[i++] = 20.0;   //dtheta_max
+      pm[i++] = log(1.0); // r_min
+      pm[i++] = 4.0;      // fr_max
+      pm[i++] = 1.0;      // gamma
+      pm[i++] = 1.0;      // alpha
+      pm[i++] = -2.0;      // lambda
+      pm[i++] = -0.5;      // k
+      pm[i++] = 0.0;      // xi
+      pm[i++] = log(30.0);     // Rv
+      pm[i++] = log(20.0);     // Rblr, should larger than r_max=r_max * fr_max
+      pm[i++] = cos(30.0/180.0*PI);     // inc
+      pm[i++] = log(4.0); // mbh
+      break;
+    
+    case 9:
+      i=0;
+      pm[i++] = log(4.0);   //theta_min
+      pm[i++] = 1.0;
+      pm[i++] = 0.2;
+      pm[i++] = cos(30.0/180.0*PI);     // inc
+      pm[i++] = 30.0;
+      pm[i++] = log(4.0); // mbh
+      break;
+  }
+  return;
 }
