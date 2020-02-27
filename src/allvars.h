@@ -144,6 +144,7 @@ typedef struct
   double sa_linecenter;
   double sa_InstRes;
   char sa_str_par_fix[BRAINS_MAX_STR_LENGTH], sa_str_par_fix_val[BRAINS_MAX_STR_LENGTH];
+  int n_sa_vel_recon, n_sa_base_recon;
 #endif
 }PARSET;
 extern PARSET parset;
@@ -264,7 +265,7 @@ extern double sa_flux_norm;
 
 extern double **phase_sa_particles, **Fline_sa_particles;
 extern double **phase_sa_particles_perturb, **Fline_sa_particles_perturb;
-extern double *phase_sa, *Fline_sa;
+extern double *phase_sa, *Fline_sa, *base_sa, *vel_sa, *wave_sa;
 
 extern double *clouds_alpha, *clouds_beta;
 

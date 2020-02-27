@@ -164,6 +164,103 @@ void calculate_sa_with_sample(const void *pm)
 /* 
  * calculate SA phase and line profile.
  */
+void calculate_sa_sim_with_sample(const void *pm, double *vel_sa, int n_vel_sa, double *base_sa, int n_base_sa,
+                                  double *p_sa, double *F_sa)
+{
+  int i, j, k, idV;
+  double V, dV, y, z, alpha, beta, flux_norm, phase, *phase_norm, *alpha_cent, *beta_cent;
+  double DA, PA, FA, CO, cos_PA, sin_PA, Vres;
+  double *pmodel = (double *)pm;
+
+  phase_norm = workspace_phase;
+  alpha_cent = phase_norm + n_vel_sa;
+  beta_cent = alpha_cent + n_vel_sa;
+
+  /* angular size distance */
+  DA = exp(pmodel[num_params_blr + num_params_sa_blr_model]);   
+  /* position angle */         
+  PA = pmodel[num_params_blr + num_params_sa_blr_model + 1]/180.0 * PI;  
+  /* line flux scaling center */
+  FA = exp(pmodel[num_params_blr + num_params_sa_blr_model+2]);   
+  /* 
+   * line center offset: V+dV = (w-(w0+dw0))/(w0+dw0) ==> dV = - dw0/w0 
+   * equivalent to redshift offset:  dz = -(1+z) dw0/w0
+   */       
+  CO = -pmodel[num_params_blr + num_params_sa_blr_model+3]/parset.sa_linecenter * C_Unit; 
+
+  /* instrument broadening */
+  Vres = parset.sa_InstRes; 
+
+  cos_PA = cos(PA);
+  sin_PA = sin(PA);
+
+  dV = vel_sa[1] - vel_sa[0];
+  
+  for(i=0; i<n_vel_sa; i++)
+  {
+    for(k=0; k<n_base_sa; k++)
+    {
+      p_sa[k*n_vel_sa + i] = 0.0;
+    }
+    phase_norm[i] = 0.0;
+    alpha_cent[i] = 0.0;
+    beta_cent[i] = 0.0;
+  }
+  
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    y = clouds_alpha[i];
+    z = clouds_beta[i];
+    
+    alpha = y * cos_PA + z * sin_PA;
+    beta = -y * sin_PA + z * cos_PA;
+
+    for(j=0; j< parset.n_vel_per_cloud; j++)
+    {
+      V = clouds_vel[i*parset.n_vel_per_cloud + j] + CO + Vres * gsl_ran_ugaussian(gsl_r);
+      if(V<vel_sa[0] || V >= vel_sa[n_vel_sa-1]+dV)
+        continue;
+      idV = (V - vel_sa[0])/dV;
+      
+      phase_norm[idV] += clouds_weight[i];
+      alpha_cent[idV] += alpha * clouds_weight[i];
+      beta_cent[idV] += beta * clouds_weight[i];
+    }
+  }
+
+  /* normalize line spectrum */
+  flux_norm = 0.0;
+  for(j=0; j<n_vel_sa; j++)
+  {
+    flux_norm += phase_norm[j];
+  }
+  flux_norm /= (sa_flux_norm * n_vel_sa);
+  for(j=0; j<n_vel_sa; j++)
+  {
+    F_sa[j] = FA * phase_norm[j]/(flux_norm + EPS);
+  }
+
+  for(j=0; j<n_vel_sa; j++)
+  {
+    alpha_cent[j] = (alpha_cent[j]/(phase_norm[j]+EPS)) / DA;
+    beta_cent[j] =  (beta_cent[j]/(phase_norm[j]+EPS)) / DA;
+  }
+  
+  /* phi = -2*pi * f_line * B/lambda * X/DA */
+  for(k=0; k<n_base_sa; k++)
+  {
+    for(j=0; j<n_vel_sa; j++)
+    { 
+      phase = base_sa[k*2] * alpha_cent[j] + base_sa[k*2 + 1] * beta_cent[j];
+      p_sa[k*n_vel_sa + j] = -F_sa[j]/(1.0+F_sa[j]) * phase;
+    }
+  }
+  return;
+}
+
+/* 
+ * calculate SA phase and line profile.
+ */
 void calculate_sa_from_blrmodel(const void *pm, int flag_save)
 {
   int i, j, k, idV;

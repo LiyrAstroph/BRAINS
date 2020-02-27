@@ -205,6 +205,28 @@ void sim()
   pm[num_params_blr-3] = log(1.0); //A
   pm[num_params_blr-2] = 0.0;      //Ag
 
+#ifdef SA
+  double *sa_model = pm + num_params_blr;
+  set_idx_par_mutual();
+  
+  i=0;
+  sa_model[i++] = log(4.0);   //theta_min
+  sa_model[i++] = 1.0;
+  sa_model[i++] = 0.2;
+  sa_model[i++] = cos(30.0/180.0*PI);     // inc
+  sa_model[i++] = 30.0;
+  sa_model[i++] = log(4.0); // mbh
+
+  /* set the same mbh and inc */
+  sa_model[idx_sa_par_mutual[0]] = pm[idx_rm_par_mutual[0]]; //mbh
+  sa_model[idx_sa_par_mutual[1]] = pm[idx_rm_par_mutual[1]]; //inc
+
+  sa_model[num_params_sa_blr_model]     = log(550.0); //DA
+  sa_model[num_params_sa_blr_model + 1] = 0.0;        //PA
+  sa_model[num_params_sa_blr_model + 2] = 0.0;        //FA
+  sa_model[num_params_sa_blr_model + 3] = 0.0;        //CO
+#endif
+
   smooth_init(parset.n_vel_recon, TransV);
   
   if(parset.flag_dim == -1)
@@ -366,6 +388,41 @@ void sim()
   }
   fclose(fp);
 
+#ifdef SA
+  double *sa_pm;
+  sa_pm = (double *)pm + num_params_blr;
+  gen_sa_cloud_sample((void *)sa_pm, 3, 0);
+  calculate_sa_sim_with_sample(pm, vel_sa, parset.n_sa_vel_recon, base_sa, parset.n_sa_base_recon, 
+                                   phase_sa, Fline_sa);
+  
+  sprintf(fname, "%s/%s", parset.file_dir, "data/sim_sa.txt");
+  fp = fopen(fname, "w");
+  if(fp == NULL)
+  {
+    fprintf(stderr, "# Error: Cannot open file %s.\n", fname);
+    exit(0);
+  }
+  // output sa line
+  fprintf(fp, "# %d %d %d\n", 1, parset.n_sa_vel_recon, parset.n_sa_base_recon);
+  for(j=0; j<parset.n_sa_vel_recon; j++)
+  {
+    fprintf(fp, "%e %e %e\n", wave_sa[j], Fline_sa[j] + gsl_ran_ugaussian(gsl_r)*error, error);
+  }
+  fprintf(fp, "\n");
+  for(i=0; i<parset.n_sa_base_recon; i++)
+  {
+    fprintf(fp, "# %f %f\n", base_sa[i*2], base_sa[i*2+1]);
+    for(j=0; j<parset.n_sa_vel_recon; j++)
+    {
+      fprintf(fp, "%e %e %e\n", wave_sa[j], (phase_sa[i*parset.n_sa_vel_recon + j] + gsl_ran_ugaussian(gsl_r)*0.01 )/(PhaseFactor * wave_sa[j]), 
+                             0.01/(PhaseFactor * wave_sa[j]));
+    }
+    fprintf(fp, "\n");
+  }
+  fclose(fp);
+  
+#endif  
+
   smooth_end();
   sim_end();
 }
@@ -457,6 +514,14 @@ void sim_init()
       break;
   }
 
+#ifdef SA
+  set_sa_blr_model();
+  /* SA */
+  num_params_sa_blr = num_params_sa_blr_model + num_params_sa_extpar;
+  num_params_sa = num_params_sa_blr;
+
+#endif
+
   if(parset.flag_InstRes > 1)
   {
     num_params_res = 1;
@@ -490,7 +555,12 @@ void sim_init()
   num_params_blr = num_params_blr_model + num_params_nlr 
                  + num_params_res + num_params_linecenter + 2 + 1; /* include A, Ag, and line sys err */
   num_params_var = num_params_drw + num_params_trend + num_params_difftrend;
-  num_params = num_params_blr + num_params_var + parset.n_con_recon;
+
+  num_params_blr_tot = num_params_blr;
+#ifdef SA
+  num_params_blr_tot  += num_params_sa_blr;
+#endif
+  num_params = num_params_blr_tot + num_params_var + parset.n_con_recon;
 
   model = malloc(num_params * sizeof(double));
 
@@ -613,6 +683,46 @@ void sim_init()
     }
   }
 
+#ifdef SA
+  
+  sa_flux_norm = 1.0;
+  parset.sa_InstRes /= VelUnit;
+  parset.flag_sa_par_mutual = 1;
+
+  parset.n_sa_vel_recon = 40;
+  parset.n_sa_base_recon = 20;
+  
+  vel_sa = malloc(parset.n_sa_vel_recon * sizeof(double));
+  wave_sa = malloc(parset.n_sa_vel_recon * sizeof(double));
+  Fline_sa = malloc(parset.n_sa_vel_recon * sizeof(double));
+  base_sa = malloc(parset.n_sa_base_recon * 2 * sizeof(double));
+  phase_sa = malloc(parset.n_sa_vel_recon * parset.n_sa_base_recon * sizeof(double));
+  
+  clouds_alpha = malloc(parset.n_cloud_per_task * sizeof(double));
+  clouds_beta = malloc(parset.n_cloud_per_task * sizeof(double));
+
+  workspace_phase = malloc(parset.n_sa_vel_recon * 3 * sizeof(double));
+
+  double vel_max_set, vel_min_set;
+  vel_max_set = 3000.0/VelUnit;
+  vel_min_set = - vel_max_set;
+  double dVel = (vel_max_set- vel_min_set)/(parset.n_sa_vel_recon -1.0);
+  for(i=0; i<parset.n_sa_vel_recon; i++)
+  {
+    vel_sa[i] = vel_min_set + dVel*i;
+    wave_sa[i] = (1.0 + vel_sa[i]/C_Unit) * parset.sa_linecenter * (1.0+parset.redshift);
+  }
+  
+  double phi;
+  for(i=0; i<parset.n_sa_base_recon; i++)
+  {
+    phi = -PI/2.0 + PI/parset.n_sa_base_recon * i;
+    base_sa[i*2+0] = 100.0*cos(phi);
+    base_sa[i*2+1] = 100.0*sin(phi);
+  }
+  
+#endif
+
   return;
 }
 
@@ -640,4 +750,18 @@ void sim_end()
   {
     fclose(fcloud_out);
   }
+
+#ifdef SA
+  
+  free(vel_sa);
+  free(wave_sa);
+  free(Fline_sa);
+  free(base_sa);
+  free(phase_sa);
+  
+  free(clouds_alpha);
+  free(clouds_beta);
+  
+  free(workspace_phase);
+#endif
 }

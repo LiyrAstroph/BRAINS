@@ -114,7 +114,7 @@ void init()
   }
 
 #ifdef SA
-  if(parset.flag_dim > 2)
+  if(parset.flag_dim > 2 || parset.flag_dim < 0)
   {
     num_params_sa_extpar = sizeof(SAExtPar)/sizeof(double);
     switch(parset.flag_sa_blrmodel)
@@ -450,7 +450,7 @@ void allocate_memory()
   }
   
 #ifdef SA
-  if(parset.flag_dim > 2)
+  if(parset.flag_dim > 2 || parset.flag_dim < 0)
   {
     sa_extpar_range = malloc(num_params_sa_extpar * sizeof(double *));
     for(i=0; i<num_params_sa_extpar; i++)
@@ -515,7 +515,7 @@ void free_memory()
   }
   
 #ifdef SA
-  if(parset.flag_dim > 2)
+  if(parset.flag_dim > 2 || parset.flag_dim < 0)
   {
     for(i=0; i<num_params_sa_extpar; i++)
     {

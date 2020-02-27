@@ -165,6 +165,8 @@ void set_par_range_sa1d();
 void print_par_names_sa1d();
 void calculate_sa1d_from_blrmodel(const void *pm);
 void calculate_sa_with_sample(const void *pm);
+void calculate_sa_sim_with_sample(const void *pm, double *vel_sa, int n_vel_sa, double *base_sa, int n_base_sa,
+                                  double *p_sa, double *F_sa);
 void postprocess_sa1d();
 
 void calculate_sa_transfun_from_blrmodel(const void *pm, int flag_save);
