@@ -433,7 +433,7 @@ void read_parset()
       }
 #endif
 
-      if(parset.flag_trend > 2 || parset.flag_trend < 0)
+      if(parset.flag_trend > 1 || parset.flag_trend < 0)
       {
         fprintf(stderr, "# Error in FlagTrend: value %d is not allowed.\n# Please specify a value in [0-1].\n", parset.flag_trend);
         error_flag = 1;
