@@ -277,6 +277,8 @@ extern int *idx_sa_par_mutual, *idx_rm_par_mutual;
 
 extern double *prob_sa_particles, *prob_sa_particles_perturb;
 
+extern double sa_phase_error_mean, sa_line_error_mean;
+
 extern double *workspace_phase;
 #endif
 #endif

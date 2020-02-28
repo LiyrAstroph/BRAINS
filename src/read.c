@@ -1205,6 +1205,29 @@ void read_data()
         fscanf(fp, "\n");
       }
       fclose(fp);
+
+      if(error_flag == 0)
+      {
+        sa_phase_error_mean = 0.0;
+        sa_line_error_mean = 0.0;
+        for(j=0; j<n_epoch_sa_data; j++)
+        {
+          for(i=0; i<n_vel_sa_data; i++)
+          {
+            sa_line_error_mean += Flerrs_sa_data[i+j*n_vel_sa_data];
+          }
+        }
+        sa_line_error_mean /= (n_epoch_sa_data * n_vel_sa_data);
+
+        for(j=0; j<n_base_sa_data; j++)
+        {
+          for(i=0; i<n_vel_sa_data; i++)
+          {
+            sa_phase_error_mean += pherrs_sa_data[i+j*n_vel_sa_data];
+          }
+        }
+        sa_phase_error_mean /= (n_base_sa_data * n_vel_sa_data);
+      }
     }
     
     MPI_Bcast(&error_flag, 1, MPI_INT, roottask, MPI_COMM_WORLD);
@@ -1222,6 +1245,9 @@ void read_data()
     MPI_Bcast(Fline_sa_data, n_vel_sa_data * n_epoch_sa_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
     MPI_Bcast(Flerrs_sa_data, n_vel_sa_data * n_epoch_sa_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
 
+    MPI_Bcast(&sa_line_error_mean, 1, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(&sa_phase_error_mean, 1, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+
     /* convert wavelength to velocity */
     for(i=0; i<n_vel_sa_data; i++)
     {
@@ -1238,6 +1264,8 @@ void read_data()
         pherrs_sa_data[i+j*n_vel_sa_data] *= (PhaseFactor * wave_sa_data[i]);
       }
     }
+    /* in term of the central wavelength */
+    sa_phase_error_mean *= (PhaseFactor * wave_sa_data[n_vel_sa_data/2]);
 
     /* calculate sa flux norm */
     sa_flux_norm = 0.0;

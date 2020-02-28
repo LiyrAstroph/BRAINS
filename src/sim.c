@@ -245,7 +245,7 @@ void sim()
   fprintf(fp, "# %d %d %d\n", 1, parset.n_sa_vel_recon, parset.n_sa_base_recon);
   for(j=0; j<parset.n_sa_vel_recon; j++)
   {
-    fprintf(fp, "%e %e %e\n", wave_sa[j], Fline_sa[j] + gsl_ran_ugaussian(gsl_r)*error, error);
+    fprintf(fp, "%e %e %e\n", wave_sa[j], Fline_sa[j] + gsl_ran_ugaussian(gsl_r)*sa_line_error_mean, sa_line_error_mean);
   }
   fprintf(fp, "\n");
   for(i=0; i<parset.n_sa_base_recon; i++)
@@ -253,8 +253,9 @@ void sim()
     fprintf(fp, "# %f %f\n", base_sa[i*2], base_sa[i*2+1]);
     for(j=0; j<parset.n_sa_vel_recon; j++)
     {
-      fprintf(fp, "%e %e %e\n", wave_sa[j], (phase_sa[i*parset.n_sa_vel_recon + j] + gsl_ran_ugaussian(gsl_r)*0.01 )/(PhaseFactor * wave_sa[j]), 
-                             0.01/(PhaseFactor * wave_sa[j]));
+      fprintf(fp, "%e %e %e\n", wave_sa[j], 
+      (phase_sa[i*parset.n_sa_vel_recon + j] + gsl_ran_ugaussian(gsl_r)*sa_phase_error_mean )/(PhaseFactor * wave_sa[j]), 
+       sa_phase_error_mean/(PhaseFactor * wave_sa[j]));
     }
     fprintf(fp, "\n");
   }
@@ -535,9 +536,11 @@ void sim_init()
   else
   {
     sa_flux_norm = 1.0;
-      
     parset.n_sa_vel_recon = 40;
     parset.n_sa_base_recon = 20;
+
+    sa_phase_error_mean = 0.01;
+    sa_line_error_mean = 0.01;
   }
     
   vel_sa = malloc(parset.n_sa_vel_recon * sizeof(double));
