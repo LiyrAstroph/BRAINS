@@ -141,7 +141,7 @@ void postprocess_sa1d()
       {
         for(j=0; j<parset.n_con_recon; j++)
         {
-          fprintf(fcon, "%e %e\n", Tcon[j]*(1.0+parset.redshift), Fcon[j]/con_scale);
+          fprintf(fcon, "%e %e %e\n", Tcon[j]*(1.0+parset.redshift), Fcon[j]/con_scale, Fcerrs[i]/con_scale);
         }
         fprintf(fcon, "\n");
 
