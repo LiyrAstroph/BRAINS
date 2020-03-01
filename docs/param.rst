@@ -10,20 +10,24 @@ Parameter File
   
   FileDir                     /home/liyropt/Projects/GIT/BRAINS      % directory for where all the output files are stored
   
-  FlagDim                     2                          % -2, generate fully random lc; -1, mock lc based on input data; 
+  FlagDim                     2                           % -2, generate fully random lc; -1, mock lc based on input data; 
                                                           % 0, only continuum modeling; 1, 1d line RM; 2, 2d line RM
   
-  FlagBLRModel                8                           % 1, 2, 3, 4, 5, 6, 7, 8; BLR model type
+  Redshift                    0.0449                         % redshift of the object
+
+  FlagBLRModel                6                           % 1, 2, 3, 4, 5, 6, 7, 8; BLR model type
                                                           % 5 is double power-law model; 6 is Pancoast's model; 7 is two-zone model
                                                           % 0 is user defined
                                                           % -1 is user defined, analytical transfer function
-  
+  LineCenter                  4861.0                      %  rest frame, A
+  FlagLineCenter              0                           % -1, epoch-dependent offset; 0, not included; 1, uniform offset
+  LineCenterErr               50.0                        % km/s
   %========================================================================
   % data file
   
-  ContinuumFile               data/sim_con.txt          % file for continuum data
-  LineFile                    data/sim_hb.txt           % file for line data
-  Line2DFile                  data/sim_hb2d.txt         % file for line 2d data
+  ContinuumFile               data/mrk142_con.txt          % file for continuum data
+  LineFile                    data/mrk142_hb.txt           % file for line data
+  Line2DFile                  data/mrk142_hb2d.txt         % file for line 2d data
   
   %========================================================================
   % reconstruction
@@ -93,14 +97,7 @@ Parameter File
   WidthNarrowLine             93.0                        % width km/s
   WidthNarrowLineErr          10.0                         % width error
   ShiftNarrowLine             0.0                        % shift, km/s, with respect to broad line center.  
-  ShiftNarrowLineErr          0.0                         % shift error
-  
-  %========================================================================
-  % 
-  
-  FlagLineCenter              0                          % -1, epoch-dependent; 0, not included; 1, uniform
-  LineCenterErr               50.0                        % km/s
-  
+  ShiftNarrowLineErr          0.0                         % shift error  
   
   %========================================================================
   % set fixed BLR parameters and their fixed values
@@ -112,5 +109,5 @@ Parameter File
   BLRParFixVal                2.0:1.0
 
 .. note::
-  In the subdirectory ``example/", some examples of parameter file are provided. Users can choose appropriate 
+  In the subdirectory ``example/``, some examples of parameter file are provided. Users can choose appropriate 
   parameter files with their purposes.

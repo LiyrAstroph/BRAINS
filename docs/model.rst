@@ -3,7 +3,7 @@ Broad-Line Region Models
 ************************
 
 ``brains`` already encapsulates several BLR dynamical models detailed below. To specify those models in 
-running, edit the option "FlagBLRModel" in the parameter file.
+running, edit the option "FlagBLRModel" in the parameter file (see :ref:`Parameter File`).
 
 Broad-line regions are generally assumed to be composed of a larg number of 
 point-like clouds. These clouds respond to the central ionizing continuum

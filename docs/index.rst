@@ -29,6 +29,7 @@ Documentation
    user_model.rst
    transfun.rst
    todo.rst
+   mkfile.rst
 
 
 Attribution

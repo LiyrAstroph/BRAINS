@@ -9,18 +9,23 @@ Third-party Package Dependence
 
   * **MPICH** --- an MPI implementation library, available at http://www-unix.mcs.anl.gov/mpi/mpich
 
-  * **GSL** --- the GNU Scientific Library, downloaded at http://www.gnu.org/software/gs
+  * **GSL** --- the GNU Scientific Library, downloaded at http://www.gnu.org/software/gsl
 
   * **LAPACKE** --- the C-interface of LAPACK, downloaded at http://www.netlib.org/lapack/
 
   * **CDNest** --- Diffusive nested sampling, downloaded at https://github.com/LiyrAstroph/CDNest
 
-Note that in Linux system, there are package managers that can install the above libraries convienently. If so, use them. In this case, the libraries usually are installed in standard environment path. Otherwise, any of the above libraries is not installed in standard locations on your system, the ``Makefile`` provided with the code may need slight adjustments.
+.. note::
+  In Linux systems, there are package managers that can install the above libraries convienently (except for CDNest).
+  For example, DNF package managers in Fedora distribution.  
+  If so, use them. In such a case, the libraries usually are installed in standard environment path. Otherwise, 
+  if any of the above libraries is not installed in standard locations on your system, the :ref:`Makefile` provided 
+  with the code may need slight adjustments. 
 
 Compiling
 =============================
 
-Edit the configurations in ``Makefile`` to be consistent with your system if necessary. Then compile the package with the command
+Edit the configurations in :ref:`Makefile` to be consistent with your system if necessary. Then compile the package with the command
 
 .. code:: bash
 
@@ -37,7 +42,7 @@ To run the package in a parallel computer/cluster, use the following command:
 
    mpiexec -n np ./brains src/param
 
-where ``np`` is the number of cores and ``param`` is the paramter file, which specifies configurations for ``brains``.
+where ``np`` is the number of cores and ``param`` is the paramter file (see :ref:`Parameter File`), which specifies configurations for ``brains``.
 
 An exemplary reveberation mapping dataset is provided in the subdirectory ``data/``, containing four files:
 
@@ -50,6 +55,7 @@ An exemplary reveberation mapping dataset is provided in the subdirectory ``data
   
 
 One can try to run the above command to test ``brains`` with the provided dataset.
+See :ref:`Data Format` for the information of data format.
 
 Command-line Options
 ======================
@@ -86,7 +92,7 @@ For example, if one want to redo posterior processing with a different temperatu
 
 
 MCMC Sampling
-============
+=============
 
 The output Markov chain is stored in ``data/posterior_sample.txt`` for continuum reconstuction, in ``data/posterior_sample1d.txt`` for 1d reverberation mapping analysis, and in ``data/posterior_sample2d.txt`` for 2d reverberation mapping analysis.
 
