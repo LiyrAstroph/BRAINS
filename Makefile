@@ -12,7 +12,7 @@ OPTIMIZE = -O2 -Wall -finline-functions
 #OPTIMIZE += -DDebug
 
 # include spectro-astrometry analysis
-OPTIMIZE += -DSA
+#OPTIMIZE += -DSA
 
 # get GIT description
 GITCHECK := $(shell git 2>/dev/null)
