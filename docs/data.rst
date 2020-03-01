@@ -5,7 +5,7 @@ Data
 Data Input
 ==========
 
-The input data in ``brains`` depend on the option ``FlagDim`` specified in the parameter file. 
+The input data in ``brains`` depend on the option ``FlagDim`` specified in the parameter file (see :ref:`Parameter File`). 
 
 * ``FlagDim = -2``
 

@@ -28,8 +28,10 @@ Documentation
    model.rst
    user_model.rst
    transfun.rst
-   todo.rst
+   sa.rst
+   sim.rst
    mkfile.rst
+   todo.rst
 
 
 Attribution

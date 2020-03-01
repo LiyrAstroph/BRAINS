@@ -83,7 +83,7 @@ Command-line Options
     -n or --para_name
         print parameter name.
 
-For example, if one want to redo posterior processing with a different temperature, say 10 (the default is 1), one may use the command
+For example, if one wants to redo posterior processing with a different temperature, say 10 (the default is 1), one may use the command
 
 .. code:: bash
 

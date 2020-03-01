@@ -9,7 +9,10 @@ To-do List
 
 
 .. todo::
-  Create an interface to all users to input their own BLR dynamical models.
+  Create an interface to allow users to input their own BLR dynamical models.
 
 .. todo::
   Create a Python wrapper to call ``brains`` in Python environoment.
+
+.. todo::
+  Develop a python backend for visualizing the results.
