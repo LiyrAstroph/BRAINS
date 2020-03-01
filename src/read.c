@@ -1586,10 +1586,21 @@ int check_parset_isset()
     strcpy(this_tag[n_this_tag++], "LineCenter");
     strcpy(this_tag[n_this_tag++], "NLineRecon");
     strcpy(this_tag[n_this_tag++], "NVelRecon");
+#ifdef SA
+    strcpy(this_tag[n_this_tag++], "FlagSABLRModel");
+    strcpy(this_tag[n_this_tag++], "SALineCenter");
+#endif  
   }
   else if(parset.flag_dim == -1)
   {
-
+    strcpy(this_tag[n_this_tag++], "FlagBLRModel");
+    strcpy(this_tag[n_this_tag++], "ContinuumFile");
+    strcpy(this_tag[n_this_tag++], "LineFile");
+#ifdef SA
+    strcpy(this_tag[n_this_tag++], "FlagSABLRModel");
+    strcpy(this_tag[n_this_tag++], "SALineCenter");
+    strcpy(this_tag[n_this_tag++], "SAFile");
+#endif  
   }
   else if(parset.flag_dim == 0)
   {
@@ -1624,6 +1635,7 @@ int check_parset_isset()
     strcpy(this_tag[n_this_tag++], "FlagInstRes");
 
   }
+#ifdef SA
   else if(parset.flag_dim == 3)
   {
     strcpy(this_tag[n_this_tag++], "SALineCenter");
@@ -1633,7 +1645,6 @@ int check_parset_isset()
     strcpy(this_tag[n_this_tag++], "NCloudPerCore");
     strcpy(this_tag[n_this_tag++], "NVPerCloud");
   }
-#ifdef SA
   else if(parset.flag_dim == 4)
   {
     strcpy(this_tag[n_this_tag++], "ContinuumFile");
