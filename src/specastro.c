@@ -14,6 +14,9 @@
 
 #include "brains.h"
 
+/*
+ * calculate SA phase and 2D TF
+ */
 void calculate_sa_transfun2d_from_blrmodel(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
   double *sa_model, *rm_model;
@@ -39,6 +42,9 @@ void calculate_sa_transfun2d_from_blrmodel(const void *pm, double *transv, doubl
   }
 }
 
+/*
+ * calculate SA phase and 1D TF
+ */
 void calculate_sa_transfun_from_blrmodel(const void *pm, int flag_save)
 {
   double *sa_model, *rm_model;
@@ -64,7 +70,7 @@ void calculate_sa_transfun_from_blrmodel(const void *pm, int flag_save)
 }
 
 /* 
- * calculate SA phase and line profile.
+ * calculate SA phase and line profile from cloud sample
  */
 void calculate_sa_with_sample(const void *pm)
 {
@@ -162,7 +168,7 @@ void calculate_sa_with_sample(const void *pm)
 }
 
 /* 
- * calculate SA phase and line profile.
+ * calculate SA phase and line profile from cloud sample at simulated mesh.
  */
 void calculate_sa_sim_with_sample(const void *pm, double *vel_sa, int n_vel_sa, double *base_sa, int n_base_sa,
                                   double *p_sa, double *F_sa)
@@ -259,7 +265,7 @@ void calculate_sa_sim_with_sample(const void *pm, double *vel_sa, int n_vel_sa, 
 }
 
 /* 
- * calculate SA phase and line profile.
+ * calculate SA phase and line profile from a BLR model.
  */
 void calculate_sa_from_blrmodel(const void *pm, int flag_save)
 {
@@ -421,6 +427,9 @@ void set_sa_blr_model()
   return;
 }
 
+/*
+ * set the index of mutual parameters (BH mass and inclination) in RM and SA BLR models.
+ */
 void set_idx_par_mutual()
 {
   switch(parset.flag_blrmodel)

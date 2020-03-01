@@ -779,12 +779,12 @@ void set_par_value_sim(double *pm, int flag_model)
     
     case 9:
       i=0;
-      pm[i++] = log(4.0);   //theta_min
-      pm[i++] = 1.0;
-      pm[i++] = 0.2;
+      pm[i++] = log(4.0);   //mu
+      pm[i++] = 1.0;        //beta
+      pm[i++] = 0.2;        //F
       pm[i++] = cos(30.0/180.0*PI);     // inc
-      pm[i++] = 30.0;
-      pm[i++] = log(4.0); // mbh
+      pm[i++] = 30.0;       //opn
+      pm[i++] = log(4.0);   // mbh
       break;
   }
   return;
