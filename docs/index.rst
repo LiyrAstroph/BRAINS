@@ -52,6 +52,11 @@ Copyright 2019 Yan-Rong Li.
 
 Licensed under the `GNU General Public License v3.0 or later <https://opensource.org/licenses/GPL-3.0>`_.
 
+Changelog
+---------
+
+.. include:: ../HISTORY.rst
+
 Indices and Tables
 ==================
 
