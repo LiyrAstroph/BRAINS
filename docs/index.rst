@@ -28,6 +28,9 @@ Documentation
    model.rst
    user_model.rst
    transfun.rst
+   sa.rst
+   sim.rst
+   mkfile.rst
    todo.rst
 
 

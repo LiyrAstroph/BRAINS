@@ -5,7 +5,7 @@ Data
 Data Input
 ==========
 
-The input data in ``brains`` depend on the option ``FlagDim`` specified in the parameter file. 
+The input data in ``brains`` depend on the option ``FlagDim`` specified in the parameter file (see :ref:`Parameter File`). 
 
 * ``FlagDim = -2``
 
@@ -50,16 +50,31 @@ Data Format
   and the number ``nb`` of velocity bins.
 
   Then there are ``ne`` blocks. Each blocks looks like::
-
-    velocity bin 0, time, flux, error
-    velocity bin 1, time, flux, error
+    
+    # time
+    wavelength bin 0, flux, error
+    wavelength bin 1, flux, error
     ...
-    velocity bin nb, time, flux, error
+    wavelength bin nb, flux, error
   
   where time is the epoch of the current block. Blocks are separated by a blank line.
 
   .. note::
-    Velocity is in a unit of km/s and velocity bins should be equally spaced.
+
+    * Time should be given in **observed frame**. After reading in the data, 
+      the code automatically converts the time into 
+      **rest frame** by dividing with a factor :math:`(1+z)`, to account for redshift effects.
+
+    * Wavelength bins should be equally spaced and the unit of wavelength should be the same
+      as that of ``LineCenter`` option in :ref:`Parameter File`.
+
+    * Wavelength is converted into velocity as 
+
+      .. math::
+
+        V = \frac{\lambda/(1+z) - \lambda_0}{\lambda_0}, 
+      
+      where :math:`\lambda_0` is the rest-frame line center and :math:`z` is the redshift.
 
 Data Mask
 =========

@@ -3,6 +3,7 @@
 % 
 % an example parameter file for 1D analysis.
 
+Redshift                    0.158                               % redshift of the object
 
 FileDir                     /home/liyropt/Projects/GIT/BRAINS      % directory for where all the output files are stored
 

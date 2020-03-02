@@ -1,6 +1,6 @@
 /*
  * BRAINS
- * (B)LR (R)everberation-mapping (A)nalysis (I)ntegrated with (N)ested (S)ampling
+ * (B)LR (R)everberation-mapping (A)nalysis (I)n AGNs with (N)ested (S)ampling
  * Yan-Rong Li, liyanrong@ihep.ac.cn
  * Thu, Aug 4, 2016
  */
@@ -98,7 +98,7 @@ void postprocess_con()
       {
         for(j=0; j<parset.n_con_recon; j++)
         {
-          fprintf(fcon, "%e %e %f\n", Tcon[j], Fcon[j]/con_scale, Fcerrs[j]/con_scale);
+          fprintf(fcon, "%e %e %f\n", Tcon[j]*(1.0+parset.redshift), Fcon[j]/con_scale, Fcerrs[j]/con_scale);
         }
         fprintf(fcon, "\n");
       }
@@ -223,7 +223,7 @@ void reconstruct_con()
  
         for(i=0; i<parset.n_con_recon; i++)
         {
-          fprintf(fp, "%e %e %e\n", Tcon[i], Fcon[i] / con_scale, Fcerrs[i]/con_scale);
+          fprintf(fp, "%e %e %e\n", Tcon[i]*(1.0+parset.redshift), Fcon[i] / con_scale, Fcerrs[i]/con_scale);
         }
         fclose(fp);
  
@@ -819,7 +819,7 @@ void set_covar_Pmat(double sigma, double tau, double alpha)
  */
 void set_covar_Pmat_data(double sigma, double tau, double alpha, double syserr)
 {
-  double t1, t2;
+  double t1, t2, err2;
   int i, j;
  
   for(i=0; i<n_con_data; i++)
@@ -832,14 +832,16 @@ void set_covar_Pmat_data(double sigma, double tau, double alpha, double syserr)
       PSmat_data[i*n_con_data+j] = sigma*sigma* exp (- pow (fabs(t1-t2) / tau, alpha));
       PSmat_data[j*n_con_data+i] = PSmat_data[i*n_con_data+j];
 
-      PNmat_data[i*n_con_data+j] = PNmat_data[j*n_con_data+i] = 0.0;
+      //PNmat_data[i*n_con_data+j] = PNmat_data[j*n_con_data+i] = 0.0;
 
       PCmat_data[i*n_con_data+j] = PCmat_data[j*n_con_data+i] = PSmat_data[i*n_con_data+j];
     }
 
     PSmat_data[i*n_con_data+i] = sigma * sigma;
-    PNmat_data[i*n_con_data+i] = Fcerrs_data[i]*Fcerrs_data[i] + syserr*syserr;
-    PCmat_data[i*n_con_data+i] = PSmat_data[i*n_con_data+i] + PNmat_data[i*n_con_data+i];
+    //PNmat_data[i*n_con_data+i] = Fcerrs_data[i]*Fcerrs_data[i] + syserr*syserr;
+    //PCmat_data[i*n_con_data+i] = PSmat_data[i*n_con_data+i] + PNmat_data[i*n_con_data+i];
+    err2 = Fcerrs_data[i]*Fcerrs_data[i] + syserr*syserr;
+    PCmat_data[i*n_con_data+i] = PSmat_data[i*n_con_data+i] + err2;
   }
   return;
 }

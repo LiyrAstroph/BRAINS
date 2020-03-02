@@ -1,6 +1,6 @@
 /*
  * BRAINS
- * (B)LR (R)everberation-mapping (A)nalysis (I)ntegrated with (N)ested (S)ampling
+ * (B)LR (R)everberation-mapping (A)nalysis (I)n AGNs with (N)ested (S)ampling
  * Yan-Rong Li, liyanrong@ihep.ac.cn
  * Thu, Aug 4, 2016
  */
@@ -177,5 +177,37 @@ typedef struct
   double inc;           /*!< \brief 12 */
   double mbh;           /*!< \brief 13 */
 }BLRmodel8;
+
+typedef struct
+{
+  double mu;       /*!< \brief 1.  mean BLR radius, in light day */
+  double beta;     /*!< \brief 2.  shape parameter */ 
+  double F;        /*!< \brief 3.  inner edge */
+  double inc;      /*!< \brief 4.  inclination, in degree, 0-90 */
+  double opn;      /*!< \brief 5.  openning angle, in degere, 0-90 */
+  double mbh;      /*!< \brief 6.  black hole mass,  in 10e6 solar mass */ 
+}BLRmodel9;
+
+#ifdef SA
+
+typedef BLRmodel1 SABLRmodel1;
+typedef BLRmodel2 SABLRmodel2;
+typedef BLRmodel3 SABLRmodel3;
+typedef BLRmodel4 SABLRmodel4;
+typedef BLRmodel5 SABLRmodel5;
+typedef BLRmodel6 SABLRmodel6;
+typedef BLRmodel7 SABLRmodel7;
+typedef BLRmodel8 SABLRmodel8;
+typedef BLRmodel9 SABLRmodel9;
+
+typedef struct 
+{
+  double DA; /* angular size distance */
+  double PA; /* position angle */
+  double FA; /* line flux scaling factor */
+  double CO; /* line center offset */
+}SAExtPar;
+
+#endif
 
 #endif

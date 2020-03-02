@@ -1,6 +1,6 @@
 #/*
 # * BRAINS
-# * (B)LR (R)everberation-mapping (A)nalysis (I)ntegrated with (N)ested (S)ampling
+# * (B)LR (R)everberation-mapping (A)nalysis (I)n AGNs with (N)ested (S)ampling
 # * Yan-Rong Li, liyanrong@ihep.ac.cn
 # * Thu, Aug 4, 2016
 # */
@@ -10,6 +10,22 @@ SHELL=/bin/bash
 CC       = mpicc
 OPTIMIZE = -O2 -Wall -finline-functions
 #OPTIMIZE += -DDebug
+
+# include spectro-astrometry analysis
+#OPTIMIZE += -DSA
+
+# get GIT description
+GITCHECK := $(shell git 2>/dev/null)
+ifneq ($(strip $(GITCHECK)),)
+	GITREPO := $(shell git rev-parse --is-inside-work-tree 2>/dev/null)
+	ifneq ($(findstring true, $(GITREPO)),)
+		GIT_VERSION := $(shell git describe --abbrev=6 --dirty --always --tags)
+		OPTIMIZE += -DGITVERSION=\"$(GIT_VERSION)\"
+	    
+		GIT_DATE := $(firstword $(shell git --no-pager show --date=short --format="%ad" --name-only))
+		OPTIMIZE += -DGITDATE=\"$(GIT_DATE)\"
+	endif
+endif
 
 #------------target system---------
 #SYSTEM="Darwin"
@@ -70,13 +86,17 @@ OBJS     = $(SRC)/main.o $(SRC)/allvars.o $(SRC)/read.o $(SRC)/run.o     \
            $(SRC)/transfun.o $(SRC)/smooth_fftw.o $(SRC)/nrutil.o        \
            $(SRC)/system.o  $(SRC)/sim.o $(SRC)/help.o $(SRC)/version.o  \
            $(SRC)/blr_models.o $(SRC)/command_line.o                     \
-           $(SRC)/user_blr_model.o   $(SRC)/user_transfun.o                              
+           $(SRC)/user_blr_model.o   $(SRC)/user_transfun.o              \
+           $(SRC)/reconstruct_sa.o   $(SRC)/dnest_sa.o                   \
+           $(SRC)/specastro.o $(SRC)/dnest_sa1d.o $(SRC)/dnest_sa2d.o    \
+           $(SRC)/reconstruct_sa1d.o  $(SRC)/reconstruct_sa2d.o                    
  
 INCL     = Makefile $(SRC)/allvars.h $(SRC)/proto.h $(SRC)/dnest_con.h   \
            $(SRC)/dnest_line1d.h  $(SRC)/dnest_line2d.h $(SRC)/nrutil.h  \
            $(SRC)/blr_models.h   $(SRC)/brains.h $(SRC)/version.h        \
            $(SRC)/command_line.h  $(SRC)/user_blr_model.h                \
-           $(SRC)/user_transfun.h
+           $(SRC)/user_transfun.h  $(SRC)/dnest_sa.h $(SRC)/dnest_sa1d.h \
+           $(SRC)/dnest_sa2d.h
 
 OPTIONS  = $(OPTIMIZE)
 CFLAGS   = $(OPTIONS) $(GSL_INCL) $(LAPACK_INCL) $(MPICHINCL) $(DNEST_INCL) $(FFTW_INCL)

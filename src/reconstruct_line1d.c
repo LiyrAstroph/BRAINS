@@ -1,6 +1,6 @@
 /*
  * BRAINS
- * (B)LR (R)everberation-mapping (A)nalysis (I)ntegrated with (N)ested (S)ampling
+ * (B)LR (R)everberation-mapping (A)nalysis (I)n AGNs with (N)ested (S)ampling
  * Yan-Rong Li, liyanrong@ihep.ac.cn
  * Thu, Aug 4, 2016
  */
@@ -73,7 +73,7 @@ void postprocess1d()
     //file for transfer function
     sprintf(fname, "%s/%s", parset.file_dir, "data/tran_rec.txt");
     ftran = fopen(fname, "w");
-    if(fline == NULL)
+    if(ftran == NULL)
     {
       fprintf(stderr, "# Error: Cannot open file %s.\n", fname);
       exit(0);
@@ -144,13 +144,13 @@ void postprocess1d()
       {
         for(j=0; j<parset.n_con_recon; j++)
         {
-          fprintf(fcon, "%e %e\n", Tcon[j], Fcon[j]/con_scale);
+          fprintf(fcon, "%e %e\n", Tcon[j]*(1.0+parset.redshift), Fcon[j]/con_scale);
         }
         fprintf(fcon, "\n");
 
         for(j=0; j<parset.n_line_recon; j++)
         {
-          fprintf(fline, "%e %e\n", Tline[j], Fline[j]/line_scale);
+          fprintf(fline, "%e %e\n", Tline[j]*(1.0+parset.redshift), Fline[j]/line_scale);
         }
         fprintf(fline, "\n");
 
@@ -304,7 +304,7 @@ void reconstruct_line1d()
 
       for(i=0; i<parset.n_con_recon; i++)
       {
-        fprintf(fp, "%e %e\n", Tcon[i], Fcon[i] / con_scale);
+        fprintf(fp, "%e %e %e\n", Tcon[i]*(1.0+parset.redshift), Fcon[i] / con_scale, Fcerrs[i] / con_scale);
       }
       fclose(fp);
 
@@ -322,7 +322,7 @@ void reconstruct_line1d()
 
       for(i=0; i<parset.n_line_recon; i++)
       {
-        fprintf(fp, "%e %e\n", Tline[i], Fline[i] / line_scale);
+        fprintf(fp, "%e %e\n", Tline[i]*(1.0+parset.redshift), Fline[i] / line_scale);
       }
       fclose(fp);
 

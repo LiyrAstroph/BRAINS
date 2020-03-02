@@ -3,6 +3,8 @@
 % 
 % an example parameter file for only continuum reconstruction.
 
+Redshift                    0.158                               % redshift of the object
+
 FileDir                     /home/liyropt/Projects/GIT/BRAINS      % directory for where all the output files are stored
 
 FlagDim                     0                          % -2, generate fully random lc; -1, mock lc based on input data; 

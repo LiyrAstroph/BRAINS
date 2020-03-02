@@ -1,6 +1,6 @@
 /*
  * BRAINS
- * (B)LR (R)everberation-mapping (A)nalysis (I)ntegrated with (N)ested (S)ampling
+ * (B)LR (R)everberation-mapping (A)nalysis (I)n AGNs with (N)ested (S)ampling
  * Yan-Rong Li, liyanrong@ihep.ac.cn
  * Thu, Aug 4, 2016
  */
@@ -26,18 +26,29 @@ void begin_run()
    */
   VelUnit = sqrt( GRAVITY * 1.0e6 * SOLAR_MASS / CM_PER_LD ) / 1.0e5; 
 
+#ifdef SA
+  PhaseFactor = (1.0/360.0 * CM_PER_PC/CM_PER_LD);
+#endif
+
   /* dimensionless speed of light */
   C_Unit = C/1.0e5/VelUnit;
 
   /* read parameter file */
   read_parset();
-  
+
   if(parset.flag_dim != -2) /* if not randomly create mock data */
   {
     /* read data files */
     read_data();
+#ifndef SA
     /* scale continuum and line to an order of unity */
     scale_con_line();
+#else
+    if(parset.flag_dim != 3)
+    {
+      scale_con_line();
+    }
+#endif
   }
 
   /* initialization */
@@ -78,6 +89,31 @@ void begin_run()
     }
     reconstruct_line2d();
   }
+
+#ifdef SA
+  if(parset.flag_dim == 3) /* SA */
+  {
+    reconstruct_sa();
+  }
+
+  if(parset.flag_dim == 4) /* SA + RM */
+  {
+    if(parset.flag_postprc == 0)
+    {
+      reconstruct_con();
+    }
+    reconstruct_sa1d();
+  }
+
+  if(parset.flag_dim == 5) /* SA + RM */
+  {
+    if(parset.flag_postprc == 0)
+    {
+      reconstruct_con();
+    }
+    reconstruct_sa2d();
+  }
+#endif
 
   return;
 }

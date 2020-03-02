@@ -1,6 +1,6 @@
 /*
  * BRAINS
- * (B)LR (R)everberation-mapping (A)nalysis (I)ntegrated with (N)ested (S)ampling
+ * (B)LR (R)everberation-mapping (A)nalysis (I)n AGNs with (N)ested (S)ampling
  * Yan-Rong Li, liyanrong@ihep.ac.cn
  * Thu, Aug 4, 2016
  */
@@ -27,200 +27,286 @@ void read_parset()
 
   if(thistask == roottask)
   {
-    #define MAXTAGS 300
-    #define DOUBLE 1
-    #define STRING 2
-    #define INT 3
-
     FILE *fparam;
     int i, j, nt;
     char str[200], buf1[200], buf2[200], buf3[200];
-    int id[MAXTAGS];
-    void *addr[MAXTAGS];
-    char tag[MAXTAGS][50];
+
+    pardict = malloc(MAXTAGS * sizeof(PARDICT));
 
     nt = 0;
-    strcpy(tag[nt], "FileDir");
-    addr[nt] = &parset.file_dir;
-    id[nt++] = STRING;
+    strcpy(pardict[nt].tag, "FileDir");
+    pardict[nt].addr = &parset.file_dir;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = STRING;
 
-    strcpy(tag[nt], "ContinuumFile");
-    addr[nt] = &parset.continuum_file;
-    id[nt++] = STRING;
+    strcpy(pardict[nt].tag, "ContinuumFile");
+    pardict[nt].addr= &parset.continuum_file;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = STRING;
 
-    strcpy(tag[nt], "LineFile");
-    addr[nt] = &parset.line_file;
-    id[nt++] = STRING;
+    strcpy(pardict[nt].tag, "LineFile");
+    pardict[nt].addr= &parset.line_file;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = STRING;
 
-    strcpy(tag[nt], "Line2DFile");
-    addr[nt] = &parset.line2d_file;
-    id[nt++] = STRING;
+    strcpy(pardict[nt].tag, "Line2DFile");
+    pardict[nt].addr= &parset.line2d_file;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = STRING;
 
-    strcpy(tag[nt], "FlagDim");
-    addr[nt] = &parset.flag_dim;
-    id[nt++] = INT;
+    strcpy(pardict[nt].tag, "FlagDim");
+    pardict[nt].addr= &parset.flag_dim;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = INT;
 
-    strcpy(tag[nt], "NConRecon");
-    addr[nt] = &parset.n_con_recon;
-    id[nt++] = INT;
+    strcpy(pardict[nt].tag, "NConRecon");
+    pardict[nt].addr= &parset.n_con_recon;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = INT;
 
-    strcpy(tag[nt], "FlagTrend");
-    addr[nt] = &parset.flag_trend;
-    id[nt++] = INT;
+    strcpy(pardict[nt].tag, "FlagTrend");
+    pardict[nt].addr= &parset.flag_trend;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = INT;
 
-    strcpy(tag[nt], "ConConstructFileOut");
-    addr[nt] = &parset.pcon_out_file;
-    id[nt++] = STRING;
+    strcpy(pardict[nt].tag, "ConConstructFileOut");
+    pardict[nt].addr= &parset.pcon_out_file;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = STRING;
 
-    strcpy(tag[nt], "NLineRecon");
-    addr[nt] = &parset.n_line_recon;
-    id[nt++] = INT;
+    strcpy(pardict[nt].tag, "NLineRecon");
+    pardict[nt].addr= &parset.n_line_recon;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = INT;
 
-    strcpy(tag[nt], "NVelRecon");
-    addr[nt] = &parset.n_vel_recon;
-    id[nt++] = INT;
+    strcpy(pardict[nt].tag, "NVelRecon");
+    pardict[nt].addr= &parset.n_vel_recon;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = INT;
 
-    strcpy(tag[nt], "LineConstructFileOut");
-    addr[nt] = &parset.pline_out_file;
-    id[nt++] = STRING;
+    strcpy(pardict[nt].tag, "LineConstructFileOut");
+    pardict[nt].addr= &parset.pline_out_file;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = STRING;
 
-    strcpy(tag[nt], "TranFileOut");
-    addr[nt] = &parset.tran_out_file;
-    id[nt++] = STRING;
+    strcpy(pardict[nt].tag, "TranFileOut");
+    pardict[nt].addr= &parset.tran_out_file;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = STRING;
 
-    strcpy(tag[nt], "Line2DConstructFileOut");
-    addr[nt] = &parset.pline2d_out_file;
-    id[nt++] = STRING;
+    strcpy(pardict[nt].tag, "Line2DConstructFileOut");
+    pardict[nt].addr= &parset.pline2d_out_file;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = STRING;
 
-    strcpy(tag[nt], "Line2DDataConstructFileOut");
-    addr[nt] = &parset.pline2d_data_out_file;
-    id[nt++] = STRING;
+    strcpy(pardict[nt].tag, "Line2DDataConstructFileOut");
+    pardict[nt].addr= &parset.pline2d_data_out_file;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = STRING;
 
-    strcpy(tag[nt], "Tran2DFileOut");
-    addr[nt] = &parset.tran2d_out_file;
-    id[nt++] = STRING;
+    strcpy(pardict[nt].tag, "Tran2DFileOut");
+    pardict[nt].addr= &parset.tran2d_out_file;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = STRING;
 
-    strcpy(tag[nt], "Tran2DDataFileOut");
-    addr[nt] = &parset.tran2d_data_out_file;
-    id[nt++] = STRING;
+    strcpy(pardict[nt].tag, "Tran2DDataFileOut");
+    pardict[nt].addr= &parset.tran2d_data_out_file;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = STRING;
 
-    strcpy(tag[nt], "NCloudPerCore");
-    addr[nt] = &parset.n_cloud_per_task;
-    id[nt++] = INT;
+    strcpy(pardict[nt].tag, "NCloudPerCore");
+    pardict[nt].addr= &parset.n_cloud_per_task;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = INT;
 
-    strcpy(tag[nt], "NVPerCloud");
-    addr[nt] = &parset.n_vel_per_cloud;
-    id[nt++] = INT;
+    strcpy(pardict[nt].tag, "NVPerCloud");
+    pardict[nt].addr= &parset.n_vel_per_cloud;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = INT;
 
-    strcpy(tag[nt], "NTau");
-    addr[nt] = &parset.n_tau;
-    id[nt++] = INT;
+    strcpy(pardict[nt].tag, "NTau");
+    pardict[nt].addr= &parset.n_tau;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = INT;
 
-    strcpy(tag[nt], "RCloudMax");
-    addr[nt] = &parset.rcloud_max;
-    id[nt++] = DOUBLE;
+    strcpy(pardict[nt].tag, "RCloudMax");
+    pardict[nt].addr= &parset.rcloud_max;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = DOUBLE;
 
-    strcpy(tag[nt], "TimeBack");
-    addr[nt] = &parset.time_back;
-    id[nt++] = DOUBLE;
+    strcpy(pardict[nt].tag, "TimeBack");
+    pardict[nt].addr= &parset.time_back;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = DOUBLE;
 
-    strcpy(tag[nt], "FlagCloudsOut");
-    addr[nt] = &parset.flag_save_clouds;
-    id[nt++] = INT;
+    strcpy(pardict[nt].tag, "FlagCloudsOut");
+    pardict[nt].addr= &parset.flag_save_clouds;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = INT;
 
-    strcpy(tag[nt], "CloudsFileOut");
-    addr[nt] = &parset.cloud_out_file;
-    id[nt++] = STRING;
+    strcpy(pardict[nt].tag, "CloudsFileOut");
+    pardict[nt].addr= &parset.cloud_out_file;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = STRING;
 
-    strcpy(tag[nt], "FlagCloudsForceUpdate");
-    addr[nt] = &parset.flag_force_update;
-    id[nt++] = INT;
+    strcpy(pardict[nt].tag, "FlagCloudsForceUpdate");
+    pardict[nt].addr= &parset.flag_force_update;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = INT;
 
-    strcpy(tag[nt], "FlagConSysErr");
-    addr[nt] = &parset.flag_con_sys_err;
-    id[nt++] = INT;
+    strcpy(pardict[nt].tag, "FlagConSysErr");
+    pardict[nt].addr= &parset.flag_con_sys_err;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = INT;
 
-    strcpy(tag[nt], "FlagLineSysErr");
-    addr[nt] = &parset.flag_line_sys_err;
-    id[nt++] = INT;
+    strcpy(pardict[nt].tag, "FlagLineSysErr");
+    pardict[nt].addr= &parset.flag_line_sys_err;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = INT;
 
-    strcpy(tag[nt], "FlagInstRes");
-    addr[nt] = &parset.flag_InstRes;
-    id[nt++] = INT;
+    strcpy(pardict[nt].tag, "FlagInstRes");
+    pardict[nt].addr= &parset.flag_InstRes;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = INT;
 
-    strcpy(tag[nt], "InstRes");
-    addr[nt] = &parset.InstRes;
-    id[nt++] = DOUBLE;
+    strcpy(pardict[nt].tag, "InstRes");
+    pardict[nt].addr= &parset.InstRes;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = DOUBLE;
 
-    strcpy(tag[nt], "InstResErr");
-    addr[nt] = &parset.InstRes_err;
-    id[nt++] = DOUBLE;
+    strcpy(pardict[nt].tag, "InstResErr");
+    pardict[nt].addr= &parset.InstRes_err;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = DOUBLE;
 
-    strcpy(tag[nt], "InstResFile");
-    addr[nt] = &parset.file_instres;
-    id[nt++] = STRING;
+    strcpy(pardict[nt].tag, "InstResFile");
+    pardict[nt].addr= &parset.file_instres;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = STRING;
 
-    strcpy(tag[nt], "FlagNarrowLine");
-    addr[nt] = &parset.flag_narrowline;
-    id[nt++] = INT;
+    strcpy(pardict[nt].tag, "FlagNarrowLine");
+    pardict[nt].addr= &parset.flag_narrowline;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = INT;
 
-    strcpy(tag[nt], "FluxNarrowLine");
-    addr[nt] = &parset.flux_narrowline;
-    id[nt++] = DOUBLE;
+    strcpy(pardict[nt].tag, "FluxNarrowLine");
+    pardict[nt].addr= &parset.flux_narrowline;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = DOUBLE;
 
-    strcpy(tag[nt], "FluxNarrowLineErr");
-    addr[nt] = &parset.flux_narrowline_err;
-    id[nt++] = DOUBLE;
+    strcpy(pardict[nt].tag, "FluxNarrowLineErr");
+    pardict[nt].addr= &parset.flux_narrowline_err;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = DOUBLE;
 
-    strcpy(tag[nt], "WidthNarrowLine");
-    addr[nt] = &parset.width_narrowline;
-    id[nt++] = DOUBLE;
+    strcpy(pardict[nt].tag, "WidthNarrowLine");
+    pardict[nt].addr= &parset.width_narrowline;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = DOUBLE;
 
-    strcpy(tag[nt], "WidthNarrowLineErr");
-    addr[nt] = &parset.width_narrowline_err;
-    id[nt++] = DOUBLE;
+    strcpy(pardict[nt].tag, "WidthNarrowLineErr");
+    pardict[nt].addr= &parset.width_narrowline_err;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = DOUBLE;
 
-    strcpy(tag[nt], "ShiftNarrowLine");
-    addr[nt] = &parset.shift_narrowline;
-    id[nt++] = DOUBLE;
+    strcpy(pardict[nt].tag, "ShiftNarrowLine");
+    pardict[nt].addr= &parset.shift_narrowline;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = DOUBLE;
 
-    strcpy(tag[nt], "ShiftNarrowLineErr");
-    addr[nt] = &parset.shift_narrowline_err;
-    id[nt++] = DOUBLE;
+    strcpy(pardict[nt].tag, "ShiftNarrowLineErr");
+    pardict[nt].addr= &parset.shift_narrowline_err;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = DOUBLE;
 
-    strcpy(tag[nt], "BLRParFix");
-    addr[nt] = &parset.str_par_fix;
-    id[nt++] = STRING;
+    strcpy(pardict[nt].tag, "BLRParFix");
+    pardict[nt].addr= &parset.str_par_fix;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = STRING;
 
-    strcpy(tag[nt], "BLRParFixVal");
-    addr[nt] = &parset.str_par_fix_val;
-    id[nt++] = STRING;
+    strcpy(pardict[nt].tag, "BLRParFixVal");
+    pardict[nt].addr= &parset.str_par_fix_val;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = STRING;
 
-    strcpy(tag[nt], "FlagFixVar");
-    addr[nt] = &parset.flag_fixvar;
-    id[nt++] = INT;
+    strcpy(pardict[nt].tag, "FlagFixVar");
+    pardict[nt].addr= &parset.flag_fixvar;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = INT;
 
-    strcpy(tag[nt], "FlagBLRModel");
-    addr[nt] = &parset.flag_blrmodel;
-    id[nt++] = INT;
+    strcpy(pardict[nt].tag, "FlagBLRModel");
+    pardict[nt].addr= &parset.flag_blrmodel;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = INT;
 
-    strcpy(tag[nt], "FlagTrendDiff");
-    addr[nt] = &parset.flag_trend_diff;
-    id[nt++] = INT;
+    strcpy(pardict[nt].tag, "FlagTrendDiff");
+    pardict[nt].addr= &parset.flag_trend_diff;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = INT;
 
-    strcpy(tag[nt], "FlagLineCenter");
-    addr[nt] = &parset.flag_linecenter;
-    id[nt++] = INT;
+    strcpy(pardict[nt].tag, "FlagLineCenter");
+    pardict[nt].addr= &parset.flag_linecenter;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = INT;
 
-    strcpy(tag[nt], "LineCenterErr");
-    addr[nt] = &parset.linecenter_err;
-    id[nt++] = DOUBLE;
+    strcpy(pardict[nt].tag, "LineCenterErr");
+    pardict[nt].addr= &parset.linecenter_err;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = DOUBLE;
 
-    strcpy(tag[nt], "FlagNonlinear");
-    addr[nt] = &parset.flag_nonlinear;
-    id[nt++] = INT;
+    strcpy(pardict[nt].tag, "FlagNonlinear");
+    pardict[nt].addr= &parset.flag_nonlinear;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = INT;
 
+    strcpy(pardict[nt].tag, "LineCenter");
+    pardict[nt].addr= &parset.linecenter;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = DOUBLE;
 
+    strcpy(pardict[nt].tag, "Redshift");
+    pardict[nt].addr= &parset.redshift;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = DOUBLE;
+
+#ifdef SA
+    strcpy(pardict[nt].tag, "SAFile");
+    pardict[nt].addr= &parset.sa_file;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = STRING;
+
+    strcpy(pardict[nt].tag, "FlagSABLRModel");
+    pardict[nt].addr= &parset.flag_sa_blrmodel;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = INT;
+
+    strcpy(pardict[nt].tag, "FlagSAParMutual");
+    pardict[nt].addr= &parset.flag_sa_par_mutual;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = INT;
+
+    strcpy(pardict[nt].tag, "SALineCenter");
+    pardict[nt].addr= &parset.sa_linecenter;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = DOUBLE;
+    
+    strcpy(pardict[nt].tag, "SAInstRes");
+    pardict[nt].addr= &parset.sa_InstRes;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = DOUBLE;
+
+    strcpy(pardict[nt].tag, "SABLRParFix");
+    pardict[nt].addr= &parset.sa_str_par_fix;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = STRING;
+
+    strcpy(pardict[nt].tag, "SABLRParFixVal");
+    pardict[nt].addr= &parset.sa_str_par_fix_val;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = STRING;
+#endif
+
+    num_pardict = nt;
     /* default values */
     parset.flag_dim = 0;
     parset.flag_trend = 0;
@@ -237,6 +323,10 @@ void read_parset()
     parset.flag_InstRes = 0;
     parset.InstRes = 0.0;
     parset.InstRes_err = 0.0;
+    parset.redshift = 0.0;
+    parset.linecenter = 4861.0;
+    parset.n_cloud_per_task = 0;
+    parset.n_vel_per_cloud = 1;
 
     strcpy(parset.continuum_file, "");
     strcpy(parset.line_file, "");
@@ -250,7 +340,19 @@ void read_parset()
     strcpy(parset.tran_out_file, "data/tran.txt");
     strcpy(parset.tran2d_out_file, "data/tran2d.txt");
     strcpy(parset.tran2d_data_out_file, "data/tran2d_data.txt");
-    
+    strcpy(parset.str_par_fix,"");
+    strcpy(parset.str_par_fix_val,"");
+
+#ifdef SA
+    parset.flag_sa_blrmodel = 1;
+    parset.flag_sa_par_mutual = 0;
+    parset.sa_linecenter = 1.875; 
+    parset.sa_InstRes = 0.0;
+    strcpy(parset.sa_file, "");
+    strcpy(parset.sa_str_par_fix,"");
+    strcpy(parset.sa_str_par_fix_val,"");
+#endif 
+
     char fname[200];
     sprintf(fname, "%s", parset.param_file);
     
@@ -260,129 +362,178 @@ void read_parset()
       fprintf(stderr, "# Error: Cannot open file %s\n", fname);
       error_flag = 2;
     }
-
-    while(!feof(fparam))
+    
+    if(error_flag == 0)
     {
-      sprintf(str,"empty");
-
-      fgets(str, 200, fparam);
-      if(sscanf(str, "%s%s%s", buf1, buf2, buf3)<2)
-        continue;
-      if(buf1[0]=='%')
-        continue;
-      for(i=0, j=-1; i<nt; i++)
-        if(strcmp(buf1, tag[i]) == 0)
-        {
-          j = i;
-          tag[i][0] = 0;
-          //printf("%s %s\n", buf1, buf2);
-          break;
-        }
-      if(j >=0)
+      while(!feof(fparam))
       {
-        switch(id[j])
+        sprintf(str,"empty");
+  
+        fgets(str, 200, fparam);
+        if(sscanf(str, "%s%s%s", buf1, buf2, buf3)<2)
+          continue;
+        if(buf1[0]=='%')
+          continue;
+        for(i=0, j=-1; i<nt; i++)
+          if(strcmp(buf1, pardict[i].tag) == 0 && pardict[i].isset == 0)
+          {
+            j = i;
+            pardict[i].isset = 1;
+            //printf("%s %s\n", buf1, buf2);
+            break;
+          }
+        if(j >=0)
         {
-          case DOUBLE:
-            *((double *) addr[j]) = atof(buf2);
-            break;
-          case STRING:
-            strcpy(addr[j], buf2);
-            break;
-          case INT:
-            *((int *)addr[j]) = (int) atof(buf2);
-            break;
+          switch(pardict[j].id)
+          {
+            case DOUBLE:
+              *((double *) pardict[j].addr) = atof(buf2);
+              break;
+            case STRING:
+              strcpy(pardict[j].addr, buf2);
+              break;
+            case INT:
+              *((int *)pardict[j].addr) = (int) atof(buf2);
+              break;
+          }
+        }
+        else
+        {
+          fprintf(stderr, "# Error in file %s: Tag '%s' is not allowed or multiple defined.\n", 
+                        parset.param_file, buf1);
+          error_flag = 3;
         }
       }
-      else
+      fclose(fparam);
+    }
+
+    if(error_flag == 0)
+    {
+      /* check whether all the necessary parameters are set */
+      if(check_parset_isset() != EXIT_SUCCESS)
       {
-        fprintf(stderr, "# Error in file %s: Tag '%s' is not allowed or multiple defined.\n", 
-                      parset.param_file, buf1);
-        error_flag = 3;
+        error_flag = 6;
       }
     }
-    fclose(fparam);
 
     /* check input options */
-    if(parset.flag_dim > 2 || parset.flag_dim < -2)
+    if(error_flag == 0)
     {
-      fprintf(stderr, "# Error in FlagDim: value %d is not allowed.\n# Please specify a value in [-2-2].\n", parset.flag_dim);
-      error_flag = 1;
-    }
+#ifndef SA
+      if(parset.flag_dim > 2 || parset.flag_dim < -2)
+      {
+        fprintf(stderr, "# Error in FlagDim: value %d is not allowed.\n# Please specify a value in [-2-2].\n", parset.flag_dim);
+        error_flag = 1;
+      }
+#else 
+      if(parset.flag_dim > 5 || parset.flag_dim < -2)
+      {
+        fprintf(stderr, "# Error in FlagDim: value %d is not allowed.\n# Please specify a value in [-2-5].\n", parset.flag_dim);
+        error_flag = 1;
+      }
+#endif
 
-    if(parset.flag_trend > 2 || parset.flag_trend < 0)
-    {
-      fprintf(stderr, "# Error in FlagTrend: value %d is not allowed.\n# Please specify a value in [0-1].\n", parset.flag_trend);
-      error_flag = 1;
-    }
-
-    if(parset.flag_blrmodel > 8 || parset.flag_blrmodel < -1)
-    {
-      fprintf(stderr, "# Error in FlagBLRModel: value %d is not allowed.\n# Please specify a value in [-1-8].\n", parset.flag_blrmodel);
-      error_flag = 1;
-    }
-
-    if((parset.flag_narrowline > 3 || parset.flag_narrowline < 0) && parset.flag_dim == 2)
-    {
-      fprintf(stderr, "# Error in FlagNarrowLine: value %d is not allowed.\n# Please specify a value in [0-3].\n", parset.flag_narrowline);
-      error_flag = 1;
-    }
-
-    if((parset.flag_trend_diff < 0 || parset.flag_trend_diff > 10) && parset.flag_dim > 0)
-    {
-      fprintf(stderr, "# Error in FlagTrendDiff: value %d is not allowed.\n# Please specify a value in [0-10].\n", parset.flag_trend_diff);
-      error_flag = 1;
-    }
-
-    if((parset.flag_InstRes < 0 || parset.flag_InstRes > 2) && (parset.flag_dim == 2 || parset.flag_dim < 0))
-    {
-      fprintf(stderr, "# Error in FlagInstRes: value %d is not allowed.\n# Please specify a value in [0-2].\n", parset.flag_InstRes);
-      error_flag = 1;
-    }
-
-    if((parset.flag_linecenter < -1 || parset.flag_linecenter > 1) && parset.flag_dim == 2)
-    {
-      fprintf(stderr, "# Error in FlagLineCenter: value %d is not allowed.\n# Please specify a value in [-1-1].\n", parset.flag_linecenter);
-      error_flag = 1;
-    }
+      if(parset.flag_trend > 1 || parset.flag_trend < 0)
+      {
+        fprintf(stderr, "# Error in FlagTrend: value %d is not allowed.\n# Please specify a value in [0-1].\n", parset.flag_trend);
+        error_flag = 1;
+      }
   
-    if(parset.InstRes < 0.0 && (parset.flag_dim == 2 || parset.flag_dim < 0) )
-    {
-      fprintf(stderr, "# Error in InstRes: value %f is not allowed.\n# Please specify a positive value.\n", parset.InstRes);
-      error_flag = 1;
-    }
-
-    if(parset.InstRes_err < 0.0 && (parset.flag_dim == 2 || parset.flag_dim < 0))
-    {
-      fprintf(stderr, "# Error in InstResErr: value %f is not allowed.\n# Please specify a positive value.\n", parset.InstRes_err);
-      error_flag = 1;
-    }
-
-    /* check whether necessary files provided */
-    if(parset.flag_dim >= -1)
-    {
-      if(strlen(parset.continuum_file) == 0)
+      if(parset.flag_blrmodel > 9 || parset.flag_blrmodel < -1)
       {
-        fprintf(stderr, "# Please specify continuum data file in parameter file.\n");
-        error_flag = 4;
+        fprintf(stderr, "# Error in FlagBLRModel: value %d is not allowed.\n# Please specify a value in [-1-9].\n", parset.flag_blrmodel);
+        error_flag = 1;
       }
-    }
-    if(parset.flag_dim == 1)
-    {
-      if(strlen(parset.line_file) == 0)
+      
+      /* check linecenter */
+      if(parset.linecenter <= 0.0)
       {
-        fprintf(stderr, "# Please specify 1D line data file in parameter file.\n");
-        error_flag = 4;
+        fprintf(stderr, "# Error in LineCenter: value %f is not allowed.\n"
+          "# Please specify a positive value.\n", parset.linecenter);
+          error_flag = 1;
       }
-    }
-    if(parset.flag_dim == -1 || parset.flag_dim == 2)
-    {
-      if(strlen(parset.line2d_file) == 0)
-      {
-        fprintf(stderr, "# Please specify 2D line data file in parameter file.\n");
-        error_flag = 4;
-      }
-    }
   
+      /* check redshift */
+      if(parset.redshift < 0.0)
+      {
+        fprintf(stderr, "# Error in redshift: value %f is not allowed.\n"
+          "# Please specify a non-negative value.\n", parset.redshift);
+          error_flag = 1;
+      }
+        
+      if((parset.flag_narrowline > 3 || parset.flag_narrowline < 0) && (parset.flag_dim == 2 || parset.flag_dim == 5))
+      {
+        fprintf(stderr, "# Error in FlagNarrowLine: value %d is not allowed.\n# Please specify a value in [0-3].\n", parset.flag_narrowline);
+        error_flag = 1;
+      }
+  
+      if((parset.flag_trend_diff < 0 || parset.flag_trend_diff > 10) && parset.flag_dim > 0)
+      {
+        fprintf(stderr, "# Error in FlagTrendDiff: value %d is not allowed.\n# Please specify a value in [0-10].\n", parset.flag_trend_diff);
+        error_flag = 1;
+      }
+  
+      if((parset.flag_InstRes < 0 || parset.flag_InstRes > 2) && (parset.flag_dim == 2 || parset.flag_dim == 5|| parset.flag_dim < 0))
+      {
+        fprintf(stderr, "# Error in FlagInstRes: value %d is not allowed.\n# Please specify a value in [0-2].\n", parset.flag_InstRes);
+        error_flag = 1;
+      }
+  
+      if((parset.flag_linecenter < -1 || parset.flag_linecenter > 1) && (parset.flag_dim == 2 || parset.flag_dim == 5))
+      {
+        fprintf(stderr, "# Error in FlagLineCenter: value %d is not allowed.\n# Please specify a value in [-1-1].\n", parset.flag_linecenter);
+        error_flag = 1;
+      }
+    
+      if(parset.InstRes < 0.0 && (parset.flag_dim == 2 || parset.flag_dim == 5 || parset.flag_dim < 0) )
+      {
+        fprintf(stderr, "# Error in InstRes: value %f is not allowed.\n# Please specify a positive value.\n", parset.InstRes);
+        error_flag = 1;
+      }
+  
+      if(parset.InstRes_err < 0.0 && (parset.flag_dim == 2 || parset.flag_dim == 5 || parset.flag_dim < 0))
+      {
+        fprintf(stderr, "# Error in InstResErr: value %f is not allowed.\n# Please specify a positive value.\n", parset.InstRes_err);
+        error_flag = 1;
+      }
+  
+      /* check whether necessary files provided */
+      if(parset.flag_dim >= -1 && parset.flag_dim != 3)
+      {
+        if(strlen(parset.continuum_file) == 0)
+        {
+          fprintf(stderr, "# Please specify continuum data file in parameter file.\n");
+          error_flag = 4;
+        }
+      }
+      if(parset.flag_dim == 1)
+      {
+        if(strlen(parset.line_file) == 0)
+        {
+          fprintf(stderr, "# Please specify 1D line data file in parameter file.\n");
+          error_flag = 4;
+        }
+      }
+      if(parset.flag_dim == -1 || parset.flag_dim == 2 || parset.flag_dim == 5)
+      {
+        if(strlen(parset.line2d_file) == 0)
+        {
+          fprintf(stderr, "# Please specify 2D line data file in parameter file.\n");
+          error_flag = 4;
+        }
+      }
+  
+      if(parset.flag_dim > 0)
+      {
+        if(parset.n_cloud_per_task <= 1)
+        {
+          fprintf(stderr, "# Error in NCloudPerCore: value %d is not allowed.\n# Please specify a larger number.\n", 
+                            parset.n_cloud_per_task);
+          error_flag = 1;
+        }
+      }
+    }
+    
     if( error_flag == 0 )
     {
       /* narrow line, line center, and InstRes only apply in 2D RM */
@@ -392,7 +543,7 @@ void read_parset()
         parset.flag_linecenter = 0;
         parset.flag_InstRes = 0;
       }
-      if(parset.flag_dim ==2)
+      if(parset.flag_dim ==2 || parset.flag_dim == 5)
       {
         if(parset.flag_narrowline == 0)
         {
@@ -480,7 +631,91 @@ void read_parset()
       {
         parset.linecenter_err /= VelUnit;
       }
+#ifdef SA
+      /* check flag_sa_blrmodel */
+      if(parset.flag_sa_blrmodel > 9 || parset.flag_sa_blrmodel < -1)
+      {
+        fprintf(stderr, "# Error in FlagSABLRModel: value %d is not allowed.\n"
+          "# Please specify a value in [-1-9].\n", parset.flag_sa_blrmodel);
+          error_flag = 1;
+      }
+
+      /* check flag_sa_par_mutual */
+      if(parset.flag_sa_par_mutual > 1 || parset.flag_sa_par_mutual < 0)
+      {
+        fprintf(stderr, "# Error in FlagSAParMutual: value %d is not allowed.\n"
+          "# Please specify a value either 0 or 1.\n", parset.flag_sa_par_mutual);
+          error_flag = 1;
+      }
+
+      /* check flag_sa_linecenter */
+      if(parset.sa_linecenter <= 0.0)
+      {
+        fprintf(stderr, "# Error in SALineCenter: value %f is not allowed.\n"
+          "# Please specify a positive value.\n", parset.sa_linecenter);
+          error_flag = 1;
+      }
+
+      /* check sa InstRes */
+      if(parset.sa_InstRes < 0.0 && (parset.flag_dim > 2))
+      {
+        fprintf(stderr, "# Error in SAInstResErr: value %f is not allowed.\n# Please specify a non-negative value.\n", 
+                parset.sa_InstRes);
+        error_flag = 1;
+      }
+      
+      /* SA + 1D RM, must have the same BLR */
+      if(parset.flag_dim == 4)
+      {
+        parset.flag_sa_par_mutual = 0;
+        if(parset.flag_blrmodel != parset.flag_sa_blrmodel)
+        {
+          fprintf(stderr, "# Error in FlagBLRModel = %d and FlagSABLRModel = %d.\n"
+          "# For FlagDim = 4, FlagBLRModel and FlagSABLRModel must be identical.\n",
+          parset.flag_blrmodel, parset.flag_sa_blrmodel);
+          error_flag = 1;
+        }
+      }
+
+      if(parset.flag_dim > 3)
+      {
+        if(parset.flag_sa_par_mutual == 0)
+        {
+          if(parset.flag_blrmodel != parset.flag_sa_blrmodel)
+          {
+            fprintf(stderr, "# Error in FlagBLRModel = %d and FlagSABLRModel = %d.\n"
+            "# For FlagSAParMutual = 0, FlagBLRModel and FlagSABLRModel must be identical.\n",
+            parset.flag_blrmodel, parset.flag_sa_blrmodel);
+            error_flag = 1;
+          }
+        }
+      }
+
+      if(parset.flag_dim > 2 )
+      {
+        if(strlen(parset.sa_file) == 0)
+        {
+          fprintf(stderr, "# Please specify SA data file in parameter file.\n");
+          error_flag = 4;
+        }
+      }
+      
+      if(error_flag == 0)
+      {
+        if(parset.flag_dim > 2)
+        {
+          parset.sa_InstRes /= VelUnit;
+        }
+      }
+#endif
     }
+
+    /* print out input parameters into a file */
+    if(error_flag == 0)
+    {
+      fprint_param();
+    }
+    free(pardict);
   }  
     
   MPI_Bcast(&error_flag, 1, MPI_INT, roottask, MPI_COMM_WORLD);
@@ -506,10 +741,9 @@ void read_data()
   // first need to determine the number of data points 
   if(thistask == roottask)
   {
-    
     int count;
     
-    if(parset.flag_dim >= -1 && error_flag == 0)
+    if(parset.flag_dim >= -1 && parset.flag_dim != 3 && error_flag == 0)
     { 
       // continuum file
       sprintf(fname, "%s/%s", parset.file_dir, parset.continuum_file);
@@ -537,7 +771,7 @@ void read_data()
       }
     }
 
-    if(parset.flag_dim == 1 && error_flag == 0)
+    if((parset.flag_dim == 1 || parset.flag_dim == 4) && error_flag == 0)
     {
       sprintf(fname, "%s/%s", parset.file_dir, parset.line_file);
     // emission flux line
@@ -564,7 +798,7 @@ void read_data()
       }
     }
 
-    if( (parset.flag_dim == 2 || parset.flag_dim == -1) && error_flag == 0 )
+    if( (parset.flag_dim == 2 || parset.flag_dim == -1 || parset.flag_dim == 5) && error_flag == 0 )
     {
       sprintf(fname, "%s/%s", parset.file_dir, parset.line2d_file);
       fp = fopen(fname, "r");
@@ -580,6 +814,26 @@ void read_data()
         printf("line2d data points: %d %d\n", n_line_data, n_vel_data);
       }
     }
+
+#ifdef SA
+    if( (parset.flag_dim > 2 || parset.flag_dim == -1) && error_flag == 0 )
+    {
+      sprintf(fname, "%s/%s", parset.file_dir, parset.sa_file);
+      fp = fopen(fname, "r");
+      if(fp == NULL)
+      {
+        fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+        error_flag = 2;
+      }
+      else
+      {
+        fscanf(fp, "%s %d %d %d\n", buf, &n_epoch_sa_data, &n_vel_sa_data, &n_base_sa_data);
+        fclose(fp);
+        printf("sa data points: %d %d %d\n", n_epoch_sa_data, n_vel_sa_data, n_base_sa_data);
+      }
+    }
+#endif 
+
   }
 
   MPI_Bcast(&error_flag, 1, MPI_INT, roottask, MPI_COMM_WORLD);
@@ -589,15 +843,17 @@ void read_data()
     exit(0);
   }
 
-  if(parset.flag_dim >= -1)
+  if(parset.flag_dim >= -1 && parset.flag_dim != 3)
   {
     MPI_Bcast(&n_con_data, 1, MPI_INT, roottask, MPI_COMM_WORLD);
   }
 
-  if(parset.flag_dim == 1 )
+  if(parset.flag_dim == 1 || parset.flag_dim == 4)
+  {
     MPI_Bcast(&n_line_data, 1, MPI_INT, roottask, MPI_COMM_WORLD);
+  }
 
-  if(parset.flag_dim == 2 || parset.flag_dim == -1)
+  if(parset.flag_dim == 2 || parset.flag_dim == -1 || parset.flag_dim == 5)
   {
     MPI_Bcast(&n_line_data, 1, MPI_INT, roottask, MPI_COMM_WORLD);
     MPI_Bcast(&n_vel_data, 1, MPI_INT, roottask, MPI_COMM_WORLD);
@@ -605,11 +861,20 @@ void read_data()
     n_vel_data_ext = n_vel_data + 2 * n_vel_data_incr;
   }
 
+#ifdef SA
+  if(parset.flag_dim > 2 || parset.flag_dim == -1)
+  {
+    MPI_Bcast(&n_epoch_sa_data, 1, MPI_INT, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(&n_vel_sa_data,   1, MPI_INT, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(&n_base_sa_data,  1, MPI_INT, roottask, MPI_COMM_WORLD);
+  }
+#endif
+
   // now allocate memory for data
   allocate_memory_data();
 
   // now read data
-  if(parset.flag_dim >= -1)
+  if(parset.flag_dim >= -1 && parset.flag_dim != 3)
   {
     if(thistask == roottask)
     {
@@ -617,29 +882,51 @@ void read_data()
       sprintf(fname, "%s/%s", parset.file_dir, parset.continuum_file);
       fp = fopen(fname, "r");
       for(i=0; i<n_con_data; i++)
-      {
-        fscanf(fp, "%lf %lf %lf \n", &Tcon_data[i], &Fcon_data[i], &Fcerrs_data[i]);
+      {      
+        if(fscanf(fp, "%lf %lf %lf \n", &Tcon_data[i], &Fcon_data[i], &Fcerrs_data[i])<3)
+        {
+          fprintf(stderr, "# Error in continuum data file %s.\n"
+            "# Too few columns in line %d.\n", fname, i);
+          error_flag = 5;
+          break;
+        }
       }
       fclose(fp);
-
-      /* cal mean continuum error */
-      con_error_mean = 0.0;
-      for(i=0; i<n_con_data; i++)
+      
+      if(error_flag == 0)
       {
-        con_error_mean += Fcerrs_data[i];
+        /* convert time to rest frame */
+        for(i=0; i<n_con_data; i++)
+        {
+          Tcon_data[i] /= (1.0+parset.redshift);
+        }
+  
+        /* cal mean continuum error */
+        con_error_mean = 0.0;
+        for(i=0; i<n_con_data; i++)
+        {
+          con_error_mean += Fcerrs_data[i];
+        }
+        con_error_mean /= n_con_data;
       }
-      con_error_mean /= n_con_data;
-
+    }
+    MPI_Bcast(&error_flag, 1, MPI_INT, roottask, MPI_COMM_WORLD);
+    if(error_flag != 0)
+    {
+      MPI_Finalize();
+      free_memory_data();
+      exit(0);
     }
 
     MPI_Bcast(Tcon_data, n_con_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
     MPI_Bcast(Fcon_data, n_con_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
     MPI_Bcast(Fcerrs_data, n_con_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
     MPI_Bcast(&con_error_mean, 1, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+    
   }
 
   // read line
-  if(parset.flag_dim == 1)
+  if(parset.flag_dim == 1 || parset.flag_dim == 4)
   {
     if(thistask == roottask)
     {
@@ -648,28 +935,43 @@ void read_data()
       fp = fopen(fname, "r");
       for(i=0; i<n_line_data; i++)
       {
-        fscanf(fp, "%lf %lf %lf \n", &Tline_data[i], &Fline_data[i], &Flerrs_data[i]);
+        if(fscanf(fp, "%lf %lf %lf \n", &Tline_data[i], &Fline_data[i], &Flerrs_data[i]) < 3)
+        {
+          fprintf(stderr, "# Error in line data file %s.\n"
+            "# Too few columns in line %d.\n", fname, i);
+          error_flag = 5;
+          break;
+        }
       }
       fclose(fp);
-
-      if(Tline_data[0] - Tcon_data[n_con_data-1] > 0.0)
+      
+      if(error_flag == 0)
       {
-        fprintf(stderr, "# Error: No time overlap between ontinuum and line time series.\n");
-        fprintf(stderr, "# Error: continuum, %f-%f; line, %f-%f.\n", Tcon_data[0], Tcon_data[n_con_data-1], 
-          Tline_data[0], Tline_data[n_line_data-1]);
-        error_flag = 4;
+        /* convert time to rest frame */
+        for(i=0; i<n_line_data; i++)
+        {
+          Tline_data[i] /= (1.0+parset.redshift);
+        }
+  
+        if(Tline_data[0] - Tcon_data[n_con_data-1] > 0.0)
+        {
+          fprintf(stderr, "# Error: No time overlap between ontinuum and line time series.\n");
+          fprintf(stderr, "# Error: continuum, %f-%f; line, %f-%f.\n", Tcon_data[0], Tcon_data[n_con_data-1], 
+            Tline_data[0], Tline_data[n_line_data-1]);
+          error_flag = 4;
+        }
+  
+        /* cal mean line error */
+        line_error_mean = 0.0;
+        for(i=0; i<n_line_data;i++)
+        {
+          // note mask with error < 0.0
+          if(Flerrs_data[i] > 0.0)
+            line_error_mean += Flerrs_data[i];
+        }
+        line_error_mean /= n_line_data;
       }
-
-      /* cal mean line error */
-      line_error_mean = 0.0;
-      for(i=0; i<n_line_data;i++)
-      {
-        // note mask with error < 0.0
-        if(Flerrs_data[i] > 0.0)
-          line_error_mean += Flerrs_data[i];
-      }
-      line_error_mean /= n_line_data;
-    }
+    }  
 
     MPI_Bcast(&error_flag, 1, MPI_INT, roottask, MPI_COMM_WORLD);
     if(error_flag != 0)
@@ -687,7 +989,7 @@ void read_data()
   }
 
   // read 2d line data
-  if(parset.flag_dim == 2 || parset.flag_dim == -1)
+  if(parset.flag_dim == 2 || parset.flag_dim == -1 || parset.flag_dim == 5)
   {
     if(thistask == roottask)
     {
@@ -700,37 +1002,65 @@ void read_data()
 
       for(i=0; i<n_line_data; i++)
       {
+        /* read date */
+        if(fscanf(fp, "# %lf\n", &Tline_data[i]) < 1)
+        {
+          fprintf(stderr, "# Error in line2d data file %s.\n"
+            "# Too few columns.\n", fname);
+            error_flag = 5; 
+            break;
+        }
+        
+        /* read spectrum */
         for(j=0; j<n_vel_data; j++)
         {
-          fscanf(fp, "%lf%lf%lf%lf\n", &Vline_data[j], &Tline_data[i], 
-                 &Fline2d_data[i*n_vel_data + j], &Flerrs2d_data[i*n_vel_data + j]);
-
-          Vline_data[j] /= VelUnit;
+          if(fscanf(fp, "%lf%lf%lf\n", &Wline_data[j], 
+                 &Fline2d_data[i*n_vel_data + j], &Flerrs2d_data[i*n_vel_data + j]) < 3)
+          {
+            fprintf(stderr, "# Error in line2d data file %s.\n"
+            "# Too few columns.\n", fname);
+            error_flag = 5; 
+            break;
+          }
         }
-
         fscanf(fp, "\n");
       }
       fclose(fp);
-
-      if(Tline_data[0] - Tcon_data[n_con_data-1] > 0.0)
-      {
-        fprintf(stderr, "# Error: No time overlap between ontinuum and line time series.\n");
-        fprintf(stderr, "# Error: continuum, %f-%f; line, %f-%f.\n", Tcon_data[0], Tcon_data[n_con_data-1], 
-          Tline_data[0], Tline_data[n_line_data-1]);
-        error_flag = 4;
-      }
       
-      // cal mean line error
-      line_error_mean = 0.0;
-      for(i=0; i<n_line_data;i++)
-        for(j=0; j<n_vel_data; j++)
+      if(error_flag == 0)
+      {
+        /* convert time to rest frame */
+        for(i=0; i<n_line_data; i++)
         {
-          // note mask with error < 0.0
-          if(Flerrs2d_data[i*n_vel_data + j] > 0.0)
-            line_error_mean += Flerrs2d_data[i*n_vel_data + j];
+          Tline_data[i] /= (1.0+parset.redshift);
+        }
+  
+        if(Tline_data[0] - Tcon_data[n_con_data-1] > 0.0)
+        {
+          fprintf(stderr, "# Error: No time overlap between ontinuum and line time series.\n");
+          fprintf(stderr, "# Error: continuum, %f-%f; line, %f-%f.\n", Tcon_data[0], Tcon_data[n_con_data-1], 
+            Tline_data[0], Tline_data[n_line_data-1]);
+          error_flag = 4;
         }
 
-      line_error_mean /= (n_line_data*n_vel_data);
+        /* convert wavelength to velocity */
+        for(j=0; j<n_vel_data; j++)
+        {
+          Vline_data[j] = (Wline_data[j]/(1.0+parset.redshift) - parset.linecenter)/parset.linecenter * C_Unit;
+        }
+        
+        // cal mean line error
+        line_error_mean = 0.0;
+        for(i=0; i<n_line_data;i++)
+          for(j=0; j<n_vel_data; j++)
+          {
+            // note mask with error < 0.0
+            if(Flerrs2d_data[i*n_vel_data + j] > 0.0)
+              line_error_mean += Flerrs2d_data[i*n_vel_data + j];
+          }
+  
+        line_error_mean /= (n_line_data*n_vel_data);
+      }
     }
     
     MPI_Bcast(&error_flag, 1, MPI_INT, roottask, MPI_COMM_WORLD);
@@ -764,7 +1094,7 @@ void read_data()
   }
 
   /* read instrument broadening data */
-  if(parset.flag_InstRes == 2 && parset.flag_dim == 2)
+  if(parset.flag_InstRes == 2 && (parset.flag_dim == 2 || parset.flag_dim == 5))
   {
     if(thistask == roottask)
     {
@@ -782,6 +1112,8 @@ void read_data()
           if(fscanf(fp, "%lf %lf\n", &instres_epoch[i], &instres_err_epoch[i]) < 2)
           {
             fprintf(stderr, "Error: Cannot read file %s.\n", fname);
+            error_flag = 5;
+            break;
           }
           //printf("%d %f %f\n", i, instres_epoch[i], instres_err_epoch[i]);
           instres_epoch[i] /= VelUnit;
@@ -791,7 +1123,8 @@ void read_data()
           {
             printf("# Error narrow line width %f should be smaller than InstRes %f at %d epoch.\n",
               parset.width_narrowline*VelUnit, parset.InstRes*VelUnit, i);    
-            error_flag = 1;      
+            error_flag = 1;   
+            break;   
           }
         }
         fclose(fp);
@@ -810,7 +1143,7 @@ void read_data()
     MPI_Bcast(instres_err_epoch, n_line_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
   }
   /*uniform prior of line broadening*/
-  if(parset.flag_InstRes == 1 && parset.flag_dim == 2)
+  if(parset.flag_InstRes == 1 && (parset.flag_dim == 2 || parset.flag_dim == 5))
   {
     for(i=0; i<n_line_data; i++)
     {
@@ -818,6 +1151,132 @@ void read_data()
       instres_err_epoch[i] = parset.InstRes_err;
     }
   }
+
+#ifdef SA
+/* read SA data */
+  if(parset.flag_dim > 2 || parset.flag_dim == -1)
+  {
+    int j;
+    if(thistask == roottask)
+    {
+      sprintf(fname, "%s/%s", parset.file_dir, parset.sa_file);
+      fp = fopen(fname, "r");
+  
+      fgets(buf, 200, fp);
+  
+      /* read line profile */
+      for(j=0; j<n_epoch_sa_data; j++)
+      {
+        for(i=0; i<n_vel_sa_data; i++)
+        {
+          if(fscanf(fp, "%lf %lf %lf\n", &wave_sa_data[i], 
+                     &Fline_sa_data[i+j*n_vel_sa_data], &Flerrs_sa_data[i+j*n_vel_sa_data]) < 3)
+          {
+            fprintf(stderr, "# Error in SA data file %s.\n"
+            "# Too few columns.\n", fname);
+            error_flag = 5;
+            break;
+          }
+        }
+        fscanf(fp, "\n");
+      }
+      
+      for(j=0; j<n_base_sa_data; j++)
+      {
+        if(fscanf(fp, "# %lf %lf\n", &base_sa_data[j*2+0], &base_sa_data[j*2+1]) < 2)
+        {
+          fprintf(stderr, "# Error in SA data file %s.\n"
+            "# Too few columns in base %d.\n", fname, i);
+          error_flag = 5;
+          break;
+        }
+
+        for(i=0; i<n_vel_sa_data; i++)
+        {
+          if(fscanf(fp, "%lf %lf %lf\n", &wave_sa_data[i], &phase_sa_data[i+j*n_vel_sa_data], 
+                      &pherrs_sa_data[i+j*n_vel_sa_data]) < 3)
+          {
+            fprintf(stderr, "# Error in SA data file %s.\n"
+            "# Too few columns.\n", fname);
+            error_flag = 5;
+            break;
+          }
+        }
+        fscanf(fp, "\n");
+      }
+      fclose(fp);
+
+      if(error_flag == 0)
+      {
+        sa_phase_error_mean = 0.0;
+        sa_line_error_mean = 0.0;
+        for(j=0; j<n_epoch_sa_data; j++)
+        {
+          for(i=0; i<n_vel_sa_data; i++)
+          {
+            sa_line_error_mean += Flerrs_sa_data[i+j*n_vel_sa_data];
+          }
+        }
+        sa_line_error_mean /= (n_epoch_sa_data * n_vel_sa_data);
+
+        for(j=0; j<n_base_sa_data; j++)
+        {
+          for(i=0; i<n_vel_sa_data; i++)
+          {
+            sa_phase_error_mean += pherrs_sa_data[i+j*n_vel_sa_data];
+          }
+        }
+        sa_phase_error_mean /= (n_base_sa_data * n_vel_sa_data);
+      }
+    }
+    
+    MPI_Bcast(&error_flag, 1, MPI_INT, roottask, MPI_COMM_WORLD);
+    if(error_flag != 0)
+    {
+      MPI_Finalize();
+      free_memory_data();
+      exit(0);
+    }
+
+    MPI_Bcast(wave_sa_data, n_vel_sa_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(base_sa_data, n_base_sa_data*2, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(phase_sa_data, n_vel_sa_data*n_base_sa_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(pherrs_sa_data, n_vel_sa_data*n_base_sa_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(Fline_sa_data, n_vel_sa_data * n_epoch_sa_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(Flerrs_sa_data, n_vel_sa_data * n_epoch_sa_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+
+    MPI_Bcast(&sa_line_error_mean, 1, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(&sa_phase_error_mean, 1, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+
+    /* convert wavelength to velocity */
+    for(i=0; i<n_vel_sa_data; i++)
+    {
+      vel_sa_data[i] = (wave_sa_data[i]/(1.0+parset.redshift) - parset.sa_linecenter)/parset.sa_linecenter;
+      vel_sa_data[i] *= C_Unit;
+    }
+
+    /* normalize phase */
+    for(j=0; j<n_base_sa_data; j++)
+    {
+      for(i=0; i<n_vel_sa_data; i++)
+      {
+        phase_sa_data[i+j*n_vel_sa_data] *= (PhaseFactor * wave_sa_data[i]);
+        pherrs_sa_data[i+j*n_vel_sa_data] *= (PhaseFactor * wave_sa_data[i]);
+      }
+    }
+    /* in term of the central wavelength */
+    sa_phase_error_mean *= (PhaseFactor * wave_sa_data[n_vel_sa_data/2]);
+
+    /* calculate sa flux norm */
+    sa_flux_norm = 0.0;
+    for(i=0; i<n_vel_sa_data; i++)
+    {
+      sa_flux_norm += Fline_sa_data[i];
+    }
+    sa_flux_norm /= n_vel_sa_data;
+  }
+#endif  
+
   return;
 }
 
@@ -826,24 +1285,26 @@ void read_data()
  */
 void allocate_memory_data()
 {
-  if(parset.flag_dim >=-1)
+  if(parset.flag_dim >=-1 && parset.flag_dim != 3)
   {
     Tcon_data = malloc(n_con_data * sizeof(double));
     Fcon_data = malloc(n_con_data * sizeof(double));
     Fcerrs_data = malloc(n_con_data * sizeof(double));
   }
 
-  if(parset.flag_dim == 1)
+  if(parset.flag_dim == 1 || parset.flag_dim == 4)
   {
     Tline_data = malloc(n_line_data * sizeof(double));
     Fline_data = malloc(n_line_data * sizeof(double));
     Flerrs_data = malloc(n_line_data * sizeof(double));
   }
 
-  if(parset.flag_dim == 2 || parset.flag_dim == -1)
+  if(parset.flag_dim == 2 || parset.flag_dim == -1 || parset.flag_dim == 5)
   {
     Vline_data_ext = malloc(n_vel_data_ext * sizeof(double));
+    Wline_data_ext = malloc(n_vel_data_ext * sizeof(double));
     Vline_data = Vline_data_ext + n_vel_data_incr;
+    Wline_data = Wline_data_ext + n_vel_data_incr;
     Tline_data = malloc(n_line_data * sizeof(double));
     Fline_data = malloc(n_line_data * sizeof(double));
     Flerrs_data = malloc(n_line_data * sizeof(double));
@@ -852,11 +1313,24 @@ void allocate_memory_data()
     Flerrs2d_data = malloc(n_line_data * n_vel_data * sizeof(double *));
   }
 
-  if(parset.flag_InstRes > 0 && parset.flag_dim == 2)
+  if(parset.flag_InstRes > 0 && (parset.flag_dim == 2 || parset.flag_dim == 5))
   {
     instres_epoch = malloc(n_line_data * sizeof(double));
     instres_err_epoch = malloc(n_line_data * sizeof(double));
   }
+
+#ifdef SA
+  if(parset.flag_dim > 2 || parset.flag_dim == -1)
+  {
+    wave_sa_data = malloc(n_vel_sa_data*sizeof(double));
+    vel_sa_data = malloc(n_vel_sa_data*sizeof(double));
+    base_sa_data = malloc(n_base_sa_data * 2 * sizeof(double));
+    Fline_sa_data = malloc(n_vel_sa_data*n_epoch_sa_data*sizeof(double));
+    Flerrs_sa_data = malloc(n_vel_sa_data*n_epoch_sa_data*sizeof(double));
+    phase_sa_data = malloc(n_vel_sa_data * n_base_sa_data * sizeof(double));
+    pherrs_sa_data = malloc(n_vel_sa_data * n_base_sa_data * sizeof(double));
+  }
+#endif
 }
 
 /*!
@@ -864,23 +1338,24 @@ void allocate_memory_data()
  */
 void free_memory_data()
 {
-  if(parset.flag_dim >=-1)
+  if(parset.flag_dim >=-1 && parset.flag_dim != 3)
   {
     free(Tcon_data);
     free(Fcon_data);
     free(Fcerrs_data);
   }
 
-  if(parset.flag_dim == 1)
+  if(parset.flag_dim == 1 || parset.flag_dim == 4)
   {
     free(Tline_data);
     free(Fline_data);
     free(Flerrs_data);
   }
 
-  if(parset.flag_dim == 2 || parset.flag_dim == -1)
+  if(parset.flag_dim == 2 || parset.flag_dim == -1 || parset.flag_dim == 5)
   {
     free(Vline_data_ext);
+    free(Wline_data_ext);
     free(Tline_data);
     free(Fline_data);
     free(Flerrs_data);
@@ -890,11 +1365,24 @@ void free_memory_data()
   }
 
 
-  if(parset.flag_InstRes > 0 && parset.flag_dim == 2)
+  if(parset.flag_InstRes > 0 && (parset.flag_dim == 2 || parset.flag_dim == 5))
   {
     free(instres_epoch); 
     free(instres_err_epoch);
   }
+
+#ifdef SA
+  if(parset.flag_dim > 2 || parset.flag_dim == -1)
+  {
+    free(wave_sa_data);
+    free(vel_sa_data);
+    free(base_sa_data);
+    free(Fline_sa_data);
+    free(Flerrs_sa_data);
+    free(phase_sa_data);
+    free(pherrs_sa_data); 
+  }
+#endif
 }
 
 /*! 
@@ -1013,4 +1501,199 @@ void get_posterior_sample_file(char *fname, char *samplefile)
   fgets(buf, BRAINS_MAX_STR_LENGTH, fp);
   sscanf(buf, "%s", samplefile);
   fclose(fp);
+}
+
+/* 
+ * print out parameters into a file
+ * 
+ */
+void fprint_param()
+{
+  int i;
+  FILE *fp;
+  char fname[BRAINS_MAX_STR_LENGTH];
+  
+  sprintf(fname, "%s/%s", parset.file_dir, "data/BRAINS_param.txt");
+  fp = fopen(fname, "w");
+  fprintf(fp, "#*************************************************\n");
+  fprint_version(fp);
+  fprintf(fp, "#*************************************************\n");
+  
+  fprintf(fp, "%-30s  %-s\n", "ParameterFile", parset.param_file);
+  for(i=0; i<num_pardict; i++)
+  {
+    if(pardict[i].isset == 0)
+      continue;
+
+    switch(pardict[i].id)
+    {
+      case INT:
+        fprintf(fp, "%-30s  %-4d\n", pardict[i].tag, *((int *)pardict[i].addr));
+        break;
+      case DOUBLE:
+        fprintf(fp, "%-30s  %-10.4f\n", pardict[i].tag, *((double *)pardict[i].addr));
+        break;
+      case STRING:
+        fprintf(fp, "%-30s  %-s\n", pardict[i].tag, ((char *)pardict[i].addr));
+        break;
+    }
+  }
+
+  fclose(fp);
+}
+
+int search_pardict(char *tag)
+{
+  int i;
+  for(i=0; i<num_pardict; i++)
+  {
+    if(strcmp(pardict[i].tag, tag) == 0)
+    {
+      return i;
+    }
+  }
+
+  fprintf(stderr, "# no match of tag %s.\n", tag);
+  return num_pardict+1;
+}
+
+/* 
+ * check whether all the necessary parameters are set.
+ * 
+ */
+int check_parset_isset()
+{
+  int i, error_flag = 0, idx, n_this_tag;
+  char *pub_tag[50] = {"FileDir", "FlagDim", "Redshift"};
+  char this_tag[MAXTAGS][50];
+  
+
+  for(i=0; i<3; i++)
+  {
+    idx = search_pardict(pub_tag[i]);
+    if(pardict[idx].isset == 0)
+    {
+      fprintf(stderr, "# %s is not set.\n", pub_tag[i]);
+      error_flag = 1;
+    }
+  }
+  
+  n_this_tag = 0;
+  if(parset.flag_dim == -2)
+  {
+    strcpy(this_tag[n_this_tag++], "FlagBLRModel");
+    strcpy(this_tag[n_this_tag++], "NConRecon");
+    strcpy(this_tag[n_this_tag++], "LineCenter");
+    strcpy(this_tag[n_this_tag++], "NLineRecon");
+    strcpy(this_tag[n_this_tag++], "NVelRecon");
+#ifdef SA
+    strcpy(this_tag[n_this_tag++], "FlagSABLRModel");
+    strcpy(this_tag[n_this_tag++], "SALineCenter");
+#endif  
+  }
+  else if(parset.flag_dim == -1)
+  {
+    strcpy(this_tag[n_this_tag++], "FlagBLRModel");
+    strcpy(this_tag[n_this_tag++], "ContinuumFile");
+    strcpy(this_tag[n_this_tag++], "LineFile");
+#ifdef SA
+    strcpy(this_tag[n_this_tag++], "FlagSABLRModel");
+    strcpy(this_tag[n_this_tag++], "SALineCenter");
+    strcpy(this_tag[n_this_tag++], "SAFile");
+#endif  
+  }
+  else if(parset.flag_dim == 0)
+  {
+    strcpy(this_tag[n_this_tag++], "ContinuumFile");
+    strcpy(this_tag[n_this_tag++], "NConRecon");
+    strcpy(this_tag[n_this_tag++], "ConConstructFileOut");
+  }
+  else if(parset.flag_dim == 1)
+  {
+    strcpy(this_tag[n_this_tag++], "ContinuumFile");
+    strcpy(this_tag[n_this_tag++], "LineFile");
+    strcpy(this_tag[n_this_tag++], "NConRecon");
+    strcpy(this_tag[n_this_tag++], "NLineRecon");
+    strcpy(this_tag[n_this_tag++], "NCloudPerCore");
+    strcpy(this_tag[n_this_tag++], "ConConstructFileOut");
+    strcpy(this_tag[n_this_tag++], "LineConstructFileOut");
+    strcpy(this_tag[n_this_tag++], "NTau");
+  }
+  else if(parset.flag_dim == 2)
+  {
+    strcpy(this_tag[n_this_tag++], "ContinuumFile");
+    strcpy(this_tag[n_this_tag++], "Line2DFile");
+    strcpy(this_tag[n_this_tag++], "LineCenter");
+    strcpy(this_tag[n_this_tag++], "NConRecon");
+    strcpy(this_tag[n_this_tag++], "NLineRecon");
+    strcpy(this_tag[n_this_tag++], "NVelRecon");
+    strcpy(this_tag[n_this_tag++], "NCloudPerCore");
+    strcpy(this_tag[n_this_tag++], "NVPerCloud");
+    strcpy(this_tag[n_this_tag++], "ConConstructFileOut");
+    strcpy(this_tag[n_this_tag++], "Line2DDataConstructFileOut");
+    strcpy(this_tag[n_this_tag++], "NTau");
+    strcpy(this_tag[n_this_tag++], "FlagInstRes");
+
+  }
+#ifdef SA
+  else if(parset.flag_dim == 3)
+  {
+    strcpy(this_tag[n_this_tag++], "SALineCenter");
+    strcpy(this_tag[n_this_tag++], "FlagSABLRModel");
+    strcpy(this_tag[n_this_tag++], "SAInstRes");
+    strcpy(this_tag[n_this_tag++], "SAFile");
+    strcpy(this_tag[n_this_tag++], "NCloudPerCore");
+    strcpy(this_tag[n_this_tag++], "NVPerCloud");
+  }
+  else if(parset.flag_dim == 4)
+  {
+    strcpy(this_tag[n_this_tag++], "ContinuumFile");
+    strcpy(this_tag[n_this_tag++], "LineFile");
+    strcpy(this_tag[n_this_tag++], "NConRecon");
+    strcpy(this_tag[n_this_tag++], "NLineRecon");
+    strcpy(this_tag[n_this_tag++], "ConConstructFileOut");
+
+    strcpy(this_tag[n_this_tag++], "SALineCenter");
+    strcpy(this_tag[n_this_tag++], "FlagSABLRModel");
+    strcpy(this_tag[n_this_tag++], "SAInstRes");
+    strcpy(this_tag[n_this_tag++], "SAFile");
+    strcpy(this_tag[n_this_tag++], "NCloudPerCore");
+    strcpy(this_tag[n_this_tag++], "NVPerCloud");
+  }
+  else if(parset.flag_dim == 5)
+  {
+    strcpy(this_tag[n_this_tag++], "ContinuumFile");
+    strcpy(this_tag[n_this_tag++], "Line2DFile");
+    strcpy(this_tag[n_this_tag++], "LineCenter");
+    strcpy(this_tag[n_this_tag++], "NConRecon");
+    strcpy(this_tag[n_this_tag++], "NLineRecon");
+    strcpy(this_tag[n_this_tag++], "NVelRecon");
+    strcpy(this_tag[n_this_tag++], "ConConstructFileOut");
+    strcpy(this_tag[n_this_tag++], "Line2DDataConstructFileOut");
+    strcpy(this_tag[n_this_tag++], "NTau");
+    strcpy(this_tag[n_this_tag++], "FlagInstRes");
+
+    strcpy(this_tag[n_this_tag++], "SALineCenter");
+    strcpy(this_tag[n_this_tag++], "FlagSABLRModel");
+    strcpy(this_tag[n_this_tag++], "SAInstRes");
+    strcpy(this_tag[n_this_tag++], "SAFile");
+    strcpy(this_tag[n_this_tag++], "NCloudPerCore");
+    strcpy(this_tag[n_this_tag++], "NVPerCloud");
+  }
+#endif
+
+  for(i=0; i<n_this_tag; i++)
+  {
+    idx = search_pardict(this_tag[i]);
+    if(pardict[idx].isset == 0)
+    {
+      fprintf(stderr, "# %s is not set.\n", this_tag[i]);
+      error_flag = 1;
+    }
+  }
+
+  if(error_flag == 0)
+    return EXIT_SUCCESS;
+  else 
+    return EXIT_FAILURE;
 }

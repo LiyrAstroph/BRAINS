@@ -1,5 +1,5 @@
 /* BRAINS
- * (B)LR (R)everberation-mapping (A)nalysis (I)ntegrated with (N)ested (S)ampling
+ * (B)LR (R)everberation-mapping (A)nalysis (I)n AGNs with (N)ested (S)ampling
  * Yan-Rong Li, liyanrong@ihep.ac.cn
  * Thu, Aug 4, 2016
  */
@@ -24,31 +24,6 @@
 
 const int num_params_MyBLRmodel1d = 8;   /*!< number of parameters for 1D model */
 const int num_params_MyBLRmodel2d = 17;  /*!< number of parameters for 2D model */
-
-
-/*
- * define a BLR model struct.
- */
-typedef struct
-{
-  double mu;            /*!< \brief 1. peak radius*/
-  double beta;          /*!< \brief 2. fraction of inner radius*/
-  double F;             /*!< \brief 3. fraction of outer radius*/
-  double inc;           /*!< \brief 4. inclination */
-  double opn;           /*!< \brief 5. opening angle */
-  double k;             /*!< \brief 6. kappa */
-  double gam;           /*!< \brief 7. gamma */
-  double xi;            /*!< \brief 8. obscuration */
-  double mbh;           /*!< \brief 9. black hole mass */
-  double fellip;        /*!< \brief 10.ellipitic orbits */
-  double fflow;         /*!< \brief 11.inflow/outflow */
-  double sigr_circ;     /*!< \brief 12. */
-  double sigthe_circ;   /*!< \brief 13. */
-  double sigr_rad;      /*!< \brief 14. */
-  double sigthe_rad;    /*!< \brief 15. */
-  double theta_rot;     /*!< \brief 16. */
-  double sig_turb;      /*!< \brief 17. turbulence velocity */
-}MyBLRmodel;
 
 
 /*!
@@ -220,11 +195,12 @@ void gen_cloud_sample_mymodel(const void *pm, int flag_type, int flag_save)
     y = yb;
     z =-xb * sin_inc_cmp + zb * cos_inc_cmp;
 
-    dis = r - x;
     weight = 0.5 + k*(x/r);
-    clouds_tau[i] = dis;
     clouds_weight[i] = weight;
 
+#ifndef SA
+    dis = r - x;
+    clouds_tau[i] = dis;
     if(flag_type == 1)
     {
       if(flag_save && thistask==roottask)
@@ -234,6 +210,48 @@ void gen_cloud_sample_mymodel(const void *pm, int flag_type, int flag_save)
       }
       continue;
     }
+#else
+  switch(flag_type) 
+  {
+    case 1:   /* 1D RM */
+      dis = r - x;
+      clouds_tau[i] = dis;
+      if(flag_save && thistask==roottask)
+      {
+        if(i%(icr_cloud_save) == 0)
+          fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+      }
+      continue;
+      break;
+    
+    case 2:  /* 2D RM */
+      dis = r - x;
+      clouds_tau[i] = dis;
+      break;
+
+    case 3: /* SA */
+      clouds_alpha[i] = y;
+      clouds_beta[i] = z;
+      break;
+    
+    case 4: /* 1D RM + SA */
+      dis = r - x;
+      clouds_tau[i] = dis;
+
+      clouds_alpha[i] = y;
+      clouds_beta[i] = z;
+      break;
+    
+    case 5: /* 2D RM + SA */
+      dis = r - x;
+      clouds_tau[i] = dis;
+
+      clouds_alpha[i] = y;
+      clouds_beta[i] = z;
+      break;
+  }
+  
+#endif
 
     Vkep = sqrt(mbh/r);
     
@@ -339,3 +357,96 @@ void set_par_value_mymodel_sim(double *pm)
   pm[i++] = 0.0;       // parameter for spectral broadening 
 }
 
+#ifdef SA
+/*!
+ *  set parameter range
+ */
+void set_sa_blr_range_mymodel()
+{
+  int i;
+  
+  i = 0;
+  //mu
+  sa_blr_range_model[i][0] = log(0.1);
+  sa_blr_range_model[i++][1] = log(rcloud_max_set*0.5);
+  //beta
+  sa_blr_range_model[i][0] = 0.001;
+  sa_blr_range_model[i++][1] = 2.0;
+  //F
+  sa_blr_range_model[i][0] = 0.0;
+  sa_blr_range_model[i++][1] = 1.0;
+  //inc
+  sa_blr_range_model[i][0] = 0.0; //in cosine
+  sa_blr_range_model[i++][1] = 1.0;
+  //opn
+  sa_blr_range_model[i][0] = 0.0;  // in rad
+  sa_blr_range_model[i++][1] = 90.0;
+  //k
+  sa_blr_range_model[i][0] = -0.5;
+  sa_blr_range_model[i++][1] = 0.5;
+  //gamma
+  sa_blr_range_model[i][0] = 1.0;
+  sa_blr_range_model[i++][1] = 5.0;
+  //xi
+  sa_blr_range_model[i][0] = 0.0;
+  sa_blr_range_model[i++][1] = 1.0;
+  
+  //mbh
+  sa_blr_range_model[i][0] = log(0.1);
+  sa_blr_range_model[i++][1] = log(1.0e3);
+  //fellip
+  sa_blr_range_model[i][0] = 0.0;
+  sa_blr_range_model[i++][1] = 1.0;
+  //fflow
+  sa_blr_range_model[i][0] = 0.0;
+  sa_blr_range_model[i++][1] = 1.0;
+  //sigr_circ
+  sa_blr_range_model[i][0] = log(0.001);
+  sa_blr_range_model[i++][1] = log(0.1);
+  //sigthe_circ
+  sa_blr_range_model[i][0] = log(0.001);
+  sa_blr_range_model[i++][1] = log(1.0);
+  //sigr_rad
+  sa_blr_range_model[i][0] = log(0.001);
+  sa_blr_range_model[i++][1] = log(0.1);
+  //sigthe_rad
+  sa_blr_range_model[i][0] = log(0.001);
+  sa_blr_range_model[i++][1] = log(1.0);
+  //theta_rot
+  sa_blr_range_model[i][0] = 0.0;
+  sa_blr_range_model[i++][1] = 90.0;
+  //sig_turb
+  sa_blr_range_model[i][0] = log(0.0001);
+  sa_blr_range_model[i++][1] = log(0.1);
+  
+  return;
+}
+
+/*!
+ *  set parameter values used in simulation (if flag_dim < 0).
+ */
+void set_sa_par_value_mymodel_sim(double *pm)
+{
+  int i;
+
+	i=0;
+  pm[i++] = log(4.0);   // mu
+  pm[i++] = 1.0;        // beta
+  pm[i++] = 0.25;        // F
+  pm[i++] = cos(20.0/180.0*PI); // inc
+  pm[i++] = 40.0;       // opn
+  pm[i++] = -0.4;        // kappa
+  pm[i++] = 5.0;        // gamma
+  pm[i++] = 0.5;        // obscuration
+  pm[i++] = log(2.0);  //mbh
+  pm[i++] = 0.5;       //fellip
+  pm[i++] = 0.4;       //fflow
+  pm[i++] = log(0.01); //
+  pm[i++] = log(0.1);  //
+  pm[i++] = log(0.01); //
+  pm[i++] = log(0.1);  //
+  pm[i++] = 0.0;       // theta_rot
+  pm[i++] = log(0.001);  // sig_turb
+  pm[i++] = 0.0;       // parameter for spectral broadening 
+}
+#endif

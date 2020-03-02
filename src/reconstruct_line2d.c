@@ -1,6 +1,6 @@
 /*
  * BRAINS
- * (B)LR (R)everberation-mapping (A)nalysis (I)ntegrated with (N)ested (S)ampling
+ * (B)LR (R)everberation-mapping (A)nalysis (I)n AGNs with (N)ested (S)ampling
  * Yan-Rong Li, liyanrong@ihep.ac.cn
  * Thu, Aug 4, 2016
  */
@@ -47,7 +47,7 @@ void postprocess2d()
     double *Fline1d, dV;
 
     // velocity grid width, in term of wavelength of Hbeta.
-    dV = (Vline_data[n_vel_data-1]-Vline_data[0])/(n_vel_data-1) * VelUnit * 4861.0/3.0e5; 
+    dV = (Vline_data[n_vel_data-1]-Vline_data[0])/(n_vel_data-1) * parset.linecenter/C_Unit; 
     Fline1d = malloc(n_line_data * sizeof(double));
 
     // get number of lines in posterior sample file
@@ -89,7 +89,7 @@ void postprocess2d()
     //file for transfer function
     sprintf(fname, "%s/%s", parset.file_dir, "data/tran2d_rec.txt");
     ftran = fopen(fname, "w");
-    if(fline == NULL)
+    if(ftran == NULL)
     {
       fprintf(stderr, "# Error: Cannot open file %s.\n", fname);
       exit(0);
@@ -182,7 +182,7 @@ void postprocess2d()
         // output continuum
         for(j=0; j<parset.n_con_recon; j++)
         {
-          fprintf(fcon, "%e %e\n", Tcon[j], Fcon[j]/con_scale);
+          fprintf(fcon, "%e %e\n", Tcon[j]*(1.0+parset.redshift), Fcon[j]/con_scale);
         }
         fprintf(fcon, "\n");
 
@@ -201,7 +201,7 @@ void postprocess2d()
         for(j=0; j<parset.n_tau; j++)
         {
           fprintf(ftran, "%e ", TransTau[j]);
-          
+
           for(k=0; k<n_vel_data; k++)
           {
             fprintf(ftran, "%e ", Trans2D_at_veldata[j * n_vel_data_ext + (k+n_vel_data_incr)]);
@@ -213,7 +213,7 @@ void postprocess2d()
         // output 1d line 
         for(j = 0; j<n_line_data; j++)
         {
-          fprintf(fline1d, "%e %e\n", Tline_data[j], Fline1d[j]);
+          fprintf(fline1d, "%e %e\n", Tline_data[j]*(1.0+parset.redshift), Fline1d[j]);
         }
         fprintf(fline1d, "\n");
       }
@@ -367,7 +367,7 @@ void reconstruct_line2d()
 
       for(i=0; i<parset.n_con_recon; i++)
       {
-        fprintf(fp, "%e %e\n", Tcon[i], Fcon[i] / con_scale);
+        fprintf(fp, "%e %e %e\n", Tcon[i]*(1.0+parset.redshift), Fcon[i] / con_scale, Fcerrs[i] / con_scale);
       }
       fclose(fp);
 
@@ -385,12 +385,15 @@ void reconstruct_line2d()
         fprintf(stderr, "# Error: Cannot open file %s\n", fname);
         exit(-1);
       }
-    
+      
+      fprintf(fp, "# %d %d\n", n_line_data, n_vel_data);
       for(i=0; i<n_line_data; i++)
       {
+        fprintf(fp, "# %f\n", Tline_data[i]*(1.0+parset.redshift));
         for(j=0; j<n_vel_data; j++)
         {
-          fprintf(fp, "%e %e %e\n", Vline_data[j]*VelUnit, Tline_data[i],  Fline2d_at_data[i*n_vel_data_ext + (j+n_vel_data_incr)] / line_scale);
+          fprintf(fp, "%e %e\n", Wline_data[j],   
+                            Fline2d_at_data[i*n_vel_data_ext + (j+n_vel_data_incr)] / line_scale);
         }
         fprintf(fp, "\n");
       }
@@ -407,9 +410,10 @@ void reconstruct_line2d()
       fprintf(fp, "# %d %d\n", parset.n_tau, n_vel_data);
       for(i=0; i<parset.n_tau; i++)
       {
+        fprintf(fp, "# %f\n", TransTau[i]);
         for(j=0; j<n_vel_data; j++)
         {
-          fprintf(fp, "%e %e %e\n", Vline_data[j]*VelUnit, TransTau[i],  Trans2D_at_veldata[i*n_vel_data_ext + (j+n_vel_data_incr)]);
+          fprintf(fp, "%e %e\n", Vline_data[j], Trans2D_at_veldata[i*n_vel_data_ext + (j+n_vel_data_incr)]);
         }
         fprintf(fp, "\n");
       }
@@ -471,12 +475,15 @@ void reconstruct_line2d()
         fprintf(stderr, "# Error: Cannot open file %s\n", fname);
         exit(-1);
       }
-
+      
+      fprintf(fp, "# %d %d\n", parset.n_line_recon, parset.n_vel_recon);
       for(i=0; i<parset.n_line_recon; i++)
       {
+        fprintf(fp, "# %f\n", Tline[i]*(1.0+parset.redshift));
         for(j=0; j<parset.n_vel_recon; j++)
         {
-          fprintf(fp, "%e %e %e\n", TransV[j]*VelUnit, Tline[i],  Fline2d[i*parset.n_vel_recon + j] / line_scale);
+          fprintf(fp, "%e %e\n", (1.0 + TransV[j]/C_Unit) * parset.linecenter * (1.0+parset.redshift),  
+                Fline2d[i*parset.n_vel_recon + j] / line_scale);
         }
 
         fprintf(fp, "\n");
@@ -494,9 +501,10 @@ void reconstruct_line2d()
       fprintf(fp, "# %d %d\n", parset.n_tau, parset.n_vel_recon);
       for(i=0; i<parset.n_tau; i++)
       {
+        fprintf(fp, "# %f\n", TransTau[i]);
         for(j=0; j<parset.n_vel_recon; j++)
         {
-          fprintf(fp, "%e %e %e\n", TransV[j]*VelUnit, TransTau[i], Trans2D[i*parset.n_vel_recon + j]);
+          fprintf(fp, "%e %e\n", TransV[j]*VelUnit, Trans2D[i*parset.n_vel_recon + j]);
         }
 
         fprintf(fp, "\n");
