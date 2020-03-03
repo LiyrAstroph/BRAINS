@@ -630,15 +630,15 @@ void set_sa_blr_range_model3()
   int i;
   
   i = 0;
-  //alpha
-  sa_blr_range_model[i][0] = -3.0;
-  sa_blr_range_model[i++][1] = 3.0;
   //Rin
   sa_blr_range_model[i][0] = log(0.1);
   sa_blr_range_model[i++][1] = log(rcloud_max_set*0.5);
   //F
   sa_blr_range_model[i][0] = log(1.0);
   sa_blr_range_model[i++][1] = log(1.0e2);
+  //alpha
+  sa_blr_range_model[i][0] = -3.0;
+  sa_blr_range_model[i++][1] = 3.0;
   //inc
   sa_blr_range_model[i][0] = 0.0;  // in cosine
   sa_blr_range_model[i++][1] = 1.0;
@@ -668,15 +668,15 @@ void set_sa_blr_range_model4()
   int i;
   
   i = 0;
-  //alpha
-  sa_blr_range_model[i][0] = -3.0;
-  sa_blr_range_model[i++][1] = 3.0;
   //Rin
   sa_blr_range_model[i][0] = log(0.1);
   sa_blr_range_model[i++][1] = log(rcloud_max_set*0.5);
   //F
   sa_blr_range_model[i][0] = log(1.0);
   sa_blr_range_model[i++][1] = log(1.0e2);
+  //alpha
+  sa_blr_range_model[i][0] = -3.0;
+  sa_blr_range_model[i++][1] = 3.0;
   //inc
   sa_blr_range_model[i][0] = 0.0; // in cosine
   sa_blr_range_model[i++][1] = 1.0;

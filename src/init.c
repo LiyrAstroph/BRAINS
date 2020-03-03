@@ -758,15 +758,15 @@ void set_blr_range_model3()
   int i;
   
   i = 0;
-  //alpha
-  blr_range_model[i][0] = -3.0;
-  blr_range_model[i++][1] = 3.0;
   //Rin
   blr_range_model[i][0] = log(0.1);
   blr_range_model[i++][1] = log(rcloud_max_set*0.5);
   //F
   blr_range_model[i][0] = log(1.0);
   blr_range_model[i++][1] = log(1.0e2);
+  //alpha
+  blr_range_model[i][0] = -3.0;
+  blr_range_model[i++][1] = 3.0;
   //inc
   blr_range_model[i][0] = 0.0;  // in cosine
   blr_range_model[i++][1] = 1.0;
@@ -796,15 +796,15 @@ void set_blr_range_model4()
   int i;
   
   i = 0;
-  //alpha
-  blr_range_model[i][0] = -3.0;
-  blr_range_model[i++][1] = 3.0;
   //Rin
   blr_range_model[i][0] = log(0.1);
   blr_range_model[i++][1] = log(rcloud_max_set*0.5);
   //F
   blr_range_model[i][0] = log(1.0);
   blr_range_model[i++][1] = log(1.0e2);
+  //alpha
+  blr_range_model[i][0] = -3.0;
+  blr_range_model[i++][1] = 3.0;
   //inc
   blr_range_model[i][0] = 0.0; // in cosine
   blr_range_model[i++][1] = 1.0;

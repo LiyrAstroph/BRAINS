@@ -37,35 +37,6 @@ void sim()
   
   double *pm = (double *)model, error, fcon;
   
-  if(parset.flag_blrmodel == -1)
-  {
-    set_par_value_mytransfun_sim(pm);
-  }
-  else 
-  {
-    set_par_value_sim(pm, parset.flag_blrmodel);
-  }
-  
-  pm[num_params_blr_model + num_params_nlr ] = 0.0; // spectral broadening
-
-  pm[num_params_blr-3] = log(1.0); //A
-  pm[num_params_blr-2] = 0.0;      //Ag
-
-#ifdef SA
-  double *sa_model = pm + num_params_blr;
-  set_idx_par_mutual();
-  set_par_value_sim(sa_model, parset.flag_sa_blrmodel);
-
-  /* set the same mbh and inc */
-  sa_model[idx_sa_par_mutual[0]] = pm[idx_rm_par_mutual[0]]; //mbh
-  sa_model[idx_sa_par_mutual[1]] = pm[idx_rm_par_mutual[1]]; //inc
-
-  sa_model[num_params_sa_blr_model]     = log(550.0); //DA
-  sa_model[num_params_sa_blr_model + 1] = 0.0;        //PA
-  sa_model[num_params_sa_blr_model + 2] = 0.0;        //FA
-  sa_model[num_params_sa_blr_model + 3] = 0.0;        //CO
-#endif
-
   smooth_init(parset.n_vel_recon, TransV);
   
   if(parset.flag_dim == -1)
@@ -119,7 +90,10 @@ void sim()
   {
     for(i=0; i<parset.n_con_recon; i++)
     {
-      fprintf(fp, "%e %e %e\n", Tcon[i]*(1.0+parset.redshift), Fcon[i]/con_scale, Fcerrs[i]/con_scale);
+      if(Tcon[i] >= 0.0)
+      {
+        fprintf(fp, "%e %e %e\n", Tcon[i]*(1.0+parset.redshift), Fcon[i]/con_scale, Fcerrs[i]/con_scale);
+      }
     }
   }
   fclose(fp);
@@ -271,6 +245,7 @@ void sim_init()
 {
   int i, j;
   double dT, Tspan;
+  double *pm, Rblr, mbh;
 
   switch(parset.flag_blrmodel)
   {
@@ -403,18 +378,75 @@ void sim_init()
   num_params = num_params_blr_tot + num_params_var + parset.n_con_recon;
 
   model = malloc(num_params * sizeof(double));
+  par_fix = (int *) malloc(num_params * sizeof(int));
+  par_fix_val = (double *) malloc(num_params * sizeof(double));
+
+  /* setup parameters */
+  pm = (double *)model;
+  if(parset.flag_blrmodel == -1)
+  {
+    set_par_value_mytransfun_sim(pm);
+  }
+  else 
+  {
+    set_par_value_sim(pm, parset.flag_blrmodel);
+    set_par_fix_blrmodel();
+    for(i=0; i<num_params_blr_model; i++)
+    {
+      if(par_fix[i] == 1)
+      {
+        pm[i] = par_fix_val[i];
+      }
+    }
+  }
+  
+  pm[num_params_blr_model + num_params_nlr ] = 0.0; // spectral broadening
+
+  pm[num_params_blr-3] = log(1.0); //A
+  pm[num_params_blr-2] = 0.0;      //Ag
+
+#ifdef SA
+  double *sa_model = pm + num_params_blr;
+  set_idx_par_mutual();
+  set_par_value_sim(sa_model, parset.flag_sa_blrmodel);
+  set_par_fix_sa_blrmodel(); 
+  for(i=0; i<num_params_sa_blr_model; i++)
+  {
+    if(par_fix[num_params_blr + i] == 1)
+    {
+      pm[num_params_blr + i] = par_fix_val[num_params_blr + i];
+    }
+  }
+
+  /* set the same mbh and inc */
+  sa_model[idx_sa_par_mutual[0]] = pm[idx_rm_par_mutual[0]]; //mbh
+  sa_model[idx_sa_par_mutual[1]] = pm[idx_rm_par_mutual[1]]; //inc
+
+  sa_model[num_params_sa_blr_model]     = log(550.0); //DA
+  sa_model[num_params_sa_blr_model + 1] = 0.0;        //PA
+  sa_model[num_params_sa_blr_model + 2] = 0.0;        //FA
+  sa_model[num_params_sa_blr_model + 3] = 0.0;        //CO
+#endif
 
   Fcon = malloc(parset.n_con_recon * sizeof(double));
+
+  mbh = exp(pm[idx_rm_par_mutual[0]]);
+
+  if(parset.flag_blrmodel != 8) /* model 8 is particular */
+  {
+    Rblr = exp(pm[0]);
+  }
+  else 
+  {
+    Rblr = exp(pm[9]);
+  }
 
   if(parset.flag_dim == -1)
   {
     Tspan = Tcon_data[n_con_data -1] - Tcon_data[0];
   
   /* set time array for continuum */
-    if(parset.time_back > 0.0)
-      Tcon_min = Tcon_data[0] - parset.time_back;
-    else
-      Tcon_min = Tcon_data[0] - 0.5*Tspan;
+    Tcon_min = Tcon_data[0] - time_back_set;
     
     Tcon_max = Tcon_data[n_con_data-1] + fmax(0.05*Tspan, 10.0);
     dT = (Tcon_max - Tcon_min)/(parset.n_con_recon -1);
@@ -426,15 +458,16 @@ void sim_init()
   }
   else
   {
-    Tspan = 120.0;
+    Tspan = Rblr*10.0;
 
     rcloud_min_set = 0.0;
     rcloud_max_set = Tspan/2.0;
     if(parset.rcloud_max > 0.0)
       rcloud_max_set = fmin(rcloud_max_set, parset.rcloud_max);
-    printf("rcloud_min_max_set: %f %f\n", rcloud_min_set, rcloud_max_set);
+    printf("RM rcloud_min_max_set: %f %f\n", rcloud_min_set, rcloud_max_set);
 
-    Tcon_min = 0.0;
+    time_back_set = 2.0*rcloud_max_set;
+    Tcon_min = 0.0 - time_back_set;
     Tcon_max = Tspan;
 
     dT = (Tcon_max - Tcon_min)/(parset.n_con_recon -1);
@@ -476,7 +509,7 @@ void sim_init()
   }
   else
   {
-    Tline_min = Tcon_min + 30.0;
+    Tline_min = 0.0;
     Tline_max = Tcon_max;
 
     dT = (Tline_max - Tline_min)/(parset.n_line_recon - 1);
@@ -488,7 +521,7 @@ void sim_init()
     Tline[parset.n_line_recon - 1] = Tline_max-1.0e-10;
 
     double vel_max_set, vel_min_set;
-    vel_max_set = 3000.0/VelUnit;
+    vel_max_set = sqrt(pow(3.0*sqrt(mbh/Rblr), 2.0) + pow(3.0*parset.InstRes, 2.0));
     vel_min_set = - vel_max_set;
     double dVel = (vel_max_set- vel_min_set)/(parset.n_vel_recon -1.0);
 
@@ -524,6 +557,7 @@ void sim_init()
   }
 
 #ifdef SA
+  double saRblr;
 
   parset.sa_InstRes /= VelUnit;
   parset.flag_sa_par_mutual = 1;
@@ -554,6 +588,17 @@ void sim_init()
 
   workspace_phase = malloc(parset.n_sa_vel_recon * 3 * sizeof(double));
   
+  if(parset.flag_sa_blrmodel != 8)
+  {
+    saRblr = exp(pm[num_params_blr]);
+  }
+  else 
+  {
+    saRblr = exp(pm[num_params_blr + 9]);
+  }
+  rcloud_max_set = fmax(rcloud_max_set, saRblr * 5.0);
+  printf("SA rcloud_min_max_set: %f %f\n", rcloud_min_set, rcloud_max_set);
+
   if(parset.flag_dim == -1)
   {
     memcpy(vel_sa, vel_sa_data, parset.n_sa_vel_recon * sizeof(double));
@@ -564,7 +609,7 @@ void sim_init()
   else
   {
     double vel_max_set, vel_min_set;
-    vel_max_set = 3000.0/VelUnit;
+    vel_max_set = sqrt(pow(3.0*sqrt(mbh/saRblr), 2.0) + pow(3.0*parset.sa_InstRes, 2.0));
     vel_min_set = - vel_max_set;
     double dVel = (vel_max_set- vel_min_set)/(parset.n_sa_vel_recon -1.0);
     for(i=0; i<parset.n_sa_vel_recon; i++)
@@ -589,6 +634,8 @@ void sim_init()
 void sim_end()
 {
   free(model);
+  free(par_fix);
+  free(par_fix_val);
   free(Fcon);
 
   free(TransTau);
@@ -663,9 +710,9 @@ void set_par_value_sim(double *pm, int flag_model)
 
     case 3:
       i=0;
-      pm[i++] = -1.0;
       pm[i++] = log(3.0);
       pm[i++] = log(5.0);
+      pm[i++] = -1.0;
       pm[i++] = cos(20.0/180.0*PI);
       pm[i++] = 40.0;
       pm[i++] = 0.0;
@@ -676,9 +723,9 @@ void set_par_value_sim(double *pm, int flag_model)
 
     case 4:
       i=0;
-      pm[i++] = -1.0;
       pm[i++] = log(3.0);
       pm[i++] = log(5.0);
+      pm[i++] = -1.0;
       pm[i++] = cos(20.0/180.0*PI);
       pm[i++] = 40.0;
       pm[i++] = 0.0;

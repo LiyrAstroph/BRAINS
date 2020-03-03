@@ -53,9 +53,9 @@ typedef struct
  */
 typedef struct
 {
-  double alpha;    /*!< \brief 1.  shape parameter */ 
-  double Rin;      /*!< \brief 2.  mean BLR radius, in light day */
-  double F;        /*!< \brief 3.  inner edge */
+  double Rin;      /*!< \brief 1.  mean BLR radius, in light day */
+  double F;        /*!< \brief 2.  inner edge */
+  double alpha;    /*!< \brief 3.  shape parameter */ 
   double inc;      /*!< \brief 4.  inclination, in degree, 0-90 */
   double opn;      /*!< \brief 5.  openning angle, in degere, 0-90 */
   double k;        /*!< \brief 6.  anisotropic emission */
