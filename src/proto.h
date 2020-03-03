@@ -203,6 +203,10 @@ void set_sa_blr_range_model7();
 void set_sa_blr_range_model8();
 void set_sa_blr_range_model9();
 
+/* SA smooth */
+void sa_smooth_init(int n_v_sa, const double *v_sa, double sigV);
+void sa_smooth_end();
+void sa_smooth_run(double *v_sa, double *F_sa, int n_v_sa, double *p_sa, int n_base_sa);
 #endif
 
 /* matrix operations */

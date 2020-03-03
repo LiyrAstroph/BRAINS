@@ -9,8 +9,10 @@
 
 #include <math.h>
 #include <stddef.h>
+#include <string.h>
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
+#include <fftw3.h>
 
 #include "brains.h"
 
@@ -76,7 +78,7 @@ void calculate_sa_with_sample(const void *pm)
 {
   int i, j, k, idV;
   double V, dV, y, z, alpha, beta, flux_norm, phase, *phase_norm, *alpha_cent, *beta_cent;
-  double DA, PA, FA, CO, cos_PA, sin_PA, Vres;
+  double DA, PA, FA, CO, cos_PA, sin_PA;
   double *pmodel = (double *)pm;
 
   phase_norm = workspace_phase;
@@ -94,9 +96,6 @@ void calculate_sa_with_sample(const void *pm)
    * equivalent to redshift offset:  dz = -(1+z) dw0/w0
    */       
   CO = -pmodel[num_params_blr + num_params_sa_blr_model+3]/parset.sa_linecenter * C_Unit;  
-
-  /* instrument broadening */
-  Vres = parset.sa_InstRes; 
 
   cos_PA = cos(PA);
   sin_PA = sin(PA);
@@ -125,7 +124,7 @@ void calculate_sa_with_sample(const void *pm)
 
     for(j=0; j< parset.n_vel_per_cloud; j++)
     {
-      V = clouds_vel[i*parset.n_vel_per_cloud + j] + CO + Vres * gsl_ran_ugaussian(gsl_r);
+      V = clouds_vel[i*parset.n_vel_per_cloud + j] + CO;
       if(V<vel_sa_data[0] || V >= vel_sa_data[n_vel_sa_data-1]+dV)
         continue;
       idV = (V - vel_sa_data[0])/dV;
@@ -164,6 +163,9 @@ void calculate_sa_with_sample(const void *pm)
     }
   }
 
+  /* smooth */
+  sa_smooth_run(vel_sa_data, Fline_sa, n_vel_sa_data, phase_sa, n_base_sa_data);
+
   return;
 }
 
@@ -175,7 +177,7 @@ void calculate_sa_sim_with_sample(const void *pm, double *vel_sa, int n_vel_sa, 
 {
   int i, j, k, idV;
   double V, dV, y, z, alpha, beta, flux_norm, phase, *phase_norm, *alpha_cent, *beta_cent;
-  double DA, PA, FA, CO, cos_PA, sin_PA, Vres;
+  double DA, PA, FA, CO, cos_PA, sin_PA;
   double *pmodel = (double *)pm;
 
   phase_norm = workspace_phase;
@@ -193,9 +195,6 @@ void calculate_sa_sim_with_sample(const void *pm, double *vel_sa, int n_vel_sa, 
    * equivalent to redshift offset:  dz = -(1+z) dw0/w0
    */       
   CO = -pmodel[num_params_blr + num_params_sa_blr_model+3]/parset.sa_linecenter * C_Unit; 
-
-  /* instrument broadening */
-  Vres = parset.sa_InstRes; 
 
   cos_PA = cos(PA);
   sin_PA = sin(PA);
@@ -223,7 +222,7 @@ void calculate_sa_sim_with_sample(const void *pm, double *vel_sa, int n_vel_sa, 
 
     for(j=0; j< parset.n_vel_per_cloud; j++)
     {
-      V = clouds_vel[i*parset.n_vel_per_cloud + j] + CO + Vres * gsl_ran_ugaussian(gsl_r);
+      V = clouds_vel[i*parset.n_vel_per_cloud + j] + CO;
       if(V<vel_sa[0] || V >= vel_sa[n_vel_sa-1]+dV)
         continue;
       idV = (V - vel_sa[0])/dV;
@@ -261,6 +260,10 @@ void calculate_sa_sim_with_sample(const void *pm, double *vel_sa, int n_vel_sa, 
       p_sa[k*n_vel_sa + j] = -F_sa[j]/(1.0+F_sa[j]) * phase;
     }
   }
+
+  /* smooth */
+  sa_smooth_run(vel_sa, F_sa, n_vel_sa, p_sa, n_base_sa);
+  
   return;
 }
 
@@ -271,7 +274,7 @@ void calculate_sa_from_blrmodel(const void *pm, int flag_save)
 {
   int i, j, k, idV;
   double V, dV, y, z, alpha, beta, flux_norm, phase, *phase_norm, *alpha_cent, *beta_cent;
-  double DA, PA, FA, CO, cos_PA, sin_PA, Vres;
+  double DA, PA, FA, CO, cos_PA, sin_PA;
   double *pmodel = (double *)pm;
 
   phase_norm = workspace_phase;
@@ -288,10 +291,7 @@ void calculate_sa_from_blrmodel(const void *pm, int flag_save)
    * line center offset: V+dV = (w-(w0+dw0))/(w0+dw0) ==> dV = - dw0/w0 
    * equivalent to redshift offset:  dz = -(1+z) dw0/w0
    */       
-  CO = -pmodel[num_params_blr + num_params_sa_blr_model+3]/parset.sa_linecenter * C_Unit;  
-
-  /* instrument broadening */
-  Vres = parset.sa_InstRes; 
+  CO = -pmodel[num_params_blr + num_params_sa_blr_model+3]/parset.sa_linecenter * C_Unit;
 
   cos_PA = cos(PA);
   sin_PA = sin(PA);
@@ -322,7 +322,7 @@ void calculate_sa_from_blrmodel(const void *pm, int flag_save)
 
     for(j=0; j< parset.n_vel_per_cloud; j++)
     {
-      V = clouds_vel[i*parset.n_vel_per_cloud + j] + CO + Vres * gsl_ran_ugaussian(gsl_r);
+      V = clouds_vel[i*parset.n_vel_per_cloud + j] + CO;
       if(V<vel_sa_data[0] || V >= vel_sa_data[n_vel_sa_data-1]+dV)
         continue;
       idV = (V - vel_sa_data[0])/dV;
@@ -360,6 +360,9 @@ void calculate_sa_from_blrmodel(const void *pm, int flag_save)
       phase_sa[k*n_vel_sa_data + j] = -Fline_sa[j]/(1.0+Fline_sa[j]) * phase;
     }
   }
+
+  /* smooth */
+  sa_smooth_run(vel_sa_data, Fline_sa, n_vel_sa_data, phase_sa, n_base_sa_data);
 
   return;
 }
@@ -1050,4 +1053,107 @@ void set_par_fix_sa_blrmodel()
   return;
 }
 
+
+int nd_fft_sa, npad_sa;
+
+fftw_complex *sa_data_fft, *sa_resp_fft, *sa_conv_fft;
+fftw_plan sa_pdata, sa_presp, sa_pback;
+double *sa_real_data, *sa_real_resp, *sa_real_conv;
+
+/*!
+ * This function initiates workspace for FFT.
+ */
+void sa_smooth_init(int n_v_sa, const double *v_sa, double sigV)
+{
+  int i;
+  double dV;
+
+  npad_sa = fmin(n_v_sa * 0.2, 100);
+  npad_sa = (npad_sa/2) * 2;
+  nd_fft_sa = n_v_sa+npad_sa;
+
+  sa_data_fft = (fftw_complex *) fftw_malloc((nd_fft_sa/2+1) * sizeof(fftw_complex));
+  sa_resp_fft = (fftw_complex *) fftw_malloc((nd_fft_sa/2+1) * sizeof(fftw_complex));
+  sa_conv_fft = (fftw_complex *) fftw_malloc((nd_fft_sa/2+1) * sizeof(fftw_complex));
+
+  sa_real_data = (double *)fftw_malloc(nd_fft_sa * sizeof(double));
+  //real_resp = (double *)fftw_malloc(nd_fft_sa * sizeof(double));
+  sa_real_conv = (double *)fftw_malloc(nd_fft_sa * sizeof(double));
+
+  sa_pdata = fftw_plan_dft_r2c_1d(nd_fft_sa, sa_real_data, sa_data_fft, FFTW_PATIENT);
+  //presp = fftw_plan_dft_r2c_1d(nd_fft_sa, sa_real_resp, sa_resp_fft, FFTW_PATIENT);
+  sa_pback = fftw_plan_dft_c2r_1d(nd_fft_sa, sa_conv_fft, sa_real_conv, FFTW_PATIENT);
+
+  dV = v_sa[1] - v_sa[0];
+  for(i=0; i<nd_fft_sa/2+1; i++)
+  {
+    sa_resp_fft[i][0] = exp(-2.0 * PI*PI * sigV/dV*sigV/dV * i*i*1.0/nd_fft_sa/nd_fft_sa)/nd_fft_sa;
+    sa_resp_fft[i][1] = 0.0;
+  }
+  return;
+}
+
+/*!
+ * This function finalizes FFT.
+ */
+void sa_smooth_end()
+{
+  fftw_destroy_plan(sa_pdata);
+  fftw_destroy_plan(sa_pback);
+
+  fftw_free(sa_data_fft);
+  fftw_free(sa_resp_fft);
+  fftw_free(sa_conv_fft);
+  
+  fftw_free(sa_real_data);
+  //fftw_free(sa_real_resp);
+  fftw_free(sa_real_conv);
+  return;
+}
+
+void sa_smooth_run(double *v_sa, double *F_sa, int n_v_sa, double *p_sa, int n_base_sa)
+{
+  int i, j;
+  /* first profile */
+  memcpy(sa_real_data+npad_sa/2, F_sa, n_v_sa*sizeof(double));
+  for(i=0; i<npad_sa/2; i++)
+    sa_real_data[i] = sa_real_data[nd_fft_sa-1-i] = 0.0;
+  
+  /* FFT of line */
+  fftw_execute(sa_pdata);
+  /* complex multiply and inverse FFT 
+   * note that for FFT of real data, FFTW outputs n/2+1 complex numbers.
+   * similarly, for complex to real transform, FFTW needs input of n/2+1 complex numbers.
+   */
+  for(i=0; i<nd_fft_sa/2 + 1; i++)
+  {
+    sa_conv_fft[i][0] = sa_data_fft[i][0]*sa_resp_fft[i][0] - sa_data_fft[i][1]*sa_resp_fft[i][1];
+    sa_conv_fft[i][1] = sa_data_fft[i][0]*sa_resp_fft[i][1] + sa_data_fft[i][1]*sa_resp_fft[i][0];
+  }
+  fftw_execute(sa_pback);
+  memcpy(F_sa, sa_real_conv+npad_sa/2, n_v_sa*sizeof(double));
+
+  /* then phase */
+  for(j=0; j<n_base_sa; j++)
+  {
+    memcpy(sa_real_data+npad_sa/2, &p_sa[j*n_v_sa], n_v_sa*sizeof(double));
+    for(i=0; i<npad_sa/2; i++)
+      sa_real_data[i] = sa_real_data[nd_fft_sa-1-i] = 0.0;
+    
+    /* FFT of line */
+    fftw_execute(sa_pdata);
+    /* complex multiply and inverse FFT 
+     * note that for FFT of real data, FFTW outputs n/2+1 complex numbers.
+     * similarly, for complex to real transform, FFTW needs input of n/2+1 complex numbers.
+     */
+    for(i=0; i<nd_fft_sa/2 + 1; i++)
+    {
+      sa_conv_fft[i][0] = sa_data_fft[i][0]*sa_resp_fft[i][0] - sa_data_fft[i][1]*sa_resp_fft[i][1];
+      sa_conv_fft[i][1] = sa_data_fft[i][0]*sa_resp_fft[i][1] + sa_data_fft[i][1]*sa_resp_fft[i][0];
+    }
+    fftw_execute(sa_pback);
+    memcpy(&p_sa[j*n_v_sa], sa_real_conv+npad_sa/2, n_v_sa*sizeof(double));
+  }
+  return;
+}
 #endif

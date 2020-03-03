@@ -46,6 +46,8 @@ void postprocess_sa()
     char fname[200];
     FILE *fp, *fline, *fsa;
 
+    sa_smooth_init(n_vel_sa_data, vel_sa_data, parset.sa_InstRes);
+
     // get number of lines in posterior sample file
     get_posterior_sample_file(dnest_options_file, posterior_sample_file);
 
@@ -137,6 +139,8 @@ void postprocess_sa()
     fclose(fline);
     fclose(fsa);
 
+    sa_smooth_end();
+
     pm = (double *)best_model_sa;
     pmstd = (double *)best_model_std_sa;
     for(j=0; j<num_params; j++)
@@ -223,7 +227,9 @@ void reconstruct_sa()
   
   reconstruct_sa_init();
 
+  sa_smooth_init(n_vel_sa_data, vel_sa_data, parset.sa_InstRes);
   dnest_sa(argc, argv);
+  sa_smooth_end();
 
   if(parset.flag_exam_prior != 1 && parset.flag_para_name != 1)
   {
@@ -242,7 +248,9 @@ void reconstruct_sa()
       Fline_sa = Fline_sa_particles[which_particle_update];
       phase_sa = phase_sa_particles[which_particle_update];
       
+      sa_smooth_init(n_vel_sa_data, vel_sa_data, parset.sa_InstRes);
       calculate_sa_from_blrmodel(best_model_sa, 1);
+      sa_smooth_end();
 
       sprintf(fname, "%s/%s", parset.file_dir, "data/psa_line.txt");
       fp = fopen(fname, "w");

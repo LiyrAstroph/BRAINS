@@ -204,6 +204,9 @@ void sim()
 #ifdef SA
   double *sa_pm;
   sa_pm = (double *)pm + num_params_blr;
+
+  sa_smooth_init(parset.n_sa_vel_recon, vel_sa, parset.sa_InstRes);
+
   gen_sa_cloud_sample((void *)sa_pm, 3, 0);
   calculate_sa_sim_with_sample(pm, vel_sa, parset.n_sa_vel_recon, base_sa, parset.n_sa_base_recon, 
                                    phase_sa, Fline_sa);
@@ -234,6 +237,7 @@ void sim()
     fprintf(fp, "\n");
   }
   fclose(fp);
+  sa_smooth_end();
   
 #endif  
 

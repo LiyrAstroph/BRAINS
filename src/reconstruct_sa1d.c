@@ -39,6 +39,8 @@ void postprocess_sa1d()
     char fname[200];
     FILE *fp, *fline, *fsa, *fsaline, *ftran, *fcon;
 
+    sa_smooth_init(n_vel_sa_data, vel_sa_data, parset.sa_InstRes);
+
     // get number of lines in posterior sample file
     get_posterior_sample_file(dnest_options_file, posterior_sample_file);
 
@@ -182,6 +184,7 @@ void postprocess_sa1d()
     fclose(fcon);
     fclose(ftran);
     fclose(fline);
+    sa_smooth_end();
 
     pm = (double *)best_model_sa1d;
     pmstd = (double *)best_model_std_sa1d;
@@ -265,7 +268,9 @@ void reconstruct_sa1d()
   
   reconstruct_sa1d_init();
   
+  sa_smooth_init(n_vel_sa_data, vel_sa_data, parset.sa_InstRes);
   dnest_sa1d(argc, argv);
+  sa_smooth_end();
 
   if(parset.flag_exam_prior != 1 && parset.flag_para_name != 1)
   {
@@ -289,12 +294,16 @@ void reconstruct_sa1d()
       Fline_sa = Fline_sa_particles[which_particle_update];
       phase_sa = phase_sa_particles[which_particle_update];
 
+      sa_smooth_init(n_vel_sa_data, vel_sa_data, parset.sa_InstRes);
+
       //calculate_con_from_model(best_model_line1d + num_params_blr *sizeof(double));
       calculate_con_from_model_semiseparable(best_model_sa1d + num_params_blr_tot *sizeof(double));
       gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
 
       calculate_sa_transfun_from_blrmodel(best_model_sa1d, 1);
       calculate_line_from_blrmodel(best_model_sa1d, Tline, Fline, parset.n_line_recon);
+
+      sa_smooth_end();
       
       // output continuum light curve
       sprintf(fname, "%s/%s", parset.file_dir, parset.pcon_out_file);

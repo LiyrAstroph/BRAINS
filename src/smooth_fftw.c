@@ -62,9 +62,9 @@ void smooth_init(int nv, const double *transv)
   //real_resp = (double *)fftw_malloc(nd_fft * sizeof(double));
   real_conv = (double *)fftw_malloc(nd_fft * sizeof(double));
 
-  pdata = fftw_plan_dft_r2c_1d(nd_fft, real_data, data_fft, FFTW_MEASURE);
-  //presp = fftw_plan_dft_r2c_1d(nd_fft, real_resp, resp_fft, FFTW_MEASURE);
-  pback = fftw_plan_dft_c2r_1d(nd_fft, conv_fft, real_conv, FFTW_MEASURE);
+  pdata = fftw_plan_dft_r2c_1d(nd_fft, real_data, data_fft, FFTW_PATIENT);
+  //presp = fftw_plan_dft_r2c_1d(nd_fft, real_resp, resp_fft, FFTW_PATIENT);
+  pback = fftw_plan_dft_c2r_1d(nd_fft, conv_fft, real_conv, FFTW_PATIENT);
 
 }
 

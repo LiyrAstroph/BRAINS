@@ -37,6 +37,7 @@ void postprocess_sa2d()
   {
     // initialize smoothing workspace
     smooth_init(n_vel_data_ext, Vline_data_ext);
+    sa_smooth_init(n_vel_sa_data, vel_sa_data, parset.sa_InstRes);
 
     char fname[200];
     FILE *fp, *fline, *fline1d, *fsa, *fsaline, *ftran, *fcon;
@@ -228,6 +229,7 @@ void postprocess_sa2d()
     }
 
     smooth_end();
+    sa_smooth_end();
     fclose(fp);
     fclose(fcon);
     fclose(fline);
@@ -320,8 +322,10 @@ void reconstruct_sa2d()
   reconstruct_sa2d_init();
   
   smooth_init(n_vel_data_ext, Vline_data_ext);
+  sa_smooth_init(n_vel_sa_data, vel_sa_data, parset.sa_InstRes);
   dnest_sa2d(argc, argv);
   smooth_end();
+  sa_smooth_end();
  
   if(parset.flag_exam_prior != 1 && parset.flag_para_name != 1)
   {
@@ -364,6 +368,7 @@ void reconstruct_sa2d()
       fclose(fp);
       
       smooth_init(n_vel_data_ext, Vline_data_ext);
+      sa_smooth_init(n_vel_sa_data, vel_sa_data, parset.sa_InstRes);
 
       calculate_sa_transfun2d_from_blrmodel(best_model_sa2d, Vline_data_ext, Trans2D_at_veldata, n_vel_data_ext, 0);
       calculate_line2d_from_blrmodel(best_model_sa2d, Tline_data, Vline_data_ext, Trans2D_at_veldata, 
@@ -537,6 +542,7 @@ void reconstruct_sa2d()
       fclose(fp);
 
       smooth_end();
+      sa_smooth_end();
     }
   }
   
