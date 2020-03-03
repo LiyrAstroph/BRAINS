@@ -16,7 +16,7 @@
 
 int command_line_options(int argc, char** argv)
 {
-  int opt, opt_idx;
+  int opt, opt_idx, info=EXIT_SUCCESS;
 
   /* cope with command options. */
   if(thistask == roottask)
@@ -112,40 +112,53 @@ int command_line_options(int argc, char** argv)
           
         case '?':
           printf("# Incorrect option -%c %s.\n", optopt, optarg);
-          return EXIT_FAILURE;
+          info = EXIT_FAILURE;
           break;
 
         default:
           break;
       }
     }
-
-    if(parset.flag_postprc == 1 || parset.flag_sample_info == 1)
-      parset.flag_restart = 0;
     
-    if(parset.flag_help == 0) /* not only print help */
+    if(info != EXIT_FAILURE)
     {
-      if(argv[optind] != NULL) /* parameter file is specified */
-        strcpy(parset.param_file, argv[optind]); /* copy input parameter file */
-      else
+      if(parset.flag_postprc == 1 || parset.flag_sample_info == 1)
+        parset.flag_restart = 0;
+      
+      if(parset.flag_help == 0) /* not only print help */
       {
-        parset.flag_end = 1;
-        fprintf(stderr, "# Error: No parameter file specified!\n");
+        if(argv[optind] != NULL) /* parameter file is specified */
+          strcpy(parset.param_file, argv[optind]); /* copy input parameter file */
+        else
+        {
+          parset.flag_end = 1;
+          fprintf(stderr, "# Error: No parameter file specified!\n");
+        }
       }
     }
   }
+  
+  MPI_Bcast(&info, 1, MPI_INT, roottask, MPI_COMM_WORLD);
 
-  /* broadcast parset */
-  MPI_Bcast(&parset, sizeof(PARSET), MPI_BYTE, roottask, MPI_COMM_WORLD);
-
-  if(parset.flag_end == 1 && parset.flag_help ==0 )
+  if(info != EXIT_FAILURE)
   {
-    if(thistask == roottask)
+    /* broadcast parset */
+    MPI_Bcast(&parset, sizeof(PARSET), MPI_BYTE, roottask, MPI_COMM_WORLD);
+  
+    if(parset.flag_end == 1 && parset.flag_help ==0 )
     {
-      fprintf(stdout, "Ends incorrectly.\n");
+      if(thistask == roottask)
+      {
+        fprintf(stdout, "Ends incorrectly.\n");
+      }
+      return EXIT_FAILURE;
     }
+  
+    return EXIT_SUCCESS;
+  }
+  else 
+  {
     return EXIT_FAILURE;
   }
-
-  return EXIT_SUCCESS;
+  
 }
