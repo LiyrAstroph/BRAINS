@@ -33,6 +33,7 @@ Documentation
    sim.rst
    mkfile.rst
    todo.rst
+   changelog.rst
 
 
 Attribution
@@ -55,7 +56,8 @@ Licensed under the `GNU General Public License v3.0 or later <https://opensource
 Changelog
 ---------
 
-.. include:: ../HISTORY.rst
+see :ref:`log_label`
+
 
 Indices and Tables
 ==================
