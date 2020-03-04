@@ -543,6 +543,8 @@ double perturb_line2d(void *model)
     width = ( par_range_model[which][1] - par_range_model[which][0] );
   }
 
+  width /= 2.35;
+
   if(par_prior_model[which] == GAUSSIAN)
   {
     logH -= (-0.5*pow((pm[which] - par_prior_gaussian[which][0])/par_prior_gaussian[which][1], 2.0) );
