@@ -702,9 +702,14 @@ void read_parset()
       
       if(error_flag == 0)
       {
-        if(parset.flag_dim > 2)
+        if(parset.flag_dim > 2 || parset.flag_dim < 0)
         {
           parset.sa_InstRes /= VelUnit;
+        }
+        /* for simulation, force the flag to be 1 */
+        if(parset.flag_dim < 0)
+        {
+          parset.flag_sa_par_mutual = 1;
         }
       }
 #endif

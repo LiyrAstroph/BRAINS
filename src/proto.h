@@ -119,6 +119,8 @@ void smooth_init(int nv, const double *transv);
 void smooth_end();
 void smooth_test();
 
+int get_idx_mbh_from_blrmodel();
+
 /* sim */
 void sim();
 void sim_init();

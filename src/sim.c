@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h> 
 #include <stdbool.h>
+#include <stddef.h>
 #include <math.h>
 #include <float.h>
 #include <string.h>
@@ -247,7 +248,7 @@ void sim()
 
 void sim_init()
 {
-  int i, j;
+  int i, j, idx;
   double dT, Tspan;
   double *pm, Rblr, mbh;
 
@@ -434,7 +435,8 @@ void sim_init()
 
   Fcon = malloc(parset.n_con_recon * sizeof(double));
 
-  mbh = exp(pm[idx_rm_par_mutual[0]]);
+  idx = get_idx_mbh_from_blrmodel();
+  mbh = exp(pm[idx]);
 
   if(parset.flag_blrmodel != 8) /* model 8 is particular */
   {
@@ -562,9 +564,6 @@ void sim_init()
 
 #ifdef SA
   double saRblr;
-
-  parset.sa_InstRes /= VelUnit;
-  parset.flag_sa_par_mutual = 1;
 
   if(parset.flag_dim == -1)
   {
@@ -839,4 +838,56 @@ void set_par_value_sim(double *pm, int flag_model)
       break;
   }
   return;
+}
+
+/* 
+ * get index of mbh from a BLR model.
+ * 
+ */
+int get_idx_mbh_from_blrmodel()
+{
+  int idx = -1;
+  switch(parset.flag_blrmodel)
+  {
+    case 0:
+      idx = offsetof(MyBLRmodel, mbh);
+      break;
+
+    case 1:
+      idx = offsetof(BLRmodel1, mbh);
+      break;
+
+    case 2:
+      idx = offsetof(BLRmodel2, mbh);
+      break;
+    
+    case 3:
+      idx = offsetof(BLRmodel3, mbh);
+      break;
+
+    case 4:
+      idx = offsetof(BLRmodel4, mbh);
+      break;
+    
+    case 5:
+      idx = offsetof(BLRmodel5, mbh);
+      break;
+
+    case 6:
+      idx = offsetof(BLRmodel6, mbh);
+      break;
+    
+    case 7:
+      idx = offsetof(BLRmodel7, mbh);
+      break;
+    
+    case 8:
+      idx = offsetof(BLRmodel8, mbh);
+      break;
+    
+    case 9:
+      idx = offsetof(BLRmodel9, mbh);
+      break;
+  }
+  return idx;
 }
