@@ -1702,3 +1702,29 @@ int check_parset_isset()
   else 
     return EXIT_FAILURE;
 }
+
+int _qsort_cmp(const void *a, const void *b)
+{
+  return *(double *)a > *(double *)b?1:-1;
+}
+
+double get_mediate_cad(double *tcon, int ncon)
+{
+  int i;
+  double *cad, med_cad;
+  cad = malloc((ncon -1)*sizeof(double));
+
+  for(i=0; i<ncon-1; i++)
+    cad[i] = tcon[i+1] - tcon[i];
+  
+  qsort(cad, ncon-1, sizeof(double), _qsort_cmp);
+
+  if(ncon<2)
+    med_cad = cad[0];
+  else
+    med_cad = cad[ncon/2-1];
+
+  free(cad);
+
+  return med_cad;
+}

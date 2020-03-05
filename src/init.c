@@ -294,11 +294,11 @@ void init()
       double DT=Tcon_data[0] - time_back_set;
       if(parset.rcloud_max > 0.0)
       {
-        DT = fmin(DT, Tline_data[0] - parset.rcloud_max*2.0);
+        DT = fmax(DT, Tline_data[0] - parset.rcloud_max*2.0);
       }
       else if(parset.time_back > 0.0) /* neglect when parset.rcloud_max is set */
       { 
-        DT = fmin(DT, Tcon_data[0] - parset.time_back);
+        DT = fmax(DT, Tcon_data[0] - parset.time_back);
       }
       time_back_set = Tcon_data[0] - DT;
   
@@ -311,6 +311,27 @@ void init()
   
       if(parset.rcloud_max > 0.0)
         rcloud_max_set = fmin(rcloud_max_set, parset.rcloud_max);
+
+      /* check whether n_con_recon is appropriate */
+      double med_cad, med_cad_recon;
+      //med_cad = get_mediate_cad(Tcon_data, n_con_data);
+      med_cad = (Tcon_data[n_con_data-1] - Tcon_data[0])/(n_con_data -1);
+      med_cad_recon = (Tcon_data[n_con_data-1] - Tcon_data[0] + time_back_set)/(parset.n_con_recon-1);
+      if(med_cad_recon > 1.05*med_cad)
+      {
+        if(thistask == roottask)
+        {
+          printf("# Too small NConRecon.\n" 
+               "# Better to change it to %d or set RCloudMax/TimeBack to smaller than %f/%f.\n", 
+               (int)(parset.n_con_recon * med_cad_recon/med_cad), 
+               (Tline_data[0] - Tcon_data[0] + time_back_set)/2.0 ,time_back_set);
+          printf("\e[1;35m" "# Use '-f' option in command line if want to ignore this check.\n" "\e[0m");
+        }
+        if(parset.flag_force_run != 1)
+        {
+          exit(0);
+        }
+      }
     }
 
     if(thistask == roottask && parset.flag_dim >=-1)

@@ -20,6 +20,7 @@ void free_memory_data();
 void allocate_memory();
 void free_memory();
 
+double get_mediate_cad(double *tcon, int ncon);
 
 void init();
 void scale_con_line();

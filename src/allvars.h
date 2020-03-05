@@ -128,6 +128,7 @@ typedef struct
   int flag_nonlinear;
 
   int flag_force_update;
+  int flag_force_run;
 
   int flag_con_sys_err, flag_line_sys_err;
   

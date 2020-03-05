@@ -48,8 +48,9 @@ int command_line_options(int argc, char** argv)
     parset.flag_help = 0;
     parset.flag_end = 0;
     parset.flag_para_name = 0;
+    parset.flag_force_run = 0;
 
-    while( (opt = getopt_long(argc, argv, "pt:rcs:ehvn", long_options, &opt_idx)) != -1)
+    while( (opt = getopt_long(argc, argv, "pt:rcs:ehvnf", long_options, &opt_idx)) != -1)
     {
       switch(opt)
       {
@@ -93,6 +94,10 @@ int command_line_options(int argc, char** argv)
         case 'e':  /* examine the priors assigned */
           printf("# Examine priors.\n");
           parset.flag_exam_prior = 1;
+          break;
+        
+        case 'f':
+          parset.flag_force_run = 1;
           break;
 
         case 'h':  /* print help */
