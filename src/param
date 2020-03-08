@@ -1,6 +1,9 @@
 % parameter file
 % lines beginning with '%' are regarded as comments and are neglected
 % 
+% this is a full list. 
+% in a run, only some parameters are required to specify, depending on
+% "FlagDim", so no need to set all the parameters.
 %========================================================================
 % generic
 %
@@ -22,10 +25,10 @@ LineFile                    data/sim_hb.txt           % file for line data
 Line2DFile                  data/sim_hb2d.txt         % file for line 2d data
 
 %========================================================================
-% spectro-astrometry configuration 
+% spectro-astrometry (SA) configuration, only when "-DSA" is switched on in Makefile
 %
 
-%SALineCenter                1.875                     % reset frame, um          
+%SALineCenter                1.875                     % rest frame, the unit must be the same as that of the wavelength in SA data           
 %FlagSABLRModel              6                         % same as FlagBLRModel 
 %FlagSAParMutual             1                         % flag for mutual parameters with BLR model
                                                       % 0: all 
@@ -34,7 +37,7 @@ Line2DFile                  data/sim_hb2d.txt         % file for line 2d data
 %SAFile                      data/3C273_sa.txt 
 
 %=========================================================================
-% reverberatipn mapping generic configuration
+% reverberation mapping (RM) generic configuration
 %
 
 FlagBLRModel                6                           % 1, 2, 3, 4, 5, 6, 7, 8; BLR model type
@@ -42,7 +45,7 @@ FlagBLRModel                6                           % 1, 2, 3, 4, 5, 6, 7, 8
                                                         % 0 is user defined
                                                         % -1 is user defined, analytical transfer function
 
-LineCenter                  4861.0                      %  rest frame, A
+LineCenter                  4861.0                      %  rest frame, the unit must be the same as that of the wavelength in RM data 
 FlagLineCenter              0                           % -1, epoch-dependent offset; 0, not included; 1, uniform offset
 LineCenterErr               50.0                        % km/s
 
@@ -60,7 +63,7 @@ FlagCloudsForceUpdate       0                           % default 0;
                                                         % 0, only update when BLR parameters are updated 
                                                         % 1, update every MCMC perturb (continuum + BLR)
 
-FlagConSysErr               1                           % 0, not include systematic error of contininuum; 1, include
+FlagConSysErr               0                           % 0, not include systematic error of continuum; 1, include
 FlagLineSysErr              0                           % 0, not include systematic error of line; 1, include
 
 FlagNonlinear               1                           % 0, linear response; 1, non-linear response
@@ -93,7 +96,7 @@ Tran2DFileOut               data/tran2d.txt             % output filename for 2d
 Tran2DDataFileOut           data/tran2d_data.txt        % output filename for 2d transfer function at velocity points same with data
 
 %========================================================================
-% spectral broadening
+% RM spectral broadening
 % 
 FlagInstRes                 0                           % 0, uniform prior, epoch-independent
                                                         % 1, uniform prior, but epoch-dependent parameterization
@@ -107,7 +110,7 @@ InstResFile                 data/sim_broaden.txt       % file for storing epoch-
                                                           % two columns: broadening width and error (km/s), in the order of time as the 2d line data
 
 %========================================================================
-% narrow-line component
+% RM narrow-line component
 % use a gaussian to model the narrow-line component
 % 
 FlagNarrowLine              0                           % 0, no narrow line; 
@@ -124,7 +127,7 @@ ShiftNarrowLineErr          0.0                         % shift error
 
 %========================================================================
 % set fixed BLR parameters and their fixed values
-% do not put sapce in the strings
+% do not put space in the strings
 % 1: fixed; 0: not fixed; values are separated by ":"
 %
 
