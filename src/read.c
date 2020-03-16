@@ -399,7 +399,8 @@ void read_parset()
         }
         else
         {
-          fprintf(stderr, "# Error in file %s: Tag '%s' is not allowed or multiple defined.\n", 
+          fprintf(stderr, "# Error in file %s: Tag '%s' is not allowed or multiple defined.\n"
+                          "# Note: if using spectro-astrometric analysis, switch on '-DSA' in Makefile.\n", 
                         parset.param_file, buf1);
           error_flag = 3;
         }
