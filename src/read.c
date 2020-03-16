@@ -423,79 +423,89 @@ void read_parset()
 #ifndef SA
       if(parset.flag_dim > 2 || parset.flag_dim < -2)
       {
-        fprintf(stderr, "# Error in FlagDim: value %d is not allowed.\n# Please specify a value in [-2-2].\n", parset.flag_dim);
-        error_flag = 1;
+        fprintf(stderr, "# Error in FlagDim: value %d is not allowed.\n"
+                        "# Please specify a value in [-2-2].\n", parset.flag_dim);
+                        error_flag = 1;
       }
 #else 
       if(parset.flag_dim > 5 || parset.flag_dim < -2)
       {
-        fprintf(stderr, "# Error in FlagDim: value %d is not allowed.\n# Please specify a value in [-2-5].\n", parset.flag_dim);
-        error_flag = 1;
+        fprintf(stderr, "# Error in FlagDim: value %d is not allowed.\n"
+                        "# Please specify a value in [-2-5].\n", parset.flag_dim);
+                        error_flag = 1;
       }
 #endif
 
       if(parset.flag_trend > 1 || parset.flag_trend < 0)
       {
-        fprintf(stderr, "# Error in FlagTrend: value %d is not allowed.\n# Please specify a value in [0-1].\n", parset.flag_trend);
-        error_flag = 1;
+        fprintf(stderr, "# Error in FlagTrend: value %d is not allowed.\n"
+                        "# Please specify a value in [0-1].\n", parset.flag_trend);
+                        error_flag = 1;
       }
   
       if(parset.flag_blrmodel > 9 || parset.flag_blrmodel < -1)
       {
-        fprintf(stderr, "# Error in FlagBLRModel: value %d is not allowed.\n# Please specify a value in [-1-9].\n", parset.flag_blrmodel);
-        error_flag = 1;
+        fprintf(stderr, "# Error in FlagBLRModel: value %d is not allowed.\n"
+                        "# Please specify a value in [-1-9].\n", parset.flag_blrmodel);
+                        error_flag = 1;
       }
       
       /* check linecenter */
       if(parset.linecenter <= 0.0)
       {
         fprintf(stderr, "# Error in LineCenter: value %f is not allowed.\n"
-          "# Please specify a positive value.\n", parset.linecenter);
-          error_flag = 1;
+                        "# Please specify a positive value.\n", parset.linecenter);
+                        error_flag = 1;
       }
   
       /* check redshift */
       if(parset.redshift < 0.0)
       {
         fprintf(stderr, "# Error in redshift: value %f is not allowed.\n"
-          "# Please specify a non-negative value.\n", parset.redshift);
+                        "# Please specify a non-negative value.\n", parset.redshift);
           error_flag = 1;
       }
         
       if((parset.flag_narrowline > 3 || parset.flag_narrowline < 0) && (parset.flag_dim == 2 || parset.flag_dim == 5))
       {
-        fprintf(stderr, "# Error in FlagNarrowLine: value %d is not allowed.\n# Please specify a value in [0-3].\n", parset.flag_narrowline);
-        error_flag = 1;
+        fprintf(stderr, "# Error in FlagNarrowLine: value %d is not allowed.\n"
+                        "# Please specify a value in [0-3].\n", parset.flag_narrowline);
+                        error_flag = 1;
       }
   
       if((parset.flag_trend_diff < 0 || parset.flag_trend_diff > 10) && parset.flag_dim > 0)
       {
-        fprintf(stderr, "# Error in FlagTrendDiff: value %d is not allowed.\n# Please specify a value in [0-10].\n", parset.flag_trend_diff);
-        error_flag = 1;
+        fprintf(stderr, "# Error in FlagTrendDiff: value %d is not allowed.\n"
+                        "# Please specify a value in [0-10].\n", parset.flag_trend_diff);
+                        error_flag = 1;
       }
   
       if((parset.flag_InstRes < 0 || parset.flag_InstRes > 2) && (parset.flag_dim == 2 || parset.flag_dim == 5|| parset.flag_dim < 0))
       {
-        fprintf(stderr, "# Error in FlagInstRes: value %d is not allowed.\n# Please specify a value in [0-2].\n", parset.flag_InstRes);
-        error_flag = 1;
+        fprintf(stderr, "# Error in FlagInstRes: value %d is not allowed.\n"
+                        "# Please specify a value in [0-2].\n", parset.flag_InstRes);
+                        error_flag = 1;
       }
   
       if((parset.flag_linecenter < -1 || parset.flag_linecenter > 1) && (parset.flag_dim == 2 || parset.flag_dim == 5))
       {
-        fprintf(stderr, "# Error in FlagLineCenter: value %d is not allowed.\n# Please specify a value in [-1-1].\n", parset.flag_linecenter);
-        error_flag = 1;
+        fprintf(stderr, "# Error in FlagLineCenter: value %d is not allowed.\n"
+                        "# Please specify a value in [-1-1].\n", parset.flag_linecenter);
+                        error_flag = 1;
       }
     
       if(parset.InstRes < 0.0 && (parset.flag_dim == 2 || parset.flag_dim == 5 || parset.flag_dim < 0) )
       {
-        fprintf(stderr, "# Error in InstRes: value %f is not allowed.\n# Please specify a positive value.\n", parset.InstRes);
-        error_flag = 1;
+        fprintf(stderr, "# Error in InstRes: value %f is not allowed.\n"
+                        "# Please specify a positive value.\n", parset.InstRes);
+                        error_flag = 1;
       }
   
       if(parset.InstRes_err < 0.0 && (parset.flag_dim == 2 || parset.flag_dim == 5 || parset.flag_dim < 0))
       {
-        fprintf(stderr, "# Error in InstResErr: value %f is not allowed.\n# Please specify a positive value.\n", parset.InstRes_err);
-        error_flag = 1;
+        fprintf(stderr, "# Error in InstResErr: value %f is not allowed.\n"
+                        "# Please specify a positive value.\n", parset.InstRes_err);
+                        error_flag = 1;
       }
   
       /* check whether necessary files provided */
@@ -528,8 +538,9 @@ void read_parset()
       {
         if(parset.n_cloud_per_task <= 1)
         {
-          fprintf(stderr, "# Error in NCloudPerCore: value %d is not allowed.\n# Please specify a larger number.\n", 
-                            parset.n_cloud_per_task);
+          fprintf(stderr, "# Error in NCloudPerCore: value %d is not allowed.\n"
+                          "# Please specify a larger number.\n", 
+                          parset.n_cloud_per_task);
           error_flag = 1;
         }
       }
@@ -660,8 +671,9 @@ void read_parset()
       /* check sa InstRes */
       if(parset.sa_InstRes < 0.0 && (parset.flag_dim > 2))
       {
-        fprintf(stderr, "# Error in SAInstResErr: value %f is not allowed.\n# Please specify a non-negative value.\n", 
-                parset.sa_InstRes);
+        fprintf(stderr, "# Error in SAInstResErr: value %f is not allowed.\n"
+                        "# Please specify a non-negative value.\n", 
+                        parset.sa_InstRes);
         error_flag = 1;
       }
       
