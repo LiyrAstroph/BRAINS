@@ -286,7 +286,7 @@ void calculate_con_from_model(const void *model)
   set_covar_Pmat_data(sigma, tau, alpha, syserr);
   set_covar_Umat(sigma, tau, alpha);
 
-  inverse_mat(PCmat_data, n_con_data, &info);
+  inverse_pomat(PCmat_data, n_con_data, &info);
  
   // Cq^-1 = L^TxC^-1xL
   multiply_mat_MN(PCmat_data, Larr_data, ybuf, n_con_data, nq, n_con_data);
@@ -297,7 +297,7 @@ void calculate_con_from_model(const void *model)
   multiply_mat_MN_transposeA(Larr_data, ybuf, yq, nq, 1, n_con_data);
 
   // (hat q) = Cqx(L^TxC^-1xy)
-  inverse_mat(Cq, nq, &info);
+  inverse_pomat(Cq, nq, &info);
   multiply_mat_MN(Cq, yq, ybuf, nq, 1, nq);
 
   // q = uq + (hat q)
@@ -324,14 +324,14 @@ void calculate_con_from_model(const void *model)
   multiply_mat_MN_transposeB(PEmat1, USmat, PEmat2, parset.n_con_recon, parset.n_con_recon, n_con_data);
 
   set_covar_Pmat(sigma, tau, alpha);
-  inverse_mat(PSmat, parset.n_con_recon, &info);
+  inverse_pomat(PSmat, parset.n_con_recon, &info);
 
   // Q = [S^-1 + N^-1]^-1
   memcpy(PQmat, PSmat, parset.n_con_recon*parset.n_con_recon*sizeof(double));
   for(i=0; i<parset.n_con_recon; i++)
     PQmat[i*parset.n_con_recon+i] += 1.0/(sigma*sigma + syserr*syserr - PEmat2[i*parset.n_con_recon + i]);  
   
-  inverse_mat(PQmat, parset.n_con_recon, &info);
+  inverse_pomat(PQmat, parset.n_con_recon, &info);
   Chol_decomp_L(PQmat, parset.n_con_recon, &info);
   multiply_matvec(PQmat, &pm[num_params_var], parset.n_con_recon, yu);
 
@@ -391,7 +391,7 @@ void calculate_con_from_model_semiseparable(const void *model)
   multiply_mat_MN_transposeA(Larr_data, ybuf, yq, nq, 1, n_con_data);
 
   // (hat q) = Cqx(L^TxC^-1xy)
-  inverse_mat(Cq, nq, &info);
+  inverse_pomat(Cq, nq, &info);
   multiply_mat_MN(Cq, yq, ybuf, nq, 1, nq);
 
   // q = uq + (hat q)
@@ -481,7 +481,7 @@ void reconstruct_con_from_varmodel(double sigma_hat, double tau, double alpha, d
   set_covar_Pmat_data(sigma, tau, alpha, syserr);
   set_covar_Umat(sigma, tau, alpha);
 
-  inverse_mat(PCmat_data, n_con_data, &info);
+  inverse_pomat(PCmat_data, n_con_data, &info);
   
   multiply_mat_MN(PCmat_data, Larr_data, Lbuf, n_con_data, nq, n_con_data);
   multiply_mat_MN_transposeA(Larr_data, Lbuf, Cq, nq, nq, n_con_data);
@@ -489,7 +489,7 @@ void reconstruct_con_from_varmodel(double sigma_hat, double tau, double alpha, d
   multiply_matvec(PCmat_data, Fcon_data, n_con_data, ybuf);
   multiply_mat_MN_transposeA(Larr_data, ybuf, yq, nq, 1, n_con_data);
 
-  inverse_mat(Cq, nq, &info);
+  inverse_pomat(Cq, nq, &info);
   multiply_mat_MN(Cq, yq, ybuf, nq, 1, nq);
 
   memcpy(yq, ybuf, nq*sizeof(double));
@@ -560,7 +560,7 @@ double prob_con_variability(const void *model)
 
     lndet = lndet_mat(PCmat_data, n_con_data, &info);
 
-    inverse_mat(IPCmat_data, n_con_data, &info); /* calculate C^-1 */
+    inverse_pomat(IPCmat_data, n_con_data, &info); /* calculate C^-1 */
  
     /* calculate L^T*C^-1*L */
     multiply_mat_MN(IPCmat_data, Larr_data, Lbuf, n_con_data, nq, n_con_data);
@@ -571,7 +571,7 @@ double prob_con_variability(const void *model)
     multiply_mat_MN_transposeA(Larr_data, ybuf, yq, nq, 1, n_con_data);
 
     /* calculate (L^T*C^-1*L)^-1 * L^T*C^-1*y */
-    inverse_mat(Cq, nq, &info);
+    inverse_pomat(Cq, nq, &info);
     multiply_mat_MN(Cq, yq, ybuf, nq, 1, nq);
 
     Chol_decomp_L(Cq, nq, &info);
@@ -644,7 +644,7 @@ double prob_con_variability_semiseparable(const void *model)
     multiply_mat_MN_transposeA(Larr_data, ybuf, yq, nq, 1, n_con_data);
 
     /* calculate (L^T*C^-1*L)^-1 * L^T*C^-1*y */
-    inverse_mat(Cq, nq, &info);
+    inverse_pomat(Cq, nq, &info);
     multiply_mat_MN(Cq, yq, ybuf, nq, 1, nq);
 
     Chol_decomp_L(Cq, nq, &info);
@@ -700,7 +700,7 @@ double prob_con_variability_initial(const void *model)
 
   lndet = lndet_mat(PCmat_data, n_con_data, &info);
 
-  inverse_mat(IPCmat_data, n_con_data, &info);
+  inverse_pomat(IPCmat_data, n_con_data, &info);
 
   multiply_mat_MN(IPCmat_data, Larr_data, Lbuf, n_con_data, nq, n_con_data);
   multiply_mat_MN_transposeA(Larr_data, Lbuf, Cq, nq, nq, n_con_data);
@@ -708,7 +708,7 @@ double prob_con_variability_initial(const void *model)
   multiply_matvec(IPCmat_data, Fcon_data, n_con_data, ybuf);
   multiply_mat_MN_transposeA(Larr_data, ybuf, yq, nq, 1, n_con_data);
 
-  inverse_mat(Cq, nq, &info);
+  inverse_pomat(Cq, nq, &info);
   multiply_mat_MN(Cq, yq, ybuf, nq, 1, nq);
 
   Chol_decomp_L(Cq, nq, &info);
@@ -769,7 +769,7 @@ double prob_con_variability_initial_semiseparable(const void *model)
   multiply_matvec_semiseparable_drw(Fcon_data, W, D, phi, n_con_data, sigma2, ybuf);
   multiply_mat_MN_transposeA(Larr_data, ybuf, yq, nq, 1, n_con_data);
 
-  inverse_mat(Cq, nq, &info);
+  inverse_pomat(Cq, nq, &info);
   multiply_mat_MN(Cq, yq, ybuf, nq, 1, nq);
 
   Chol_decomp_L(Cq, nq, &info);

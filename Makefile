@@ -96,7 +96,7 @@ INCL     = Makefile $(SRC)/allvars.h $(SRC)/proto.h $(SRC)/dnest_con.h   \
            $(SRC)/blr_models.h   $(SRC)/brains.h $(SRC)/version.h        \
            $(SRC)/command_line.h  $(SRC)/user_blr_model.h                \
            $(SRC)/user_transfun.h  $(SRC)/dnest_sa.h $(SRC)/dnest_sa1d.h \
-           $(SRC)/dnest_sa2d.h
+           $(SRC)/dnest_sa2d.h  $(SRC)/mathfun.h
 
 OPTIONS  = $(OPTIMIZE)
 CFLAGS   = $(OPTIONS) $(GSL_INCL) $(LAPACK_INCL) $(MPICHINCL) $(DNEST_INCL) $(FFTW_INCL)

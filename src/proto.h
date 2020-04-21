@@ -211,39 +211,3 @@ void sa_smooth_init(int n_v_sa, const double *v_sa, double sigV);
 void sa_smooth_end();
 void sa_smooth_run(double *v_sa, double *F_sa, int n_v_sa, double *p_sa, int n_base_sa);
 #endif
-
-/* matrix operations */
-void inverse_mat(double *a, int n, int *info);
-double det_mat(double *a, int n, int *info);
-double lndet_mat(double *a, int n, int *info);
-void display_mat(double *a, int m, int n);
-void multiply_mat(double * a, double *b, double *c, int n);
-void multiply_mat_transposeA(double * a, double *b, double *c, int n);
-void multiply_mat_transposeB(double * a, double *b, double *c, int n);
-void multiply_matvec(double *a, double *x, int n, double *y);
-void multiply_matvec_transposeA(double *a, double *x, int n, double *y);
-void multiply_matvec_MN(double * a, int m, int n, double *x, double *y);
-void multiply_mat_MN(double * a, double *b, double *c, int m, int n, int k);
-void multiply_mat_MN_transposeA(double * a, double *b, double *c, int m, int n, int k);
-void multiply_mat_MN_transposeB(double * a, double *b, double *c, int m, int n, int k);
-int multiply_mat_MN_inverseA(double * a, double *b, int m, int n);
-void multiply_vec2mat(double * x, double * a, int n);
-void eigen_sym_mat(double *a, int n, double *val, int *info);
-void Chol_decomp_U(double *a, int n, int *info);
-void Chol_decomp_L(double *a, int n, int *info);
-double ** matrix_malloc(int n1, int n2);
-double * array_malloc(int n);
-void test_mathfun();
-void compute_semiseparable_drw(double *t, int n, double a1, double c1, double *sigma, double syserr,  double *W, double *D, double *phi);
-void multiply_matvec_semiseparable_drw(double *y, double  *W, double *D, double *phi, int n, double a1, double *z);
-void multiply_mat_semiseparable_drw(double *Y, double  *W, double *D, double *phi, int n, int m, double a1, double *Z);
-void multiply_mat_transposeB_semiseparable_drw(double *Y, double  *W, double *D, double *phi, int n, int m, double a1, double *Z);
-
-void inverse_semiseparable_uv(double *t, int n, double a1, double c1, double *A);
-
-void multiply_matvec_semiseparable_uv(double *y, double *u, double  *W, double *D, double *phi,
-                                      int n, double *z);
-
-void compute_inverse_semiseparable_plus_diag(double *t, int n, double a1, double c1, 
-                double *sigma, double syserr, double *u, double *v,
-                double *W, double *D, double *phi, double *work);

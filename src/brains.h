@@ -15,6 +15,7 @@
 
 #include "allvars.h"
 #include "proto.h"
+#include "mathfun.h"
 #include "blr_models.h"
 #include "version.h"
 #include "dnest_con.h"

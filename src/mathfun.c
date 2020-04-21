@@ -120,6 +120,7 @@ int multiply_mat_MN_inverseA(double * a, double *b, int m, int n)
 
 /*!
  * This functions calculate A^-1(nxn).
+ * A is a generic matrix.
  */
 void inverse_mat(double * a, int n, int *info)
 {
@@ -133,6 +134,45 @@ void inverse_mat(double * a, int n, int *info)
   LAPACKE_dgetri(LAPACK_ROW_MAJOR, n, a, n, ipiv);
 
   free(ipiv);
+  return;
+}
+
+/*!
+ * This functions calculate A^-1(nxn).
+ * A is a symmetric matrix.
+ */
+void inverse_symat(double * a, int n, int *info)
+{
+  int * ipiv, i, j;
+  ipiv=malloc(n*sizeof(int));
+
+  LAPACKE_dsytrf(LAPACK_ROW_MAJOR, 'U', n, a, n, ipiv);
+  LAPACKE_dsytri(LAPACK_ROW_MAJOR, 'U', n, a, n, ipiv);
+
+  /* fill up the lower triangle */
+  for(i=0; i<n; i++)
+    for(j=0; j<i; j++)
+      a[i*n+j] = a[j*n+i];
+
+  free(ipiv);
+  return;
+}
+
+/*!
+ * This functions calculate A^-1(nxn).
+ * A is a postive-definite symmetrix matrix.
+ */
+void inverse_pomat(double * a, int n, int *info)
+{
+  int i, j;
+
+  LAPACKE_dpotrf(LAPACK_ROW_MAJOR, 'U', n, a, n);
+  LAPACKE_dpotri(LAPACK_ROW_MAJOR, 'U', n, a, n);
+
+  /* fill up the lower triangle */
+  for(i=0; i<n; i++)
+    for(j=0; j<i; j++)
+      a[i*n+j] = a[j*n+i];
   return;
 }
 
