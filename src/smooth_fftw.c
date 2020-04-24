@@ -49,9 +49,8 @@ double *real_data, *real_resp, *real_conv;
  */
 void smooth_init(int nv, const double *transv)
 {
-  npad = fmin(nv * 0.2, 100);
-  npad = (npad/2) * 2;
-  nd_fft = nv+npad;
+  npad = fmin(nv * 0.1, 20);
+  nd_fft = nv+npad*2;
 
   data_fft = (fftw_complex *) fftw_malloc((nd_fft/2+1) * sizeof(fftw_complex));
   resp_fft0 = (fftw_complex *) fftw_malloc((nd_fft/2+1) * sizeof(fftw_complex));
@@ -145,8 +144,8 @@ void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int
         resp_fft[i][1] = -resp_fft0[i][0] * sin(2.0*PI*linecenter/dV * i*1.0/nd_fft);
       }
 
-      memcpy(real_data+npad/2, &fl2d[j*nv], nv*sizeof(double));
-      for(i=0; i<npad/2; i++)
+      memcpy(real_data+npad, &fl2d[j*nv], nv*sizeof(double));
+      for(i=0; i<npad; i++)
         real_data[i] = real_data[nd_fft-1-i] = 0.0;
 
       /* FFT of line */
@@ -167,7 +166,7 @@ void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int
       //{
       //fl2d[j*nv + i] = real_conv[i] * dV / nd_fft;
       //}
-      memcpy(&fl2d[j*nv], real_conv+npad/2, nv*sizeof(double));
+      memcpy(&fl2d[j*nv], real_conv+npad, nv*sizeof(double));
     }
 
   }
@@ -199,8 +198,8 @@ void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int
         resp_fft[i][1] = -resp_fft0[i][0] * sin(2.0*PI*linecenter/dV * i*1.0/nd_fft);
       }
     
-      memcpy(real_data+npad/2, &fl2d[j*nv], nv*sizeof(double));
-      for(i=0; i<npad/2; i++)
+      memcpy(real_data+npad, &fl2d[j*nv], nv*sizeof(double));
+      for(i=0; i<npad; i++)
         real_data[i] = real_data[nd_fft-1-i] = 0.0;
 
       /* FFT of line */
@@ -221,7 +220,7 @@ void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int
       //{
         //fl2d[j*nv + i] = real_conv[i] * dV / nd_fft;
       //}
-      memcpy(&fl2d[j*nv], real_conv+npad/2, nv*sizeof(double));
+      memcpy(&fl2d[j*nv], real_conv+npad, nv*sizeof(double));
     }
   }
   return;

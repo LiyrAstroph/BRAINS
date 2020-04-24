@@ -1068,9 +1068,8 @@ void sa_smooth_init(int n_v_sa, const double *v_sa, double sigV)
   int i;
   double dV;
 
-  npad_sa = fmin(n_v_sa * 0.2, 100);
-  npad_sa = (npad_sa/2) * 2;
-  nd_fft_sa = n_v_sa+npad_sa;
+  npad_sa = fmin(n_v_sa * 0.1, 20);
+  nd_fft_sa = n_v_sa+npad_sa*2;
 
   sa_data_fft = (fftw_complex *) fftw_malloc((nd_fft_sa/2+1) * sizeof(fftw_complex));
   sa_resp_fft = (fftw_complex *) fftw_malloc((nd_fft_sa/2+1) * sizeof(fftw_complex));
@@ -1115,8 +1114,8 @@ void sa_smooth_run(double *v_sa, double *F_sa, int n_v_sa, double *p_sa, int n_b
 {
   int i, j;
   /* first profile */
-  memcpy(sa_real_data+npad_sa/2, F_sa, n_v_sa*sizeof(double));
-  for(i=0; i<npad_sa/2; i++)
+  memcpy(sa_real_data+npad_sa, F_sa, n_v_sa*sizeof(double));
+  for(i=0; i<npad_sa; i++)
     sa_real_data[i] = sa_real_data[nd_fft_sa-1-i] = 0.0;
   
   /* FFT of line */
@@ -1131,13 +1130,13 @@ void sa_smooth_run(double *v_sa, double *F_sa, int n_v_sa, double *p_sa, int n_b
     sa_conv_fft[i][1] = sa_data_fft[i][0]*sa_resp_fft[i][1] + sa_data_fft[i][1]*sa_resp_fft[i][0];
   }
   fftw_execute(sa_pback);
-  memcpy(F_sa, sa_real_conv+npad_sa/2, n_v_sa*sizeof(double));
+  memcpy(F_sa, sa_real_conv+npad_sa, n_v_sa*sizeof(double));
 
   /* then phase */
   for(j=0; j<n_base_sa; j++)
   {
-    memcpy(sa_real_data+npad_sa/2, &p_sa[j*n_v_sa], n_v_sa*sizeof(double));
-    for(i=0; i<npad_sa/2; i++)
+    memcpy(sa_real_data+npad_sa, &p_sa[j*n_v_sa], n_v_sa*sizeof(double));
+    for(i=0; i<npad_sa; i++)
       sa_real_data[i] = sa_real_data[nd_fft_sa-1-i] = 0.0;
     
     /* FFT of line */
@@ -1152,7 +1151,7 @@ void sa_smooth_run(double *v_sa, double *F_sa, int n_v_sa, double *p_sa, int n_b
       sa_conv_fft[i][1] = sa_data_fft[i][0]*sa_resp_fft[i][1] + sa_data_fft[i][1]*sa_resp_fft[i][0];
     }
     fftw_execute(sa_pback);
-    memcpy(&p_sa[j*n_v_sa], sa_real_conv+npad_sa/2, n_v_sa*sizeof(double));
+    memcpy(&p_sa[j*n_v_sa], sa_real_conv+npad_sa, n_v_sa*sizeof(double));
   }
   return;
 }
