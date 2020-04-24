@@ -58,7 +58,6 @@ double *PSmat, *USmat, *PSmat_data;
 double *PCmat_data, *IPCmat_data, *PQmat, *PEmat1, *PEmat2;
 double *workspace, *workspace_uv;
 double *var_param, *var_param_std;
-double *con_q;
 double logz_con;
 double *Larr_data, *Larr_rec;
 double *pow_Tcon_data;
@@ -106,7 +105,6 @@ double rcloud_min_set, rcloud_max_set, time_back_set;
 
 double **Fcon_particles, **Fcon_particles_perturb;
 double *prob_con_particles, *prob_con_particles_perturb;
-double **con_q_particles, **con_q_particles_perturb;
 
 int force_update;
 double **TransTau_particles, **TransTau_particles_perturb;

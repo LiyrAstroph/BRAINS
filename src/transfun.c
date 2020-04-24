@@ -64,21 +64,7 @@ void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl
     {
       tau = TransTau[j];
       tc = tl - tau;
-      if(tc>=Tcon_min && tc <=Tcon_max)
-      {
-        fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, tc, gsl_acc); /* interpolation */
-      }
-      else
-      {
-        /* fcon = mean */ 
-        fcon = con_q[0];
-        tmp = 1.0;
-        for(m=1; m < nq; m++)/*  beyond the range, set to be the long-term trend */
-        {
-          tmp *= tc;
-          fcon += con_q[m] * tmp;
-        }
-      }
+      fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, tc, gsl_acc); /* interpolation */
       
       /* add different trend in continuum and emission */
       if(parset.flag_trend_diff > 0)
@@ -140,21 +126,7 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
     {
       tau = TransTau[k];
       tc = tl - tau;
-      if(tc>=Tcon_min && tc <=Tcon_max)
-      {
-        fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, tc, gsl_acc);          
-      }
-      else
-      {
-        /* fcon = mean */ 
-        fcon = con_q[0];
-        tmp = 1.0;
-        for(m=1; m < nq; m++)/*  beyond the range, set to be the long-term trend */
-        {
-          tmp *= tc;
-          fcon += con_q[m] * tmp;
-        }
-      }
+      fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, tc, gsl_acc);          
 
       /* add different trend in continuum and emission line */
       if(parset.flag_trend_diff > 0)

@@ -185,7 +185,6 @@ extern double *PSmat, *USmat, *PSmat_data;
 extern double *PCmat_data, *IPCmat_data, *PQmat, *PEmat1, *PEmat2;
 extern double *workspace, *workspace_uv;
 extern double *var_param, *var_param_std;
-extern double *con_q;
 extern double logz_con;
 extern double *Larr_data, *Larr_rec;
 extern double *pow_Tcon_data;
@@ -230,7 +229,6 @@ extern double rcloud_min_set, rcloud_max_set, time_back_set;
 
 extern double **Fcon_particles, **Fcon_particles_perturb;
 extern double *prob_con_particles, *prob_con_particles_perturb;
-extern double **con_q_particles, **con_q_particles_perturb;
 
 extern int force_update;
 extern double **TransTau_particles, **TransTau_particles_perturb;

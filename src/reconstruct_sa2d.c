@@ -125,7 +125,6 @@ void postprocess_sa2d()
     which_particle_update = 0;
     nc = 0;
 
-    con_q = con_q_particles[which_particle_update];
     Fcon = Fcon_particles[which_particle_update];
     TransTau = TransTau_particles[which_particle_update];
     Trans2D_at_veldata = Trans2D_at_veldata_particles[which_particle_update];
@@ -340,7 +339,6 @@ void reconstruct_sa2d()
       which_parameter_update = -1; // force to update the transfer function
       which_particle_update = 0;
 
-      con_q = con_q_particles[which_particle_update];
       Fcon = Fcon_particles[which_particle_update];
       TransTau = TransTau_particles[which_particle_update];
       Trans2D_at_veldata = Trans2D_at_veldata_particles[which_particle_update];
@@ -655,14 +653,6 @@ void reconstruct_sa2d_init()
     Fline_at_data_particles_perturb[i] = malloc(n_line_data * n_vel_data_ext * sizeof(double));
   }
 
-  con_q_particles = malloc(parset.num_particles * sizeof(double *));
-  con_q_particles_perturb = malloc(parset.num_particles * sizeof(double *));
-  for(i=0; i<parset.num_particles; i++)
-  {
-    con_q_particles[i] = malloc(nq * sizeof(double));
-    con_q_particles_perturb[i] = malloc(nq* sizeof(double));
-  }
-  
   /* SA setup */
   phase_sa_particles = malloc(parset.num_particles * sizeof(double *));
   phase_sa_particles_perturb = malloc(parset.num_particles * sizeof(double *));
@@ -738,9 +728,6 @@ void reconstruct_sa2d_end()
     free(TransTau_particles_perturb[i]);
     free(Fline_at_data_particles[i]);
     free(Fline_at_data_particles_perturb[i]);
-
-    free(con_q_particles[i]);
-    free(con_q_particles_perturb[i]);
   }
   free(Trans2D_at_veldata_particles);
   free(Trans2D_at_veldata_particles_perturb);
@@ -748,9 +735,6 @@ void reconstruct_sa2d_end()
   free(TransTau_particles_perturb);
   free(Fline_at_data_particles);
   free(Fline_at_data_particles_perturb);
-
-  free(con_q_particles);
-  free(con_q_particles_perturb);
 
   /* SA setup */
   for(i=0; i<parset.num_particles; i++)
@@ -820,7 +804,6 @@ double prob_sa2d(const void *model)
   // only update continuum reconstruction when the corresponding parameters are updated
   if( which_parameter_update >= num_params_blr_tot )
   {
-    con_q = con_q_particles_perturb[which_particle_update];
     Fcon = Fcon_particles_perturb[which_particle_update];
     //calculate_con_from_model(model + num_params_blr*sizeof(double));
     calculate_con_from_model_semiseparable(model + num_params_blr_tot*sizeof(double));
@@ -829,7 +812,6 @@ double prob_sa2d(const void *model)
   }
   else /* continuum has no change, use the previous values */
   {
-    con_q = con_q_particles[which_particle_update];
     Fcon = Fcon_particles[which_particle_update];
     gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
   }
@@ -946,7 +928,6 @@ double prob_initial_sa2d(const void *model)
   
   which_particle_update = dnest_get_which_particle_update();
 
-  con_q = con_q_particles[which_particle_update];
   Fcon = Fcon_particles[which_particle_update];
   //calculate_con_from_model(model + num_params_blr*sizeof(double));
   calculate_con_from_model_semiseparable(model + num_params_blr_tot*sizeof(double));

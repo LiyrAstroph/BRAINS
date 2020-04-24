@@ -622,10 +622,6 @@ void accept_action_sa2d()
     Fcon_particles[which_particle_update] = Fcon_particles_perturb[which_particle_update];
     Fcon_particles_perturb[which_particle_update] = ptemp;
 
-    ptemp = con_q_particles[which_particle_update];
-    con_q_particles[which_particle_update] = con_q_particles_perturb[which_particle_update];
-    con_q_particles_perturb[which_particle_update] = ptemp;
-
     if(force_update != 1)
     {
       ptemp = Fline_at_data_particles[which_particle_update];
@@ -674,7 +670,6 @@ void kill_action_sa2d(int i, int i_copy)
 {
   memcpy(Fcon_particles[i], Fcon_particles[i_copy], parset.n_con_recon * sizeof(double));
   memcpy(Fline_at_data_particles[i], Fline_at_data_particles[i_copy], n_line_data * sizeof(double));
-  memcpy(con_q_particles[i], con_q_particles[i_copy], nq * sizeof(double));
   memcpy(TransTau_particles[i], TransTau_particles[i_copy], parset.n_tau*sizeof(double));
   memcpy(Trans2D_at_veldata_particles[i], Trans2D_at_veldata_particles[i_copy], parset.n_tau * n_vel_data * sizeof(double));
 

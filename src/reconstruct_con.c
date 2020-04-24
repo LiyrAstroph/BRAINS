@@ -305,8 +305,6 @@ void calculate_con_from_model(const void *model)
   multiply_matvec(Cq, &pm[3], nq, yq);
   for(i=0; i<nq; i++)
     yq[i] += ybuf[i];
-
-  memcpy(con_q, yq, nq*sizeof(double)); //back up long-term trend
   
   // y = yc - Lxq
   multiply_matvec_MN(Larr_data, n_con_data, nq, yq, ybuf);
@@ -399,8 +397,6 @@ void calculate_con_from_model_semiseparable(const void *model)
   multiply_matvec(Cq, &pm[3], nq, yq);
   for(i=0; i<nq; i++)
     yq[i] += ybuf[i];
-
-  memcpy(con_q, yq, nq*sizeof(double)); //back up long-term trend
   
   // y = yc - Lxq
   multiply_matvec_MN(Larr_data, n_con_data, nq, yq, ybuf);
@@ -493,7 +489,6 @@ void reconstruct_con_from_varmodel(double sigma_hat, double tau, double alpha, d
   multiply_mat_MN(Cq, yq, ybuf, nq, 1, nq);
 
   memcpy(yq, ybuf, nq*sizeof(double));
-  memcpy(con_q, ybuf, nq*sizeof(double)); // back up long-term trend
   
   multiply_matvec_MN(Larr_data, n_con_data, nq, yq, ybuf);
   for(i=0; i<n_con_data; i++)
@@ -919,7 +914,6 @@ void reconstruct_con_init()
   prob_con_particles = malloc(parset.num_particles * sizeof(double));
   prob_con_particles_perturb = malloc(parset.num_particles * sizeof(double));
 
-  con_q = malloc(nq * sizeof(double));
   return;
 }
 
@@ -953,7 +947,6 @@ void reconstruct_con_end()
   free(best_model_con);
   free(best_model_std_con);
 
-  free(con_q);
   return;
 }
 

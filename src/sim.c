@@ -538,8 +538,6 @@ void sim_init()
     }
   }
   
-  con_q = malloc(nq * sizeof(double));
-
   clouds_tau = malloc(parset.n_cloud_per_task * sizeof(double));
   clouds_weight = malloc(parset.n_cloud_per_task * sizeof(double));
   clouds_vel = malloc(parset.n_cloud_per_task * parset.n_vel_per_cloud * sizeof(double));
@@ -649,8 +647,6 @@ void sim_end()
   free(Fline2d);
   free(Trans2D);
   free(Trans1D);
-
-  free(con_q);
 
   free(clouds_tau);
   free(clouds_weight);
