@@ -452,9 +452,9 @@ void sim_init()
     Tspan = Tcon_data[n_con_data -1] - Tcon_data[0];
   
   /* set time array for continuum */
-    Tcon_min = Tcon_data[0] - time_back_set;
+    Tcon_min = Tcon_data[0] - time_back_set - 10.0;
     
-    Tcon_max = Tcon_data[n_con_data-1] + fmax(0.05*Tspan, 10.0);
+    Tcon_max = fmax(Tcon_data[n_con_data-1], Tline_data[n_line_data-1]) + fmax(0.05*Tspan, 10.0);
     dT = (Tcon_max - Tcon_min)/(parset.n_con_recon -1);
   
     for(i=0; i<parset.n_con_recon; i++)
@@ -473,8 +473,8 @@ void sim_init()
     printf("RM rcloud_min_max_set: %f %f\n", rcloud_min_set, rcloud_max_set);
 
     time_back_set = 2.0*rcloud_max_set;
-    Tcon_min = 0.0 - time_back_set;
-    Tcon_max = Tspan;
+    Tcon_min = 0.0 - time_back_set - 10.0;
+    Tcon_max = Tspan + 10.0;
 
     dT = (Tcon_max - Tcon_min)/(parset.n_con_recon -1);
   
@@ -516,7 +516,7 @@ void sim_init()
   else
   {
     Tline_min = 0.0;
-    Tline_max = Tcon_max;
+    Tline_max = Tcon_max - 1.0;
 
     dT = (Tline_max - Tline_min)/(parset.n_line_recon - 1);
 
@@ -524,7 +524,6 @@ void sim_init()
     {
       Tline[i] = Tline_min + i*dT;
     }
-    Tline[parset.n_line_recon - 1] = Tline_max-1.0e-10;
 
     double vel_max_set, vel_min_set;
     vel_max_set = sqrt(pow(3.0*sqrt(mbh/Rblr), 2.0) + pow(3.0*parset.InstRes, 2.0));

@@ -406,10 +406,10 @@ void reconstruct_sa1d_init()
   /* RM setup */
   Tspan = (Tcon_data[n_con_data-1] - Tcon_data[0]);
 
-  Tcon_min = Tcon_data[0] - time_back_set;
+  Tcon_min = Tcon_data[0] - time_back_set - 10.0;
 
-  Tcon_max = Tcon_data[n_con_data-1] + fmax(0.05*Tspan, 10.0);
-  Tcon_max = fmax(Tcon_max, Tline_data[n_line_data -1]);  /* The time span should cover that of the emission line data */
+  Tcon_max = Tcon_data[n_con_data-1] + fmax(0.05*Tspan, 20.0);
+  Tcon_max = fmax(Tcon_max, Tline_data[n_line_data -1] + 10.0);  /* The time span should cover that of the emission line data */
   
   if(thistask == roottask)
     printf("Tcon_min_max: %f %f\n", Tcon_min - Tcon_data[0], Tcon_max - Tcon_data[n_con_data-1]);
@@ -436,11 +436,11 @@ void reconstruct_sa1d_init()
 
   Tline_min = Tline_data[0] - fmin(0.05*(Tline_data[n_line_data - 1] - Tline_data[0]), 10.0);
   if(parset.time_back <= 0.0)
-    Tline_min = fmax(Tline_min, Tcon_min + Tspan/2.0 - 10.0);
+    Tline_min = fmax(Tline_min, Tcon_min + time_back_set);
   
 
-  Tline_max = Tline_data[n_line_data -1] + fmin(0.05*(Tline_data[n_line_data - 1] - Tline_data[0]), 10);
-  Tline_max = fmin(Tline_max, Tcon_max);  /* The time span should be smaller than that of the continuum */
+  Tline_max = Tline_data[n_line_data -1] + fmin(0.05*(Tline_data[n_line_data - 1] - Tline_data[0]), 10.0);
+  Tline_max = fmin(Tline_max, Tcon_max - 1.0);  /* The time span should be smaller than that of the continuum */
   
   if(thistask == roottask)
     printf("Tline_min_max: %f %f\n", Tline_min-Tline_data[0], Tline_max - Tline_data[n_line_data-1]);
