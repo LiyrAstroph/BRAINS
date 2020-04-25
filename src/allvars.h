@@ -242,8 +242,6 @@ extern double *clouds_tau, *clouds_weight, *clouds_vel;
 extern FILE *fcloud_out;
 extern int icr_cloud_save;
 
-extern int postprc;
-
 /* GSL */
 extern const gsl_rng_type * gsl_T;
 extern gsl_rng * gsl_r;

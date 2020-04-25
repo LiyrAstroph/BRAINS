@@ -118,8 +118,6 @@ double *clouds_tau, *clouds_weight, *clouds_vel;
 FILE *fcloud_out = NULL;
 int icr_cloud_save = 1;
 
-int postprc;
-
 /* GSL */
 const gsl_rng_type * gsl_T;
 gsl_rng * gsl_r;
