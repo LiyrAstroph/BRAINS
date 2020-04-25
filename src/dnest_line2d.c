@@ -36,9 +36,12 @@ int dnest_line2d(int argc, char **argv)
   set_blr_model2d();
     
   num_params_blr = num_params_blr_model + num_params_nlr 
-                 + num_params_res + num_params_linecenter + 2 + 1; /* include A, Ag, and line sys err */
+                 + num_params_res + num_params_linecenter + 1; /* include line sys err */
   num_params_blr_tot = num_params_blr;
-  num_params = parset.n_con_recon + num_params_blr + num_params_var;
+  num_params = parset.n_con_recon + num_params_blr_tot + num_params_var;
+  idx_resp = num_params_blr_tot + num_params_drw + num_params_trend;
+  idx_difftrend = idx_resp + num_params_resp;
+
   par_fix = (int *) malloc(num_params * sizeof(int));
   par_fix_val = (double *) malloc(num_params * sizeof(double));
   par_range_model = malloc( num_params * sizeof(double *));
@@ -136,8 +139,8 @@ int dnest_line2d(int argc, char **argv)
   /* fix non-linear response */
   if(parset.flag_nonlinear !=1)
   {
-    par_fix[num_params_blr-2] = 1;
-    par_fix_val[num_params_blr-2] = 0.0;
+    par_fix[idx_resp + 1] = 1;
+    par_fix_val[idx_resp + 1] = 0.0;
   }
   
   print_par_names_model2d();
@@ -167,7 +170,7 @@ int dnest_line2d(int argc, char **argv)
  */
 void set_par_range_model2d()
 {
-  int i;
+  int i, j, i1, i2;
 
   /* setup parameter range, BLR parameters first */
   for(i=0; i<num_params_blr_model; i++)
@@ -201,7 +204,7 @@ void set_par_range_model2d()
     par_prior_gaussian[i][1] = 1.0;
   }
   /* cope with line center */
-  for(i=num_params_blr-num_params_linecenter-3; i< num_params_blr-3; i++)
+  for(i=num_params_blr-num_params_linecenter-1; i< num_params_blr-1; i++)
   {
     par_range_model[i][0] = -10.0;
     par_range_model[i][1] =  10.0;
@@ -209,16 +212,6 @@ void set_par_range_model2d()
     par_prior_model[i] = GAUSSIAN;
     par_prior_gaussian[i][0] = 0.0;
     par_prior_gaussian[i][1] = 1.0;
-  }
-  
-  for(i=num_params_blr-3; i<num_params_blr-1; i++)
-  {
-    par_range_model[i][0] = resp_range[i - (num_params_blr-3)][0];
-    par_range_model[i][1] = resp_range[i - (num_params_blr-3)][1];
-
-    par_prior_model[i] = UNIFORM;
-    par_prior_gaussian[i][0] = 0.0;
-    par_prior_gaussian[i][1] = 0.0;
   }
 
   /* the last is systematic error */
@@ -275,15 +268,37 @@ void set_par_range_model2d()
     par_prior_gaussian[i][0] = 0.0;
     par_prior_gaussian[i][1] = 1.0;
   }
-  /* different trend in continuum and line */
-  for(i=num_params_drw + num_params_trend + num_params_blr; i< num_params_var + num_params_blr; i++)
+
+  /* response A and Ag */
+  j = 0;
+  i1 = idx_resp;
+  i2 = idx_resp + num_params_resp;
+  for(i=i1; i<i2; i++)
   {
-    par_range_model[i][0] = var_range_model[4 + i - (num_params_drw + num_params_trend + num_params_blr)][0];
-    par_range_model[i][1] = var_range_model[4 + i - (num_params_drw + num_params_trend + num_params_blr)][1];
+    par_range_model[i][0] = resp_range[j][0];
+    par_range_model[i][1] = resp_range[j][1];
 
     par_prior_model[i] = UNIFORM;
     par_prior_gaussian[i][0] = 0.0;
     par_prior_gaussian[i][1] = 0.0;
+
+    j++;
+  }
+
+  /* different trend in continuum and line */
+  j = 0;
+  i1 = idx_difftrend;
+  i2 = idx_difftrend + num_params_difftrend;
+  for(i=i1; i< i2; i++)
+  {
+    par_range_model[i][0] = var_range_model[4 + j][0];
+    par_range_model[i][1] = var_range_model[4 + j][1];
+
+    par_prior_model[i] = UNIFORM;
+    par_prior_gaussian[i][0] = 0.0;
+    par_prior_gaussian[i][1] = 0.0;
+
+    j++;
   }
 
   /* continuum ligth curve values */
@@ -357,14 +372,6 @@ void print_par_names_model2d()
     fprintf(fp, str_fmt, i, "line center", par_range_model[i][0], par_range_model[i][1], par_prior_model[i],
                             par_fix[i], par_fix_val[i]);
   }
-  
-  i++;
-  fprintf(fp, str_fmt, i, "A", par_range_model[i][0], par_range_model[i][1], par_prior_model[i],
-                            par_fix[i], par_fix_val[i]);
-
-  i++;
-  fprintf(fp, str_fmt, i, "Ag", par_range_model[i][0], par_range_model[i][1], par_prior_model[i],
-                            par_fix[i], par_fix_val[i]);
 
   i++;
   fprintf(fp, str_fmt, i, "sys_err_line", par_range_model[i][0], par_range_model[i][1], par_prior_model[i],
@@ -386,6 +393,14 @@ void print_par_names_model2d()
     fprintf(fp, str_fmt, i, "trend", par_range_model[i][0], par_range_model[i][1], par_prior_model[i],
                             par_fix[i], par_fix_val[i]);
   }
+  
+  i++;
+  fprintf(fp, str_fmt, i, "A", par_range_model[i][0], par_range_model[i][1], par_prior_model[i],
+                            par_fix[i], par_fix_val[i]);
+
+  i++;
+  fprintf(fp, str_fmt, i, "Ag", par_range_model[i][0], par_range_model[i][1], par_prior_model[i],
+                            par_fix[i], par_fix_val[i]);
 
   for(j=0; j<num_params_difftrend; j++)
   {

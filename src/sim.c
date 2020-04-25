@@ -373,14 +373,19 @@ void sim_init()
   which_parameter_update = -1;
   
   num_params_blr = num_params_blr_model + num_params_nlr 
-                 + num_params_res + num_params_linecenter + 2 + 1; /* include A, Ag, and line sys err */
-  num_params_var = num_params_drw + num_params_trend + num_params_difftrend;
+                 + num_params_res + num_params_linecenter + 1; /* include line sys err */
+  num_params_var = num_params_drw + num_params_trend + num_params_difftrend + num_params_resp;
 
   num_params_blr_tot = num_params_blr;
 #ifdef SA
   num_params_blr_tot  += num_params_sa_blr;
 #endif
   num_params = num_params_blr_tot + num_params_var + parset.n_con_recon;
+
+  /* index of A and Ag */
+  idx_resp = num_params_blr_tot + num_params_drw + num_params_trend;
+  /* index of different trend */
+  idx_difftrend = idx_resp + num_params_resp;
 
   model = malloc(num_params * sizeof(double));
   par_fix = (int *) malloc(num_params * sizeof(int));
@@ -407,8 +412,8 @@ void sim_init()
   
   pm[num_params_blr_model + num_params_nlr ] = 0.0; // spectral broadening
 
-  pm[num_params_blr-3] = log(1.0); //A
-  pm[num_params_blr-2] = 0.0;      //Ag
+  pm[idx_resp + 0] = log(1.0); //A
+  pm[idx_resp + 1] = 0.0;      //Ag
 
 #ifdef SA
   double *sa_model = pm + num_params_blr;

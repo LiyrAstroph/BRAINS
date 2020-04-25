@@ -208,7 +208,7 @@ extern double *par_fix_val;
 
 extern int num_params_blr_tot;
 extern int num_params, num_params_blr, num_params_blr_model, num_params_var, num_params_difftrend, num_params_nlr, num_params_res;
-extern int num_params_drw, num_params_trend;
+extern int num_params_drw, num_params_trend, num_params_resp;
 extern int num_params_linecenter;
 
 extern double **blr_range_model, **par_range_model;
@@ -220,6 +220,7 @@ extern int nlr_prior_model[3];
 extern double mass_range[2];
 extern double sys_err_line_range[2]; /* range for systematic error of line */
 extern double resp_range[2][2];
+extern int idx_resp, idx_difftrend;
 
 extern double *instres_epoch, *instres_err_epoch;
 

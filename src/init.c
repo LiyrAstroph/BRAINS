@@ -32,6 +32,14 @@ void init()
   nq = 1 + parset.flag_trend;
   num_params_trend = nq;
   num_params_drw = 3; /* include systematic error */
+  if(parset.flag_dim == 0)
+  {
+    num_params_resp = 0; /* no A and Ag for 0D */
+  }
+  else
+  {
+    num_params_resp = 2; /* response A and Ag */
+  }
 
   if(parset.flag_trend_diff > 0)
   {
@@ -42,7 +50,7 @@ void init()
     num_params_difftrend = 0;
   }
   
-  num_params_var = num_params_drw + num_params_trend + num_params_difftrend;
+  num_params_var = num_params_drw + num_params_trend + num_params_resp + num_params_difftrend;
 
   /* number of parameters for narrow line, only valid for 2d RM. */
   num_params_nlr = 0;
@@ -338,7 +346,14 @@ void init()
     {
       printf("rcloud_min_max_set: %f %f\n", rcloud_min_set, rcloud_max_set);
     }
-     
+    
+    // response range A and Ag
+    resp_range[0][0] = log(0.1);
+    resp_range[0][1] = log(10.0);
+  
+    resp_range[1][0] = -1.0;
+    resp_range[1][1] =  3.0;
+
     /* set the range of continuum variation  */
     var_range_model[0][0] = log(1.0); /* systematic error in continuum */
     var_range_model[0][1] = log(1.0+10.0);
@@ -393,13 +408,6 @@ void init()
     // range for systematic error
     sys_err_line_range[0] = log(1.0);
     sys_err_line_range[1] = log(1.0+10.0);
-  
-    // response range
-    resp_range[0][0] = log(0.1);
-    resp_range[0][1] = log(10.0);
-  
-    resp_range[1][0] = -1.0;
-    resp_range[1][1] =  3.0;
     
     set_blr_range_model();
     

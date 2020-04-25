@@ -41,15 +41,15 @@ void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl
   double fline, fcon, tl, tc, tau, A, Ag, ftrend, a0=0.0, tmp, dTransTau;
   double *pmodel = (double *)pm;
 
-  A=exp(pmodel[num_params_blr-3]); /*  response coefficient */
-  Ag=pmodel[num_params_blr-2];     /*  no-linearity of response */
+  A=exp(pmodel[idx_resp]);
+  Ag=pmodel[idx_resp + 1];
 
   if(parset.flag_trend_diff > 0)
   {
     tmp = 0.0;
     for(m=1; m<num_params_difftrend+1; m++)
     {
-      tmp += pmodel[num_params_blr_tot + num_params_drw + num_params_trend + m-1] * pow_Tcon_data[m-1];
+      tmp += pmodel[idx_difftrend + m-1] * pow_Tcon_data[m-1];
     }
     a0 = -tmp;
   }
@@ -74,7 +74,7 @@ void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl
         for(m=1; m<num_params_difftrend+1; m++)
         {
           tmp *= (tc - Tmed_data);
-          ftrend += pmodel[num_params_blr_tot + num_params_drw + num_params_trend + m-1] * tmp;
+          ftrend += pmodel[idx_difftrend + m-1] * tmp;
         }
         fcon += ftrend;
       }
@@ -101,15 +101,15 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
   double tau, tl, tc, fcon, A, Ag, ftrend, fnarrow, a0=0.0, tmp, dTransTau;
   double *pmodel = (double *)pm;
 
-  A=exp(pmodel[num_params_blr-3]);
-  Ag=pmodel[num_params_blr-2];
+  A=exp(pmodel[idx_resp]);
+  Ag=pmodel[idx_resp + 1];
 
   if(parset.flag_trend_diff > 0)
   {
     tmp = 0.0;
     for(m=1; m<num_params_difftrend+1; m++)
     {
-      tmp += pmodel[num_params_blr_tot + num_params_drw + num_params_trend + m-1] * pow_Tcon_data[m-1];
+      tmp += pmodel[idx_difftrend + m-1] * pow_Tcon_data[m-1];
     }
     a0 = -tmp;
   }
@@ -136,7 +136,7 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
         for(m=1; m<num_params_difftrend+1; m++)
         {
           tmp *= (tc - Tmed_data);
-          ftrend += pmodel[num_params_blr_tot + num_params_drw + num_params_trend + m-1] * tmp;
+          ftrend += pmodel[idx_difftrend + m-1] * tmp;
         }
         fcon += ftrend;
       }
