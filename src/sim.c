@@ -42,7 +42,7 @@ void sim()
   
   if(parset.flag_dim == -1)
   {
-    //note that here use sigma_hat = sigma/sqrt(tau).
+    /* note that here use sigma_hat = sigma/sqrt(tau) */
     printf("sim with ln(sigma) = %f and  ln(taud) = %f.\n", var_param[1], var_param[2]);
     reconstruct_con_from_varmodel(exp(var_param[1]), exp(var_param[2]), 1.0, 0.0); 
   }
@@ -51,6 +51,7 @@ void sim()
     con_scale = 1.0;
     line_scale = 1.0;
     line_error_mean = con_error_mean = 0.01;
+    /* arguments: sigma_hat, tau, alapha, and syserr */
     create_con_from_random(0.03, 45.0, 1.0, 0.0); 
   }
   gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
@@ -341,7 +342,8 @@ void sim_init()
   num_params_sa = num_params_sa_blr;
 
 #endif
-
+  
+  /* use epoch-independent broadening */
   if(parset.flag_InstRes > 1)
   {
     num_params_res = 1;
@@ -359,13 +361,13 @@ void sim_init()
     printf("# set flag_narrowline to 1.\n");
     parset.flag_narrowline = 1;
   }
-
-  if(parset.flag_narrowline == 0)
+  else if(parset.flag_narrowline == 0)
   {
     parset.width_narrowline = 0.0;
   }
 
   parset.flag_linecenter = 0;
+  num_params_linecenter = 0;
 
   parset.num_particles = 1;
   which_particle_update = 0;
@@ -410,7 +412,8 @@ void sim_init()
     }
   }
   
-  pm[num_params_blr_model + num_params_nlr ] = 0.0; // spectral broadening
+  /* spectral broadening, note this is a deviation from the input value */
+  pm[num_params_blr_model + num_params_nlr ] = 0.0; 
 
   pm[idx_resp + 0] = log(1.0); //A
   pm[idx_resp + 1] = 0.0;      //Ag
@@ -531,7 +534,7 @@ void sim_init()
     }
 
     double vel_max_set, vel_min_set;
-    vel_max_set = sqrt(pow(3.0*sqrt(mbh/Rblr), 2.0) + pow(3.0*parset.InstRes, 2.0));
+    vel_max_set = sqrt(pow(2.0*sqrt(mbh/Rblr), 2.0) + pow(2.0*parset.InstRes, 2.0));
     vel_min_set = - vel_max_set;
     double dVel = (vel_max_set- vel_min_set)/(parset.n_vel_recon -1.0);
 
@@ -614,7 +617,7 @@ void sim_init()
   else
   {
     double vel_max_set, vel_min_set;
-    vel_max_set = sqrt(pow(3.0*sqrt(mbh/saRblr), 2.0) + pow(3.0*parset.sa_InstRes, 2.0));
+    vel_max_set = sqrt(pow(2.0*sqrt(mbh/saRblr), 2.0) + pow(2.0*parset.sa_InstRes, 2.0));
     vel_min_set = - vel_max_set;
     double dVel = (vel_max_set- vel_min_set)/(parset.n_sa_vel_recon -1.0);
     for(i=0; i<parset.n_sa_vel_recon; i++)
@@ -676,6 +679,9 @@ void sim_end()
 #endif
 }
 
+/* 
+ * set parameter values for either RM or SA
+ */
 void set_par_value_sim(double *pm, int flag_model)
 {
   int i;
@@ -889,5 +895,5 @@ int get_idx_mbh_from_blrmodel()
       idx = offsetof(BLRmodel9, mbh);
       break;
   }
-  return idx;
+  return idx / sizeof(double);
 }

@@ -161,11 +161,11 @@ int dnest_line2d(int argc, char **argv)
  *   II.  narrow line...........(if flag_narrowline is true)\n
  *   III. spectral broadening...()                          \n
  *   IV.  line center...........(if flag_linecenter is true)\n
- *   V.   response A and Ag.....()                          \n
- *   VI.  systematic error......()                          \n
- *   VII. variability...........()                          \n
- *   VIII.long-term trend.......()                          \n
- *   IX.  different trend.......()                          \n
+ *   V.   systematic error......()                          \n
+ *   VI.  variability...........()                          \n
+ *   VII. long-term trend.......()                          \n
+ *   VIII.response A and Ag.....()                          \n
+ *   IX.  different trend.......(if flag_difftend is ture)  \n
  *   X.   continuum light curve.()                          \n
  */
 void set_par_range_model2d()

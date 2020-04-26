@@ -186,6 +186,7 @@ void set_par_range_model1d()
       par_prior_gaussian[i][1] = 0.0;
     }
   }
+  /* long-term trend */
   for(i=num_params_drw + num_params_blr; i< num_params_drw + num_params_trend + num_params_blr; i++)
   {
     par_range_model[i][0] = var_range_model[3][0];
