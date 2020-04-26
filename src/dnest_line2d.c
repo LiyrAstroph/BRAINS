@@ -41,6 +41,7 @@ int dnest_line2d(int argc, char **argv)
   num_params = parset.n_con_recon + num_params_blr_tot + num_params_var;
   idx_resp = num_params_blr_tot + num_params_drw + num_params_trend;
   idx_difftrend = idx_resp + num_params_resp;
+  idx_linecenter = num_params_blr_model + num_params_nlr + num_params_res;
 
   par_fix = (int *) malloc(num_params * sizeof(int));
   par_fix_val = (double *) malloc(num_params * sizeof(double));
@@ -639,6 +640,10 @@ void accept_action_2d()
   return;
 }
 
+/*
+ * action when particle i is killed in cdnest sampling.
+ * particle i_copy's properties is copyed to particle i. 
+ */
 void kill_action_2d(int i, int i_copy)
 {
   memcpy(Fcon_particles[i], Fcon_particles[i_copy], parset.n_con_recon * sizeof(double));

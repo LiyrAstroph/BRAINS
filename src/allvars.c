@@ -87,7 +87,7 @@ int nlr_prior_model[3];
 double mass_range[2];
 double sys_err_line_range[2];
 double resp_range[2][2];
-int idx_resp, idx_difftrend;
+int idx_resp, idx_difftrend, idx_linecenter;
 
 int num_params_blr_tot;
 int num_params, num_params_blr, num_params_blr_model, num_params_var, num_params_difftrend, num_params_nlr, num_params_res;

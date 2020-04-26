@@ -127,14 +127,14 @@ void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int
     
     for(j=0; j<nl; j++)
     {
-      /* line center */
+      /* line center, not include for flag_linecenter = 0 */
       if(parset.flag_linecenter > 0) /* uniform */
       {
-        linecenter = pmodel[num_params_blr - num_params_linecenter - 1] * parset.linecenter_err; 
+        linecenter = pmodel[idx_linecenter] * parset.linecenter_err; 
       }
       else if(parset.flag_linecenter < 0) /* epoch dependent */
       {
-        linecenter = pmodel[num_params_blr - num_params_linecenter - 1 + j] * parset.linecenter_err;
+        linecenter = pmodel[idx_linecenter + j] * parset.linecenter_err;
       }
 
       for(i=0; i<nd_fft/2+1; i++)
@@ -181,11 +181,11 @@ void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int
       /* line center */
       if(parset.flag_linecenter > 0) /* uniform  */
       {
-        linecenter = pmodel[num_params_blr - num_params_linecenter - 1] * parset.linecenter_err; 
+        linecenter = pmodel[idx_linecenter] * parset.linecenter_err; 
       }
       else if(parset.flag_linecenter < 0) /* epoch dependent */
       {
-        linecenter = pmodel[num_params_blr - num_params_linecenter - 1 + j] * parset.linecenter_err;
+        linecenter = pmodel[idx_linecenter + j] * parset.linecenter_err;
       }
       /* setup response */
       for(i=0; i<nd_fft/2+1; i++)

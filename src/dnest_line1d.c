@@ -125,7 +125,16 @@ int dnest_line1d(int argc, char **argv)
 }
 
 /*!
- * this function set the parameter range.
+ * this function setups parameter ranges.
+ * 
+ * The order of parameters is:                              \n
+ *   I.   blr model.............()                          \n
+ *   II.  systematic error......()                          \n
+ *   III. variability...........()                          \n
+ *   IV.  long-term trend.......()                          \n
+ *   V.   response A and Ag.....()                          \n
+ *   VI.  different trend.......(if flag_difftend is ture)  \n
+ *   VII. continuum light curve.()                          \n
  */
 void set_par_range_model1d()
 {
@@ -544,6 +553,10 @@ void accept_action_1d()
   return;
 }
 
+/*
+ * action when particle i is killed in cdnest sampling.
+ * particle i_copy's properties is copyed to particle i. 
+ */
 void kill_action_1d(int i, int i_copy)
 {
   memcpy(Fcon_particles[i], Fcon_particles[i_copy], parset.n_con_recon * sizeof(double));

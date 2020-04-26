@@ -220,7 +220,7 @@ extern int nlr_prior_model[3];
 extern double mass_range[2];
 extern double sys_err_line_range[2]; /* range for systematic error of line */
 extern double resp_range[2][2];
-extern int idx_resp, idx_difftrend;
+extern int idx_resp, idx_difftrend, idx_linecenter;
 
 extern double *instres_epoch, *instres_err_epoch;
 

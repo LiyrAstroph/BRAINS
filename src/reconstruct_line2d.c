@@ -458,9 +458,9 @@ void reconstruct_line2d()
         double linecenter_mean = 0.0;
         for(i=0; i<n_line_data; i++)
         {
-          linecenter_mean += pm[num_params_blr - num_params_linecenter - 3 + i];
+          linecenter_mean += pm[idx_linecenter + i];
         }
-        pm[num_params_blr - num_params_linecenter - 3] = linecenter_mean/n_line_data;
+        pm[idx_linecenter] = linecenter_mean/n_line_data;
       }
       
       calculate_line2d_from_blrmodel(best_model_line2d, Tline, TransV, 

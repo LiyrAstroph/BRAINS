@@ -58,6 +58,7 @@ int dnest_sa2d(int argc, char **argv)
   num_params = num_params_sa + num_params_rm;
   idx_resp = num_params_blr_tot + num_params_drw + num_params_trend;
   idx_difftrend = idx_resp + num_params_resp;
+  idx_linecenter = num_params_blr_model + num_params_nlr + num_params_res;
 
   par_fix = (int *) malloc(num_params * sizeof(int));
   par_fix_val = (double *) malloc(num_params * sizeof(double));
@@ -645,9 +646,9 @@ void accept_action_sa2d()
   }
   else if( param != num_params_blr-1 && force_update != 1)
   {
-    /* BLR parameter is updated 
+    /* RM and SA BLR parameter is updated 
      * Note a) that the (num_par_blr-1)-th parameter is systematic error of line.
-     * when this parameter is updated, Trans1D and Fline are unchanged.
+     * when this parameter is updated, Trans2D, Fline, phase_sa, and Fline_sa are unchanged.
      *      b) Fline is always changed, except param = num_params_blr-1.
      */
     
@@ -680,6 +681,10 @@ void accept_action_sa2d()
   return;
 }
 
+/*
+ * action when particle i is killed in cdnest sampling.
+ * particle i_copy's properties is copyed to particle i. 
+ */
 void kill_action_sa2d(int i, int i_copy)
 {
   memcpy(Fcon_particles[i], Fcon_particles[i_copy], parset.n_con_recon * sizeof(double));
