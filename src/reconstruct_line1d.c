@@ -94,7 +94,6 @@ void postprocess1d()
     force_update = 1;
     which_parameter_update = -1; 
     which_particle_update = 0;
-    Fcon = Fcon_particles[which_particle_update];
     Fcon_rm = Fcon_rm_particles[which_particle_update];
     TransTau = TransTau_particles[which_particle_update];
     Trans1D = Trans1D_particles[which_particle_update];
@@ -284,7 +283,6 @@ void reconstruct_line1d()
       which_parameter_update = -1; // force to update the transfer function
       which_particle_update = 0;
 
-      Fcon = Fcon_particles[which_particle_update];
       Fcon_rm = Fcon_rm_particles[which_particle_update];
       TransTau = TransTau_particles[which_particle_update];
       Trans1D = Trans1D_particles[which_particle_update];
@@ -429,13 +427,7 @@ void reconstruct_line1d_init()
   MPI_Bcast(&parset.num_particles, 1, MPI_INT, roottask, MPI_COMM_WORLD);
 
   // Fcon perturbed and accepted for each particle
-  Fcon_particles = malloc(parset.num_particles * sizeof(double *));
-  Fcon_particles_perturb = malloc(parset.num_particles * sizeof(double *));
-  for(i=0; i<parset.num_particles; i++)
-  {
-    Fcon_particles[i] = malloc(parset.n_con_recon * sizeof(double));
-    Fcon_particles_perturb[i] = malloc(parset.n_con_recon * sizeof(double));
-  }
+  Fcon = malloc(parset.n_con_recon * sizeof(double));
   Fcon_rm_particles = malloc(parset.num_particles * sizeof(double *));
   Fcon_rm_particles_perturb = malloc(parset.num_particles * sizeof(double *));
   for(i=0; i<parset.num_particles; i++)
@@ -507,13 +499,10 @@ void reconstruct_line1d_end()
   int i;
   for(i=0; i<parset.num_particles; i++)
   {
-    free(Fcon_particles[i]);
-    free(Fcon_particles_perturb[i]);
     free(Fcon_rm_particles[i]);
     free(Fcon_rm_particles_perturb[i]);
   }
-  free(Fcon_particles);
-  free(Fcon_particles_perturb);
+  free(Fcon);
   free(Fcon_rm_particles);
   free(Fcon_rm_particles_perturb);
 
@@ -575,7 +564,6 @@ double prob_initial_line1d(const void *model)
   
   which_particle_update = dnest_get_which_particle_update();
 
-  Fcon = Fcon_particles[which_particle_update];
   Fcon_rm = Fcon_rm_particles[which_particle_update];
   //calculate_con_from_model(model + num_params_blr*sizeof(double));
   calculate_con_from_model_semiseparable(model + num_params_blr*sizeof(double));
@@ -617,7 +605,6 @@ double prob_restart_line1d(const void *model)
   
   which_particle_update = dnest_get_which_particle_update();
 
-  Fcon = Fcon_particles[which_particle_update];
   Fcon_rm = Fcon_rm_particles[which_particle_update];
   //calculate_con_from_model(model + num_params_blr*sizeof(double));
   calculate_con_from_model_semiseparable(model + num_params_blr*sizeof(double));
@@ -664,7 +651,6 @@ double prob_line1d(const void *model)
   // only update continuum reconstruction when the corresponding parameters are updated
   if( which_parameter_update >= num_params_blr )
   {
-    Fcon = Fcon_particles_perturb[which_particle_update];
     Fcon_rm = Fcon_rm_particles_perturb[which_particle_update];
     //calculate_con_from_model(model + num_params_blr*sizeof(double));
     calculate_con_from_model_semiseparable(model + num_params_blr*sizeof(double));
@@ -674,7 +660,6 @@ double prob_line1d(const void *model)
   }
   else /* continuum has no change, use the previous values */
   {
-    Fcon = Fcon_particles[which_particle_update];
     Fcon_rm = Fcon_rm_particles[which_particle_update];
     gsl_interp_init(gsl_linear, Tcon, Fcon_rm, parset.n_con_recon);
   }

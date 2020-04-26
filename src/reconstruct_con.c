@@ -76,7 +76,6 @@ void postprocess_con()
 
     which_parameter_update = -1;
     which_particle_update = 0;
-    Fcon = Fcon_particles[which_particle_update];
 
     for(i=0; i<num_ps; i++)
     {
@@ -206,7 +205,6 @@ void reconstruct_con()
       {
         which_parameter_update = -1;
         which_particle_update = 0;
-        Fcon = Fcon_particles[which_particle_update];
 
         calculate_con_from_model_semiseparable(best_model_con);
  
@@ -904,13 +902,7 @@ void reconstruct_con_init()
   }
   MPI_Bcast(&parset.num_particles, 1, MPI_INT, roottask, MPI_COMM_WORLD);
 
-  Fcon_particles = malloc(parset.num_particles * sizeof(double *));
-  Fcon_particles_perturb = malloc(parset.num_particles * sizeof(double *));
-  for(i=0; i<parset.num_particles; i++)
-  {
-    Fcon_particles[i] = malloc(parset.n_con_recon * sizeof(double));
-    Fcon_particles_perturb[i] = malloc(parset.n_con_recon * sizeof(double));
-  }
+  Fcon = malloc(parset.n_con_recon * sizeof(double *));
   prob_con_particles = malloc(parset.num_particles * sizeof(double));
   prob_con_particles_perturb = malloc(parset.num_particles * sizeof(double));
 
@@ -933,13 +925,7 @@ void reconstruct_con_end()
   free(par_prior_gaussian);
   free(par_prior_model);
   
-  for(i=0; i<parset.num_particles; i++)
-  {
-    free(Fcon_particles[i]);
-    free(Fcon_particles_perturb[i]);
-  }
-  free(Fcon_particles);
-  free(Fcon_particles_perturb);
+  free(Fcon);
   
   free(prob_con_particles);
   free(prob_con_particles_perturb);
