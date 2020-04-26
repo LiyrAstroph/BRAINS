@@ -627,8 +627,8 @@ void read_parset()
         parset.n_vel_per_cloud = fmax(10.0, parset.n_vel_per_cloud);
         printf("# set NCloudPerCore and NVPerCloud: %d %d\n", parset.n_cloud_per_task, parset.n_vel_per_cloud);
   
-        parset.n_tau = fmax(500, parset.n_tau);
-        parset.n_con_recon = fmax(500, parset.n_con_recon);
+        parset.n_tau = fmax(1000, parset.n_tau);
+        parset.n_con_recon = fmax(1000, parset.n_con_recon);
         printf("# set NTau and NConRecon: %d %d\n", parset.n_tau, parset.n_con_recon);
         parset.flag_save_clouds = 1;
       }

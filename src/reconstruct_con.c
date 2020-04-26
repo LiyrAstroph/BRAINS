@@ -90,16 +90,20 @@ void postprocess_con()
       fscanf(fp, "\n");
 
       memcpy(posterior_sample+i*size_of_modeltype, post_model, size_of_modeltype);
-
-      calculate_con_from_model_semiseparable(post_model);
-
-      if(gsl_rng_uniform(gsl_r) < 1.0)
+      
+      /* not output reconstruction when flag_dim = -1 */
+      if(parset.flag_dim != -1)
       {
-        for(j=0; j<parset.n_con_recon; j++)
+        calculate_con_from_model_semiseparable(post_model);
+
+        if(gsl_rng_uniform(gsl_r) < 1.0)
         {
-          fprintf(fcon, "%e %e %f\n", Tcon[j]*(1.0+parset.redshift), Fcon[j]/con_scale, Fcerrs[j]/con_scale);
+          for(j=0; j<parset.n_con_recon; j++)
+          {
+            fprintf(fcon, "%e %e %f\n", Tcon[j]*(1.0+parset.redshift), Fcon[j]/con_scale, Fcerrs[j]/con_scale);
+          }
+          fprintf(fcon, "\n");
         }
-        fprintf(fcon, "\n");
       }
     }
 
