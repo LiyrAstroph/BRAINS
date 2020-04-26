@@ -52,7 +52,7 @@ int which_level_update;      /*!< which level of the particle */
 
 /* continuum reconstruction */
 int nq;
-double *Tcon, *Fcon, *Fcerrs;
+double *Tcon, *Fcon, *Fcerrs, *Fcon_rm;
 double Tcon_min, Tcon_max;
 double *PSmat, *USmat, *PSmat_data;
 double *PCmat_data, *IPCmat_data, *PQmat, *PEmat1, *PEmat2;
@@ -104,7 +104,7 @@ double *instres_epoch, *instres_err_epoch;
 double *TransTau, *TransV, *TransW, *Trans1D, *Trans2D_at_veldata, *Trans2D;
 double rcloud_min_set, rcloud_max_set, time_back_set;
 
-double **Fcon_particles, **Fcon_particles_perturb;
+double **Fcon_particles, **Fcon_particles_perturb, **Fcon_rm_particles, **Fcon_rm_particles_perturb;
 double *prob_con_particles, *prob_con_particles_perturb;
 
 int force_update;

@@ -110,6 +110,7 @@ void postprocess_sa1d()
     nc = 0;
     
     Fcon = Fcon_particles[which_particle_update];
+    Fcon_rm = Fcon_rm_particles[which_particle_update];
     TransTau = TransTau_particles[which_particle_update];
     Trans1D = Trans1D_particles[which_particle_update];
 
@@ -133,7 +134,8 @@ void postprocess_sa1d()
       memcpy(posterior_sample+i*size_of_modeltype, post_model, size_of_modeltype);
       
       calculate_con_from_model_semiseparable(post_model + num_params_blr_tot *sizeof(double));
-      gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
+      calculate_con_rm(post_model);
+      gsl_interp_init(gsl_linear, Tcon, Fcon_rm, parset.n_con_recon);
 
       calculate_sa_transfun_from_blrmodel(post_model, 0);
       calculate_line_from_blrmodel(post_model, Tline, Fline, parset.n_line_recon);
@@ -286,6 +288,7 @@ void reconstruct_sa1d()
       which_particle_update = 0;
 
       Fcon = Fcon_particles[which_particle_update];
+      Fcon_rm = Fcon_rm_particles[which_particle_update];
       TransTau = TransTau_particles[which_particle_update];
       Trans1D = Trans1D_particles[which_particle_update];
       
@@ -296,7 +299,8 @@ void reconstruct_sa1d()
 
       //calculate_con_from_model(best_model_line1d + num_params_blr *sizeof(double));
       calculate_con_from_model_semiseparable(best_model_sa1d + num_params_blr_tot *sizeof(double));
-      gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
+      calculate_con_rm(best_model_sa1d);
+      gsl_interp_init(gsl_linear, Tcon, Fcon_rm, parset.n_con_recon);
 
       calculate_sa_transfun_from_blrmodel(best_model_sa1d, 1);
       calculate_line_from_blrmodel(best_model_sa1d, Tline, Fline, parset.n_line_recon);
@@ -460,6 +464,13 @@ void reconstruct_sa1d_init()
     Fcon_particles[i] = malloc(parset.n_con_recon * sizeof(double));
     Fcon_particles_perturb[i] = malloc(parset.n_con_recon * sizeof(double));
   }
+  Fcon_rm_particles = malloc(parset.num_particles * sizeof(double *));
+  Fcon_rm_particles_perturb = malloc(parset.num_particles * sizeof(double *));
+  for(i=0; i<parset.num_particles; i++)
+  {
+    Fcon_rm_particles[i] = malloc(parset.n_con_recon * sizeof(double));
+    Fcon_rm_particles_perturb[i] = malloc(parset.n_con_recon * sizeof(double));
+  }
 
   TransTau_particles = malloc(parset.num_particles * sizeof(double *));
   TransTau_particles_perturb = malloc(parset.num_particles * sizeof(double *));
@@ -545,9 +556,13 @@ void reconstruct_sa1d_end()
   {
     free(Fcon_particles[i]);
     free(Fcon_particles_perturb[i]);
+    free(Fcon_rm_particles[i]);
+    free(Fcon_rm_particles_perturb[i]);
   }
   free(Fcon_particles);
   free(Fcon_particles_perturb);
+  free(Fcon_rm_particles);
+  free(Fcon_rm_particles_perturb);
 
   for(i=0; i<parset.num_particles; i++)
   {
@@ -633,15 +648,18 @@ double prob_sa1d(const void *model)
   if( which_parameter_update >= num_params_blr_tot )
   {
     Fcon = Fcon_particles_perturb[which_particle_update];
+    Fcon_rm = Fcon_rm_particles_perturb[which_particle_update];
     //calculate_con_from_model(model + num_params_blr*sizeof(double));
     calculate_con_from_model_semiseparable(model + num_params_blr_tot*sizeof(double));
+    calculate_con_rm(model);
 
-    gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
+    gsl_interp_init(gsl_linear, Tcon, Fcon_rm, parset.n_con_recon);
   }
   else /* continuum has no change, use the previous values */
   {
     Fcon = Fcon_particles[which_particle_update];
-    gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
+    Fcon_rm = Fcon_rm_particles[which_particle_update];
+    gsl_interp_init(gsl_linear, Tcon, Fcon_rm, parset.n_con_recon);
   }
 
   /* only update transfer function when BLR model is changed
@@ -750,9 +768,11 @@ double prob_initial_sa1d(const void *model)
   which_particle_update = dnest_get_which_particle_update();
 
   Fcon = Fcon_particles[which_particle_update];
+  Fcon_rm = Fcon_rm_particles[which_particle_update];
   //calculate_con_from_model(model + num_params_blr*sizeof(double));
   calculate_con_from_model_semiseparable(model + num_params_blr_tot*sizeof(double));
-  gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
+  calculate_con_rm(model);
+  gsl_interp_init(gsl_linear, Tcon, Fcon_rm, parset.n_con_recon);
   
   TransTau = TransTau_particles[which_particle_update];
   Trans1D = Trans1D_particles[which_particle_update]; 

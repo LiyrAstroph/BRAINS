@@ -64,6 +64,7 @@ void create_con_from_random(double sigma_hat, double tau, double alpha, double s
 void postprocess_con();
 void set_par_range_con();
 void print_par_names_con();
+void calculate_con_rm(const void *pm);
 
 void set_blr_model1d();
 void set_blr_model2d();

@@ -179,7 +179,7 @@ extern double *limits;  // external from dnest
 
 /* continuum reconstruction */
 extern int nq;
-extern double *Tcon, *Fcon, *Fcerrs;
+extern double *Tcon, *Fcon, *Fcerrs, *Fcon_rm;
 extern double Tcon_min, Tcon_max;
 extern double *PSmat, *USmat, *PSmat_data;
 extern double *PCmat_data, *IPCmat_data, *PQmat, *PEmat1, *PEmat2;
@@ -228,7 +228,7 @@ extern double *instres_epoch, *instres_err_epoch;
 extern double *TransTau, *TransV, *TransW, *Trans1D, *Trans2D_at_veldata, *Trans2D;
 extern double rcloud_min_set, rcloud_max_set, time_back_set;
 
-extern double **Fcon_particles, **Fcon_particles_perturb;
+extern double **Fcon_particles, **Fcon_particles_perturb, **Fcon_rm_particles, **Fcon_rm_particles_perturb;
 extern double *prob_con_particles, *prob_con_particles_perturb;
 
 extern int force_update;

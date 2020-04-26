@@ -22,6 +22,62 @@
 
 #include "brains.h"
 
+
+/* 
+ * calculate (Fcon + ftrend)^Ag 
+ * 
+ */
+void calculate_con_rm(const void *pm)
+{
+  int i, m;
+  double fcon, A, Ag, ftrend, a0=0.0, tmp;
+  double *pmodel = (double *)pm;
+
+  A=exp(pmodel[idx_resp]);
+  Ag=pmodel[idx_resp + 1];
+
+  /* add different trend in continuum and emission */
+  if(parset.flag_trend_diff > 0)
+  {
+    tmp = 0.0;
+    for(m=1; m<num_params_difftrend+1; m++)
+    {
+      tmp += pmodel[idx_difftrend + m-1] * pow_Tcon_data[m-1];
+    }
+    a0 = -tmp;
+
+    for(i=0; i<parset.n_con_recon; i++)
+    {
+      ftrend = a0;
+      tmp = 1.0;
+      for(m=1; m<num_params_difftrend+1; m++)
+      {
+        tmp *= (Tcon[i] - Tmed_data);
+        ftrend += pmodel[idx_difftrend + m-1] * tmp;
+      }
+      
+      fcon = Fcon[i] + ftrend;
+      if(fcon > 0.0)
+      {
+        Fcon_rm[i] = pow(fcon, 1.0 + Ag);
+      }
+      else 
+      {
+        Fcon_rm[i] = 0.0;
+      }
+    }
+  }
+  else 
+  {
+    for(i=0; i<parset.n_con_recon; i++)
+    {
+      Fcon_rm[i] = A * pow(Fcon[i], 1.0+Ag);
+    }
+  }
+
+  return;
+}
+
 /*!
  * This function calculate 1d line from a given BLR model.
  *
@@ -37,22 +93,8 @@
  */
 void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl)
 {
-  int i, j, m;
-  double fline, fcon, tl, tc, tau, A, Ag, ftrend, a0=0.0, tmp, dTransTau;
-  double *pmodel = (double *)pm;
-
-  A=exp(pmodel[idx_resp]);
-  Ag=pmodel[idx_resp + 1];
-
-  if(parset.flag_trend_diff > 0)
-  {
-    tmp = 0.0;
-    for(m=1; m<num_params_difftrend+1; m++)
-    {
-      tmp += pmodel[idx_difftrend + m-1] * pow_Tcon_data[m-1];
-    }
-    a0 = -tmp;
-  }
+  int i, j;
+  double fline, fcon_rm, tl, tc, tau, dTransTau;
 
   dTransTau = TransTau[1] - TransTau[0];
 
@@ -64,28 +106,11 @@ void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl
     {
       tau = TransTau[j];
       tc = tl - tau;
-      fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, tc, gsl_acc); /* interpolation */
-      
-      /* add different trend in continuum and emission */
-      if(parset.flag_trend_diff > 0)
-      {
-        ftrend = a0;
-        tmp = 1.0;
-        for(m=1; m<num_params_difftrend+1; m++)
-        {
-          tmp *= (tc - Tmed_data);
-          ftrend += pmodel[idx_difftrend + m-1] * tmp;
-        }
-        fcon += ftrend;
-      }
-
-      /* take into account the possibility that fcon is negative */
-      if(fcon > 0.0)
-      {
-        fline += Trans1D[j] * fcon * pow(fcon, Ag);     /*  line response */
-      }	
+      fcon_rm = gsl_interp_eval(gsl_linear, Tcon, Fcon_rm, tc, gsl_acc); /* interpolation */
+    
+      fline += Trans1D[j] * fcon_rm;     /*  line response */
     }
-    Fl[i] = fline * dTransTau * A;
+    Fl[i] = fline * dTransTau;
   }
 
   return;
@@ -97,22 +122,9 @@ void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl
 void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const double *transv, const double *trans2d, 
                                               double *fl2d, int nl, int nv)
 {
-  int i, j, k, m;
-  double tau, tl, tc, fcon, A, Ag, ftrend, fnarrow, a0=0.0, tmp, dTransTau;
+  int i, j, k;
+  double tau, tl, tc, fcon_rm, fnarrow, dTransTau;
   double *pmodel = (double *)pm;
-
-  A=exp(pmodel[idx_resp]);
-  Ag=pmodel[idx_resp + 1];
-
-  if(parset.flag_trend_diff > 0)
-  {
-    tmp = 0.0;
-    for(m=1; m<num_params_difftrend+1; m++)
-    {
-      tmp += pmodel[idx_difftrend + m-1] * pow_Tcon_data[m-1];
-    }
-    a0 = -tmp;
-  }
 
   dTransTau = TransTau[1] - TransTau[0];
 
@@ -126,33 +138,16 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
     {
       tau = TransTau[k];
       tc = tl - tau;
-      fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, tc, gsl_acc);          
-
-      /* add different trend in continuum and emission line */
-      if(parset.flag_trend_diff > 0)
-      {
-        ftrend = a0;
-        tmp = 1.0;
-        for(m=1; m<num_params_difftrend+1; m++)
-        {
-          tmp *= (tc - Tmed_data);
-          ftrend += pmodel[idx_difftrend + m-1] * tmp;
-        }
-        fcon += ftrend;
-      }
+      fcon_rm = gsl_interp_eval(gsl_linear, Tcon, Fcon_rm, tc, gsl_acc);
 
       for(i=0; i<nv; i++)
       {
-        if(fcon > 0.0)
-        {
-           fl2d[j*nv + i] += trans2d[k*nv+i] * fcon * pow(fcon, Ag);
-           //fline += trans2d[k*nv+i] * fcon;
-        }
+        fl2d[j*nv + i] += trans2d[k*nv+i] * fcon_rm;
       }
     }
     for(i=0; i<nv; i++)
     {
-      fl2d[j*nv + i] *= dTransTau * A;
+      fl2d[j*nv + i] *= dTransTau;
     }
   }
 

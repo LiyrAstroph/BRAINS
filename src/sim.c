@@ -54,7 +54,7 @@ void sim()
     /* arguments: sigma_hat, tau, alapha, and syserr */
     create_con_from_random(0.03, 45.0, 1.0, 0.0); 
   }
-  gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
+  calculate_con_rm(model);
   
   sprintf(fname, "%s/%s", parset.file_dir, "/data/sim_con_full.txt");
   fp = fopen(fname, "w");
@@ -80,6 +80,7 @@ void sim()
   
   if(parset.flag_dim != -2)
   {
+    gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
     for(i=0; i<n_con_data; i++)
     {
       //fprintf(fp, "%f %f %f\n", Tcon[i], Fcon[i]/con_scale, Fcerrs[i]/con_scale);
@@ -100,10 +101,9 @@ void sim()
   }
   fclose(fp);
   
-  
+  gsl_interp_init(gsl_linear, Tcon, Fcon_rm, parset.n_con_recon);
   transfun_1d_cal(model, 0);
   calculate_line_from_blrmodel(model, Tline, Fline, parset.n_line_recon);
-
   
   sprintf(fname, "%s/%s", parset.file_dir, "/data/sim_hb.txt");
   fp = fopen(fname, "w");
@@ -442,6 +442,7 @@ void sim_init()
 #endif
 
   Fcon = malloc(parset.n_con_recon * sizeof(double));
+  Fcon_rm = malloc(parset.n_con_recon * sizeof(double));
 
   idx = get_idx_mbh_from_blrmodel();
   mbh = exp(pm[idx]);
@@ -645,6 +646,7 @@ void sim_end()
   free(par_fix);
   free(par_fix_val);
   free(Fcon);
+  free(Fcon_rm);
 
   free(TransTau);
   free(TransV);
