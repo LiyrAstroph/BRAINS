@@ -169,7 +169,7 @@ extern double *Vline_data, *Fline2d_data, *Flerrs2d_data, *Wline_data;
 extern double *Vline_data_ext, *Wline_data_ext;
 extern double con_scale, line_scale;
 
-extern double con_error_mean, line_error_mean;
+extern double con_error_mean, line_error_mean, line_error_mean_sq;
 
 extern char dnest_options_file[BRAINS_MAX_STR_LENGTH];
 

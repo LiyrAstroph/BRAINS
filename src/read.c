@@ -1004,6 +1004,7 @@ void read_data()
     MPI_Bcast(Flerrs_data, n_line_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
 
     MPI_Bcast(&line_error_mean, 1, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+    line_error_mean_sq = line_error_mean * line_error_mean;
   }
 
   // read 2d line data
@@ -1096,6 +1097,7 @@ void read_data()
     MPI_Bcast(Flerrs2d_data, n_line_data*n_vel_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
 
     MPI_Bcast(&line_error_mean, 1, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+    line_error_mean_sq = line_error_mean * line_error_mean;
     // each task calculates line fluxes
     cal_emission_flux();
 

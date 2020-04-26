@@ -42,7 +42,7 @@ double *Vline_data, *Fline2d_data, *Flerrs2d_data, *Wline_data;
 double *Vline_data_ext, *Wline_data_ext;
 double con_scale, line_scale;
 
-double con_error_mean, line_error_mean;
+double con_error_mean, line_error_mean, line_error_mean_sq;
 
 char dnest_options_file[BRAINS_MAX_STR_LENGTH];
 

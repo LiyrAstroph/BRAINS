@@ -881,7 +881,7 @@ double prob_sa2d(const void *model)
     Fline2d_at_data = Fline_at_data_particles_perturb[which_particle_update];
     calculate_line2d_from_blrmodel(model, Tline_data, Vline_data_ext, Trans2D_at_veldata, Fline2d_at_data, n_line_data, n_vel_data_ext);
     
-    var2_se = (exp(pm[num_params_blr-1])-1.0) * (exp(pm[num_params_blr-1])-1.0) * line_error_mean*line_error_mean;
+    var2_se = (exp(pm[num_params_blr-1])-1.0) * (exp(pm[num_params_blr-1])-1.0) * line_error_mean_sq;
     for(i=0; i<n_line_data; i++)
     {
       for(j=0; j<n_vel_data; j++)
@@ -900,7 +900,7 @@ double prob_sa2d(const void *model)
   {
     /* re-point */
     Fline2d_at_data = Fline_at_data_particles[which_particle_update];
-    var2_se = (exp(pm[num_params_blr-1])-1.0) * (exp(pm[num_params_blr-1])-1.0) * line_error_mean*line_error_mean;
+    var2_se = (exp(pm[num_params_blr-1])-1.0) * (exp(pm[num_params_blr-1])-1.0) * line_error_mean_sq;
     for(i=0; i<n_line_data; i++)
     {
       for(j=0; j<n_vel_data; j++)
@@ -973,7 +973,7 @@ double prob_initial_sa2d(const void *model)
   Fline2d_at_data = Fline_at_data_particles_perturb[which_particle_update];
   calculate_line2d_from_blrmodel(model, Tline_data, Vline_data_ext, Trans2D_at_veldata, Fline2d_at_data, n_line_data, n_vel_data_ext);
   
-  var2_se = (exp(pm[num_params_blr-1])-1.0) * (exp(pm[num_params_blr-1])-1.0) * line_error_mean*line_error_mean;
+  var2_se = (exp(pm[num_params_blr-1])-1.0) * (exp(pm[num_params_blr-1])-1.0) * line_error_mean_sq;
   for(i=0; i<n_line_data; i++)
   {
     for(j=0; j<n_vel_data; j++)

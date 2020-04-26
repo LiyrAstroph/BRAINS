@@ -708,7 +708,7 @@ double prob_sa1d(const void *model)
     Fline_at_data = Fline_at_data_particles_perturb[which_particle_update];
     calculate_line_from_blrmodel(model, Tline_data, Fline_at_data, n_line_data);
 
-    var2_se = (exp(pm[num_params_blr-1])-1.0) * (exp(pm[num_params_blr-1])-1.0) * line_error_mean*line_error_mean;
+    var2_se = (exp(pm[num_params_blr-1])-1.0) * (exp(pm[num_params_blr-1])-1.0) * line_error_mean_sq;
     for(i=0; i<n_line_data; i++)
     {
       //note mask with error < 0.0
@@ -724,7 +724,7 @@ double prob_sa1d(const void *model)
   {
     /* re-point */
     Fline_at_data = Fline_at_data_particles[which_particle_update];
-    var2_se = (exp(pm[num_params_blr-1])-1.0) * (exp(pm[num_params_blr-1])-1.0) * line_error_mean*line_error_mean;
+    var2_se = (exp(pm[num_params_blr-1])-1.0) * (exp(pm[num_params_blr-1])-1.0) * line_error_mean_sq;
     for(i=0; i<n_line_data; i++)
     {
       //note mask with error < 0.0
@@ -791,7 +791,7 @@ double prob_initial_sa1d(const void *model)
   
   Fline_at_data = Fline_at_data_particles_perturb[which_particle_update];
   calculate_line_from_blrmodel(model, Tline_data, Fline_at_data, n_line_data);
-  var2_se = (exp(pm[num_params_blr-1])-1.0) * (exp(pm[num_params_blr-1])-1.0) * line_error_mean*line_error_mean;
+  var2_se = (exp(pm[num_params_blr-1])-1.0) * (exp(pm[num_params_blr-1])-1.0) * line_error_mean_sq;
   for(i=0; i<n_line_data; i++)
   {
     //note mask with error < 0.0
