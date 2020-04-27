@@ -1282,6 +1282,20 @@ void read_data()
       vel_sa_data[i] *= C_Unit;
     }
 
+    /* check velocity grid: the starting and end point must have different sign */
+    if(vel_sa_data[0] * vel_sa_data[n_vel_sa_data -1] > 0.0)
+    {
+      if(thistask == roottask)
+      {
+        fprintf(stderr, "# Error: SA wavelength bins too red or too blue. \n"
+                        "# this usually happens on an incorrect redshift option.\n");
+      }
+      
+      MPI_Finalize();
+      free_memory_data();
+      exit(0);
+    }
+
     /* normalize phase */
     for(j=0; j<n_base_sa_data; j++)
     {
