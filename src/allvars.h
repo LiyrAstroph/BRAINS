@@ -261,8 +261,6 @@ extern double *wave_sa_data;
 
 extern double sa_flux_norm;
 
-extern double **phase_sa_particles, **Fline_sa_particles;
-extern double **phase_sa_particles_perturb, **Fline_sa_particles_perturb;
 extern double *phase_sa, *Fline_sa, *base_sa, *vel_sa, *wave_sa;
 
 extern double *clouds_alpha, *clouds_beta;

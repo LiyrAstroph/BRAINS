@@ -137,8 +137,6 @@ double *wave_sa_data;
 
 double sa_flux_norm;
 
-double **phase_sa_particles, **Fline_sa_particles;
-double **phase_sa_particles_perturb, **Fline_sa_particles_perturb;
 double *phase_sa, *Fline_sa, *base_sa, *vel_sa, *wave_sa;
 
 double *clouds_alpha, *clouds_beta;

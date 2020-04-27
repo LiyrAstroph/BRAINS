@@ -112,9 +112,6 @@ void postprocess_sa1d()
     Fcon_rm = Fcon_rm_particles[which_particle_update];
     TransTau = TransTau_particles[which_particle_update];
     Trans1D = Trans1D_particles[which_particle_update];
-
-    Fline_sa = Fline_sa_particles[which_particle_update];
-    phase_sa = phase_sa_particles[which_particle_update];
     
     for(i=0; i<num_ps; i++)
     {
@@ -289,9 +286,6 @@ void reconstruct_sa1d()
       Fcon_rm = Fcon_rm_particles[which_particle_update];
       TransTau = TransTau_particles[which_particle_update];
       Trans1D = Trans1D_particles[which_particle_update];
-      
-      Fline_sa = Fline_sa_particles[which_particle_update];
-      phase_sa = phase_sa_particles[which_particle_update];
 
       sa_smooth_init(n_vel_sa_data, vel_sa_data, parset.sa_InstRes);
 
@@ -489,21 +483,8 @@ void reconstruct_sa1d_init()
   }
 
   /* SA setup */
-  phase_sa_particles = malloc(parset.num_particles * sizeof(double *));
-  phase_sa_particles_perturb = malloc(parset.num_particles * sizeof(double *));
-  for(i=0; i<parset.num_particles; i++)
-  {
-    phase_sa_particles[i] = malloc(n_base_sa_data * n_vel_sa_data * sizeof(double));
-    phase_sa_particles_perturb[i] = malloc(n_base_sa_data * n_vel_sa_data * sizeof(double));
-  }
-
-  Fline_sa_particles = malloc(parset.num_particles * sizeof(double *));
-  Fline_sa_particles_perturb = malloc(parset.num_particles * sizeof(double *));
-  for(i=0; i<parset.num_particles; i++)
-  {
-    Fline_sa_particles[i] = malloc(n_vel_sa_data * sizeof(double));
-    Fline_sa_particles_perturb[i] = malloc(n_vel_sa_data * sizeof(double));
-  }
+  phase_sa = malloc(n_base_sa_data * n_vel_sa_data * sizeof(double));
+  Fline_sa = malloc(n_vel_sa_data * sizeof(double));
 
   prob_sa_particles = malloc(parset.num_particles * sizeof(double));
   prob_sa_particles_perturb = malloc(parset.num_particles * sizeof(double));
@@ -570,19 +551,8 @@ void reconstruct_sa1d_end()
   free(Fline_at_data_particles_perturb);
 
   /* SA setup */
-  for(i=0; i<parset.num_particles; i++)
-  {
-    free(phase_sa_particles[i]);
-    free(phase_sa_particles_perturb[i]);
-
-    free(Fline_sa_particles[i]);
-    free(Fline_sa_particles_perturb[i]);
-  }
-  free(phase_sa_particles);
-  free(phase_sa_particles_perturb);
-
-  free(Fline_sa_particles);
-  free(Fline_sa_particles_perturb);
+  free(phase_sa);
+  free(Fline_sa);
 
   free(prob_sa_particles);
   free(prob_sa_particles_perturb);
@@ -660,9 +630,6 @@ double prob_sa1d(const void *model)
     /* re-point */
     TransTau = TransTau_particles_perturb[which_particle_update];
     Trans1D = Trans1D_particles_perturb[which_particle_update]; 
-    
-    phase_sa = phase_sa_particles_perturb[which_particle_update];
-    Fline_sa = Fline_sa_particles_perturb[which_particle_update];
 
     calculate_sa_transfun_from_blrmodel(model, 0);
 
@@ -692,9 +659,6 @@ double prob_sa1d(const void *model)
     /* re-point */
     TransTau = TransTau_particles[which_particle_update];
     Trans1D = Trans1D_particles[which_particle_update];
-
-    phase_sa = phase_sa_particles[which_particle_update];
-    Fline_sa = Fline_sa_particles[which_particle_update];
 
     prob_sa = prob_sa_particles[which_particle_update];
   }
@@ -762,9 +726,6 @@ double prob_initial_sa1d(const void *model)
   
   TransTau = TransTau_particles[which_particle_update];
   Trans1D = Trans1D_particles[which_particle_update]; 
-    
-  phase_sa = phase_sa_particles[which_particle_update];
-  Fline_sa = Fline_sa_particles[which_particle_update];
 
   calculate_sa_transfun_from_blrmodel(model, 0);
 

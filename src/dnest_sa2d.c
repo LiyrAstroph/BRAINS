@@ -664,15 +664,6 @@ void accept_action_sa2d()
       ptemp = Fline_at_data_particles[which_particle_update];
       Fline_at_data_particles[which_particle_update] = Fline_at_data_particles_perturb[which_particle_update];
       Fline_at_data_particles_perturb[which_particle_update] = ptemp;
-    
-
-      ptemp = phase_sa_particles[which_particle_update];
-      phase_sa_particles[which_particle_update] = phase_sa_particles_perturb[which_particle_update];
-      phase_sa_particles_perturb[which_particle_update] = ptemp;
-
-      ptemp = Fline_sa_particles[which_particle_update];
-      Fline_sa_particles[which_particle_update] = Fline_sa_particles_perturb[which_particle_update];
-      Fline_sa_particles_perturb[which_particle_update] = ptemp;
 
       prob_sa_particles[which_particle_update] = prob_sa_particles_perturb[which_particle_update];
     }
@@ -692,8 +683,6 @@ void kill_action_sa2d(int i, int i_copy)
   memcpy(TransTau_particles[i], TransTau_particles[i_copy], parset.n_tau*sizeof(double));
   memcpy(Trans2D_at_veldata_particles[i], Trans2D_at_veldata_particles[i_copy], parset.n_tau * n_vel_data * sizeof(double));
 
-  memcpy(phase_sa_particles[i], phase_sa_particles[i_copy], n_vel_sa_data * n_base_sa_data * sizeof(double));
-  memcpy(Fline_sa_particles[i], Fline_sa_particles[i_copy], n_vel_sa_data * n_epoch_sa_data * sizeof(double));
   prob_sa_particles[i] = prob_sa_particles[i_copy];
 
   return;
