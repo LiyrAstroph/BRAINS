@@ -40,7 +40,7 @@ int dnest_sa1d(int argc, char **argv)
     set_blr_model2d();
     num_params_sa_blr_model = 0;
   }
-  else /* SA and RM have different BLRs but share the same mbh and inc. */
+  else /* SA and RM have different BLRs but share the same inc. */
   {
     set_blr_model1d();
     set_sa_blr_model();
@@ -114,18 +114,21 @@ int dnest_sa1d(int argc, char **argv)
     par_fix_val[num_params_blr-1] = log(1.0);
   }
 
-  /* fix mbh and inc of SA BLR if SA and RM have different BLR */
+  /* fix inc of SA BLR if SA and RM have different BLR 
+   * in this case, DA must be fixed.
+   */
   if(parset.flag_sa_par_mutual != 0)
   {
     /* get the index for mbh and inclination parameters */
     set_idx_par_mutual();
-    /* mbh */
-    par_fix[num_params_blr + idx_sa_par_mutual[0]] = 1;
-    par_fix_val[num_params_blr + idx_sa_par_mutual[0]] = 0.0;
     
     /* inc */
     par_fix[num_params_blr + idx_sa_par_mutual[1]] = 1;
     par_fix_val[num_params_blr + idx_sa_par_mutual[1]] = 0.0;
+
+    /* fix DA */
+    par_fix[num_params_blr + num_params_sa_blr_model] = 1;
+    par_fix_val[num_params_blr + num_params_sa_blr_model] = log(550.0);
   }
 
   /* fix FA */
