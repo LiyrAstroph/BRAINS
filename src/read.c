@@ -15,7 +15,7 @@
 #include <string.h>
 #include <math.h>
 
-#include "allvars.h"
+#include "brains.h"
 #include "proto.h"
 
 /*!
