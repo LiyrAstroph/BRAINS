@@ -337,29 +337,21 @@ double log_likelihoods_cal_sa_exam(const void *model)
   return 0.0;
 }
 
+/*
+ * action when a particle's move is accepted.
+ * usually store some values with no need to recompute.
+ */
 void accept_action_sa()
-{
-  /*int param;
-  double *ptemp;
-
-  // the parameter previously updated
-  param = which_parameter_update;
-  
-  ptemp = phase_sa_particles[which_particle_update];
-  phase_sa_particles[which_particle_update] = phase_sa_particles_perturb[which_particle_update];
-  phase_sa_particles_perturb[which_particle_update] = ptemp;
-
-  ptemp = Fline_sa_particles[which_particle_update];
-  Fline_sa_particles[which_particle_update] = Fline_sa_particles_perturb[which_particle_update];
-  Fline_sa_particles_perturb[which_particle_update] = ptemp;*/
-  
+{  
   return;
 }
 
+/*
+ * action when particle i is killed in cdnest sampling.
+ * particle i_copy's properties is copyed to particle i. 
+ */
 void kill_action_sa(int i, int i_copy)
 {
-  memcpy(phase_sa_particles[i], phase_sa_particles[i_copy], n_vel_sa_data * n_base_sa_data * sizeof(double));
-  memcpy(Fline_sa_particles[i], Fline_sa_particles[i_copy], n_vel_sa_data * n_epoch_sa_data * sizeof(double));
   return;
 }
 

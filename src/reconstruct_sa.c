@@ -92,9 +92,6 @@ void postprocess_sa()
     which_parameter_update = -1; // force to update the transfer function
     which_particle_update = 0;
     nc = 0;
-
-    Fline_sa = Fline_sa_particles[which_particle_update];
-    phase_sa = phase_sa_particles[which_particle_update];
     
     for(i=0; i<num_ps; i++)
     {
@@ -244,9 +241,6 @@ void reconstruct_sa()
       force_update = 1;
       which_parameter_update = -1; // force to update the transfer function
       which_particle_update = 0;
-
-      Fline_sa = Fline_sa_particles[which_particle_update];
-      phase_sa = phase_sa_particles[which_particle_update];
       
       sa_smooth_init(n_vel_sa_data, vel_sa_data, parset.sa_InstRes);
       calculate_sa_from_blrmodel(best_model_sa, 1);
@@ -309,21 +303,8 @@ void reconstruct_sa_init()
   }
   MPI_Bcast(&parset.num_particles, 1, MPI_INT, roottask, MPI_COMM_WORLD);
 
-  phase_sa_particles = malloc(parset.num_particles * sizeof(double *));
-  phase_sa_particles_perturb = malloc(parset.num_particles * sizeof(double *));
-  for(i=0; i<parset.num_particles; i++)
-  {
-    phase_sa_particles[i] = malloc(n_base_sa_data * n_vel_sa_data * sizeof(double));
-    phase_sa_particles_perturb[i] = malloc(n_base_sa_data * n_vel_sa_data * sizeof(double));
-  }
-
-  Fline_sa_particles = malloc(parset.num_particles * sizeof(double *));
-  Fline_sa_particles_perturb = malloc(parset.num_particles * sizeof(double *));
-  for(i=0; i<parset.num_particles; i++)
-  {
-    Fline_sa_particles[i] = malloc(n_vel_sa_data * sizeof(double));
-    Fline_sa_particles_perturb[i] = malloc(n_vel_sa_data * sizeof(double));
-  }
+  phase_sa = malloc(n_base_sa_data * n_vel_sa_data * sizeof(double));
+  Fline_sa = malloc(n_vel_sa_data * sizeof(double));
 
   /* cloud sample related */
   clouds_weight = malloc(parset.n_cloud_per_task * sizeof(double));
@@ -356,19 +337,8 @@ void reconstruct_sa_end()
 {
   int i;
 
-  for(i=0; i<parset.num_particles; i++)
-  {
-    free(phase_sa_particles[i]);
-    free(phase_sa_particles_perturb[i]);
-
-    free(Fline_sa_particles[i]);
-    free(Fline_sa_particles_perturb[i]);
-  }
-  free(phase_sa_particles);
-  free(phase_sa_particles_perturb);
-
-  free(Fline_sa_particles);
-  free(Fline_sa_particles_perturb);
+  free(phase_sa);
+  free(Fline_sa);
 
   for(i=0; i<num_params; i++)
   {
@@ -414,11 +384,7 @@ double prob_sa(const void *model)
   double prob_sa = 0.0, var2, dy, var2_se;
   int i, j;
   double *pm = (double *)model;
-  
-  which_particle_update = dnest_get_which_particle_update();
-  phase_sa = phase_sa_particles_perturb[which_particle_update];
-  Fline_sa = Fline_sa_particles_perturb[which_particle_update];
-  
+   
   calculate_sa_from_blrmodel(model, 0);
 
   for(j=0; j<n_epoch_sa_data; j++)
