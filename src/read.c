@@ -1067,6 +1067,13 @@ void read_data()
         {
           Vline_data[j] = (Wline_data[j]/(1.0+parset.redshift) - parset.linecenter)/parset.linecenter * C_Unit;
         }
+        /* check velocity grid: the starting and end point must have different sign */
+        if(Vline_data[0] * Vline_data[n_vel_data -1] > 0.0)
+        {
+          fprintf(stderr, "# Error: wavelength bins too red or too blue. \n"
+                          "# this usually happens on an incorrect redshift option.\n");
+          error_flag = 5;
+        }
         
         // cal mean line error
         line_error_mean = 0.0;
