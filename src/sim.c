@@ -115,7 +115,7 @@ void sim()
 
   if(parset.flag_dim == -1)
   {
-    error = line_error_mean * sqrt(n_line_data) * (Vline_data[1] - Vline_data[0]);
+    error = line_error_mean * sqrt(n_line_data) * (Wline_data[1] - Wline_data[0]);
   }
   else
   {

@@ -1432,10 +1432,10 @@ void free_memory_data()
 void cal_emission_flux()
 {
   int i, j;
-  double dV;
+  double dW;
   
   // assume that velocity grid is equally spaced 
-  dV = (Vline_data[n_vel_data-1]-Vline_data[0])/(n_vel_data-1);
+  dW = (Wline_data[n_vel_data-1]-Wline_data[0])/(n_vel_data-1);
 
 // using trapezoid formula.
   for(j=0; j<n_line_data; j++)
@@ -1450,9 +1450,8 @@ void cal_emission_flux()
     Fline_data[j] += Fline2d_data[j*n_vel_data + n_vel_data-1]/2.0;
     Flerrs_data[j] += (Flerrs2d_data[j*n_vel_data + n_vel_data-1]*Flerrs2d_data[j*n_vel_data + n_vel_data-1])/2.0;
 
-    Fline_data[j] *= dV;
-    Flerrs_data[j] *= dV*dV;
-    Flerrs_data[j] = sqrt(Flerrs_data[j]);
+    Fline_data[j] *= dW;
+    Flerrs_data[j] = sqrt(Flerrs_data[j]) * dW;
   }
 }
 
