@@ -1099,6 +1099,7 @@ void read_data()
 
     // broadcast 2d data
     MPI_Bcast(Vline_data, n_vel_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(Wline_data, n_vel_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
     MPI_Bcast(Tline_data, n_line_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
     MPI_Bcast(Fline2d_data, n_line_data*n_vel_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
     MPI_Bcast(Flerrs2d_data, n_line_data*n_vel_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
@@ -1110,12 +1111,15 @@ void read_data()
 
     /* extend velocity grid */
     double dVel = Vline_data[1] - Vline_data[0];
+    double dW = Wline_data[1] - Wline_data[0];
     for(i=n_vel_data_incr-1; i>=0; i--)
     {
       /* left-hand side */
       Vline_data_ext[i] = Vline_data_ext[i+1] - dVel;  
+      Wline_data_ext[i] = Wline_data_ext[i+1] - dW;
       /* right-hand side */
       Vline_data_ext[n_vel_data_ext - 1 - i] = Vline_data_ext[n_vel_data_ext - 1 - i - 1] + dVel;
+      Wline_data_ext[n_vel_data_ext - 1 - i] = Wline_data_ext[n_vel_data_ext - 1 - i - 1] + dW;
     }
 
   }
@@ -1432,10 +1436,10 @@ void free_memory_data()
 void cal_emission_flux()
 {
   int i, j;
-  double dW;
+  double dV;
   
   // assume that velocity grid is equally spaced 
-  dW = (Wline_data[n_vel_data-1]-Wline_data[0])/(n_vel_data-1);
+  dV = Vline_data[1]-Vline_data[0];
 
 // using trapezoid formula.
   for(j=0; j<n_line_data; j++)
@@ -1450,8 +1454,8 @@ void cal_emission_flux()
     Fline_data[j] += Fline2d_data[j*n_vel_data + n_vel_data-1]/2.0;
     Flerrs_data[j] += (Flerrs2d_data[j*n_vel_data + n_vel_data-1]*Flerrs2d_data[j*n_vel_data + n_vel_data-1])/2.0;
 
-    Fline_data[j] *= dW;
-    Flerrs_data[j] = sqrt(Flerrs_data[j]) * dW;
+    Fline_data[j] *= dV;
+    Flerrs_data[j] = sqrt(Flerrs_data[j]) * dV;
   }
 }
 
