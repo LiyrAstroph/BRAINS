@@ -105,7 +105,7 @@ void sim()
   transfun_1d_cal(model, 0);
   calculate_line_from_blrmodel(model, Tline, Fline, parset.n_line_recon);
   
-  sprintf(fname, "%s/%s", parset.file_dir, "/data/sim_hb.txt");
+  sprintf(fname, "%s/%s", parset.file_dir, "/data/sim_line.txt");
   fp = fopen(fname, "w");
   if(fp == NULL)
   {
@@ -147,7 +147,7 @@ void sim()
           Trans2D, Fline2d, parset.n_line_recon, parset.n_vel_recon);
 
   
-  sprintf(fname, "%s/%s", parset.file_dir, "/data/sim_hb2d.txt");
+  sprintf(fname, "%s/%s", parset.file_dir, "/data/sim_line2d.txt");
   fp = fopen(fname, "w");
   if(fp == NULL)
   {
