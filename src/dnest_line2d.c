@@ -647,8 +647,8 @@ void accept_action_2d()
 void kill_action_2d(int i, int i_copy)
 {
   memcpy(Fcon_rm_particles[i], Fcon_rm_particles[i_copy], parset.n_con_recon * sizeof(double));
-  memcpy(Fline_at_data_particles[i], Fline_at_data_particles[i_copy], n_line_data * sizeof(double));
+  memcpy(Fline_at_data_particles[i], Fline_at_data_particles[i_copy], n_line_data * n_vel_data_ext  * sizeof(double));
   memcpy(TransTau_particles[i], TransTau_particles[i_copy], parset.n_tau*sizeof(double));
-  memcpy(Trans2D_at_veldata_particles[i], Trans2D_at_veldata_particles[i_copy], parset.n_tau * n_vel_data * sizeof(double));
+  memcpy(Trans2D_at_veldata_particles[i], Trans2D_at_veldata_particles[i_copy], parset.n_tau * n_vel_data_ext * sizeof(double));
   return;
 }

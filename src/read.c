@@ -1294,7 +1294,7 @@ void read_data()
         fprintf(stderr, "# Error: SA wavelength bins too red or too blue. \n"
                         "# this usually happens on an incorrect redshift option.\n");
       }
-      
+      MPI_Barrier(MPI_COMM_WORLD);
       MPI_Finalize();
       free_memory_data();
       exit(0);
