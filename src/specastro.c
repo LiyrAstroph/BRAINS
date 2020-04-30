@@ -1054,7 +1054,7 @@ void set_par_fix_sa_blrmodel()
 }
 
 
-int nd_fft_sa, npad_sa;
+int nd_fft_sa, nd_fft_sa_cal, npad_sa;
 
 fftw_complex *sa_data_fft, *sa_resp_fft, *sa_conv_fft;
 fftw_plan sa_pdata, sa_presp, sa_pback;
@@ -1070,10 +1070,11 @@ void sa_smooth_init(int n_v_sa, const double *v_sa, double sigV)
 
   npad_sa = fmin(n_v_sa * 0.1, 20);
   nd_fft_sa = n_v_sa+npad_sa*2;
+  nd_fft_sa_cal = nd_fft_sa/2+1;
 
-  sa_data_fft = (fftw_complex *) fftw_malloc((nd_fft_sa/2+1) * sizeof(fftw_complex));
-  sa_resp_fft = (fftw_complex *) fftw_malloc((nd_fft_sa/2+1) * sizeof(fftw_complex));
-  sa_conv_fft = (fftw_complex *) fftw_malloc((nd_fft_sa/2+1) * sizeof(fftw_complex));
+  sa_data_fft = (fftw_complex *) fftw_malloc((nd_fft_sa_cal) * sizeof(fftw_complex));
+  sa_resp_fft = (fftw_complex *) fftw_malloc((nd_fft_sa_cal) * sizeof(fftw_complex));
+  sa_conv_fft = (fftw_complex *) fftw_malloc((nd_fft_sa_cal) * sizeof(fftw_complex));
 
   sa_real_data = (double *)fftw_malloc(nd_fft_sa * sizeof(double));
   //real_resp = (double *)fftw_malloc(nd_fft_sa * sizeof(double));
@@ -1084,7 +1085,7 @@ void sa_smooth_init(int n_v_sa, const double *v_sa, double sigV)
   sa_pback = fftw_plan_dft_c2r_1d(nd_fft_sa, sa_conv_fft, sa_real_conv, FFTW_PATIENT);
 
   dV = v_sa[1] - v_sa[0];
-  for(i=0; i<nd_fft_sa/2+1; i++)
+  for(i=0; i<nd_fft_sa_cal; i++)
   {
     sa_resp_fft[i][0] = exp(-2.0 * PI*PI * sigV/dV*sigV/dV * i*i*1.0/nd_fft_sa/nd_fft_sa)/nd_fft_sa;
     sa_resp_fft[i][1] = 0.0;
@@ -1124,7 +1125,7 @@ void sa_smooth_run(double *v_sa, double *F_sa, int n_v_sa, double *p_sa, int n_b
    * note that for FFT of real data, FFTW outputs n/2+1 complex numbers.
    * similarly, for complex to real transform, FFTW needs input of n/2+1 complex numbers.
    */
-  for(i=0; i<nd_fft_sa/2 + 1; i++)
+  for(i=0; i<nd_fft_sa_cal; i++)
   {
     sa_conv_fft[i][0] = sa_data_fft[i][0]*sa_resp_fft[i][0] - sa_data_fft[i][1]*sa_resp_fft[i][1];
     sa_conv_fft[i][1] = sa_data_fft[i][0]*sa_resp_fft[i][1] + sa_data_fft[i][1]*sa_resp_fft[i][0];
@@ -1145,7 +1146,7 @@ void sa_smooth_run(double *v_sa, double *F_sa, int n_v_sa, double *p_sa, int n_b
      * note that for FFT of real data, FFTW outputs n/2+1 complex numbers.
      * similarly, for complex to real transform, FFTW needs input of n/2+1 complex numbers.
      */
-    for(i=0; i<nd_fft_sa/2 + 1; i++)
+    for(i=0; i<nd_fft_sa_cal; i++)
     {
       sa_conv_fft[i][0] = sa_data_fft[i][0]*sa_resp_fft[i][0] - sa_data_fft[i][1]*sa_resp_fft[i][1];
       sa_conv_fft[i][1] = sa_data_fft[i][0]*sa_resp_fft[i][1] + sa_data_fft[i][1]*sa_resp_fft[i][0];

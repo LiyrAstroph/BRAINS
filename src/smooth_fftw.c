@@ -37,7 +37,7 @@
 #include "brains.h"
 
 
-int nd_fft, npad;
+int nd_fft, nd_fft_cal, npad;
 
 fftw_complex *data_fft, *resp_fft, *resp_fft0, *conv_fft;
 fftw_plan pdata, presp, pback;
@@ -51,11 +51,12 @@ void smooth_init(int nv, const double *transv)
 {
   npad = fmin(nv * 0.1, 20);
   nd_fft = nv+npad*2;
+  nd_fft_cal = nd_fft/2 + 1;
 
-  data_fft = (fftw_complex *) fftw_malloc((nd_fft/2+1) * sizeof(fftw_complex));
-  resp_fft0 = (fftw_complex *) fftw_malloc((nd_fft/2+1) * sizeof(fftw_complex));
-  resp_fft = (fftw_complex *) fftw_malloc((nd_fft/2+1) * sizeof(fftw_complex));
-  conv_fft = (fftw_complex *) fftw_malloc((nd_fft/2+1) * sizeof(fftw_complex));
+  data_fft = (fftw_complex *) fftw_malloc((nd_fft_cal) * sizeof(fftw_complex));
+  resp_fft0 = (fftw_complex *) fftw_malloc((nd_fft_cal) * sizeof(fftw_complex));
+  resp_fft = (fftw_complex *) fftw_malloc((nd_fft_cal) * sizeof(fftw_complex));
+  conv_fft = (fftw_complex *) fftw_malloc((nd_fft_cal) * sizeof(fftw_complex));
 
   real_data = (double *)fftw_malloc(nd_fft * sizeof(double));
   //real_resp = (double *)fftw_malloc(nd_fft * sizeof(double));
@@ -119,7 +120,7 @@ void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int
        So include here. Thereby, need not to mannually multiply 1/nd_fft in the final output.
      */
 
-    for(i=0; i<nd_fft/2+1; i++)
+    for(i=0; i<nd_fft_cal; i++)
     {
       resp_fft0[i][0] = exp(-2.0 * PI*PI * sigV/dV*sigV/dV * i*i*1.0/nd_fft/nd_fft)/nd_fft;
       resp_fft0[i][1] = 0.0;
@@ -137,7 +138,7 @@ void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int
         linecenter = pmodel[idx_linecenter + j] * parset.linecenter_err;
       }
 
-      for(i=0; i<nd_fft/2+1; i++)
+      for(i=0; i<nd_fft_cal; i++)
       {  
         /* line center */
         resp_fft[i][0] =  resp_fft0[i][0] * cos(2.0*PI*linecenter/dV * i*1.0/nd_fft);
@@ -155,7 +156,7 @@ void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int
        * note that for FFT of real data, FFTW outputs n/2+1 complex numbers.
        * similarly, for complex to real transform, FFTW needs input of n/2+1 complex numbers.
        */
-      for(i=0; i<nd_fft/2 + 1; i++)
+      for(i=0; i<nd_fft_cal; i++)
       {
         conv_fft[i][0] = data_fft[i][0]*resp_fft[i][0] - data_fft[i][1]*resp_fft[i][1];
         conv_fft[i][1] = data_fft[i][0]*resp_fft[i][1] + data_fft[i][1]*resp_fft[i][0];
@@ -188,7 +189,7 @@ void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int
         linecenter = pmodel[idx_linecenter + j] * parset.linecenter_err;
       }
       /* setup response */
-      for(i=0; i<nd_fft/2+1; i++)
+      for(i=0; i<nd_fft_cal; i++)
       {
         resp_fft0[i][0] = exp(-2.0 * PI*PI * sigV/dV*sigV/dV * i*i*1.0/nd_fft/nd_fft)/nd_fft;
         resp_fft0[i][1] = 0.0;
@@ -209,7 +210,7 @@ void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int
        * note that for FFT of real data, FFTW outputs n/2+1 complex numbers.
        * similarly, for complex to real transform, FFTW needs input of n/2+1 complex numbers.
        */
-      for(i=0; i<nd_fft/2 + 1; i++)
+      for(i=0; i<nd_fft_cal; i++)
       {
         conv_fft[i][0] = data_fft[i][0]*resp_fft[i][0] - data_fft[i][1]*resp_fft[i][1];
         conv_fft[i][1] = data_fft[i][0]*resp_fft[i][1] + data_fft[i][1]*resp_fft[i][0];
