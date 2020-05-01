@@ -7,6 +7,7 @@ data/*
 !data/sim_hb.txt
 !data/sim_hb2d.txt
 !data/sim_broadening.txt
+!data/sim_sa.txt
 analysis/*
 !analysis/*.py
 !src/OPTIONS*

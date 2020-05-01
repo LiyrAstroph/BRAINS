@@ -8,7 +8,7 @@
 % generic
 %
 
-Redshift                    0.0449                                    % redshift of the object
+Redshift                    0.0                                    % redshift of the object
 
 FileDir                     /home/liyropt/Projects/GIT/BRAINS      % directory for where all the output files are stored
 
@@ -34,7 +34,7 @@ Line2DFile                  data/sim_line2d.txt         % file for line 2d data
                                                        % 0: all 
                                                        % 1: only BH mass and inclination
 %SAInstRes                   235.0                     % km/s, fixed
-%SAFile                      data/3C273_sa.txt 
+%SAFile                      data/sim_sa.txt 
 
 %=========================================================================
 % reverberation mapping (RM) generic configuration
