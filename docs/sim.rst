@@ -13,5 +13,5 @@ The code can generate simulation data according the ``FlagDim`` option in parame
   
   Generate fully random simulation data.
 
-The output simulation data files are ``sim_con.txt``, ``sim_hb.txt``, and ``sim_hb2d.txt``
-in the subdirectory ``data/``.
+The output simulation data files are ``sim_con.txt``, ``sim_line.txt``, ``sim_line2d.txt``, ``sim_broadening.txt``,
+and ``sim_sa.txt`` in the subdirectory ``data/``.

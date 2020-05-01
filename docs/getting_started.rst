@@ -48,10 +48,11 @@ An exemplary reveberation mapping dataset is provided in the subdirectory ``data
 
 .. code-block:: bash
 
-   sim_con.txt                 # continuum light curve
-   sim_hb.txt                  # 1d broad-line flux light curve   
-   sim_hb2d.txt                # 2d broad-line time series
-   sim_broadening.txt          # spectral broadening data
+   sim_con.txt                   # continuum light curve
+   sim_line.txt                  # 1d broad-line flux light curve   
+   sim_line2d.txt                # 2d broad-line time series
+   sim_broadening.txt            # spectral broadening data
+   sim_sa.txt                    # spectral-astrometry data
   
 
 One can try to run the above command to test ``brains`` with the provided dataset.
