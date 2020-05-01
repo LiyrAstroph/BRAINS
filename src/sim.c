@@ -32,7 +32,7 @@ void sim()
 
   FILE *fp;
   char fname[200];
-  int i, j;
+  int i, j, incr;
 
   sim_init();
   
@@ -91,7 +91,8 @@ void sim()
   }
   else
   {
-    for(i=0; i<parset.n_con_recon; i++)
+    incr = fmax(0.5/(Tcon[1]-Tcon[0]), 1.0); //cadence to be 0.5day or increasement to be 1
+    for(i=0; i<parset.n_con_recon; i+=incr)
     {
       if(Tcon[i] >= 0.0)
       {
