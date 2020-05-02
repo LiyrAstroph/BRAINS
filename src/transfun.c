@@ -59,7 +59,7 @@ void calculate_con_rm(const void *pm)
       fcon = Fcon[i] + ftrend;
       if(fcon > 0.0)
       {
-        Fcon_rm[i] = pow(fcon, 1.0 + Ag);
+        Fcon_rm[i] = A * pow(fcon, 1.0 + Ag);
       }
       else 
       {
