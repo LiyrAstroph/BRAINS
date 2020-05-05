@@ -360,7 +360,7 @@ void calculate_con_from_model_semiseparable(const void *model)
 
   double *pm = (double *)model;
   double sigma, sigma2, tau, alpha;
-  int i, j, info;
+  int i, info;
 
   syserr = (exp(pm[0]) - 1.0) * con_error_mean;  // systematic error 
   tau = exp(pm[2]);

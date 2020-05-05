@@ -23,11 +23,9 @@ void *best_model_std_sa2d;  /*!< standard deviation of the best model */
 void postprocess_sa2d()
 {
   char posterior_sample_file[BRAINS_MAX_STR_LENGTH];
-  int num_ps, i, j, k, nc;
+  int num_ps, i, j, k;
   double *pm, *pmstd;
-  double *lag;
   void *posterior_sample, *post_model;
-  double mean_lag, mean_lag_std, sum1, sum2;
   int size_of_modeltype = num_params * sizeof(double);
   
   best_model_sa2d = malloc(size_of_modeltype);
@@ -123,7 +121,6 @@ void postprocess_sa2d()
     force_update = 1;
     which_parameter_update = -1; // force to update the transfer function
     which_particle_update = 0;
-    nc = 0;
 
     Fcon_rm = Fcon_rm_particles[which_particle_update];
     TransTau = TransTau_particles[which_particle_update];

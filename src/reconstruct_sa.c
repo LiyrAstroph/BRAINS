@@ -30,11 +30,9 @@ void *best_model_std_sa;  /*!< standard deviation of the best model */
 void postprocess_sa()
 {
   char posterior_sample_file[BRAINS_MAX_STR_LENGTH];
-  int num_ps, i, j, k, nc;
+  int num_ps, i, j, k;
   double *pm, *pmstd;
-  double *lag;
   void *posterior_sample, *post_model;
-  double mean_lag, mean_lag_std, sum1, sum2;
   int size_of_modeltype = num_params * sizeof(double);
   
   best_model_sa = malloc(size_of_modeltype);
@@ -91,7 +89,6 @@ void postprocess_sa()
     force_update = 1;
     which_parameter_update = -1; // force to update the transfer function
     which_particle_update = 0;
-    nc = 0;
     
     for(i=0; i<num_ps; i++)
     {
@@ -293,9 +290,7 @@ void reconstruct_sa()
 }
 
 void reconstruct_sa_init()
-{
-  int i, j;
-  
+{ 
   sprintf(dnest_options_file, "%s/%s", parset.file_dir, "src/OPTIONSSA");
   if(thistask == roottask)
   {
@@ -381,9 +376,8 @@ void reconstruct_sa_end()
  */
 double prob_sa(const void *model)
 {
-  double prob_sa = 0.0, var2, dy, var2_se;
+  double prob_sa = 0.0, var2, dy;
   int i, j;
-  double *pm = (double *)model;
    
   calculate_sa_from_blrmodel(model, 0);
 

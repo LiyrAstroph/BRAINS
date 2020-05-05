@@ -505,7 +505,7 @@ double perturb_sa1d(void *model)
 {
   double *pm = (double *)model;
   double logH = 0.0, limit1, limit2, width, rnd;
-  int which, which_level, count_saves; 
+  int which, which_level; 
 
   /* 
    * fixed parameters need not to update 

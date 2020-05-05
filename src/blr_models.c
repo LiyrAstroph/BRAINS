@@ -1887,7 +1887,7 @@ void gen_cloud_sample_model8(const void *pm, int flag_type, int flag_save)
 void gen_cloud_sample_model9(const void *pm, int flag_type, int flag_save)
 {
   int i, j, nc;
-  double r, phi, dis, Lopn, Lopn_cos, u;
+  double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, vx, vy, vz, vxb, vyb, vzb;
   double inc, F, beta, mu, a, s, rin, sig;
   double Lphi, Lthe, Vkep, Rs, g;

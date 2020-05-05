@@ -314,7 +314,7 @@ double perturb_sa(void *model)
   {
     logH -= (-0.5*pow((pm[which] - par_prior_gaussian[which][0])/par_prior_gaussian[which][1], 2.0) );
     pm[which] += dnest_randh() * width;
-    (&pm[which], par_range_model[which][0], par_range_model[which][1]);
+    dnest_wrap(&pm[which], par_range_model[which][0], par_range_model[which][1]);
     //dnest_wrap(&pm[which], limit1, limit2);
     logH += (-0.5*pow((pm[which] - par_prior_gaussian[which][0])/par_prior_gaussian[which][1], 2.0) );
   }
