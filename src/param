@@ -96,15 +96,18 @@ Tran2DFileOut               data/tran2d.txt             % output filename for 2d
 Tran2DDataFileOut           data/tran2d_data.txt        % output filename for 2d transfer function at velocity points same with data
 
 %========================================================================
-% RM spectral broadening
-% 
+% RM spectral broadening, referring to the standard deviation of Gaussian
+% If FlagNarrowLine = 0, InstRes only means instrument broadening 
+% Otherwise, InstRes includes: 1) instrument broadening and 2) intrinsic width 
+% of narrow line (added in square).
+%
 FlagInstRes                 0                           % 0, uniform prior, epoch-independent
                                                         % 1, uniform prior, but epoch-dependent parameterization
                                                         % 2, epoch-dependent parameterization, prior stored in "InstResFile"
 
-InstRes                     490                           % instrument broadening (modeled by a Gaussian), in km/s, for FlagInstRes=0, or 1
+InstRes                     490                         % instrument broadening (modeled by a Gaussian), in km/s, for FlagInstRes=0, or 1
                                                           
-InstResErr                  50.0                         % instrument broadening error, in km/s, for FlagInstRes=0, or 1
+InstResErr                  50.0                        % instrument broadening error, in km/s, for FlagInstRes=0, or 1
 
 InstResFile                 data/sim_broaden.txt       % file for storing epoch-dependent instrument broadening
                                                           % two columns: broadening width and error (km/s), in the order of time as the 2d line data
@@ -112,6 +115,7 @@ InstResFile                 data/sim_broaden.txt       % file for storing epoch-
 %========================================================================
 % RM narrow-line component
 % use a gaussian to model the narrow-line component
+% width is the standard deviation of the Gaussian
 % 
 FlagNarrowLine              0                           % 0, no narrow line; 
                                                         % 1, add fixed narrow line; 
