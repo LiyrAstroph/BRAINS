@@ -334,7 +334,7 @@ void read_parset()
     strcpy(parset.file_instres, "");
     strcpy(parset.pcon_out_file, "data/pcon.txt");
     strcpy(parset.pline_out_file, "data/pline.txt");
-    strcpy(parset.pline2d_out_file, "data/pline2d_data.txt");
+    strcpy(parset.pline2d_out_file, "data/pline2d.txt");
     strcpy(parset.pline2d_data_out_file, "data/pline2d_data.txt");
     strcpy(parset.cloud_out_file, "data/clouds.txt");
     strcpy(parset.tran_out_file, "data/tran.txt");

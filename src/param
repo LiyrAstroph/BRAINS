@@ -91,7 +91,7 @@ TranFileOut                 data/tran.txt               % output filename for 1d
 %
 NVelRecon                   42                          % number of points for line reconstruction along velocity axis
 Line2DConstructFileOut      data/pline2d.txt            % output filename for 2d line reconstrction
-Line2DDataConstructFileOut  data/pline2d_data.txt       % output filename for 2d transfer function at points same with data
+Line2DDataConstructFileOut  data/pline2d_data.txt       % output filename for 2d line reconstrction at points same with data
 Tran2DFileOut               data/tran2d.txt             % output filename for 2d transfer function
 Tran2DDataFileOut           data/tran2d_data.txt        % output filename for 2d transfer function at velocity points same with data
 
