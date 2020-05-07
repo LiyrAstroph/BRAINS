@@ -32,6 +32,7 @@ int dnest_con(int argc, char **argv)
   int i;
 
   num_params = parset.n_con_recon + num_params_var;
+  rnd_frac = fmax(0.2, 1.0*(num_params_var)/num_params);
 
   par_range_model = malloc( num_params * sizeof(double *));
   par_prior_gaussian = malloc(num_params * sizeof(double *));
@@ -285,7 +286,7 @@ double perturb_con(void *model)
   do
   {
     rnd = dnest_rand();
-    if(rnd < 0.1)
+    if(rnd < rnd_frac)
       which = dnest_rand_int(num_params_var);
     else
       which = dnest_rand_int(parset.n_con_recon) + num_params_var;

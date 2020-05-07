@@ -59,6 +59,8 @@ int dnest_sa1d(int argc, char **argv)
   idx_resp = num_params_blr_tot + num_params_drw + num_params_trend;
   idx_difftrend = idx_resp + num_params_resp;
 
+  rnd_frac = fmax(0.2, 1.0*(num_params_blr_tot+num_params_var)/num_params);
+
   par_fix = (int *) malloc(num_params * sizeof(int));
   par_fix_val = (double *) malloc(num_params * sizeof(double));
   par_range_model = malloc( num_params * sizeof(double *));
@@ -514,7 +516,7 @@ double perturb_sa1d(void *model)
   do
   {
     rnd = dnest_rand();
-    if(rnd < fmax(0.2, 1.0*(num_params_blr_tot+num_params_var)/num_params))
+    if(rnd < rnd_frac)
       which = dnest_rand_int(num_params_blr_tot + num_params_var);
     else
       which = dnest_rand_int(parset.n_con_recon) + num_params_blr_tot + num_params_var;

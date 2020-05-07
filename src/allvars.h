@@ -210,6 +210,7 @@ extern int num_params_blr_tot;
 extern int num_params, num_params_blr, num_params_blr_model, num_params_var, num_params_difftrend, num_params_nlr, num_params_res;
 extern int num_params_drw, num_params_trend, num_params_resp;
 extern int num_params_linecenter;
+extern double rnd_frac;
 
 extern double **blr_range_model, **par_range_model;
 extern int *par_prior_model;  /* prior type for model parameters */
