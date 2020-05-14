@@ -171,14 +171,14 @@ void reconstruct_con()
   strcpy(argv[argc], parset.file_dir);
   strcat(argv[argc++], "/data/restart_dnest.txt");
 
-  if(parset.flag_restart == 1)
+  if(parset.flag_restart == 1 && parset.flag_dim == 0)
   {
     strcpy(argv[argc++], "-r");
     strcpy(argv[argc], parset.file_dir);
     strcat(argv[argc], "/");
     strcat(argv[argc++], "data/restart_dnest.txt");
   }
-  if(parset.flag_postprc == 1)
+  if(parset.flag_postprc == 1 || (parset.flag_dim !=0 && parset.flag_restart == 1))
   {
     strcpy(argv[argc++], "-p");
   }
