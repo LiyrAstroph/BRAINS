@@ -11,10 +11,3 @@
 10	  # Backtracking scale length (lambda in the paper Brewer et al. 2011)
 100	  # Strength of effect to force histogram to equal push (beta in the paper Brewer et al. 2011)
 1000	  # Maximum number of saves
-data/sample.txt                 # sample file
-data/sample_info.txt            # sample_info file
-data/levels.txt                 # level file
-data/sampler_state.txt          # sample state file
-data/posterior_sample.txt       # posterior sample file
-data/posterior_sample_info.txt  # posterior sample info file
-data/limits.txt                 # limits file
