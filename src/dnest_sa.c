@@ -86,7 +86,7 @@ int dnest_sa(int argc, char **argv)
 
   force_update = parset.flag_force_update;
   if(parset.flag_para_name != 1)
-    logz_sa = dnest(argc, argv, fptrset_sa, num_params, dnest_options_file);
+    logz_sa = dnest(argc, argv, fptrset_sa, num_params, "data/", dnest_options_file);
   
   dnest_free_fptrset(fptrset_sa);
 

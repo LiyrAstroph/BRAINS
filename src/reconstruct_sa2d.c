@@ -277,8 +277,8 @@ void reconstruct_sa2d()
   char **argv;
 
   //configure restart of dnest
-  argv = malloc(9*sizeof(char *));
-  for(i=0; i<9; i++)
+  argv = malloc(11*sizeof(char *));
+  for(i=0; i<11; i++)
   {
     argv[i] = malloc(BRAINS_MAX_STR_LENGTH*sizeof(char));
   }
@@ -313,6 +313,10 @@ void reconstruct_sa2d()
     strcpy(argv[argc++], "-l");
   }
   
+  // sample tag 
+  strcpy(argv[argc++], "-g");
+  strcpy(argv[argc++], "_sa2d");
+
   reconstruct_sa2d_init();
   
   smooth_init(n_vel_data_ext, Vline_data_ext);

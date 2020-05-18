@@ -183,8 +183,8 @@ void reconstruct_sa()
   char **argv;
 
   //configure restart of dnest
-  argv = malloc(9*sizeof(char *));
-  for(i=0; i<9; i++)
+  argv = malloc(11*sizeof(char *));
+  for(i=0; i<11; i++)
   {
     argv[i] = malloc(BRAINS_MAX_STR_LENGTH*sizeof(char));
   }
@@ -218,6 +218,10 @@ void reconstruct_sa()
   {
     strcpy(argv[argc++], "-l");
   }
+
+  // sample tag 
+  strcpy(argv[argc++], "-g");
+  strcpy(argv[argc++], "_sa");
   
   reconstruct_sa_init();
 
