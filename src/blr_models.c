@@ -1796,7 +1796,7 @@ void gen_cloud_sample_model8(const void *pm, int flag_type, int flag_save)
     clouds_weight[i] = weight * density;
 
 #ifndef SA
-    dis = r - x;
+    dis = R - x;
     clouds_tau[i] = dis;
     if(flag_type == 1)
     {
