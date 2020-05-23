@@ -1488,6 +1488,7 @@ void get_num_particles(char *fname)
 
 /*!
  * get file name of posterior sample. 
+ * This function is deprecated.
  */
 void get_posterior_sample_file(char *fname, char *samplefile)
 {

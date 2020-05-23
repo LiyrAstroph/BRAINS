@@ -40,7 +40,8 @@ void postprocess_sa1d()
     sa_smooth_init(n_vel_sa_data, vel_sa_data, parset.sa_InstRes);
 
     // get number of lines in posterior sample file
-    get_posterior_sample_file(dnest_options_file, posterior_sample_file);
+    //get_posterior_sample_file(dnest_options_file, posterior_sample_file);
+    dnest_get_posterior_sample_file(posterior_sample_file);
 
     //file for posterior sample
     fp = fopen(posterior_sample_file, "r");
