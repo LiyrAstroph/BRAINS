@@ -220,7 +220,7 @@ void init()
   /* default rcloud_max_set */
   rcloud_max_set = 1.0e6;
   
-  /* not RM */
+  /* not SA */
   if(parset.flag_dim != 3)
   {
     gsl_acc = gsl_interp_accel_alloc();
@@ -344,7 +344,7 @@ void init()
 
     if(thistask == roottask && parset.flag_dim >=-1)
     {
-      printf("rcloud_min_max_set: %f %f\n", rcloud_min_set, rcloud_max_set);
+      printf("RM rcloud_min_max_set: %f %f\n", rcloud_min_set, rcloud_max_set);
     }
     
     // response range A and Ag
@@ -417,6 +417,13 @@ void init()
   /* SA */
   if(parset.flag_dim > 2)
   {
+    if(parset.rcloud_max > 0.0)
+    {
+      rcloud_max_set = fmin(rcloud_max_set, parset.rcloud_max);
+      if(thistask == roottask)
+        printf("SA rcloud_min_max set: %f %f\n", rcloud_min_set, rcloud_max_set);
+    }
+
     set_sa_blr_range_model();
 
     sa_extpar_range[0][0] = log(100.0);  /* DA */
