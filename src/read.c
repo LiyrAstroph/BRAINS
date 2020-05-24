@@ -973,7 +973,7 @@ void read_data()
   
         if(Tline_data[0] - Tcon_data[n_con_data-1] > 0.0)
         {
-          fprintf(stderr, "# Error: No time overlap between ontinuum and line time series.\n");
+          fprintf(stderr, "# Error: No time overlap between continuum and line time series.\n");
           fprintf(stderr, "# Error: continuum, %f-%f; line, %f-%f.\n", Tcon_data[0], Tcon_data[n_con_data-1], 
             Tline_data[0], Tline_data[n_line_data-1]);
           error_flag = 4;
