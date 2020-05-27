@@ -279,7 +279,7 @@ void gen_cloud_sample_mymodel(const void *pm, int flag_type, int flag_save)
       }
       
       Vr = sqrt(2.0) * rhoV * cos(theV);
-      Vph = rhoV * sin(theV);
+      Vph = rhoV * fabs(sin(theV)); /* make all clouds co-rotate */
 
       vx = Vr * cos_phi - Vph * sin_phi;
       vy = Vr * sin_phi + Vph * cos_phi;

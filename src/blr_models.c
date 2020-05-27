@@ -380,7 +380,7 @@ void gen_cloud_sample_model2(const void *pm, int flag_type, int flag_save)
       rhotheta = gsl_ran_ugaussian(gsl_r) * sigtheta + 0.5*PI;
 
       Vr = rhor * cos(rhotheta) * Vcirc;
-      Vph = rhor * sin(rhotheta) * Vcirc; //RM cannot distinguish the orientation of the rotation.
+      Vph = rhor * fabs(sin(rhotheta)) * Vcirc; /* RM cannot distinguish the orientation of the rotation. make all clouds co-rotate */
 
       vx = Vr * cos(phi) - Vph * sin(phi);
       vy = Vr * sin(phi) + Vph * cos(phi);
@@ -998,7 +998,7 @@ void gen_cloud_sample_model5(const void *pm, int flag_type, int flag_save)
       }
       
       Vr = sqrt(2.0) * rhoV * cos(theV);
-      Vph = rhoV * sin(theV);
+      Vph = rhoV * fabs(sin(theV)); /* make all clouds co-rotate */
 
       vx = Vr * cos_phi - Vph * sin_phi;
       vy = Vr * sin_phi + Vph * cos_phi;
@@ -1236,7 +1236,7 @@ void gen_cloud_sample_model6(const void *pm, int flag_type, int flag_save)
       }
       
       Vr = sqrt(2.0) * rhoV * cos(theV);
-      Vph = rhoV * sin(theV);
+      Vph = rhoV * fabs(sin(theV)); /* make all clouds co-rotate */
 
       vx = Vr * cos_phi - Vph * sin_phi;
       vy = Vr * sin_phi + Vph * cos_phi;
@@ -1477,7 +1477,7 @@ void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save)
       }
       
       Vr = sqrt(2.0) * rhoV * cos(theV);
-      Vph = rhoV * sin(theV);
+      Vph = rhoV * fabs(sin(theV)); /* make all clouds co-rotate */
 
       vx = Vr * cos_phi - Vph * sin_phi;
       vy = Vr * sin_phi + Vph * cos_phi;
@@ -1673,7 +1673,7 @@ void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save)
       }
       
       Vr = sqrt(2.0) * rhoV * cos(theV);
-      Vph = rhoV * sin(theV);
+      Vph = rhoV * fabs(sin(theV)); /* make all clouds co-rotate */
 
       vx = Vr * cos_phi - Vph * sin_phi;
       vy = Vr * sin_phi + Vph * cos_phi;
