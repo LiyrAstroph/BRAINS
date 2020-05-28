@@ -426,11 +426,11 @@ void init()
 
     set_sa_blr_range_model();
 
-    sa_extpar_range[0][0] = log(100.0);  /* DA */
+    sa_extpar_range[0][0] = log(1.0);  /* DA */
     sa_extpar_range[0][1] = log(1000.0); 
 
     sa_extpar_range[1][0] = 0.0;         /* PA */
-    sa_extpar_range[1][1] = 180.0;
+    sa_extpar_range[1][1] = 360.0;
 
     sa_extpar_range[2][0] = log(0.5);    /* FA  */
     sa_extpar_range[2][1] = log(2.0);
