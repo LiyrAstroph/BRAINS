@@ -140,3 +140,9 @@ BLRParFixVal                2.0:1.0
 
 %SABLRParFix                   000000000
 %SABLRParFixVal                2.0:1.0
+
+%=========================================================================
+% bin type of data 
+% 0, center; 1, left edge.
+% the default type is 0.
+FlagBinType                 0

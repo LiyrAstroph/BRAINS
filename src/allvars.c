@@ -116,6 +116,8 @@ double **Fline_at_data_particles, **Fline_at_data_particles_perturb;
 
 double *clouds_tau, *clouds_weight, *clouds_vel;
 
+double bin_offset;
+
 FILE *fcloud_out = NULL;
 int icr_cloud_save = 1;
 

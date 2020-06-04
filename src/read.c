@@ -269,6 +269,11 @@ void read_parset()
     pardict[nt].isset = 0;
     pardict[nt++].id = DOUBLE;
 
+    strcpy(pardict[nt].tag, "FlagBinType");
+    pardict[nt].addr= &parset.flag_bintype;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = INT;
+
 #ifdef SA
     strcpy(pardict[nt].tag, "SAFile");
     pardict[nt].addr= &parset.sa_file;
@@ -327,6 +332,7 @@ void read_parset()
     parset.linecenter = 4861.0;
     parset.n_cloud_per_task = 0;
     parset.n_vel_per_cloud = 1;
+    parset.flag_bintype = 0;
 
     strcpy(parset.continuum_file, "");
     strcpy(parset.line_file, "");

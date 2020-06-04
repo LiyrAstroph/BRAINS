@@ -139,6 +139,8 @@ typedef struct
   
   double redshift;
   double linecenter;
+
+  int flag_bintype;
 #ifdef SA
   char sa_file[BRAINS_MAX_STR_LENGTH];
   int flag_sa_blrmodel, flag_sa_par_mutual;
@@ -239,6 +241,8 @@ extern double **Trans2D_at_veldata_particles, **Trans2D_at_veldata_particles_per
 extern double **Fline_at_data_particles, **Fline_at_data_particles_perturb;
 
 extern double *clouds_tau, *clouds_weight, *clouds_vel;
+
+extern double bin_offset;
 
 extern FILE *fcloud_out;
 extern int icr_cloud_save;

@@ -77,7 +77,7 @@ void calculate_sa_transfun_from_blrmodel(const void *pm, int flag_save)
 void calculate_sa_with_sample(const void *pm)
 {
   int i, j, k, idV;
-  double V, dV, y, z, alpha, beta, flux_norm, phase, *phase_norm, *alpha_cent, *beta_cent;
+  double V, V_offset, dV, y, z, alpha, beta, flux_norm, phase, *phase_norm, *alpha_cent, *beta_cent;
   double DA, PA, FA, CO, cos_PA, sin_PA;
   double *pmodel = (double *)pm;
 
@@ -125,9 +125,10 @@ void calculate_sa_with_sample(const void *pm)
     for(j=0; j< parset.n_vel_per_cloud; j++)
     {
       V = clouds_vel[i*parset.n_vel_per_cloud + j] + CO;
-      if(V<vel_sa_data[0] || V >= vel_sa_data[n_vel_sa_data-1]+dV)
+      V_offset = V + bin_offset * dV; /* bin type: center or left edge */
+      if(V_offset<vel_sa_data[0] || V_offset >= vel_sa_data[n_vel_sa_data-1]+dV)
         continue;
-      idV = (V - vel_sa_data[0])/dV;
+      idV = (V_offset - vel_sa_data[0])/dV;
       
       phase_norm[idV] += clouds_weight[i];
       alpha_cent[idV] += alpha * clouds_weight[i];
@@ -176,7 +177,7 @@ void calculate_sa_sim_with_sample(const void *pm, double *vel_sa, int n_vel_sa, 
                                   double *p_sa, double *F_sa)
 {
   int i, j, k, idV;
-  double V, dV, y, z, alpha, beta, flux_norm, phase, *phase_norm, *alpha_cent, *beta_cent;
+  double V, V_offset, dV, y, z, alpha, beta, flux_norm, phase, *phase_norm, *alpha_cent, *beta_cent;
   double DA, PA, FA, CO, cos_PA, sin_PA;
   double *pmodel = (double *)pm;
 
@@ -223,9 +224,10 @@ void calculate_sa_sim_with_sample(const void *pm, double *vel_sa, int n_vel_sa, 
     for(j=0; j< parset.n_vel_per_cloud; j++)
     {
       V = clouds_vel[i*parset.n_vel_per_cloud + j] + CO;
-      if(V<vel_sa[0] || V >= vel_sa[n_vel_sa-1]+dV)
+      V_offset = V + bin_offset * dV; /* bin type: center or left edge */
+      if(V_offset<vel_sa[0] || V_offset >= vel_sa[n_vel_sa-1]+dV)
         continue;
-      idV = (V - vel_sa[0])/dV;
+      idV = (V_offset - vel_sa[0])/dV;
       
       phase_norm[idV] += clouds_weight[i];
       alpha_cent[idV] += alpha * clouds_weight[i];
@@ -273,7 +275,7 @@ void calculate_sa_sim_with_sample(const void *pm, double *vel_sa, int n_vel_sa, 
 void calculate_sa_from_blrmodel(const void *pm, int flag_save)
 {
   int i, j, k, idV;
-  double V, dV, y, z, alpha, beta, flux_norm, phase, *phase_norm, *alpha_cent, *beta_cent;
+  double V, V_offset, dV, y, z, alpha, beta, flux_norm, phase, *phase_norm, *alpha_cent, *beta_cent;
   double DA, PA, FA, CO, cos_PA, sin_PA;
   double *pmodel = (double *)pm;
 
@@ -323,9 +325,10 @@ void calculate_sa_from_blrmodel(const void *pm, int flag_save)
     for(j=0; j< parset.n_vel_per_cloud; j++)
     {
       V = clouds_vel[i*parset.n_vel_per_cloud + j] + CO;
-      if(V<vel_sa_data[0] || V >= vel_sa_data[n_vel_sa_data-1]+dV)
+      V_offset = V + bin_offset * dV; /* bin type: center or left edge */
+      if(V_offset <vel_sa_data[0] || V_offset >= vel_sa_data[n_vel_sa_data-1]+dV)
         continue;
-      idV = (V - vel_sa_data[0])/dV;
+      idV = (V_offset - vel_sa_data[0])/dV;
       
       phase_norm[idV] += clouds_weight[i];
       alpha_cent[idV] += alpha * clouds_weight[i];

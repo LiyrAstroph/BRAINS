@@ -271,7 +271,7 @@ void transfun_2d_cal_with_sample(double *transv, double *trans2d, int n_vel)
 {
   int i, j, idt, idV;
   double tau_min, tau_max, dTransTau;
-  double Anorm, dis, V, dV;
+  double Anorm, dis, V, V_offset, dV;
 
   tau_min = clouds_tau[0];
   tau_max = clouds_tau[0];
@@ -302,9 +302,10 @@ void transfun_2d_cal_with_sample(double *transv, double *trans2d, int n_vel)
     for(j=0; j<parset.n_vel_per_cloud; j++)
     {
       V = clouds_vel[i*parset.n_vel_per_cloud + j];
-      if(V<transv[0] || V >= transv[n_vel-1]+dV)
+      V_offset = V + bin_offset * dV; /* bin type: center or left edge */
+      if(V_offset < transv[0] || V_offset >= transv[n_vel-1] + dV )
         continue;
-      idV = (V - transv[0])/dV;
+      idV = (V_offset - transv[0])/dV; 
       //trans2d[idt*n_vel + idV] += pow(1.0/r, 2.0*(1 + gam)) * weight;
       trans2d[idt*n_vel + idV] += clouds_weight[i];
     }

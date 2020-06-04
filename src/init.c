@@ -121,6 +121,16 @@ void init()
       break;
   }
 
+  /* set bin type, 0: center, 1: left edge */
+  if(parset.flag_bintype == 0)
+  {
+    bin_offset = 0.5;
+  }
+  else 
+  {
+    bin_offset = 0.0;
+  }
+
 #ifdef SA
   if(parset.flag_dim > 2 || parset.flag_dim < 0)
   {
