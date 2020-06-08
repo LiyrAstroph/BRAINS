@@ -141,6 +141,8 @@ typedef struct
   double linecenter;
 
   int flag_bintype;
+  int flag_gravity;
+  
 #ifdef SA
   char sa_file[BRAINS_MAX_STR_LENGTH];
   int flag_sa_blrmodel, flag_sa_par_mutual;

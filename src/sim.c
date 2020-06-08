@@ -23,6 +23,40 @@
 
 #include "brains.h"
 
+/////////////////////////////////////////////////////////////////////////////////
+#ifdef SA
+/* baselines for 3C 273 dataset observed by the GRAVITY (Nature, 2020, 563, 657), 
+ * unit is meter */
+int n_base_sa_3c273 = 24;
+double base_sa_3c273[]={
+  -39.847287,   18.757261,
+  -72.901618,  -13.864206,
+  -105.767452, -59.897942,
+  -32.453674,  -32.669331,
+  -64.714063,  -78.769286,
+  -32.064961,  -46.108491,
+  -53.774627,   21.045077,
+  -71.062525,  -10.421538,
+  -79.670158,  -55.520144,
+  -16.867270,  -31.447448,
+  -25.151512,  -76.555774,
+   -8.846202,  -45.116789,
+  -54.064283,   19.430318,
+  -86.349699,  -12.827258,
+  -115.711019, -58.525511,
+  -32.484928,  -32.180585,
+  -61.579109,  -77.881063,
+  -29.231494,  -45.704607,
+  -52.779207,   21.321411,
+  -83.468788,  -12.802497,
+  -107.827509, -59.908816,
+  -28.601448,  -33.449429,
+  -50.961674,  -81.626333,
+  -23.699820,  -46.979455
+};
+#endif
+//////////////////////////////////////////////////////////////////////////////////////
+
 void *model;
 
 void sim()
@@ -234,8 +268,8 @@ void sim()
     for(j=0; j<parset.n_sa_vel_recon; j++)
     {
       fprintf(fp, "%e %e %e\n", wave_sa[j], 
-      (phase_sa[i*parset.n_sa_vel_recon + j] + gsl_ran_ugaussian(gsl_r)*sa_phase_error_mean )/(PhaseFactor * wave_sa[j]), 
-       sa_phase_error_mean/(PhaseFactor * wave_sa[j]));
+       phase_sa[i*parset.n_sa_vel_recon + j]/(PhaseFactor * wave_sa[j]) + gsl_ran_ugaussian(gsl_r)*sa_phase_error_mean, 
+       sa_phase_error_mean);
     }
     fprintf(fp, "\n");
   }
@@ -581,7 +615,10 @@ void sim_init()
   {
     sa_flux_norm = 1.0;
     parset.n_sa_vel_recon = 40;
-    parset.n_sa_base_recon = 20;
+    if(parset.flag_gravity == 1)
+      parset.n_sa_base_recon = n_base_sa_3c273;
+    else
+      parset.n_sa_base_recon = 20;
 
     sa_phase_error_mean = 0.01;
     sa_line_error_mean = 0.01;
@@ -628,13 +665,19 @@ void sim_init()
       wave_sa[i] = (1.0 + vel_sa[i]/C_Unit) * parset.sa_linecenter * (1.0+parset.redshift);
     }
     
-    double phi;
-    for(i=0; i<parset.n_sa_base_recon; i++)
+    if(parset.flag_gravity == 1)
+      memcpy(base_sa, base_sa_3c273, n_base_sa_3c273*2*sizeof(double));
+    else
     {
-      phi = -PI/2.0 + PI/parset.n_sa_base_recon * i;
-      base_sa[i*2+0] = 100.0*cos(phi);
-      base_sa[i*2+1] = 100.0*sin(phi);
+      double phi;
+      for(i=0; i<parset.n_sa_base_recon; i++)
+      {
+        phi = -PI/2.0 + PI/parset.n_sa_base_recon * i;
+        base_sa[i*2+0] = 100.0*cos(phi);
+        base_sa[i*2+1] = 100.0*sin(phi);
+      }
     }
+
   }
 #endif
 

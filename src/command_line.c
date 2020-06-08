@@ -33,6 +33,7 @@ int command_line_options(int argc, char** argv)
       {"temperature", required_argument, 0, 't'},
       {"temp", required_argument, 0, 't'},
       {"seed", required_argument, 0, 's'},
+      {"gravity", no_argument, 0, 'a'},
       {0, 0, 0, 0}
     };
 
@@ -49,8 +50,9 @@ int command_line_options(int argc, char** argv)
     parset.flag_end = 0;
     parset.flag_para_name = 0;
     parset.flag_force_run = 0;
+    parset.flag_gravity = 0;
 
-    while( (opt = getopt_long(argc, argv, "pt:rcs:ehvnf", long_options, &opt_idx)) != -1)
+    while( (opt = getopt_long(argc, argv, "pt:rcs:ehvnfa", long_options, &opt_idx)) != -1)
     {
       switch(opt)
       {
@@ -113,6 +115,11 @@ int command_line_options(int argc, char** argv)
         case 'n': /* print parameter names */
           printf("# Print parameter name.\n");
           parset.flag_para_name = 1;
+          break;
+
+        case 'a': /* use gravity's baseline */
+          printf("# Use GRAVITY's 3C 273 baselines.\n");
+          parset.flag_gravity = 1;
           break;
           
         case '?':
