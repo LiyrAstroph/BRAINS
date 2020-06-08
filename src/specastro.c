@@ -89,7 +89,7 @@ void calculate_sa_with_sample(const void *pm)
   DA = exp(pmodel[num_params_blr + num_params_sa_blr_model]);   
   /* position angle */         
   PA = pmodel[num_params_blr + num_params_sa_blr_model + 1]/180.0 * PI;  
-  /* line flux scaling center */
+  /* line flux scaling factor */
   FA = exp(pmodel[num_params_blr + num_params_sa_blr_model+2]);   
   /* 
    * line center offset: V+dV = (w-(w0+dw0))/(w0+dw0) ==> dV = - dw0/w0 
@@ -189,7 +189,7 @@ void calculate_sa_sim_with_sample(const void *pm, double *vel_sa, int n_vel_sa, 
   DA = exp(pmodel[num_params_blr + num_params_sa_blr_model]);   
   /* position angle */         
   PA = pmodel[num_params_blr + num_params_sa_blr_model + 1]/180.0 * PI;  
-  /* line flux scaling center */
+  /* line flux scaling factor */
   FA = exp(pmodel[num_params_blr + num_params_sa_blr_model+2]);   
   /* 
    * line center offset: V+dV = (w-(w0+dw0))/(w0+dw0) ==> dV = - dw0/w0 

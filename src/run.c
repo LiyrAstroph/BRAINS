@@ -27,6 +27,11 @@ void begin_run()
   VelUnit = sqrt( GRAVITY * 1.0e6 * SOLAR_MASS / CM_PER_LD ) / 1.0e5; 
 
 #ifdef SA
+  /* 
+   * phase = -2*PI * f_line * B[m]/lambda[um] * X[ld]/DA[Mpc]
+   * 
+   * extract the common unit: [2*PI * m/um * ld/Mpc] rad = [360 * ld/pc] deg 
+   */
   PhaseFactor = (1.0/360.0 * CM_PER_PC/CM_PER_LD);
 #endif
 
