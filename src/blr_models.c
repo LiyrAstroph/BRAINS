@@ -1735,10 +1735,12 @@ void gen_cloud_sample_model8(const void *pm, int flag_type, int flag_save)
   theta_min = model->theta_min/180.0 * PI;
   theta_max = model->dtheta_max/180.0*PI + theta_min;
   theta_max = fmin(theta_max, 0.5*PI);
+  model->dtheta_max = (theta_max-theta_min)/PI*180;
 
   r_min = exp(model->r_min);
   r_max = model->fr_max * r_min;
   if(r_max > 0.5*rcloud_max_set) r_max = 0.5*rcloud_max_set;
+  model->fr_max = r_max/r_min;
   
   gamma = model->gamma;
   alpha = model->alpha;
@@ -1750,6 +1752,7 @@ void gen_cloud_sample_model8(const void *pm, int flag_type, int flag_save)
   Rv = exp(model->Rv);
   Rblr = exp(model->Rblr);
   if(Rblr < r_max) Rblr = r_max;
+  model->Rblr = log(Rblr);
   inc = acos(model->inc);
   
   mbh = exp(model->mbh);
