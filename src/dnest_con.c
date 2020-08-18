@@ -231,7 +231,7 @@ void from_prior_con(void *model)
     }
     else
     {
-      pm[i] = var_range_model[i][0] + dnest_rand()*(par_range_model[i][1] - par_range_model[i][0]);
+      pm[i] = par_range_model[i][0] + dnest_rand()*(par_range_model[i][1] - par_range_model[i][0]);
     }
   }
 
