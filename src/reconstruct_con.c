@@ -416,7 +416,7 @@ void calculate_con_from_model_semiseparable(const void *model)
   multiply_mat_transposeB_semiseparable_drw(USmat, W, D, phi, n_con_data, parset.n_con_recon, sigma2, PEmat1);
   multiply_mat_MN(USmat, PEmat1, PEmat2, parset.n_con_recon, parset.n_con_recon, n_con_data);
 
-  set_covar_Pmat(sigma, tau, alpha);
+  //set_covar_Pmat(sigma, tau, alpha);
 
   for(i=0; i<parset.n_con_recon; i++)
   {

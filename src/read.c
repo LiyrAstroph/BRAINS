@@ -932,6 +932,9 @@ void read_data()
           con_error_mean += Fcerrs_data[i];
         }
         con_error_mean /= n_con_data;
+
+        /* check whether time is sorted */
+        error_flag = check_time_sorted(Tcon_data, n_con_data);
       }
     }
     MPI_Bcast(&error_flag, 1, MPI_INT, roottask, MPI_COMM_WORLD);
@@ -994,6 +997,9 @@ void read_data()
             line_error_mean += Flerrs_data[i];
         }
         line_error_mean /= n_line_data;
+
+        /* check whether time is sorted */
+        error_flag = check_time_sorted(Tline_data, n_line_data);
       }
     }  
 
@@ -1092,6 +1098,9 @@ void read_data()
           }
   
         line_error_mean /= (n_line_data*n_vel_data);
+
+        /* check whether time is sorted */
+        error_flag = check_time_sorted(Tline_data, n_line_data);
       }
     }
     
@@ -1773,4 +1782,21 @@ double get_mediate_cad(double *tcon, int ncon)
   free(cad);
 
   return med_cad;
+}
+
+int check_time_sorted(double *time_series, int n)
+{
+  int i;
+  double dt;
+
+  for(i=1; i<n; i++)
+  {
+    dt = time_series[i] - time_series[i-1];
+    if(dt < 0.0)
+    {
+      printf("light curve data are not in ascending order.\n");
+      return 1;
+    }
+  }
+  return 0;
 }

@@ -33,6 +33,7 @@ void print_help();
 void fprint_param();
 int search_pardict(char *tag);
 int check_parset_isset();
+int check_time_sorted(double *time_series, int n);
 
 void (*set_blr_range_model)();
 void set_blr_range_model1();
