@@ -980,8 +980,8 @@ void create_con_from_random(double sigma_hat, double tau, double alpha, double s
   
   for(i=0; i<parset.n_con_recon; i++)
   {
-    Fcon[i] +=  gsl_ran_ugaussian(gsl_r) * 0.01;
-    Fcerrs[i] = 0.01;
+    Fcon[i] +=  gsl_ran_ugaussian(gsl_r) * con_error_mean;
+    Fcerrs[i] = con_error_mean;
   }
 
   free(Prandvec);
