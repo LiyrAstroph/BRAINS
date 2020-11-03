@@ -510,7 +510,7 @@ void read_particle_line2d(FILE *fp, void *model)
   int j;
   double *psample = (double *)model;
 
-  for(j=0; j < dnest_num_params; j++)
+  for(j=0; j < num_params; j++)
   {
     if(fscanf(fp, "%lf", psample+j) < 1)
     {
