@@ -1501,68 +1501,6 @@ void get_num_particles(char *fname)
   fclose(fp);
 }
 
-/*!
- * get file name of posterior sample. 
- * This function is deprecated.
- */
-void get_posterior_sample_file(char *fname, char *samplefile)
-{
-  FILE *fp;
-  char buf[BRAINS_MAX_STR_LENGTH], buf1[BRAINS_MAX_STR_LENGTH];
-  fp = fopen(fname, "r");
-  if(fp == NULL)
-  {
-    fprintf(stderr, "# Error: Cannot open file %s\n", fname);
-    exit(-1);
-  }
-
-  buf[0]='#';
-  while(buf[0]=='#')
-  {
-    fgets(buf, BRAINS_MAX_STR_LENGTH, fp);
-    if(sscanf(buf, "%s", buf1) < 1)  // a blank line
-    {
-      buf[0] = '#';
-    }
-  }
-  fgets(buf, BRAINS_MAX_STR_LENGTH, fp);
-//  sscanf(buf, "%d", &options.new_level_interval);
-
-  fgets(buf, BRAINS_MAX_STR_LENGTH, fp);
-//  sscanf(buf, "%d", &options.save_interval);
-
-  fgets(buf, BRAINS_MAX_STR_LENGTH, fp);
-//  sscanf(buf, "%d", &options.thread_steps);
-
-  fgets(buf, BRAINS_MAX_STR_LENGTH, fp);
-//  sscanf(buf, "%d", &options.max_num_levels);
-
-  fgets(buf, BRAINS_MAX_STR_LENGTH, fp);
-//  sscanf(buf, "%lf", &options.lambda);
-
-  fgets(buf, BRAINS_MAX_STR_LENGTH, fp);
-//  sscanf(buf, "%lf", &options.beta);
-
-  fgets(buf, BRAINS_MAX_STR_LENGTH, fp);
-//  sscanf(buf, "%d", &options.max_num_saves);
-
-  fgets(buf, BRAINS_MAX_STR_LENGTH, fp);
-//  sscanf(buf, "%s", options.sample_file);
-  
-  fgets(buf, BRAINS_MAX_STR_LENGTH, fp);
-//  sscanf(buf, "%s", options.sample_info_file);
-  
-  fgets(buf, BRAINS_MAX_STR_LENGTH, fp);
-//  sscanf(buf, "%s", options.levels_file);
-  
-  fgets(buf, BRAINS_MAX_STR_LENGTH, fp);
-//  sscanf(buf, "%s", options.sampler_state_file);
-  
-  fgets(buf, BRAINS_MAX_STR_LENGTH, fp);
-  sscanf(buf, "%s", samplefile);
-  fclose(fp);
-}
-
 /* 
  * print out parameters into a file
  * 
