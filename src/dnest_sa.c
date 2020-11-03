@@ -276,7 +276,7 @@ double perturb_sa(void *model)
 {
   double *pm = (double *)model;
   double logH = 0.0, limit1, limit2, width;
-  int which, which_level, count_saves; 
+  int which, which_level, count_saves, size_levels; 
 
   /* 
    * fixed parameters need not to update 
@@ -292,6 +292,7 @@ double perturb_sa(void *model)
   /* level-dependent width */
   count_saves = dnest_get_count_saves();
   which_level_update = dnest_get_which_level_update();
+  size_levels = dnest_get_size_levels();
   which_level = which_level_update > (size_levels-10)?(size_levels-10):which_level_update;
 
   if( which_level > 0 && count_saves > 1000)

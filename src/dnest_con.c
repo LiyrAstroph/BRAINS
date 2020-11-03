@@ -280,7 +280,7 @@ double perturb_con(void *model)
 {
   double *pm = (double *)model;
   double logH = 0.0, limit1, limit2, width, rnd;
-  int which, which_level;
+  int which, which_level, size_levels;
   
   /* sample variability parameters more frequently */
   do
@@ -296,6 +296,7 @@ double perturb_con(void *model)
   
   /* level-dependent width */
   which_level_update = dnest_get_which_level_update(); 
+  size_levels = dnest_get_size_levels();
   which_level = which_level_update > (size_levels - 10)?(size_levels-10):which_level_update;
   if( which_level > 0)
   {
