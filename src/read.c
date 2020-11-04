@@ -1496,10 +1496,13 @@ void get_num_particles(char *fname)
     fgets(buf, BRAINS_MAX_STR_LENGTH, fp);
     if(buf[0] == '#')
       continue;
+    if(sscanf(buf, "%s%s", buf1, buf2) < 1)  /* blank line */
+      continue;
     if(sscanf(buf, "%s%s", buf1, buf2) < 2)
     {
       fprintf(stderr, "Error in geting number of particles.\n"
                       "Usually due to incorrect options.\n");
+      exit(0);
     }
     if(strcmp(buf1, "NumberParticles") == 0)
     {
