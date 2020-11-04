@@ -515,7 +515,7 @@ void read_particle_line2d(FILE *fp, void *model)
     if(fscanf(fp, "%lf", psample+j) < 1)
     {
       printf("%f\n", *psample);
-      fprintf(stderr, "#Error: Cannot read file %s.\n", options.sample_file);
+      fprintf(stderr, "#Error: Cannot read file sample2d.txt.\n");
       exit(0);
     }
   }
