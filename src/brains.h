@@ -32,6 +32,6 @@
 #endif
 
 /* header files for CDNest */
-#include "dnestvars.h"
+#include "dnest.h"
 
 #endif

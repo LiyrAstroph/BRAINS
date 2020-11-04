@@ -1480,24 +1480,34 @@ void cal_emission_flux()
 void get_num_particles(char *fname)
 {
   FILE *fp;
-  char buf[BRAINS_MAX_STR_LENGTH], buf1[BRAINS_MAX_STR_LENGTH];
+  char buf[BRAINS_MAX_STR_LENGTH], buf1[BRAINS_MAX_STR_LENGTH], buf2[BRAINS_MAX_STR_LENGTH];
   fp = fopen(fname, "r");
   if(fp == NULL)
   {
     fprintf(stderr, "# Error: Cannot open file %s\n", fname);
     exit(-1);
   }
+  
+  /* default number particles */
+  parset.num_particles = 1;
 
-  buf[0]='#';
-  while(buf[0]=='#')
+  while(!feof(fp))
   {
     fgets(buf, BRAINS_MAX_STR_LENGTH, fp);
-    if(sscanf(buf, "%s", buf1) < 1)  // a blank line
+    if(buf[0] == '#')
+      continue;
+    if(sscanf(buf, "%s%s", buf1, buf2) < 2)
     {
-      buf[0] = '#';
+      fprintf(stderr, "Error in geting number of particles.\n"
+                      "Usually due to incorrect options.\n");
+    }
+    if(strcmp(buf1, "NumberParticles") == 0)
+    {
+      parset.num_particles = atoi(buf2);
+      break;
     }
   }
-  sscanf(buf, "%d", &parset.num_particles);
+
   fclose(fp);
 }
 

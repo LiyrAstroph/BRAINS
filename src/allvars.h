@@ -17,6 +17,7 @@
 #include <stdlib.h>
 #include <float.h>
 #include <mpi.h>
+#include <math.h>
 
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_interp.h>

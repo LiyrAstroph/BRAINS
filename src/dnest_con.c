@@ -91,7 +91,7 @@ int dnest_con(int argc, char **argv)
 
   /* if not only print parameter name */
   if(parset.flag_para_name != 1)
-    logz_con = dnest(argc, argv, fptrset_con, num_params, "data/", dnest_options_file);
+    logz_con = dnest(argc, argv, fptrset_con, num_params, NULL, NULL, NULL, "data/", dnest_options_file, NULL);
   
   dnest_free_fptrset(fptrset_con);
   return 0;

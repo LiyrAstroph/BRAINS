@@ -157,7 +157,7 @@ int dnest_sa1d(int argc, char **argv)
 
   force_update = parset.flag_force_update;
   if(parset.flag_para_name != 1)
-    logz_sa1d = dnest(argc, argv, fptrset_sa1d, num_params, "data/", dnest_options_file);
+    logz_sa1d = dnest(argc, argv, fptrset_sa1d, num_params, NULL, NULL, NULL, "data/", dnest_options_file, NULL);
   
   dnest_free_fptrset(fptrset_sa1d);
 
@@ -488,7 +488,7 @@ void read_particle_sa1d(FILE *fp, void *model)
   int j;
   double *psample = (double *)model;
 
-  for(j=0; j < dnest_num_params; j++)
+  for(j=0; j < num_params; j++)
   {
     if(fscanf(fp, "%lf", psample+j) < 1)
     {
@@ -507,7 +507,7 @@ double perturb_sa1d(void *model)
 {
   double *pm = (double *)model;
   double logH = 0.0, limit1, limit2, width, rnd;
-  int which, which_level, size_levels; 
+  int which, which_level, size_levels, count_saves; 
 
   /* 
    * fixed parameters need not to update 

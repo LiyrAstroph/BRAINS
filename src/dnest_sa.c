@@ -86,7 +86,7 @@ int dnest_sa(int argc, char **argv)
 
   force_update = parset.flag_force_update;
   if(parset.flag_para_name != 1)
-    logz_sa = dnest(argc, argv, fptrset_sa, num_params, "data/", dnest_options_file);
+    logz_sa = dnest(argc, argv, fptrset_sa, num_params, NULL, NULL, NULL, "data/", dnest_options_file, NULL);
   
   dnest_free_fptrset(fptrset_sa);
 
@@ -257,7 +257,7 @@ void read_particle_sa(FILE *fp, void *model)
   int j;
   double *psample = (double *)model;
 
-  for(j=0; j < dnest_num_params; j++)
+  for(j=0; j < num_params; j++)
   {
     if(fscanf(fp, "%lf", psample+j) < 1)
     {

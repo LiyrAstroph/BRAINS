@@ -120,7 +120,7 @@ int dnest_line1d(int argc, char **argv)
 
   force_update = parset.flag_force_update;
   if(parset.flag_para_name != 1)
-    logz_line = dnest(argc, argv, fptrset_line1d, num_params, "data/", dnest_options_file);
+    logz_line = dnest(argc, argv, fptrset_line1d, num_params, NULL, NULL, NULL, "data/", dnest_options_file, NULL);
 
   dnest_free_fptrset(fptrset_line1d);
   return 0;
