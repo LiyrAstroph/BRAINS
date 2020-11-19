@@ -8,7 +8,8 @@
 #
 # plot 2D results
 # 
-
+import os
+import sys
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator, FormatStrFormatter
@@ -16,48 +17,53 @@ from matplotlib.ticker import FuncFormatter
 import copy
 import re
 from os.path import basename
+import configparser as cp 
 
-# 
-# read parameter names
-def read_para_names():
-  fp = open("para_names_model2d.txt", "r")
-  lines = fp.readlines()
-  fp.close()
-  for line in lines:
-    if re.match(".*sys_err_con.*", line):
-      idx_sys_err_con = int(line.split()[0])
-    if re.match(".*sys_err_line.*", line):
-      idx_sys_err_line = int(line.split()[0])
+def _param_parser(fname):
+  """
+  parse parameter file
+  """
+  config = cp.RawConfigParser(delimiters=' ', comment_prefixes='%', inline_comment_prefixes='%', 
+  default_section=cp.DEFAULTSECT, empty_lines_in_values=False)
   
-  return idx_sys_err_line, idx_sys_err_con
+  with open(fname) as f:
+    file_content = '[dump]\n' + f.read()
 
-#
-# read param file
-def read_param():
-  fp = open("../src/param", "r");
-  lines = fp.readlines()
-  for line in lines:
-    if line[0] == "#":
-      continue
-    if re.match("^FileDir.*", line):
-      filedir = line.split()[1]
-    if re.match("^ContinuumFile.*", line):
-      contfile = line.split()[1]
-    if re.match("^Line2DFile.*", line):
-      line2dfile = line.split()[1]
-  fp.close()
+  config.read_string(file_content)
+    
+  # check the absolute path
+  if os.path.isabs(config['dump']['filedir']) == False:
+    raise Exception("FileDir in %s is not an absoulte path.\n"%self.param_file)
+    
+  return config['dump']
 
-  return filedir, contfile, line2dfile
+param = _param_parser("../src/param")
+filedir = param['filedir']
+contfile = param['continuumfile']
+line2dfile = param['line2dfile']
+dim = int(param["flagdim"])
+
+if dim == 2:
+  postfix = "model2d"
+elif dim == 5:
+  postfix ="sa2d"
+names = np.loadtxt("para_names_%s.txt"%postfix, usecols=(1), dtype=str)
+for i in range(len(names)):
+  line = names[i]
+  if re.match("sys_err_con", line):
+    idx_con = i
+  if re.match("sys_err_line", line):
+    idx_line = i
 
 VelUnit = np.sqrt( 6.672e-8 * 1.0e6 * 1.989e33 / (2.9979e10*8.64e4)) / 1.0e5
 
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif', size=15)
 
-filedir, contfile, line2dfile = read_param()
+
 obj = re.search("^(.*)\.(.*)", basename(contfile)).group(1)
 obj = obj.replace("_", " ")
-print obj
+print(obj)
 
 
 fp=open(filedir+"/"+line2dfile, "r")
@@ -71,18 +77,22 @@ print(nv, nt)
 # read data
 date_hb=np.zeros(nt)
 grid_vel=np.zeros(nv)
+grid_wav=np.zeros(nv)
 prof = np.zeros((nt, nv))
 prof_err = np.zeros((nt, nv))
 
 for j in range(0, nt):
+  line = fp.readline()
+  date_hb[j] = line.split()[1]
   for i in range(0, nv):
     line=fp.readline()
-    grid_vel[i], date_hb[j], prof[j, i], prof_err[j, i] = line.split()
+    grid_wav[i], prof[j, i], prof_err[j, i] = line.split()
   
   line=fp.readline()
 
 fp.close()
-grid_wave = grid_vel / 3e5 * 4861.0 + 4861.0
+grid_vel[:] = (grid_wav[:]/(1.0+float(param['redshift'])) - float(param['linecenter']))/float(param['linecenter']) *3.0e5
+print(grid_vel)
 dV = (grid_vel[1]-grid_vel[0]) / VelUnit
 
 line_mean_err = np.mean(prof_err)
@@ -92,18 +102,21 @@ fp=open(filedir+"/data/pline2d_data.txt", "r")
 
 date_hb_sim=np.zeros(nt)
 grid_vel_sim=np.zeros(nv)
+grid_wav_sim=np.zeros(nv)
 prof_sim = np.zeros((nt, nv))
 prof_err_sim = np.zeros((nt, nv))
 
-#fp.readline()
+fp.readline()
 for j in range(0, nt):
+  line = fp.readline()
+  date_hb_sim[j] = line.split()[1]
   for i in range(0, nv):
     line=fp.readline()
-    grid_vel_sim[i], date_hb_sim[j], prof_sim[j, i] = line.split()
+    grid_wav_sim[i], prof_sim[j, i] = line.split()
   
   line=fp.readline()
 fp.close()
-
+grid_vel_sim[:] = (grid_wav_sim[:]/(1.0+float(param['redshift'])) - float(param['linecenter']))/float(param['linecenter']) *3.0e5
 
 # read light curves
 conlc=np.loadtxt(filedir+"/"+contfile)
@@ -127,18 +140,22 @@ grid_vel_sim /= 1.0e3
 # read sample
 con_scale = 1.0/np.mean(conlc[:, 1])
 line_scale = 1.0/np.mean(hblc[:, 1])
-phd = np.loadtxt(filedir+"/data/posterior_sample2d.txt")
-level = np.loadtxt(filedir+"/data/levels2d.txt", skiprows=1)
+if dim == 2:
+  phd = np.loadtxt(filedir+"/data/posterior_sample2d.txt")
+  level = np.loadtxt(filedir+"/data/levels2d.txt", skiprows=1)
+  logP = np.loadtxt(filedir+"/data/posterior_sample_info2d.txt", skiprows=1)
+elif dim == 5:
+  phd = np.loadtxt(filedir+"/data/posterior_sample_sa2d.txt")
+  level = np.loadtxt(filedir+"/data/levels_sa2d.txt", skiprows=1)
+  logP = np.loadtxt(filedir+"/data/posterior_sample_info_sa2d.txt", skiprows=1)
 
-idx_line, idx_con = read_para_names()
-print idx_con, idx_line
-syserr_con = (np.exp(np.mean(phd[:, idx_con])) - 1.0) * con_mean_err
-syserr = (np.exp(np.mean(phd[:, idx_line])) - 1.0) * line_mean_err
+print(idx_con, idx_line)
+syserr_con = 0.0#(np.exp(np.mean(phd[:, idx_con])) - 1.0) * con_mean_err
+syserr = 0.0 #(np.exp(np.mean(phd[:, idx_line])) - 1.0) * line_mean_err
 
 print("scale:", con_scale, line_scale)
 print("syserr:", syserr_con, syserr)
 
-logP = np.loadtxt(filedir+"/data/posterior_sample_info2d.txt", skiprows=1)
 nmax = np.argmax(logP)
 print(nmax, logP[nmax])
 
@@ -199,7 +216,7 @@ for i in range(len(logP)):
   fp.readline()
   #if (chi[i] < chi[ichimin] * (1.0 + 0.5)) and (plotnum < 100):
   if np.random.rand() < 100.0/len(logP):
-    ax5.plot(date_hb, line_rec* 4861*VelUnit/3e5, color='grey', lw=0.1, alpha=0.1)
+    ax5.plot(date_hb, line_rec* 4861*VelUnit/3e5, color='grey', lw=0.1, alpha=0.3)
     plotnum += 1
     
 fp.close()
@@ -263,7 +280,7 @@ for i in range(len(logP)):
   fp.readline()
   #if (chi[i] < chi[ichimin] * (1.0 + 0.01)) and (plotnum < 100):
   if np.random.rand() < 100.0/len(logP):
-    ax4.plot(date-date0, con, color='grey', lw=0.1, alpha=0.1)
+    ax4.plot(date-date0, con, color='grey', lw=0.1, alpha=0.3)
     plotnum += 1
 
 fp.close()
@@ -345,7 +362,7 @@ idx = np.where(chifit == chifit_sort[0])
 i = idx[0][0]
 j = 0
 print(i)
-plt.errorbar(grid_vel, prof[i, :]+j*offset, yerr=np.sqrt(prof_err[i, :]*prof_err[i, :] + syserr*syserr), ls='none', ecolor='k', capsize=1, markeredgewidth=1, zorder=32)
+plt.errorbar(grid_vel, prof[i, :]+j*offset, yerr=np.sqrt(prof_err[i, :]*prof_err[i, :] + syserr*syserr), ls='none', ecolor='k', capsize=1, markeredgewidth=1)
 plt.plot(grid_vel, prof_rec_max[i, :]+j*offset, color='b', lw=2)
 
 idx = np.where(chifit == chifit_sort[1])
@@ -373,9 +390,9 @@ ax3.xaxis.set_ticks_position("both")
 # subfig 6
 ax6=fig.add_axes([0.7, 0.2, 0.25, 0.3])
 
-hp, bins, patches=plt.hist(phd[:, 8]/np.log(10.0)+6.0, bins=10, normed=1)
+hp, bins, patches=plt.hist(phd[:, 8]/np.log(10.0)+6.0, bins=10, density=True)
 
-#hp, bins, patches=plt.hist(hd[idx_mbh[0], 8]/np.log(10.0)+6.0, bins=10, normed=1)
+#hp, bins, patches=plt.hist(hd[idx_mbh[0], 8]/np.log(10.0)+6.0, bins=10, density=True)
 ax6.set_xlabel(r'$\log(M_\bullet/M_\odot)$')
 ax6.set_ylabel(r'$\rm Hist$')
 ylim=ax6.get_ylim()
