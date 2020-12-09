@@ -1,6 +1,5 @@
 # File containing parameters for DNest
 # Put comments at the top, or at the end of the line.
-# Do not change the order of lines.
 # Lines beginning with '#' are regarded as comments.
 
 NumberParticles          2
@@ -8,3 +7,14 @@ NewLevelIntervalFactor   2
 ThreadStepsFactor        2
 MaxNumberSaves           10
 PTol                     0.1
+
+# Full options are:
+# NumberParticles          2
+# NewLevelIntervalFactor   2
+# SaveIntervalFactor       2
+# ThreadStepsFactor        10
+# MaxNumberLevels          0
+# BacktrackingLength       10.0
+# StrengthEqualPush        100.0
+# MaxNumberSaves           10000
+# PTol                     0.1
