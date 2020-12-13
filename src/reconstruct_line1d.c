@@ -559,7 +559,7 @@ void reconstruct_line1d_end()
 
 /*!
  * this function calculate probability at initial step.
- * all models have the same function.
+ * all invoked quantities are calculated.
  */
 double prob_initial_line1d(const void *model)
 {
@@ -600,7 +600,7 @@ double prob_initial_line1d(const void *model)
 
 /*!
  * this function calculate probability at restart step.
- * all models have the same function.
+ * whether invoked quantities are calculated depends on action of restart.
  */
 double prob_restart_line1d(const void *model)
 {

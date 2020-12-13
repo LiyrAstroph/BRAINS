@@ -514,7 +514,7 @@ void accept_action_1d()
   {
     /* 
      *note that (response) Fline is also changed as long as Fcon is changed.
-     *num_params_blr-the parameter is the systematic error of continuum.
+     *num_params_blr-th parameter is the systematic error of continuum.
      *the change of this parameter also changes continuum reconstruction.
      */
 

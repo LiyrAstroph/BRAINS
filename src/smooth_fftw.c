@@ -22,8 +22,8 @@
  *
  *  Note that FFTW does not include the normalization factor 1/sqrt{n}.
  * 
- *  To facilitate computation, we use the factor:
- *  the Fourier transform a Gaussian is still a Gaussian, which can be expressed analytically.
+ *  To facilitate computation, we use the fact:
+ *  the Fourier transform of a Gaussian is still a Gaussian, which can be expressed analytically.
  */
 
 

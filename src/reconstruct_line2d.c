@@ -746,6 +746,7 @@ void reconstruct_line2d_end()
 
 /*!
  * this function calculate probability at initial step.
+ * all quantities are calculated.
  */
 double prob_initial_line2d(const void *model)
 {
@@ -788,6 +789,7 @@ double prob_initial_line2d(const void *model)
 
 /*!
  * this function calculate probability at restart step.
+ * whether invoked quantities are calculated depends on action of restart.
  */
 double prob_restart_line2d(const void *model)
 {
