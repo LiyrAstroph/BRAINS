@@ -45,7 +45,7 @@ void postprocess1d()
   if(thistask == roottask)
   {
     char fname[200];
-    FILE *fp, *fcon, *fline, *ftran;
+    FILE *fp, *fcon, *fcon_rm, *fline, *ftran;
     //get_posterior_sample_file(dnest_options_file, posterior_sample_file);
     dnest_get_posterior_sample_file(posterior_sample_file);
 
@@ -62,6 +62,16 @@ void postprocess1d()
     {
       fprintf(stderr, "# Error: Cannot open file data/con_rec.txt.\n");
       exit(0);
+    }
+    //file for continuum reconstruction after detrending
+    if(parset.flag_trend_diff > 0)
+    {
+      fcon_rm = fopen("data/con_rm_rec.txt", "w");
+      if(fcon_rm == NULL)
+      {
+        fprintf(stderr, "# Error: Cannot open file data/con_rm_rec.txt.\n");
+        exit(0);
+      }
     }
     //file for line reconstruction
     sprintf(fname, "%s/%s", parset.file_dir, "data/line_rec.txt");
@@ -148,6 +158,15 @@ void postprocess1d()
           fprintf(fcon, "%e %e\n", Tcon[j]*(1.0+parset.redshift), Fcon[j]/con_scale);
         }
         fprintf(fcon, "\n");
+        
+        if(parset.flag_trend_diff > 0)
+        {
+          for(j=0; j<parset.n_con_recon; j++)
+          {
+            fprintf(fcon_rm, "%e %e\n", Tcon[j]*(1.0+parset.redshift), Fcon_rm[j]/con_scale);
+          }
+          fprintf(fcon_rm, "\n");
+        }
 
         for(j=0; j<parset.n_line_recon; j++)
         {
@@ -164,6 +183,8 @@ void postprocess1d()
     }
     fclose(fp);
     fclose(fcon);
+    if(parset.flag_trend_diff > 0)
+      fclose(fcon_rm);
     fclose(fline);
     fclose(ftran);
 

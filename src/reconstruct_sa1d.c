@@ -35,7 +35,7 @@ void postprocess_sa1d()
   {
     // initialize smoothing workspace
     char fname[200];
-    FILE *fp, *fline, *fsa, *fsaline, *ftran, *fcon;
+    FILE *fp, *fline, *fsa, *fsaline, *ftran, *fcon, *fcon_rm;
 
     sa_smooth_init(n_vel_sa_data, vel_sa_data, parset.sa_InstRes);
 
@@ -57,6 +57,16 @@ void postprocess_sa1d()
       fprintf(stderr, "# Error: Cannot open file data/con_rec.txt.\n");
       exit(0);
     }
+    //file for continuum reconstruction after detrending
+    if(parset.flag_trend_diff > 0)
+    {
+      fcon_rm = fopen("data/con_rm_rec.txt", "w");
+      if(fcon_rm == NULL)
+      {
+        fprintf(stderr, "# Error: Cannot open file data/con_rm_rec.txt.\n");
+        exit(0);
+      }
+    }  
     //file for line reconstruction
     sprintf(fname, "%s/%s", parset.file_dir, "data/line_rec.txt");
     fline = fopen(fname, "w");
@@ -142,6 +152,15 @@ void postprocess_sa1d()
         }
         fprintf(fcon, "\n");
 
+        if(parset.flag_trend_diff > 0)
+        {
+          for(j=0; j<parset.n_con_recon; j++)
+          {
+            fprintf(fcon_rm, "%e %e\n", Tcon[j]*(1.0+parset.redshift), Fcon_rm[j]/con_scale);
+          }
+          fprintf(fcon_rm, "\n");
+        }      
+
         for(j=0; j<parset.n_line_recon; j++)
         {
           fprintf(fline, "%e %e\n", Tline[j]*(1.0+parset.redshift), Fline[j]/line_scale);
@@ -177,6 +196,8 @@ void postprocess_sa1d()
     fclose(fsaline);
     fclose(fsa);
     fclose(fcon);
+    if(parset.flag_trend_diff > 0)
+      fclose(fcon_rm);
     fclose(ftran);
     fclose(fline);
     sa_smooth_end();

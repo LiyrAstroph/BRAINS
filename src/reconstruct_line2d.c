@@ -43,7 +43,7 @@ void postprocess2d()
     // initialize smoothing workspace
     smooth_init(n_vel_data_ext, Vline_data_ext);
     char fname[200];
-    FILE *fp, *fcon, *fline, *ftran, *fline1d;
+    FILE *fp, *fcon, *fcon_rm, *fline, *ftran, *fline1d;
     double *Fline1d, dV;
 
     // velocity grid width, in term of wavelength of Hbeta.
@@ -69,6 +69,16 @@ void postprocess2d()
       fprintf(stderr, "# Error: Cannot open file %s.\n", fname);
       exit(0);
     }
+    //file for continuum reconstruction after detrending
+    if(parset.flag_trend_diff > 0)
+    {
+      fcon_rm = fopen("data/con_rm_rec.txt", "w");
+      if(fcon_rm == NULL)
+      {
+        fprintf(stderr, "# Error: Cannot open file data/con_rm_rec.txt.\n");
+        exit(0);
+      }
+    }  
     //file for line reconstruction
     sprintf(fname, "%s/%s", parset.file_dir, "data/line2d_rec.txt");
     fline = fopen(fname, "w");
@@ -186,6 +196,15 @@ void postprocess2d()
           fprintf(fcon, "%e %e\n", Tcon[j]*(1.0+parset.redshift), Fcon[j]/con_scale);
         }
         fprintf(fcon, "\n");
+          
+        if(parset.flag_trend_diff > 0)
+        {
+          for(j=0; j<parset.n_con_recon; j++)
+          {
+            fprintf(fcon_rm, "%e %e\n", Tcon[j]*(1.0+parset.redshift), Fcon_rm[j]/con_scale);
+          }
+          fprintf(fcon_rm, "\n");
+        }      
 
         // output 2d line
         for(j=0; j<n_line_data; j++)
@@ -224,6 +243,8 @@ void postprocess2d()
 
     fclose(fp);
     fclose(fcon);
+    if(parset.flag_trend_diff > 0)
+      fclose(fcon_rm);
     fclose(fline);
     fclose(ftran);
     fclose(fline1d);
