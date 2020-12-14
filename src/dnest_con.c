@@ -126,11 +126,24 @@ void set_par_range_con()
     par_prior_gaussian[i][1] = 1.0;
   }
   
-  /* parameter for trend difference */
-  for(i= num_params_drw + num_params_trend; i<num_params_var; i++) 
+  /* paramter for response 
+   * in case of 0D, num_params_resp = 0 
+   * 1D and 2D call recontruct_con, in which resp parameters are needed */
+  for(i=num_params_drw + num_params_trend; i<num_params_drw + num_params_trend + num_params_resp; i++)
   {
-    par_range_model[i][0] = var_range_model[4 + i - (num_params_drw + num_params_trend)][0];
-    par_range_model[i][1] = var_range_model[4 + i - (num_params_drw + num_params_trend)][1];
+    par_range_model[i][0] = resp_range[i - (num_params_drw + num_params_trend)][0];
+    par_range_model[i][1] = resp_range[i - (num_params_drw + num_params_trend)][1];
+
+    par_prior_model[i] = UNIFORM;
+    par_prior_gaussian[i][0] = 0.0;
+    par_prior_gaussian[i][1] = 0.0;
+  }
+
+  /* parameter for trend difference */
+  for(i= num_params_drw + num_params_trend + num_params_resp; i<num_params_var; i++) 
+  {
+    par_range_model[i][0] = var_range_model[4 + i - (num_params_drw + num_params_trend + num_params_resp)][0];
+    par_range_model[i][1] = var_range_model[4 + i - (num_params_drw + num_params_trend + num_params_resp)][1];
 
     par_prior_model[i] = UNIFORM;
     par_prior_gaussian[i][0] = 0.0;
@@ -194,6 +207,15 @@ void print_par_names_con()
   {
     i++;
     fprintf(fp, str_fmt, i, "trend", par_range_model[i][0], par_range_model[i][1], par_prior_model[i],
+                            par_fix[i], par_fix_val[i]);
+  }
+  
+  /* in case of 0D, num_params_resp = 0 
+   * 1D and 2D call recontruct_con, in which resp parameters are needed */
+  for(j=0; j<num_params_resp; j++)
+  {
+    i++;
+    fprintf(fp, str_fmt, i, "resp", par_range_model[i][0], par_range_model[i][1], par_prior_model[i],
                             par_fix[i], par_fix_val[i]);
   }
 
