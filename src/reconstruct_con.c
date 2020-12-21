@@ -324,15 +324,19 @@ void calculate_con_from_model(const void *model)
   multiply_mat_MN(USmat, PCmat_data, PEmat1, parset.n_con_recon, n_con_data, n_con_data);
   multiply_mat_MN_transposeB(PEmat1, USmat, PEmat2, parset.n_con_recon, parset.n_con_recon, n_con_data);
 
+  // set DRW covariance at reconstructed points
   set_covar_Pmat(sigma, tau, alpha);
-  inverse_pomat(PSmat, parset.n_con_recon, &info);
 
-  // Q = [S^-1 + N^-1]^-1
-  memcpy(PQmat, PSmat, parset.n_con_recon*parset.n_con_recon*sizeof(double));
-  for(i=0; i<parset.n_con_recon; i++)
-    PQmat[i*parset.n_con_recon+i] += 1.0/(sigma*sigma + syserr*syserr - PEmat2[i*parset.n_con_recon + i]);  
+  // S - SxC^-1xS^T; covariance of reconstructed points
+  for(i=0; i<parset.n_con_recon*parset.n_con_recon; i++)
+    PQmat[i] = PSmat[i] - PEmat2[i];
   
-  inverse_pomat(PQmat, parset.n_con_recon, &info);
+  // assign errors
+  for(i=0; i<parset.n_con_recon; i++)
+  {
+    Fcerrs[i] = sqrt(PQmat[i*parset.n_con_recon + i]);
+  }
+
   Chol_decomp_L(PQmat, parset.n_con_recon, &info);
   multiply_matvec(PQmat, &pm[num_params_var], parset.n_con_recon, yu);
 
@@ -342,7 +346,6 @@ void calculate_con_from_model(const void *model)
   for(i=0; i<parset.n_con_recon; i++)
   {
     Fcon[i] += yu[i] + yuq[i];
-    Fcerrs[i] = sqrt(sigma*sigma + syserr*syserr - PEmat2[i*parset.n_con_recon + i]);
   }
 
   return;
@@ -416,33 +419,21 @@ void calculate_con_from_model_semiseparable(const void *model)
   multiply_mat_transposeB_semiseparable_drw(USmat, W, D, phi, n_con_data, parset.n_con_recon, sigma2, PEmat1);
   multiply_mat_MN(USmat, PEmat1, PEmat2, parset.n_con_recon, parset.n_con_recon, n_con_data);
 
-  //set_covar_Pmat(sigma, tau, alpha);
+  // set DRW covariance at reconstructed points
+  set_covar_Pmat(sigma, tau, alpha);
 
+  // S - SxC^-1xS^T; covariance of reconstructed points
+  for(i=0; i<parset.n_con_recon*parset.n_con_recon; i++)
+    PQmat[i] = PSmat[i] - PEmat2[i];
+  
+  // assign errors
   for(i=0; i<parset.n_con_recon; i++)
   {
-    Fcerrs[i] = sqrt(sigma2 + syserr*syserr - PEmat2[i*parset.n_con_recon + i]);
+    Fcerrs[i] = sqrt(PQmat[i*parset.n_con_recon + i]);
   }
 
-  /* 
-  compute_semiseparable_drw(Tcon, parset.n_con_recon, sigma2, 1.0/tau, Fcerrs, 0.0, W, D, phi);
-
-  // Q = [S^-1 + N^-1]^-1 = N x [S+N]^-1 x S
-  multiply_mat_semiseparable_drw(PSmat, W, D, phi, parset.n_con_recon, parset.n_con_recon, sigma2, PEmat2);
-  for(i=0; i<parset.n_con_recon; i++)
-  {
-    for(j=0; j<=i; j++)
-    {
-      PQmat[i*parset.n_con_recon + j] = PQmat[j*parset.n_con_recon + i] = Fcerrs[i] * Fcerrs[i] * PEmat2[i*parset.n_con_recon+j];
-    }
-  }  
-
   Chol_decomp_L(PQmat, parset.n_con_recon, &info);
-  multiply_matvec(PQmat, &pm[num_params_var], parset.n_con_recon, yu); 
-  */
-  
-  compute_inverse_semiseparable_plus_diag(Tcon, parset.n_con_recon, sigma2, 1.0/tau, 
-                                          Fcerrs, 0.0, u, v, W, D, phi, workspace_uv);
-  multiply_matvec_semiseparable_uv(&pm[num_params_var], u, W, D, phi, parset.n_con_recon, y);
+  multiply_matvec(PQmat, &pm[num_params_var], parset.n_con_recon, y);
 
   // add back long-term trend of continuum
   multiply_matvec_MN(Larr_rec, parset.n_con_recon, nq, yq, ybuf);
@@ -451,7 +442,6 @@ void calculate_con_from_model_semiseparable(const void *model)
   {
     Fcon[i] += y[i] + ybuf[i];
   }
-
   return;
 }
 
