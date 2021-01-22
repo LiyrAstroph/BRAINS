@@ -25,7 +25,7 @@
 #include "user_blr_model.h"
 #include "user_transfun.h"
 
-#ifdef SA
+#ifdef SpecAstro
 #include "dnest_sa.h"
 #include "dnest_sa1d.h"
 #include "dnest_sa2d.h"

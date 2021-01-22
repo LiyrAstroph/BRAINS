@@ -131,7 +131,7 @@ void init()
     bin_offset = 0.0;
   }
 
-#ifdef SA
+#ifdef SpecAstro
   if(parset.flag_dim > 2 || parset.flag_dim < 0)
   {
     num_params_sa_extpar = sizeof(SAExtPar)/sizeof(double);
@@ -423,7 +423,7 @@ void init()
     
   }
   
-#ifdef SA
+#ifdef SpecAstro
   /* SA */
   if(parset.flag_dim > 2)
   {
@@ -495,7 +495,7 @@ void allocate_memory()
     }
   }
   
-#ifdef SA
+#ifdef SpecAstro
   if(parset.flag_dim > 2 || parset.flag_dim < 0)
   {
     sa_extpar_range = malloc(num_params_sa_extpar * sizeof(double *));
@@ -560,7 +560,7 @@ void free_memory()
     free(var_param_std);
   }
   
-#ifdef SA
+#ifdef SpecAstro
   if(parset.flag_dim > 2 || parset.flag_dim < 0)
   {
     for(i=0; i<num_params_sa_extpar; i++)

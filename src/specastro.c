@@ -5,7 +5,7 @@
  * Thu, Aug 4, 2016
  */
 
-#ifdef SA
+#ifdef SpecAstro
 
 #include <math.h>
 #include <stddef.h>

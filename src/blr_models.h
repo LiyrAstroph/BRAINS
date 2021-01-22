@@ -188,7 +188,7 @@ typedef struct
   double mbh;      /*!< \brief 6.  black hole mass,  in 10e6 solar mass */ 
 }BLRmodel9;
 
-#ifdef SA
+#ifdef SpecAstro
 
 typedef BLRmodel1 SABLRmodel1;
 typedef BLRmodel2 SABLRmodel2;

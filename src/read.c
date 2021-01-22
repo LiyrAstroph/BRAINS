@@ -274,7 +274,7 @@ void read_parset()
     pardict[nt].isset = 0;
     pardict[nt++].id = INT;
 
-#ifdef SA
+#ifdef SpecAstro
     strcpy(pardict[nt].tag, "SAFile");
     pardict[nt].addr= &parset.sa_file;
     pardict[nt].isset = 0;
@@ -349,7 +349,7 @@ void read_parset()
     strcpy(parset.str_par_fix,"");
     strcpy(parset.str_par_fix_val,"");
 
-#ifdef SA
+#ifdef SpecAstro
     parset.flag_sa_blrmodel = 1;
     parset.flag_sa_par_mutual = 0;
     parset.sa_linecenter = 1.875; 
@@ -406,7 +406,7 @@ void read_parset()
         else
         {
           fprintf(stderr, "# Error in file %s: Tag '%s' is not allowed or multiple defined.\n"
-                          "# Note: if using spectro-astrometric analysis, switch on '-DSA' in Makefile.\n", 
+                          "# Note: if using spectro-astrometric analysis, switch on '-DSpecAstro' in Makefile.\n", 
                         parset.param_file, buf1);
           error_flag = 3;
         }
@@ -426,7 +426,7 @@ void read_parset()
     /* check input options */
     if(error_flag == 0)
     {
-#ifndef SA
+#ifndef SpecAstro
       if(parset.flag_dim > 2 || parset.flag_dim < -2)
       {
         fprintf(stderr, "# Error in FlagDim: value %d is not allowed.\n"
@@ -649,7 +649,7 @@ void read_parset()
       {
         parset.linecenter_err /= VelUnit;
       }
-#ifdef SA
+#ifdef SpecAstro
       /* check flag_sa_blrmodel */
       if(parset.flag_sa_blrmodel > 9 || parset.flag_sa_blrmodel < -1)
       {
@@ -839,7 +839,7 @@ void read_data()
       }
     }
 
-#ifdef SA
+#ifdef SpecAstro
     if( (parset.flag_dim > 2 || parset.flag_dim == -1) && error_flag == 0 )
     {
       sprintf(fname, "%s/%s", parset.file_dir, parset.sa_file);
@@ -885,7 +885,7 @@ void read_data()
     n_vel_data_ext = n_vel_data + 2 * n_vel_data_incr;
   }
 
-#ifdef SA
+#ifdef SpecAstro
   if(parset.flag_dim > 2 || parset.flag_dim == -1)
   {
     MPI_Bcast(&n_epoch_sa_data, 1, MPI_INT, roottask, MPI_COMM_WORLD);
@@ -1198,7 +1198,7 @@ void read_data()
     }
   }
 
-#ifdef SA
+#ifdef SpecAstro
 /* read SA data */
   if(parset.flag_dim > 2 || parset.flag_dim == -1)
   {
@@ -1379,7 +1379,7 @@ void allocate_memory_data()
     instres_err_epoch = malloc(n_line_data * sizeof(double));
   }
 
-#ifdef SA
+#ifdef SpecAstro
   if(parset.flag_dim > 2 || parset.flag_dim == -1)
   {
     wave_sa_data = malloc(n_vel_sa_data*sizeof(double));
@@ -1431,7 +1431,7 @@ void free_memory_data()
     free(instres_err_epoch);
   }
 
-#ifdef SA
+#ifdef SpecAstro
   if(parset.flag_dim > 2 || parset.flag_dim == -1)
   {
     free(wave_sa_data);
@@ -1597,7 +1597,7 @@ int check_parset_isset()
     strcpy(this_tag[n_this_tag++], "LineCenter");
     strcpy(this_tag[n_this_tag++], "NLineRecon");
     strcpy(this_tag[n_this_tag++], "NVelRecon");
-#ifdef SA
+#ifdef SpecAstro
     strcpy(this_tag[n_this_tag++], "FlagSABLRModel");
     strcpy(this_tag[n_this_tag++], "SALineCenter");
 #endif  
@@ -1607,7 +1607,7 @@ int check_parset_isset()
     strcpy(this_tag[n_this_tag++], "FlagBLRModel");
     strcpy(this_tag[n_this_tag++], "ContinuumFile");
     strcpy(this_tag[n_this_tag++], "LineFile");
-#ifdef SA
+#ifdef SpecAstro
     strcpy(this_tag[n_this_tag++], "FlagSABLRModel");
     strcpy(this_tag[n_this_tag++], "SALineCenter");
     strcpy(this_tag[n_this_tag++], "SAFile");
@@ -1646,7 +1646,7 @@ int check_parset_isset()
     strcpy(this_tag[n_this_tag++], "FlagInstRes");
 
   }
-#ifdef SA
+#ifdef SpecAstro
   else if(parset.flag_dim == 3)
   {
     strcpy(this_tag[n_this_tag++], "SALineCenter");

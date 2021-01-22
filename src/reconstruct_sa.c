@@ -10,7 +10,7 @@
  *  \brief reconstruct sa and RM data.
  */
 
-#ifdef SA
+#ifdef SpecAstro
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -10,7 +10,7 @@
  *  \brief header file.
  */
 
-#ifdef SA
+#ifdef SpecAstro
 
 #ifndef _DNEST_SA2D_H
 #define _DNEST_SA2D_H

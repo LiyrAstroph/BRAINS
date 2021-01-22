@@ -10,7 +10,7 @@
  *  \brief reconstruct sa and 2d RM data.
  */
 
-#ifdef SA
+#ifdef SpecAstro
 
 #include "brains.h"
 

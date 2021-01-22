@@ -104,7 +104,7 @@ void gen_cloud_sample_model1(const void *pm, int flag_type, int flag_save)
     weight = 0.5 + k*(x/r);
     clouds_weight[i] = weight;
 
-#ifndef SA
+#ifndef SpecAstro
     dis = r - x;
     clouds_tau[i] = dis;
     if(flag_type == 1)
@@ -310,7 +310,7 @@ void gen_cloud_sample_model2(const void *pm, int flag_type, int flag_save)
     weight = 0.5 + k*(x/r);
     clouds_weight[i] = weight;
 
-#ifndef SA
+#ifndef SpecAstro
     dis = r - x;
     clouds_tau[i] = dis;
     if(flag_type == 1)
@@ -501,7 +501,7 @@ void gen_cloud_sample_model3(const void *pm, int flag_type, int flag_save)
     weight = 0.5 + k*(x/r);
     clouds_weight[i] = weight;
 
-#ifndef SA
+#ifndef SpecAstro
     dis = r - x;
     clouds_tau[i] = dis;
     if(flag_type == 1)
@@ -689,7 +689,7 @@ void gen_cloud_sample_model4(const void *pm, int flag_type, int flag_save)
     weight = 0.5 + k*(x/r);
     clouds_weight[i] = weight;
 
-#ifndef SA
+#ifndef SpecAstro
     dis = r - x;
     clouds_tau[i] = dis;
     if(flag_type == 1)
@@ -917,7 +917,7 @@ void gen_cloud_sample_model5(const void *pm, int flag_type, int flag_save)
     weight = 0.5 + k*(x/r);
     clouds_weight[i] = weight;
 
-#ifndef SA
+#ifndef SpecAstro
     dis = r - x;
     clouds_tau[i] = dis;
     if(flag_type == 1)
@@ -1155,7 +1155,7 @@ void gen_cloud_sample_model6(const void *pm, int flag_type, int flag_save)
     weight = 0.5 + k*(x/r);
     clouds_weight[i] = weight;
 
-#ifndef SA
+#ifndef SpecAstro
     dis = r - x;
     clouds_tau[i] = dis;
     if(flag_type == 1)
@@ -1396,7 +1396,7 @@ void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save)
     weight = 0.5 + k*(x/r);
     clouds_weight[i] = weight;
 
-#ifndef SA
+#ifndef SpecAstro
     dis = r - x;
     clouds_tau[i] = dis;
     if(flag_type == 1)
@@ -1592,7 +1592,7 @@ void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save)
     weight = 0.5 + k*(x/r);
     clouds_weight[i] = weight;
     
-#ifndef SA
+#ifndef SpecAstro
     dis = r - x;
     clouds_tau[i] = dis;
     if(flag_type == 1)
@@ -1798,7 +1798,7 @@ void gen_cloud_sample_model8(const void *pm, int flag_type, int flag_save)
     weight = 0.5 + k*(x/R);
     clouds_weight[i] = weight * density;
 
-#ifndef SA
+#ifndef SpecAstro
     dis = R - x;
     clouds_tau[i] = dis;
     if(flag_type == 1)
@@ -1962,7 +1962,7 @@ void gen_cloud_sample_model9(const void *pm, int flag_type, int flag_save)
     weight = 1.0;
     clouds_weight[i] = weight;
 
-#ifndef SA
+#ifndef SpecAstro
     dis = r - x;
     clouds_tau[i] = dis;
     if(flag_type == 1)
@@ -2105,7 +2105,7 @@ void restart_action_2d(int iflag)
   restart_action_1d(iflag);
 }
 
-#ifdef SA
+#ifdef SpecAstro
 void restart_action_sa(int iflag)
 {
   restart_action_1d(iflag);

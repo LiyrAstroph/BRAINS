@@ -24,7 +24,7 @@
 #include "brains.h"
 
 /////////////////////////////////////////////////////////////////////////////////
-#ifdef SA
+#ifdef SpecAstro
 /* baselines for 3C 273 dataset observed by the GRAVITY (Nature, 2020, 563, 657), 
  * unit is meter */
 int n_base_sa_3c273 = 24;
@@ -238,7 +238,7 @@ void sim()
   }
   fclose(fp);
 
-#ifdef SA
+#ifdef SpecAstro
   double *sa_pm;
   sa_pm = (double *)pm + num_params_blr;
 
@@ -370,7 +370,7 @@ void sim_init()
       break;
   }
 
-#ifdef SA
+#ifdef SpecAstro
   set_sa_blr_model();
   /* SA */
   num_params_sa_blr = num_params_sa_blr_model + num_params_sa_extpar;
@@ -414,7 +414,7 @@ void sim_init()
   num_params_var = num_params_drw + num_params_trend + num_params_difftrend + num_params_resp;
 
   num_params_blr_tot = num_params_blr;
-#ifdef SA
+#ifdef SpecAstro
   num_params_blr_tot  += num_params_sa_blr;
 #endif
   num_params = num_params_blr_tot + num_params_var + parset.n_con_recon;
@@ -453,7 +453,7 @@ void sim_init()
   pm[idx_resp + 0] = log(1.0); //A
   pm[idx_resp + 1] = 0.0;      //Ag
 
-#ifdef SA
+#ifdef SpecAstro
   double *sa_model = pm + num_params_blr;
   set_idx_par_mutual();
   set_par_value_sim(sa_model, parset.flag_sa_blrmodel);
@@ -603,7 +603,7 @@ void sim_init()
     }
   }
 
-#ifdef SA
+#ifdef SpecAstro
   double saRblr;
 
   if(parset.flag_dim == -1)
@@ -710,7 +710,7 @@ void sim_end()
     fclose(fcloud_out);
   }
 
-#ifdef SA
+#ifdef SpecAstro
   
   free(vel_sa);
   free(wave_sa);

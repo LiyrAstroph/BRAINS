@@ -44,7 +44,7 @@ void set_blr_range_mymodel();
 void gen_cloud_sample_mymodel(const void *pm, int flag_type, int flag_save);
 void set_par_value_mymodel_sim(double *pm);
 
-#ifdef SA
+#ifdef SpecAstro
 void set_sa_blr_range_mymodel();
 void set_sa_par_value_mymodel_sim(double *pm);
 #endif

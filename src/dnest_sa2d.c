@@ -9,7 +9,7 @@
  *  \brief run dnest sampling for sa and 2d rm analysis.
  */
 
-#ifdef SA
+#ifdef SpecAstro
 
 #include <stdio.h>
 #include <stdlib.h>

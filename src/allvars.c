@@ -128,7 +128,7 @@ gsl_rng * gsl_r;
 gsl_interp_accel *gsl_acc;
 gsl_interp  *gsl_linear;
 
-#ifdef SA
+#ifdef SpecAstro
 
 double PhaseFactor;
 

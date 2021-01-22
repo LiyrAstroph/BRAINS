@@ -26,7 +26,7 @@ void begin_run()
    */
   VelUnit = sqrt( GRAVITY * 1.0e6 * SOLAR_MASS / CM_PER_LD ) / 1.0e5; 
 
-#ifdef SA
+#ifdef SpecAstro
   /* 
    * phase = -2*PI * f_line * B[m]/lambda[um] * X[ld]/DA[Mpc]
    * 
@@ -45,7 +45,7 @@ void begin_run()
   {
     /* read data files */
     read_data();
-#ifndef SA
+#ifndef SpecAstro
     /* scale continuum and line to an order of unity */
     scale_con_line();
 #else
@@ -95,7 +95,7 @@ void begin_run()
     reconstruct_line2d();
   }
 
-#ifdef SA
+#ifdef SpecAstro
   if(parset.flag_dim == 3) /* SA */
   {
     reconstruct_sa();

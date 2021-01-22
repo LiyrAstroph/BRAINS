@@ -134,7 +134,7 @@ double second();
 double timediff(double t0, double t1);
 void get_hms(double dt, int *h, int *m, double *s);
 
-#ifdef SA
+#ifdef SpecAstro
 
 void set_sa_blr_model();
 void set_idx_par_mutual();

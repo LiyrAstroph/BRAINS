@@ -198,7 +198,7 @@ void gen_cloud_sample_mymodel(const void *pm, int flag_type, int flag_save)
     weight = 0.5 + k*(x/r);
     clouds_weight[i] = weight;
 
-#ifndef SA
+#ifndef SpecAstro
     dis = r - x;
     clouds_tau[i] = dis;
     if(flag_type == 1)
@@ -357,7 +357,7 @@ void set_par_value_mymodel_sim(double *pm)
   pm[i++] = 0.0;       // parameter for spectral broadening 
 }
 
-#ifdef SA
+#ifdef SpecAstro
 /*!
  *  set parameter range
  */

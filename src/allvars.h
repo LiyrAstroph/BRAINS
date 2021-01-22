@@ -144,7 +144,7 @@ typedef struct
   int flag_bintype;
   int flag_gravity;
   
-#ifdef SA
+#ifdef SpecAstro
   char sa_file[BRAINS_MAX_STR_LENGTH];
   int flag_sa_blrmodel, flag_sa_par_mutual;
   double sa_linecenter;
@@ -258,7 +258,7 @@ extern gsl_interp_accel *gsl_acc;
 extern gsl_interp  *gsl_linear;
 
 
-#ifdef SA
+#ifdef SpecAstro
 extern double PhaseFactor;
 
 extern int num_params_rm;
