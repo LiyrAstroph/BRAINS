@@ -125,17 +125,38 @@ class ParaName:
     self.para_names['fix']  = names['f5']
     self.para_names['val']  = names['f6']
 
+    self.num_param_blrmodel_rm = 0
+    self.num_param_blr_rm = 0
+    self.num_param_rm_extra = 0
+    self.num_param_sa = 0
+    self.num_param_blrmodel_sa = 0
+    self.num_param_sa_extra = 0
     
-    self.num_param_blrmodel_rm = np.count_nonzero(self.para_names['name'] == 'BLR model')
-    idx = np.nonzero(self.para_names['name'] == 'SA BLR model')
-    self.num_param_rm_extra = idx[0][0] - self.num_param_blrmodel_rm
-    self.num_param_blr_rm = self.num_param_rm_extra + self.num_param_blrmodel_rm
-    self.num_param_blrmodel_sa = np.count_nonzero(self.para_names['name'] == 'SA BLR model')
-    self.num_param_sa_extra = np.count_nonzero(self.para_names['name'] ==  'SA Extra Par')
-    self.num_param_sa = self.num_param_blrmodel_sa + self.num_param_sa_extra
+    if 'BLR model' in self.para_names['name']:
+      self.num_param_blrmodel_rm = np.count_nonzero(self.para_names['name'] == 'BLR model')
+    else:
+      self.num_param_blrmodel_rm = 0
+      
+    if 'SA BLR model' in self.para_names['name']:
+      idx = np.nonzero(self.para_names['name'] == 'SA BLR model')
+      self.num_param_rm_extra = idx[0][0] - self.num_param_blrmodel_rm
+      self.num_param_blr_rm = self.num_param_rm_extra + self.num_param_blrmodel_rm
+      self.num_param_blrmodel_sa = np.count_nonzero(self.para_names['name'] == 'SA BLR model')
+      self.num_param_sa_extra = np.count_nonzero(self.para_names['name'] ==  'SA Extra Par')
+      self.num_param_sa = self.num_param_blrmodel_sa + self.num_param_sa_extra
+    else:
+      self.num_param_sa = 0
+      self.num_param_blrmodel_sa = 0
+      self.num_param_sa_extra = 0
+      idx_con =  np.nonzero(self.para_names['name'] == 'sys_err_con')
+      self.num_param_rm_extra = idx_con[0][0] - self.num_param_blrmodel_rm
+      self.num_param_blr_rm = self.num_param_rm_extra + self.num_param_blrmodel_rm
 
-    idx = np.nonzero(self.para_names['name'] == 'time series')
-    self.num_param_con = idx[0][0] - self.num_param_sa - self.num_param_blr_rm
+    if 'time series' in self.para_names['name']:
+      idx = np.nonzero(self.para_names['name'] == 'time series')
+      self.num_param_con = idx[0][0] - self.num_param_sa - self.num_param_blr_rm
+    else:
+      self.num_param_con = 0
 
     #print(self.num_param_blr_rm, self.num_param_sa, self.num_param_con)
     
@@ -261,13 +282,15 @@ class BBackend(Param, Options, ParaName):
     self.results['con_rec'] = np.loadtxt(self.file_dir+"data/con_rec.txt")
     ns = int(self.sample_size)
     nt = int(self.results['con_rec'].shape[0]/ns)
-    self.results['con_rec'] = np.reshape(self.results['con_rec'], (ns, nt, 3), order='C')
+    nc = self.results['con_rec'].shape[1]
+    self.results['con_rec'] = np.reshape(self.results['con_rec'], (ns, nt, nc), order='C')
   
   def _load_line_rec(self):
     self.results['line_rec'] = np.loadtxt(self.file_dir+"data/line_rec.txt")
     ns = int(self.sample_size)  
     nt = int(self.results['line_rec'].shape[0]/ns)
-    self.results['line_rec'] = np.reshape(self.results['line_rec'], (ns, nt, 2), order='C')
+    nc = self.results['line_rec'].shape[1]
+    self.results['line_rec'] = np.reshape(self.results['line_rec'], (ns, nt, nc), order='C')
 
   def _load_sa_rec(self):
     # load sa line reconstructions
@@ -275,9 +298,11 @@ class BBackend(Param, Options, ParaName):
     self.results["sa_phase_rec"] = np.loadtxt(self.file_dir + 'data/sa_phase_rec.txt')
     ns = int(self.sample_size)
     nv = int(self.results['sa_profile_rec'].shape[0]/ns)
-    self.results["sa_profile_rec"] = np.reshape(self.results["sa_profile_rec"], (ns, nv, 2), order='C')
+    nc = self.results['sa_profile_rec'].shape[1]
+    self.results["sa_profile_rec"] = np.reshape(self.results["sa_profile_rec"], (ns, nv, nc), order='C')
     nb = int(self.results['sa_phase_rec'].shape[0]/ns/nv)
-    self.results["sa_phase_rec"] = np.reshape(self.results["sa_phase_rec"], (ns, nb, nv, 2), order='C')
+    nc = self.results['sa_phase_rec'].shape[1]
+    self.results["sa_phase_rec"] = np.reshape(self.results["sa_phase_rec"], (ns, nb, nv, nc), order='C')
   
   def _load_line2d_rec(self):
     # load line2d reconstructions
@@ -291,7 +316,8 @@ class BBackend(Param, Options, ParaName):
     self.results['tran_rec'] = np.loadtxt(self.file_dir+"data/tran_rec.txt")
     ns = int(self.sample_size)  
     nt = int(self.results['tran_rec'].shape[0]/ns)
-    self.results['tran_rec'] = np.reshape(self.results['tran_rec'], (ns, nt, 2), order='C')
+    nc = self.results['tran_rec'].shape[1]
+    self.results['tran_rec'] = np.reshape(self.results['tran_rec'], (ns, nt, nc), order='C')
 
   def _load_tran2d_rec(self):
     # load tran2d_rec
