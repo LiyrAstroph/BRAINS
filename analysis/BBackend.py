@@ -347,11 +347,13 @@ class BBackend(Param, Options, ParaName):
     
     elif self.param['flagdim'] == '0':
       self.results['sample'] = np.loadtxt(self.file_dir + "data/posterior_sample.txt")
+      self.results['sample_info'] = np.loadtxt(self.file_dir + 'data/posterior_sample_info.txt')
       self.sample_size = self.results['sample'].shape[0]
       self._load_con_rec()
     
     elif self.param['flagdim'] == '1':
-      self.results['sample'] = np.loadtxt(self.file_dir + "data/posterior_sample1d.txt")      
+      self.results['sample'] = np.loadtxt(self.file_dir + "data/posterior_sample1d.txt")  
+      self.results['sample_info'] = np.loadtxt(self.file_dir + 'data/posterior_sample_info1d.txt')    
       self.sample_size = self.results['sample'].shape[0]
       self._load_con_rec()
       self._load_line_rec()
@@ -360,6 +362,7 @@ class BBackend(Param, Options, ParaName):
     elif self.param['flagdim'] == '2':
       # load posterior samples
       self.results['sample'] = np.loadtxt(self.file_dir + 'data/posterior_sample2d.txt')
+      self.results['sample_info'] = np.loadtxt(self.file_dir + 'data/posterior_sample_info2d.txt')
       # load likelihoods
       self.results['sample_info'] = np.loadtxt(self.file_dir + 'data/posterior_sample_info2d.txt')
       self.sample_size = self.results['sample'].shape[0]
@@ -372,12 +375,14 @@ class BBackend(Param, Options, ParaName):
 
     elif self.param['flagdim'] == '3':
       self.results['sample'] = np.loadtxt(self.file_dir + 'data/posterior_sample_sa.txt')
+      self.results['sample_info'] = np.loadtxt(self.file_dir + 'data/posterior_sample_info_sa.txt')
       self.sample_size = self.results['sample'].shape[0]
       self._load_sa_rec()
 
     
     elif self.param['flagdim'] == '4':
       self.results['sample'] = np.loadtxt(self.file_dir + 'data/posterior_sample_sa1d.txt')
+      self.results['sample_info'] = np.loadtxt(self.file_dir + 'data/posterior_sample_info_sa1d.txt')
       self.sample_size = self.results['sample'].shape[0]
       self._load_con_rec()
       self._load_line_rec()
@@ -386,6 +391,7 @@ class BBackend(Param, Options, ParaName):
 
     elif self.param['flagdim'] == '5':
       self.results['sample'] = np.loadtxt(self.file_dir + 'data/posterior_sample_sa2d.txt')
+      self.results['sample_info'] = np.loadtxt(self.file_dir + 'data/posterior_sample_info_sa2d.txt')
       self.sample_size = self.results['sample'].shape[0]
       self._load_line2d_rec()
       self._load_tran2d_rec()

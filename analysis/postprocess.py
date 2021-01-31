@@ -35,8 +35,14 @@ def postprocess(ndim, temp=1.0, fcut=0.0):
     str_dim = '1d'
   elif ndim == 2:
     str_dim = '2d'
+  elif ndim == 3:
+    str_dim = '_sa'
+  elif ndim == 4:
+    str_dim = '_sa1d'
+  elif ndim == 5:
+    str_dim = '_sa2d'
   else:
-    print('incorrect dimension.')
+    raise Exception('incorrect dimension.')
 
   try:
     levels_orig = np.loadtxt("../data/levels"+str_dim+".txt", comments='#')
