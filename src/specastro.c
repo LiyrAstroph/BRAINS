@@ -97,6 +97,7 @@ void calculate_sa_with_sample(const void *pm)
    */       
   CO = -pmodel[num_params_blr + num_params_sa_blr_model+3]/parset.sa_linecenter * C_Unit;  
 
+  /* North through East (E of N), 180 deg ambiguity */
   cos_PA = cos(PA);
   sin_PA = sin(PA);
 
@@ -197,6 +198,7 @@ void calculate_sa_sim_with_sample(const void *pm, double *vel_sa, int n_vel_sa, 
    */       
   CO = -pmodel[num_params_blr + num_params_sa_blr_model+3]/parset.sa_linecenter * C_Unit; 
 
+  /* North through East (E of N), 180 deg ambiguity */
   cos_PA = cos(PA);
   sin_PA = sin(PA);
 
