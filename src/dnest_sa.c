@@ -276,7 +276,7 @@ double perturb_sa(void *model)
 {
   double *pm = (double *)model;
   double logH = 0.0, limit1, limit2, width;
-  int which, which_level, count_saves, size_levels; 
+  int which, which_level, size_levels; 
 
   /* 
    * fixed parameters need not to update 
@@ -290,26 +290,23 @@ double perturb_sa(void *model)
   which_parameter_update = which;
   
   /* level-dependent width */
-  count_saves = dnest_get_count_saves();
   which_level_update = dnest_get_which_level_update();
   size_levels = dnest_get_size_levels();
   which_level = which_level_update > (size_levels-10)?(size_levels-10):which_level_update;
 
-  if( which_level > 0 && count_saves > 1000)
+  if( which_level > 0)
   {
     limit1 = limits[(which_level-1) * num_params *2 + which *2];
     limit2 = limits[(which_level-1) * num_params *2 + which *2 + 1];
     width = (limit2 - limit1);
-    width /= (3*2.35);
   }
   else
   {
     limit1 = par_range_model[which][0];
     limit2 = par_range_model[which][1];
     width = (par_range_model[which][1] - par_range_model[which][0]);
-    width /= (2.35);
   }
-  
+  width /= (2.35);
 
   if(par_prior_model[which] == GAUSSIAN)
   {
