@@ -35,7 +35,7 @@ void gen_cloud_sample_model1(const void *pm, int flag_type, int flag_save)
   int i, j, nc;
   double r, phi, dis, Lopn_cos, u;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
-  double inc, F, beta, mu, k, a, s, rin, sig;
+  double inc, F, beta, mu, k, a, s, rin, sig, Rs;
   double Lphi, Lthe, L, E;
   double V, weight, rnd;
   BLRmodel1 *model = (BLRmodel1 *)pm;
@@ -48,16 +48,24 @@ void gen_cloud_sample_model1(const void *pm, int flag_type, int flag_save)
   F = model->F;
   mu = exp(model->mu);
   k = model->k;
+  
+  if(flag_type == 1) // 1D RM, no dynamical parameters
+  {
+    mbh = 0.0;
+  }
+  else 
+  {
+    mbh = exp(model->mbh);
+    lambda = model->lambda;
+    q = model->q;
+  }
 
+  Rs = 3.0e11*mbh/CM_PER_LD; // Schwarzchild radius in a unit of light-days
   a = 1.0/beta/beta;
   s = mu/a;
-  rin = mu*F;
+  rin = mu*F + Rs;
   sig = (1.0-F)*s;
 
-  mbh = exp(model->mbh);
-  lambda = model->lambda;
-  q = model->q;
-  
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
 // generate a direction of the angular momentum     
@@ -240,7 +248,7 @@ void gen_cloud_sample_model2(const void *pm, int flag_type, int flag_save)
   int i, j, nc;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
-  double inc, F, beta, mu, k, a, s, rin, sig;
+  double inc, F, beta, mu, k, a, s, rin, sig, Rs;
   double Lphi, Lthe;
   double V, weight, rnd;
   BLRmodel2 *model = (BLRmodel2 *)pm;
@@ -258,10 +266,23 @@ void gen_cloud_sample_model2(const void *pm, int flag_type, int flag_save)
   s = mu/a;
   rin=mu*F;
   sig=(1.0-F)*s;
+  
+  if(flag_type == 1)  //1D RM no dynamical parameters
+  {
+    mbh = 0.0;
+  }
+  else 
+  {
+    mbh = exp(model->mbh);
+    sigr = model->sigr;
+    sigtheta = model->sigtheta * PI;
+  }
+  Rs = 3.0e11*mbh/CM_PER_LD; // Schwarzchild radius in a unit of light-days
 
-  mbh = exp(model->mbh);
-  sigr = model->sigr;
-  sigtheta = model->sigtheta * PI;
+  a = 1.0/beta/beta;
+  s = mu/a;
+  rin = mu*F + Rs;
+  sig = (1.0-F)*s;
 
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
@@ -431,7 +452,7 @@ void gen_cloud_sample_model3(const void *pm, int flag_type, int flag_save)
   int i, j, nc;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
-  double inc, F, alpha, Rin, k;
+  double inc, F, alpha, Rin, k, Rs;
   double Lphi, Lthe, L, E;
   double V, weight, rnd;
   BLRmodel3 *model = (BLRmodel3 *)pm;
@@ -444,10 +465,18 @@ void gen_cloud_sample_model3(const void *pm, int flag_type, int flag_save)
   F = model->F;
   Rin = exp(model->Rin);
   k = model->k;
-
-  mbh = exp(model->mbh);
-  xi = model->xi;
-  q = model->q;
+  
+  if(flag_type == 1)
+  {
+    mbh = 0.0;
+  }
+  else 
+  {
+    mbh = exp(model->mbh);
+    xi = model->xi;
+    q = model->q;
+  }
+  Rs = 3.0e11*mbh/CM_PER_LD; // Schwarzchild radius in a unit of light-days
   
   if(F*Rin > rcloud_max_set)
     F = rcloud_max_set/Rin;
@@ -471,7 +500,7 @@ void gen_cloud_sample_model3(const void *pm, int flag_type, int flag_save)
         rnd = pow( gsl_rng_uniform(gsl_r) * ( pow(F, 1.0-alpha) - 1.0) + 1.0,  1.0/(1.0-alpha) );
       else
         rnd = exp( gsl_rng_uniform(gsl_r) * log(F) );
-      r = Rin * rnd ;
+      r = Rin * rnd + Rs;
       nc++;
     }
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
@@ -619,7 +648,7 @@ void gen_cloud_sample_model4(const void *pm, int flag_type, int flag_save)
   int i, j, nc;
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
-  double inc, F, alpha, Rin, k;
+  double inc, F, alpha, Rin, k, Rs;
   double Lphi, Lthe, L, E;
   double V, weight, rnd;
   BLRmodel4 *model = (BLRmodel4 *)pm;
@@ -632,10 +661,18 @@ void gen_cloud_sample_model4(const void *pm, int flag_type, int flag_save)
   F = model->F;
   Rin = exp(model->Rin);
   k = model->k;
-
-  mbh = exp(model->mbh);
-  xi = model->xi;
-  q = model->q;
+  
+  if(flag_type == 1)  // 1D RM, no dynamical parameters
+  {
+    mbh = 0.0;
+  }
+  else 
+  {
+    mbh = exp(model->mbh);
+    xi = model->xi;
+    q = model->q;
+  }
+  Rs = 3.0e11*mbh/CM_PER_LD; // Schwarzchild radius in a unit of light-days
 
   if(Rin*F > rcloud_max_set)
     F = rcloud_max_set/Rin;
@@ -659,7 +696,7 @@ void gen_cloud_sample_model4(const void *pm, int flag_type, int flag_save)
         rnd = pow( gsl_rng_uniform(gsl_r) * ( pow(F, 1.0-alpha) - 1.0) + 1.0,  1.0/(1.0-alpha) );
       else
         rnd = exp( gsl_rng_uniform(gsl_r) * log(F) );
-      r = Rin * rnd ;
+      r = Rin * rnd + Rs;
       nc++;
     }
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
@@ -827,17 +864,23 @@ void gen_cloud_sample_model5(const void *pm, int flag_type, int flag_save)
   k = model->k;  
   gam = model->gam;
   xi = model->xi;
-
-  mbh = exp(model->mbh);
-  fellip = model->fellip;
-  fflow = model->fflow;
-  sigr_circ = exp(model->sigr_circ);
-  sigthe_circ = exp(model->sigthe_circ);
-  sigr_rad = exp(model->sigr_rad);
-  sigthe_rad = exp(model->sigthe_rad);
-  theta_rot = model->theta_rot*PI/180.0;
-  sig_turb = exp(model->sig_turb);
-
+  
+  if(flag_type == 1) // 1D RM, no dynamical parameters
+  {
+    mbh = 0.0;
+  }
+  else 
+  {
+    mbh = exp(model->mbh);
+    fellip = model->fellip;
+    fflow = model->fflow;
+    sigr_circ = exp(model->sigr_circ);
+    sigthe_circ = exp(model->sigthe_circ);
+    sigr_rad = exp(model->sigr_rad);
+    sigthe_rad = exp(model->sigthe_rad);
+    theta_rot = model->theta_rot*PI/180.0;
+    sig_turb = exp(model->sig_turb);
+  }
   Rs = 3.0e11*mbh/CM_PER_LD; // Schwarzchild radius in a unit of light-days
 
   if(mu*Fout > rcloud_max_set)
@@ -880,7 +923,7 @@ void gen_cloud_sample_model5(const void *pm, int flag_type, int flag_save)
       {
         rndr = pow( 1.0 - rnd * (1.0 - pow(Fout, -alpha+1.0)), 1.0/(1.0-alpha));
       }
-      r = rndr*mu;
+      r = rndr*mu + Rs;
       nc++;
     }
     phi = 2.0*PI * gsl_rng_uniform(gsl_r);
@@ -1073,16 +1116,22 @@ void gen_cloud_sample_model6(const void *pm, int flag_type, int flag_save)
   gam = model-> gam;
   xi = model->xi;
 
-  mbh = exp(model->mbh);
-  fellip = model->fellip;
-  fflow = model->fflow;
-  sigr_circ = exp(model->sigr_circ);
-  sigthe_circ = exp(model->sigthe_circ);
-  sigr_rad = exp(model->sigr_rad);
-  sigthe_rad = exp(model->sigthe_rad);
-  theta_rot = model->theta_rot*PI/180.0;
-  sig_turb = exp(model->sig_turb);
-
+  if(flag_type == 1) // 1D RM, no mbh parameters
+  {
+    mbh = 0.0;
+  }
+  else
+  {
+    mbh = exp(model->mbh);
+    fellip = model->fellip;
+    fflow = model->fflow;
+    sigr_circ = exp(model->sigr_circ);
+    sigthe_circ = exp(model->sigthe_circ);
+    sigr_rad = exp(model->sigr_rad);
+    sigthe_rad = exp(model->sigthe_rad);
+    theta_rot = model->theta_rot*PI/180.0;
+    sig_turb = exp(model->sig_turb);
+  }
   Rs = 3.0e11*mbh/CM_PER_LD; // Schwarzchild radius in a unit of light-days
 
   a = 1.0/beta/beta;
@@ -1158,7 +1207,7 @@ void gen_cloud_sample_model6(const void *pm, int flag_type, int flag_save)
 #ifndef SpecAstro
     dis = r - x;
     clouds_tau[i] = dis;
-    if(flag_type == 1)
+    if(flag_type == 1)  // 1D RM
     {
       if(flag_save && thistask==roottask)
       {
@@ -1314,17 +1363,23 @@ void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save)
   k = model->k;  
   gam = model-> gam;
   xi = model->xi;
-
-  mbh = exp(model->mbh);
-  fellip = model->fellip;
-  fflow = model->fflow;
-  sigr_circ = exp(model->sigr_circ);
-  sigthe_circ = exp(model->sigthe_circ);
-  sigr_rad = exp(model->sigr_rad);
-  sigthe_rad = exp(model->sigthe_rad);
-  theta_rot = model->theta_rot*PI/180.0;
-  sig_turb = exp(model->sig_turb);
-
+  
+  if(flag_type == 1) // 1D RM, no dyamical parameters
+  {
+    mbh = 0.0;
+  }
+  else 
+  {
+    mbh = exp(model->mbh);
+    fellip = model->fellip;
+    fflow = model->fflow;
+    sigr_circ = exp(model->sigr_circ);
+    sigthe_circ = exp(model->sigthe_circ);
+    sigr_rad = exp(model->sigr_rad);
+    sigthe_rad = exp(model->sigthe_rad);
+    theta_rot = model->theta_rot*PI/180.0;
+    sig_turb = exp(model->sig_turb);
+  }
   Rs = 3.0e11*mbh/CM_PER_LD; // Schwarzchild radius in a unit of light-days
 
   a = 1.0/beta/beta;
@@ -1520,8 +1575,6 @@ void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save)
   }
 
   //second BLR region
-  fellip = model->fellip_un;
-  fflow = model->fflow_un;
   rin = exp(model->mu_un) * model->F_un + Rs;
   a = 1.0/(model->beta_un * model->beta_un);
   sig = exp(model->mu_un) * (1.0-model->F_un)/a;
@@ -1531,6 +1584,12 @@ void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save)
     Lopn_cos_un2 = cos((model->opn + model->opn_un)/180.0*PI);
   else
     Lopn_cos_un2 = 0.0;
+    
+  if(flag_type != 1)  // 1D RM, no dynamical parameters
+  {
+    fellip = model->fellip_un;
+    fflow = model->fflow_un;
+  }
 
 
   for(i=num_sh; i<parset.n_cloud_per_task; i++)
@@ -1904,8 +1963,15 @@ void gen_cloud_sample_model9(const void *pm, int flag_type, int flag_save)
   beta = model->beta;
   F = model->F;
   mu = exp(model->mu);
-
-  mbh = exp(model->mbh);
+  
+  if(flag_type == 1)  // 1D RM, no dynmaical parameters
+  {
+    mbh = 0.0;
+  }
+  else 
+  {
+    mbh = exp(model->mbh);
+  }
   Rs = 3.0e11*mbh/CM_PER_LD; // Schwarzchild radius in a unit of light-days
 
   a = 1.0/beta/beta;
