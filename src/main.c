@@ -32,7 +32,7 @@ int main(int argc, char **argv)
   if(thistask == roottask)
   {
     t0 = second();
-    printf("===============BRAINS==================\n");
+    printf("========================BRAINS==========================\n");
     printf("Starts to run...\n");
     printf("%d cores used.\n", totaltask);
   }
@@ -60,7 +60,7 @@ int main(int argc, char **argv)
     get_hms(dt, &ht, &mt, &st);
     printf("Time used: %dh %dm %fs.\n", ht, mt, st);
     printf("Ends successfully.\n");
-    printf("===============BRAINS==================\n");
+    printf("========================BRAINS==========================\n");
   }
   return 0;
 }
