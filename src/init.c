@@ -430,9 +430,9 @@ void init()
     if(parset.rcloud_max > 0.0)
     {
       rcloud_max_set = fmin(rcloud_max_set, parset.rcloud_max);
-      if(thistask == roottask)
-        printf("SA rcloud_min_max set: %f %f\n", rcloud_min_set, rcloud_max_set);
     }
+    if(thistask == roottask)
+      printf("SA rcloud_min_max set: %f %f\n", rcloud_min_set, rcloud_max_set);
 
     set_sa_blr_range_model();
 
