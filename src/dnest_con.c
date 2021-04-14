@@ -121,9 +121,9 @@ void set_par_range_con()
     par_range_model[i][0] = var_range_model[3][0];
     par_range_model[i][1] = var_range_model[3][1];
 
-    par_prior_model[i] = GAUSSIAN;
+    par_prior_model[i] = UNIFORM;
     par_prior_gaussian[i][0] = 0.0;
-    par_prior_gaussian[i][1] = 1.0;
+    par_prior_gaussian[i][1] = 0.0;
   }
   
   /* paramter for response 
