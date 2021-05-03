@@ -659,10 +659,10 @@ void read_parset()
       }
 
       /* check flag_sa_par_mutual */
-      if(parset.flag_sa_par_mutual > 1 || parset.flag_sa_par_mutual < 0)
+      if(parset.flag_sa_par_mutual > 2 || parset.flag_sa_par_mutual < 0)
       {
         fprintf(stderr, "# Error in FlagSAParMutual: value %d is not allowed.\n"
-          "# Please specify a value either 0 or 1.\n", parset.flag_sa_par_mutual);
+          "# Please specify a value in 0, 1, or 2.\n", parset.flag_sa_par_mutual);
           error_flag = 1;
       }
 
@@ -696,17 +696,26 @@ void read_parset()
         }
       }
 
-      if(parset.flag_dim > 3)
+      /* SA + 2D RM */
+      if(parset.flag_dim > 4)
       {
-        if(parset.flag_sa_par_mutual == 0)
+        if(parset.flag_sa_par_mutual == 0 || parset.flag_sa_par_mutual == 2)
         {
           if(parset.flag_blrmodel != parset.flag_sa_blrmodel)
           {
             fprintf(stderr, "# Error in FlagBLRModel = %d and FlagSABLRModel = %d.\n"
-            "# For FlagSAParMutual = 0, FlagBLRModel and FlagSABLRModel must be identical.\n",
+            "# For FlagSAParMutual = 0 or 2, FlagBLRModel and FlagSABLRModel must be identical.\n",
             parset.flag_blrmodel, parset.flag_sa_blrmodel);
             error_flag = 1;
           }
+        }
+
+        /* for model 8, all parameters are dynamical parameters, so the models should be the same */
+        if(parset.flag_blrmodel == 8 && parset.flag_sa_par_mutual == 2)
+        {
+          parset.flag_sa_par_mutual = 0;
+          parset.flag_sa_blrmodel = parset.flag_blrmodel;
+          printf("# For BLRModel 8, force all parameters to be identical!\n");
         }
       }
 

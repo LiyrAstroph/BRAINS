@@ -21,20 +21,42 @@
  */
 void calculate_sa_transfun2d_from_blrmodel(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
 {
+  int i;
   double *sa_model, *rm_model;
 
+  /* share all parameters */
   if(parset.flag_sa_par_mutual == 0)
   {
     gen_cloud_sample(pm, 5, 0);
     transfun_2d_cal_with_sample(transv, trans2d, n_vel);
     calculate_sa_with_sample(pm);
   }
-  else
+  /* share mass and inclination */
+  else if(parset.flag_sa_par_mutual == 1)
   {
     rm_model = (double *)pm;
     sa_model = rm_model + num_params_blr;
     sa_model[idx_sa_par_mutual[0]] = rm_model[idx_rm_par_mutual[0]]; //mbh
     sa_model[idx_sa_par_mutual[1]] = rm_model[idx_rm_par_mutual[1]]; //inc
+
+    gen_cloud_sample(pm, 2, flag_save);
+    transfun_2d_cal_with_sample(transv, trans2d, n_vel);
+
+    gen_sa_cloud_sample((void *)sa_model, 3, flag_save);
+    calculate_sa_with_sample(pm);
+  }
+  /* share inclination and all dynamical parameters */
+  else 
+  {
+    rm_model = (double *)pm;
+    sa_model = rm_model + num_params_blr;
+
+    sa_model[idx_sa_par_mutual[1]] = rm_model[idx_rm_par_mutual[1]]; //inc
+    /* dynamical parameters from mass on */
+    for(i=idx_sa_par_mutual[0]; i<num_params_sa_blr_model; i++)
+    {
+      sa_model[i] = rm_model[i]; /* note the BLR models are identical */
+    }
 
     gen_cloud_sample(pm, 2, flag_save);
     transfun_2d_cal_with_sample(transv, trans2d, n_vel);

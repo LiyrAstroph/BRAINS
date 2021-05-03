@@ -33,6 +33,7 @@ Line2DFile                  data/sim_line2d.txt         % file for line 2d data
 %FlagSAParMutual             1                         % flag for mutual parameters with BLR model
                                                        % 0: all 
                                                        % 1: only BH mass and inclination
+                                                       % 2: inclination and all dyamical parameters
 %SAInstRes                   235.0                     % km/s, fixed
 %SAFile                      data/sim_sa.txt 
 
