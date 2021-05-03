@@ -32,7 +32,7 @@ void postprocess2d()
   double *pm, *pmstd;
   double *lag;
   void *posterior_sample, *post_model;
-  double mean_lag, mean_lag_std, sum1, sum2;
+  double mean_lag, mean_lag_std, sum1, sum2, sumv;
   int size_of_modeltype = num_params * sizeof(double);
   
   best_model_line2d = malloc(size_of_modeltype);
@@ -170,11 +170,14 @@ void postprocess2d()
       sum2 = 0.0;
       for(j=0; j<parset.n_tau; j++)
       {
+        // integrate over velocity
+        sumv=0.0;
         for(k=0; k<n_vel_data_ext; k++)
         {
-          sum1 += Trans2D_at_veldata[j * n_vel_data_ext + k] * TransTau[j];
-          sum2 += Trans2D_at_veldata[j * n_vel_data_ext + k];
+          sumv += Trans2D_at_veldata[j * n_vel_data_ext + k];
         }
+        sum1 += sumv * TransTau[j];
+        sum2 += sumv; 
       }
       // take care of zero transfer function
       if(sum2 > 0.0)
