@@ -512,8 +512,8 @@ void allocate_memory()
     
     if(parset.flag_sa_par_mutual != 0)
     {
-      idx_sa_par_mutual = malloc(2*sizeof(int)); 
-      idx_rm_par_mutual = malloc(2*sizeof(int));
+      idx_sa_par_mutual = malloc(3*sizeof(int)); 
+      idx_rm_par_mutual = malloc(3*sizeof(int));
     }
   }
 #endif  

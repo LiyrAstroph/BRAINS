@@ -139,9 +139,11 @@ int dnest_sa2d(int argc, char **argv)
   {
     /* get the index for mbh and inclination parameters */
     set_idx_par_mutual();
-    /* inc */
+    /* inc and opening angle */
     par_fix[num_params_blr + idx_sa_par_mutual[1]] = 1;
     par_fix_val[num_params_blr + idx_sa_par_mutual[1]] = 0.0;
+    par_fix[num_params_blr + idx_sa_par_mutual[2]] = 1;
+    par_fix_val[num_params_blr + idx_sa_par_mutual[2]] = 0.0;
     /* dynamical parameters from mass on */
     for(i=idx_sa_par_mutual[0]; i<num_params_sa_blr_model; i++)
     {

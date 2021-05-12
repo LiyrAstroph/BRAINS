@@ -45,13 +45,14 @@ void calculate_sa_transfun2d_from_blrmodel(const void *pm, double *transv, doubl
     gen_sa_cloud_sample((void *)sa_model, 3, flag_save);
     calculate_sa_with_sample(pm);
   }
-  /* share inclination and all dynamical parameters */
+  /* share inclination, opening angle and all dynamical parameters */
   else 
   {
     rm_model = (double *)pm;
     sa_model = rm_model + num_params_blr;
 
     sa_model[idx_sa_par_mutual[1]] = rm_model[idx_rm_par_mutual[1]]; //inc
+    sa_model[idx_sa_par_mutual[2]] = rm_model[idx_rm_par_mutual[2]]; //opening angle
     /* dynamical parameters from mass on */
     for(i=idx_sa_par_mutual[0]; i<num_params_sa_blr_model; i++)
     {
@@ -84,6 +85,7 @@ void calculate_sa_transfun_from_blrmodel(const void *pm, int flag_save)
     rm_model = (double *)pm;
     sa_model = rm_model + num_params_blr;
     sa_model[idx_sa_par_mutual[1]] = rm_model[idx_rm_par_mutual[1]]; // inc
+    sa_model[idx_sa_par_mutual[2]] = rm_model[idx_rm_par_mutual[2]]; // opening angle
 
     gen_cloud_sample(pm, 1, flag_save);
     transfun_1d_cal_with_sample();
@@ -376,51 +378,61 @@ void set_idx_par_mutual()
     case 0:
       idx_rm_par_mutual[0] = offsetof(MyBLRmodel, mbh);
       idx_rm_par_mutual[1] = offsetof(MyBLRmodel, inc);
+      idx_rm_par_mutual[2] = offsetof(MyBLRmodel, opn);
       break;
 
     case 1:
       idx_rm_par_mutual[0] = offsetof(BLRmodel1, mbh);
       idx_rm_par_mutual[1] = offsetof(BLRmodel1, inc);
+      idx_rm_par_mutual[2] = offsetof(BLRmodel1, opn);
       break;
 
     case 2:
       idx_rm_par_mutual[0] = offsetof(BLRmodel2, mbh);
       idx_rm_par_mutual[1] = offsetof(BLRmodel2, inc);
+      idx_rm_par_mutual[2] = offsetof(BLRmodel2, opn);
       break;
     
     case 3:
       idx_rm_par_mutual[0] = offsetof(BLRmodel3, mbh);
       idx_rm_par_mutual[1] = offsetof(BLRmodel3, inc);
+      idx_rm_par_mutual[2] = offsetof(BLRmodel3, opn);
       break;
 
     case 4:
       idx_rm_par_mutual[0] = offsetof(BLRmodel4, mbh);
       idx_rm_par_mutual[1] = offsetof(BLRmodel4, inc);
+      idx_rm_par_mutual[2] = offsetof(BLRmodel4, opn);
       break;
     
     case 5:
       idx_rm_par_mutual[0] = offsetof(BLRmodel5, mbh);
       idx_rm_par_mutual[1] = offsetof(BLRmodel5, inc);
+      idx_rm_par_mutual[2] = offsetof(BLRmodel5, opn);
       break;
 
     case 6:
       idx_rm_par_mutual[0] = offsetof(BLRmodel6, mbh);
       idx_rm_par_mutual[1] = offsetof(BLRmodel6, inc);
+      idx_rm_par_mutual[2] = offsetof(BLRmodel6, opn);
       break;
     
     case 7:
       idx_rm_par_mutual[0] = offsetof(BLRmodel7, mbh);
       idx_rm_par_mutual[1] = offsetof(BLRmodel7, inc);
+      idx_rm_par_mutual[2] = offsetof(BLRmodel7, opn);
       break;
     
     case 8:
       idx_rm_par_mutual[0] = offsetof(BLRmodel8, mbh);
       idx_rm_par_mutual[1] = offsetof(BLRmodel8, inc);
+      idx_rm_par_mutual[2] = offsetof(BLRmodel8, theta_min);
       break;
     
     case 9:
       idx_rm_par_mutual[0] = offsetof(BLRmodel9, mbh);
       idx_rm_par_mutual[1] = offsetof(BLRmodel9, inc);
+      idx_rm_par_mutual[2] = offsetof(BLRmodel9, opn);
       break;
   }
 
@@ -429,58 +441,70 @@ void set_idx_par_mutual()
     case 0:
       idx_sa_par_mutual[0] = offsetof(MyBLRmodel, mbh);
       idx_sa_par_mutual[1] = offsetof(MyBLRmodel, inc);
+      idx_sa_par_mutual[2] = offsetof(MyBLRmodel, opn);
       break;
 
     case 1:
       idx_sa_par_mutual[0] = offsetof(SABLRmodel1, mbh);
       idx_sa_par_mutual[1] = offsetof(SABLRmodel1, inc);
+      idx_sa_par_mutual[2] = offsetof(SABLRmodel1, opn);
       break;
 
     case 2:
       idx_sa_par_mutual[0] = offsetof(SABLRmodel2, mbh);
       idx_sa_par_mutual[1] = offsetof(SABLRmodel2, inc);
+      idx_sa_par_mutual[2] = offsetof(SABLRmodel2, opn);
       break;
     
     case 3:
       idx_sa_par_mutual[0] = offsetof(SABLRmodel3, mbh);
       idx_sa_par_mutual[1] = offsetof(SABLRmodel3, inc);
+      idx_sa_par_mutual[2] = offsetof(SABLRmodel3, opn);
       break;
 
     case 4:
       idx_sa_par_mutual[0] = offsetof(SABLRmodel4, mbh);
       idx_sa_par_mutual[1] = offsetof(SABLRmodel4, inc);
+      idx_sa_par_mutual[2] = offsetof(SABLRmodel4, opn);
       break;
     
     case 5:
       idx_sa_par_mutual[0] = offsetof(SABLRmodel5, mbh);
       idx_sa_par_mutual[1] = offsetof(SABLRmodel5, inc);
+      idx_sa_par_mutual[2] = offsetof(SABLRmodel5, opn);
       break;
 
     case 6:
       idx_sa_par_mutual[0] = offsetof(SABLRmodel6, mbh);
       idx_sa_par_mutual[1] = offsetof(SABLRmodel6, inc);
+      idx_sa_par_mutual[2] = offsetof(SABLRmodel6, opn);
       break;
     
     case 7:
       idx_sa_par_mutual[0] = offsetof(SABLRmodel7, mbh);
       idx_sa_par_mutual[1] = offsetof(SABLRmodel7, inc);
+      idx_sa_par_mutual[2] = offsetof(SABLRmodel7, opn);
       break;
     
     case 8:
       idx_sa_par_mutual[0] = offsetof(SABLRmodel8, mbh);
       idx_sa_par_mutual[1] = offsetof(SABLRmodel8, inc);
+      idx_sa_par_mutual[2] = offsetof(SABLRmodel8, theta_min);
       break;
     
     case 9:
       idx_sa_par_mutual[0] = offsetof(SABLRmodel9, mbh);
       idx_sa_par_mutual[1] = offsetof(SABLRmodel9, inc);
+      idx_sa_par_mutual[2] = offsetof(SABLRmodel9, opn);
       break;
   }
 
   idx_sa_par_mutual[0] /= sizeof(double);
   idx_sa_par_mutual[1] /= sizeof(double);
+  idx_sa_par_mutual[2] /= sizeof(double);
   idx_rm_par_mutual[0] /= sizeof(double);
   idx_rm_par_mutual[1] /= sizeof(double);
+  idx_rm_par_mutual[2] /= sizeof(double);
 
   return;
 }
