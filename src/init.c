@@ -131,6 +131,16 @@ void init()
     bin_offset = 0.0;
   }
 
+  /* BLR sample along theta direction */
+  if(parset.flag_theta_sample == 0)
+  {
+    theta_sample = theta_sample_outer;
+  }
+  else 
+  {
+    theta_sample = theta_sample_inner;
+  }
+
 #ifdef SpecAstro
   if(parset.flag_dim > 2 || parset.flag_dim < 0)
   {

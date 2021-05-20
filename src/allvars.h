@@ -137,6 +137,7 @@ typedef struct
 
   int flag_help, flag_end;
   int flag_para_name;
+  int flag_theta_sample;
   
   double redshift;
   double linecenter;

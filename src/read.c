@@ -274,6 +274,11 @@ void read_parset()
     pardict[nt].isset = 0;
     pardict[nt++].id = INT;
 
+    strcpy(pardict[nt].tag, "FlagThetaSample");
+    pardict[nt].addr= &parset.flag_theta_sample;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = INT;
+
 #ifdef SpecAstro
     strcpy(pardict[nt].tag, "SAFile");
     pardict[nt].addr= &parset.sa_file;
@@ -333,6 +338,7 @@ void read_parset()
     parset.n_cloud_per_task = 0;
     parset.n_vel_per_cloud = 1;
     parset.flag_bintype = 0;
+    parset.flag_theta_sample = 0;
 
     strcpy(parset.continuum_file, "");
     strcpy(parset.line_file, "");

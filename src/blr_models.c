@@ -22,6 +22,20 @@
 
 #include "brains.h"
 
+/* cluster around outer disk face, Lopn_cos1 < Lopn_cos2 */
+inline double theta_sample_outer(double gam, double Lopn_cos1, double Lopn_cos2)
+{
+  return acos(Lopn_cos1 + (Lopn_cos2-Lopn_cos1) * pow(gsl_rng_uniform(gsl_r), gam));
+}
+
+/* cluster around equatorial plane, Lopn_cos1 < Lopn_cos2 */
+inline double theta_sample_inner(double gam, double Lopn_cos1, double Lopn_cos2)
+{
+  /* note that cosine is a decreaing function */
+  double opn1 = acos(Lopn_cos1), opn2 = acos(Lopn_cos2);
+  return opn2 + (opn1-opn2)  * (1.0 - pow(gsl_rng_uniform(gsl_r), 1.0/gam));
+}
+
 /*================================================================
  * model 1
  * Brewer et al. (2011)'s model
@@ -70,7 +84,8 @@ void gen_cloud_sample_model1(const void *pm, int flag_type, int flag_save)
   {
 // generate a direction of the angular momentum     
     Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
+    //Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
+    Lthe = theta_sample(1.0, Lopn_cos, 1.0);
 
     nc = 0;
     r = rcloud_max_set+1.0;
@@ -288,7 +303,8 @@ void gen_cloud_sample_model2(const void *pm, int flag_type, int flag_save)
   {
     /* generate a direction of the angular momentum */    
     Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
+    //Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
+    Lthe = theta_sample(1.0, Lopn_cos, 1.0);
 
     nc = 0;
     r = rcloud_max_set+1.0;
@@ -485,7 +501,8 @@ void gen_cloud_sample_model3(const void *pm, int flag_type, int flag_save)
   {
 // generate a direction of the angular momentum     
     Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
+    //Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
+    Lthe = theta_sample(1.0, Lopn_cos, 1.0);
 
     nc = 0;
     r = rcloud_max_set+1.0;
@@ -681,7 +698,8 @@ void gen_cloud_sample_model4(const void *pm, int flag_type, int flag_save)
   {
     /* generate a direction of the angular momentum   */ 
     Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
+    //Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
+    Lthe = theta_sample(1.0, Lopn_cos, 1.0);
 
     nc = 0;
     r = rcloud_max_set+1.0;
@@ -897,7 +915,9 @@ void gen_cloud_sample_model5(const void *pm, int flag_type, int flag_save)
   {
     /* generate a direction of the angular momentum of the orbit  */ 
     Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_r), gam));
+    //Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_r), gam));
+    Lthe = theta_sample(gam, Lopn_cos, 1.0);
+
     cos_Lphi = cos(Lphi);
     sin_Lphi = sin(Lphi);
     cos_Lthe = cos(Lthe);
@@ -1146,7 +1166,9 @@ void gen_cloud_sample_model6(const void *pm, int flag_type, int flag_save)
   {
 // generate a direction of the angular momentum of the orbit   
     Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_r), gam));
+    //Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_r), gam));
+    Lthe = theta_sample(gam, Lopn_cos, 1.0);
+
     sin_Lphi = sin(Lphi);
     cos_Lphi = cos(Lphi);
     sin_Lthe = sin(Lthe);
@@ -1397,7 +1419,9 @@ void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save)
   {
 // generate a direction of the angular momentum of the orbit   
     Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_r), gam));
+    //Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_r), gam));
+    Lthe = theta_sample(gam, Lopn_cos, 1.0);
+
     sin_Lphi = sin(Lphi);
     cos_Lphi = cos(Lphi);
     sin_Lthe = sin(Lthe);
@@ -1596,8 +1620,10 @@ void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save)
   {
 // generate a direction of the angular momentum of the orbit   
     Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    Lthe = acos(Lopn_cos_un2 + (Lopn_cos_un1-Lopn_cos_un2) * pow(gsl_rng_uniform(gsl_r), gam));
+    //Lthe = acos(Lopn_cos_un2 + (Lopn_cos_un1-Lopn_cos_un2) * pow(gsl_rng_uniform(gsl_r), gam));
     //Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_r), gam));
+    Lthe = theta_sample(gam, Lopn_cos_un2, Lopn_cos_un1);
+
     sin_Lphi = sin(Lphi);
     cos_Lphi = cos(Lphi);
     sin_Lthe = sin(Lthe);
@@ -1986,8 +2012,9 @@ void gen_cloud_sample_model9(const void *pm, int flag_type, int flag_save)
   {
 // generate a direction of the angular momentum     
     Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
+    //Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
     //Lthe = gsl_rng_uniform(gsl_r) * Lopn;
+    Lthe = theta_sample(1.0, Lopn_cos, 1.0);
 
     nc = 0;
     r = rcloud_max_set+1.0;

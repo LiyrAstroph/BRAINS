@@ -13,6 +13,10 @@
 #ifndef _BLR_MODELS_H
 #define _BLR_MODELS_H
 
+double (*theta_sample)(double gam, double Lopn_cos1, double Lopn_cos2);
+double theta_sample_outer(double gam, double Lopn_cos1, double Lopn_cos2);
+double theta_sample_inner(double gam, double Lopn_cos1, double Lopn_cos2);
+
 /*!
  *  \struct BLRmodel1
  *  \brief broad-line region model 1. 
