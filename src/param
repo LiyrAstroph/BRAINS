@@ -69,6 +69,7 @@ FlagLineSysErr              0                           % 0, not include systema
 
 FlagNonlinear               1                           % 0, linear response; 1, non-linear response
 
+FlagThetaSample             0                           % 0, sample over cos theta; 1, over theta
 %========================================================================
 % continuum configuration
 %
