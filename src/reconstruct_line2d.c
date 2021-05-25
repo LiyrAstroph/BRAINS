@@ -883,7 +883,7 @@ double prob_line2d(const void *model)
   
    // only update transfer function when BLR model is changed.
    // or when forced to updated
-  if( (which_parameter_update < num_params_blr-1) || force_update == 1)
+  if( (which_parameter_update < num_params_blr_model) || force_update == 1)
   {
     TransTau = TransTau_particles_perturb[which_particle_update];
     Trans2D_at_veldata = Trans2D_at_veldata_particles_perturb[which_particle_update];

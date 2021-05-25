@@ -608,15 +608,8 @@ void accept_action_2d()
     ptemp = Fcon_rm_particles[which_particle_update];
     Fcon_rm_particles[which_particle_update] = Fcon_rm_particles_perturb[which_particle_update];
     Fcon_rm_particles_perturb[which_particle_update] = ptemp;
-
-    if(force_update != 1)
-    {
-      ptemp = Fline_at_data_particles[which_particle_update];
-      Fline_at_data_particles[which_particle_update] = Fline_at_data_particles_perturb[which_particle_update];
-      Fline_at_data_particles_perturb[which_particle_update] = ptemp;
-    }
   }
-  else if( param < num_params_blr -1 && force_update != 1)
+  else if( param < num_params_blr_model && force_update != 1)
   {
     /* BLR parameter is updated 
      * Note a) that the (num_par_blr-1)-th parameter is systematic error of line.
@@ -624,21 +617,22 @@ void accept_action_2d()
      *      b) Fline is always changed, except for param = num_params_blr-1.
      */
     
-    {
-      ptemp = TransTau_particles[which_particle_update];
-      TransTau_particles[which_particle_update] = TransTau_particles_perturb[which_particle_update];
-      TransTau_particles_perturb[which_particle_update] = ptemp;
-
-      ptemp = Trans2D_at_veldata_particles[which_particle_update];
-      Trans2D_at_veldata_particles[which_particle_update] = Trans2D_at_veldata_particles_perturb[which_particle_update];
-      Trans2D_at_veldata_particles_perturb[which_particle_update] = ptemp;
-
-      ptemp = Fline_at_data_particles[which_particle_update];
-      Fline_at_data_particles[which_particle_update] = Fline_at_data_particles_perturb[which_particle_update];
-      Fline_at_data_particles_perturb[which_particle_update] = ptemp;
-
-    }
+    ptemp = TransTau_particles[which_particle_update];
+    TransTau_particles[which_particle_update] = TransTau_particles_perturb[which_particle_update];
+    TransTau_particles_perturb[which_particle_update] = ptemp;
+    
+    ptemp = Trans2D_at_veldata_particles[which_particle_update];
+    Trans2D_at_veldata_particles[which_particle_update] = Trans2D_at_veldata_particles_perturb[which_particle_update];
+    Trans2D_at_veldata_particles_perturb[which_particle_update] = ptemp;
   } 
+
+  //Fline is always updated except param = num_params_blr - 1
+  if(param != num_params_blr - 1  && force_update != 1)
+  {
+    ptemp = Fline_at_data_particles[which_particle_update];
+    Fline_at_data_particles[which_particle_update] = Fline_at_data_particles_perturb[which_particle_update];
+    Fline_at_data_particles_perturb[which_particle_update] = ptemp;
+  }
     
   return;
 }

@@ -815,13 +815,14 @@ double prob_sa2d(const void *model)
     gsl_interp_init(gsl_linear, Tcon, Fcon_rm, parset.n_con_recon);
   }
 
-  /* only update transfer function when BLR model is changed
+  /* only update transfer function when BLR model of RM and SA is changed
    * or forced to update (force_update = 1)
    * Trans1D is a pointer to the transfer function
    */
-  if(     ((which_parameter_update < num_params_blr_tot)
-        && (which_parameter_update != num_params_blr-1)) 
-        || force_update == 1)
+  if((
+      (which_parameter_update < num_params_blr_model) || 
+      (which_parameter_update >= num_params_blr && which_parameter_update < num_params_blr_tot)
+     ) || force_update == 1 )
   {
     /* re-point */
     TransTau = TransTau_particles_perturb[which_particle_update];
