@@ -144,9 +144,11 @@ void calculate_sa_with_sample(const void *pm)
     y = clouds_alpha[i];
     z = clouds_beta[i];
     
-    alpha = y * cos_PA + z * sin_PA;
-    beta = -y * sin_PA + z * cos_PA;
-
+    //alpha = y * cos_PA + z * sin_PA;
+    //beta = -y * sin_PA + z * cos_PA;
+    alpha = y;
+    beta = z;
+    
     for(j=0; j< parset.n_vel_per_cloud; j++)
     {
       V = clouds_vel[i*parset.n_vel_per_cloud + j] + CO;
@@ -175,6 +177,12 @@ void calculate_sa_with_sample(const void *pm)
 
   for(j=0; j<n_vel_sa_data; j++)
   {
+    y = alpha_cent[j];
+    z = beta_cent[j];
+
+    alpha_cent[j] = y * cos_PA + z * sin_PA;
+    beta_cent[j] = -y * sin_PA + z * cos_PA;
+
     alpha_cent[j] = (alpha_cent[j]/(phase_norm[j]+EPS)) / DA;
     beta_cent[j] =  (beta_cent[j]/(phase_norm[j]+EPS)) / DA;
   }
@@ -244,9 +252,11 @@ void calculate_sa_sim_with_sample(const void *pm, double *vel_sa, int n_vel_sa, 
     y = clouds_alpha[i];
     z = clouds_beta[i];
     
-    alpha = y * cos_PA + z * sin_PA;
-    beta = -y * sin_PA + z * cos_PA;
-
+    //alpha = y * cos_PA + z * sin_PA;
+    //beta = -y * sin_PA + z * cos_PA;
+    alpha = y;
+    beta = z;
+    
     for(j=0; j< parset.n_vel_per_cloud; j++)
     {
       V = clouds_vel[i*parset.n_vel_per_cloud + j] + CO;
@@ -275,6 +285,12 @@ void calculate_sa_sim_with_sample(const void *pm, double *vel_sa, int n_vel_sa, 
 
   for(j=0; j<n_vel_sa; j++)
   {
+    y = alpha_cent[j];
+    z = beta_cent[j];
+
+    alpha_cent[j] = y * cos_PA + z * sin_PA;
+    beta_cent[j] = -y * sin_PA + z * cos_PA;
+
     alpha_cent[j] = (alpha_cent[j]/(phase_norm[j]+EPS)) / DA;
     beta_cent[j] =  (beta_cent[j]/(phase_norm[j]+EPS)) / DA;
   }
