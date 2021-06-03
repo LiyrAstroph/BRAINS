@@ -663,7 +663,7 @@ void accept_action_sa2d()
   }
   else if((
            param < num_params_blr_model || 
-          (which_parameter_update >= num_params_blr && which_parameter_update < num_params_blr_tot)
+          (param >= num_params_blr && param < num_params_blr_tot)
           ) && force_update != 1 )
   {
     /* RM and SA BLR parameter is updated 
