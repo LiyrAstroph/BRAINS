@@ -211,4 +211,19 @@ void set_sa_blr_range_model9();
 void sa_smooth_init(int n_v_sa, const double *v_sa, double sigV);
 void sa_smooth_end();
 void sa_smooth_run(double *v_sa, double *F_sa, int n_v_sa, double *p_sa, int n_base_sa);
+
+/* SARM */
+void transfun_sarm_cal_cloud(const void *pm, double *transv, double *trans2d, double *trans_sarm_alpha, double *trans_sarm_beta, 
+                             int n_vel, int flag_save);
+void transfun_sarm_cal_with_sample(double *transv, double *trans2d, double *trans_sarm_alpha, double *trans_sarm_beta, int n_vel);
+
+void calculate_sarm_sim_with_sample(const void *pm, double *tline_sarm, double *vel_sa, double *trans2d, 
+                                    double *trans_alpha, double *trans_beta,
+                                    int n_sa_vel, int n_sarm_line, double *base_sarm, 
+                                    int n_sarm_base, double *phase_sarm, double *Fline_sarm, 
+                                    double *momentum_alpha, double *momentum_beta);
+
+void sarm_smooth_init(int n_v_sarm, const double *v_sarm, double sigV);
+void sarm_smooth_end();
+void sarm_smooth_run(const void *pm, double *v_sarm, double *F_sarm, int n_v_sarm, int n_line_sarm, double *p_sarm, int n_base_sarm);
 #endif

@@ -171,7 +171,7 @@ void gen_cloud_sample_model1(const void *pm, int flag_type, int flag_save)
       clouds_beta[i] = z;
       break;
     
-    case 5: /* 2D RM + SA */
+    case 5: /* 2D RM + SA; SARM */
       dis = r - x;
       clouds_tau[i] = dis;
 
@@ -391,7 +391,7 @@ void gen_cloud_sample_model2(const void *pm, int flag_type, int flag_save)
       clouds_beta[i] = z;
       break;
     
-    case 5: /* 2D RM + SA */
+    case 5: /* 2D RM + SA; SARM */
       dis = r - x;
       clouds_tau[i] = dis;
 
@@ -591,7 +591,7 @@ void gen_cloud_sample_model3(const void *pm, int flag_type, int flag_save)
       clouds_beta[i] = z;
       break;
     
-    case 5: /* 2D RM + SA */
+    case 5: /* 2D RM + SA; SARM */
       dis = r - x;
       clouds_tau[i] = dis;
 
@@ -788,7 +788,7 @@ void gen_cloud_sample_model4(const void *pm, int flag_type, int flag_save)
       clouds_beta[i] = z;
       break;
     
-    case 5: /* 2D RM + SA */
+    case 5: /* 2D RM + SA; SARM */
       dis = r - x;
       clouds_tau[i] = dis;
 
@@ -1024,7 +1024,7 @@ void gen_cloud_sample_model5(const void *pm, int flag_type, int flag_save)
       clouds_beta[i] = z;
       break;
     
-    case 5: /* 2D RM + SA */
+    case 5: /* 2D RM + SA; SARM */
       dis = r - x;
       clouds_tau[i] = dis;
 
@@ -1270,7 +1270,7 @@ void gen_cloud_sample_model6(const void *pm, int flag_type, int flag_save)
       clouds_beta[i] = z;
       break;
     
-    case 5: /* 2D RM + SA */
+    case 5: /* 2D RM + SA; SARM */
       dis = r - x;
       clouds_tau[i] = dis;
 
@@ -1519,7 +1519,7 @@ void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save)
       clouds_beta[i] = z;
       break;
     
-    case 5: /* 2D RM + SA */
+    case 5: /* 2D RM + SA; SARM */
       dis = r - x;
       clouds_tau[i] = dis;
 
@@ -1721,7 +1721,7 @@ void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save)
       clouds_beta[i] = z;
       break;
     
-    case 5: /* 2D RM + SA */
+    case 5: /* 2D RM + SA; SARM */
       dis = r - x;
       clouds_tau[i] = dis;
 
@@ -1927,7 +1927,7 @@ void gen_cloud_sample_model8(const void *pm, int flag_type, int flag_save)
       clouds_beta[i] = z;
       break;
     
-    case 5: /* 2D RM + SA */
+    case 5: /* 2D RM + SA; SARM */
       dis = R - x;
       clouds_tau[i] = dis;
 
@@ -2099,7 +2099,7 @@ void gen_cloud_sample_model9(const void *pm, int flag_type, int flag_save)
       clouds_beta[i] = z;
       break;
     
-    case 5: /* 2D RM + SA */
+    case 5: /* 2D RM + SA; SARM */
       dis = r - x;
       clouds_tau[i] = dis;
 

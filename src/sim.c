@@ -66,7 +66,7 @@ void sim()
 
   FILE *fp;
   char fname[200];
-  int i, j, incr;
+  int i, j, k, incr;
 
   sim_init();
   
@@ -275,6 +275,52 @@ void sim()
   }
   fclose(fp);
   sa_smooth_end();
+
+  /* SARM */
+  sarm_smooth_init(parset.n_sa_vel_recon, vel_sa, parset.sa_InstRes);
+  transfun_sarm_cal_cloud((void *)sa_pm, vel_sa, Trans2D, Trans_sarm_alpha, Trans_sarm_beta, parset.n_sa_vel_recon, 0);
+  calculate_sarm_sim_with_sample(pm, Tline_sarm, vel_sa, Trans2D, Trans_sarm_alpha, Trans_sarm_beta, 
+                                     parset.n_sa_vel_recon, parset.n_sarm_line_recon, base_sarm, 
+                                     parset.n_sarm_base_recon, phase_sarm, Fline_sarm, 
+                                     momentum_sarm_alpha, momentum_sarm_beta);
+  
+  sprintf(fname, "%s/%s", parset.file_dir, "data/sim_sarm.txt");
+  fp = fopen(fname, "w");
+  if(fp == NULL)
+  {
+    fprintf(stderr, "# Error: Cannot open file %s.\n", fname);
+    exit(0);
+  }
+  
+  fprintf(fp, "# %d %d %d\n", parset.n_sarm_line_recon, parset.n_sa_vel_recon, parset.n_sarm_base_recon);
+  /* output line */
+  for(i=0; i<parset.n_sarm_line_recon; i++)
+  {
+    fprintf(fp, "# %f\n", Tline_sarm[i]);
+    for(j=0; j<parset.n_sa_vel_recon; j++)
+    {
+      fprintf(fp, "%e %e %e\n", wave_sa[j], Fline_sarm[i*parset.n_sa_vel_recon + j] + gsl_ran_ugaussian(gsl_r)*sa_line_error_mean, 
+                                            sa_line_error_mean);
+    }
+    fprintf(fp,"\n");
+  }
+  /* output phase */
+  for(i=0; i<parset.n_sarm_line_recon; i++)
+  {
+    for(k=0; k<parset.n_sarm_base_recon; k++)
+    {
+      fprintf(fp, "# %f %f\n", base_sarm[i*parset.n_sarm_base_recon*2+k*2+0], base_sarm[i*parset.n_sarm_base_recon*2+k*2+1]);
+      for(j=0; j<parset.n_sa_vel_recon; j++)
+      {
+        fprintf(fp, "%e %e %e\n", wave_sa[j], 
+        phase_sarm[i*parset.n_sa_vel_recon*parset.n_sarm_base_recon + k*parset.n_sa_vel_recon + j]/(PhaseFactor * wave_sa[j]) + gsl_ran_ugaussian(gsl_r)*sa_phase_error_mean,
+        sa_phase_error_mean);
+      }
+      fprintf(fp,"\n");
+    }
+  }
+  fclose(fp);
+  sarm_smooth_end();
   
 #endif  
 
@@ -622,6 +668,9 @@ void sim_init()
 
     sa_phase_error_mean = 0.01;
     sa_line_error_mean = 0.01;
+
+    parset.n_sarm_base_recon = 2;
+    parset.n_sarm_line_recon = parset.n_line_recon;
   }
     
   vel_sa = malloc(parset.n_sa_vel_recon * sizeof(double));
@@ -632,6 +681,16 @@ void sim_init()
   
   clouds_alpha = malloc(parset.n_cloud_per_task * sizeof(double));
   clouds_beta = malloc(parset.n_cloud_per_task * sizeof(double));
+
+  /* sarm */
+  Tline_sarm = malloc(parset.n_sarm_line_recon * sizeof(double));
+  Fline_sarm = malloc(parset.n_sarm_line_recon * parset.n_sa_vel_recon * sizeof(double));
+  base_sarm = malloc(parset.n_sarm_base_recon * parset.n_sarm_line_recon * 2 * sizeof(double));
+  momentum_sarm_alpha = malloc(parset.n_sa_vel_recon * parset.n_sarm_line_recon * sizeof(double));
+  momentum_sarm_beta = malloc(parset.n_sa_vel_recon * parset.n_sarm_line_recon * sizeof(double));
+  phase_sarm = malloc(parset.n_sa_vel_recon * parset.n_sarm_base_recon * parset.n_sarm_line_recon * sizeof(double));
+  Trans_sarm_alpha = malloc(parset.n_tau * parset.n_sa_vel_recon * sizeof(double));
+  Trans_sarm_beta = malloc(parset.n_tau * parset.n_sa_vel_recon * sizeof(double));
 
   workspace_phase = malloc(parset.n_sa_vel_recon * 3 * sizeof(double));
   
@@ -678,6 +737,16 @@ void sim_init()
       }
     }
 
+    /* SARM */
+    for(i=0; i<parset.n_sarm_line_recon; i++)
+    {
+      Tline_sarm[i] = Tline[i];
+      for(j=0; j<parset.n_sarm_base_recon; j++)
+      {
+        base_sarm[i*parset.n_sarm_base_recon*2 + j*2 + 0] = 70.0 + 10*cos(PI/parset.n_sarm_base_recon * j);
+        base_sarm[i*parset.n_sarm_base_recon*2 + j*2 + 1] = -70.0 + 10*sin(PI/parset.n_sarm_base_recon * j);
+      }
+    }
   }
 #endif
 
@@ -720,6 +789,15 @@ void sim_end()
   
   free(clouds_alpha);
   free(clouds_beta);
+ 
+  free(Tline_sarm);
+  free(Fline_sarm);
+  free(base_sarm);
+  free(phase_sarm);
+  free(momentum_sarm_alpha);
+  free(momentum_sarm_beta);
+  free(Trans_sarm_alpha);
+  free(Trans_sarm_beta);
   
   free(workspace_phase);
 #endif

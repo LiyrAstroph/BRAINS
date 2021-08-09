@@ -154,5 +154,11 @@ double *prob_sa_particles, *prob_sa_particles_perturb;
 
 double sa_phase_error_mean, sa_line_error_mean;
 
+/* sarm */
+double *Tline_sarm;
+double *Trans_sarm_alpha, *Trans_sarm_beta;
+double *momentum_sarm_alpha, *momentum_sarm_beta;
+double *base_sarm, *phase_sarm, *Fline_sarm;
+
 double *workspace_phase;
 #endif

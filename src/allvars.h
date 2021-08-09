@@ -152,6 +152,9 @@ typedef struct
   double sa_InstRes;
   char sa_str_par_fix[BRAINS_MAX_STR_LENGTH], sa_str_par_fix_val[BRAINS_MAX_STR_LENGTH];
   int n_sa_vel_recon, n_sa_base_recon;
+
+  /* sarm */
+  int n_sarm_base_recon, n_sarm_line_recon; /* number of baselines in each epoch */
 #endif
 }PARSET;
 extern PARSET parset;
@@ -283,6 +286,12 @@ extern int *idx_sa_par_mutual, *idx_rm_par_mutual;
 extern double *prob_sa_particles, *prob_sa_particles_perturb;
 
 extern double sa_phase_error_mean, sa_line_error_mean;
+
+/* sarm */
+extern double *Tline_sarm;
+extern double *Trans_sarm_alpha, *Trans_sarm_beta;
+extern double *momentum_sarm_alpha, *momentum_sarm_beta;
+extern double *base_sarm, *phase_sarm, *Fline_sarm;
 
 extern double *workspace_phase;
 #endif
