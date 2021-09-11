@@ -213,6 +213,14 @@ void sa_smooth_end();
 void sa_smooth_run(double *v_sa, double *F_sa, int n_v_sa, double *p_sa, int n_base_sa);
 
 /* SARM */
+int dnest_sarm(int argc, char **argv);
+void set_par_range_sarm();
+void print_par_names_sarm();
+void reconstruct_sarm();
+void reconstruct_sarm_init();
+void reconstruct_sarm_end();
+void cal_emission_flux_sarm();
+void scale_con_line_sarm();
 void transfun_sarm_cal_cloud(const void *pm, double *transv, double *trans2d, double *trans_sarm_alpha, double *trans_sarm_beta, 
                              int n_vel, int flag_save);
 void transfun_sarm_cal_with_sample(double *transv, double *trans2d, double *trans_sarm_alpha, double *trans_sarm_beta, int n_vel);

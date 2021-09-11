@@ -137,7 +137,7 @@ void calculate_sarm_sim_with_sample(const void *pm, double *tline, double *vel_s
 
     tl = tline[j];
     /* interpret to get the present continuum flux */
-    fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, tl, gsl_acc);
+    fcon = Fcon_sarm[j];
 
     for(k=0; k<parset.n_tau; k++)
     {

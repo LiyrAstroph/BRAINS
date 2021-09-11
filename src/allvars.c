@@ -155,10 +155,20 @@ double *prob_sa_particles, *prob_sa_particles_perturb;
 double sa_phase_error_mean, sa_line_error_mean;
 
 /* sarm */
+int n_epoch_sarm_data, n_base_sarm_data, n_vel_sarm_data;
+double *base_sarm_data, *Tline_sarm_data;
+double *Fcon_sarm_data;
+double *Fline_sarm_data, *Flerrs_sarm_data;
+double *Fline2d_sarm_data, *Flerrs2d_sarm_data;
+
 double *Tline_sarm;
+double *phase_sarm_data, *pherrs_sarm_data;
 double *Trans_sarm_alpha, *Trans_sarm_beta;
 double *momentum_sarm_alpha, *momentum_sarm_beta;
-double *base_sarm, *phase_sarm, *Fline_sarm;
+double *base_sarm, *phase_sarm, *Fline_sarm, *Fcon_sarm;
+
+double line_sarm_scale;
+double phase_sarm_error_mean, line_sarm_error_mean;
 
 double *workspace_phase;
 #endif

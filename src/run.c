@@ -49,7 +49,11 @@ void begin_run()
     /* scale continuum and line to an order of unity */
     scale_con_line();
 #else
-    if(parset.flag_dim != 3)
+    if(parset.flag_dim == 6)
+    {
+      scale_con_line_sarm();
+    }
+    else if(parset.flag_dim != 3)
     {
       scale_con_line();
     }
@@ -110,13 +114,22 @@ void begin_run()
     reconstruct_sa1d();
   }
 
-  if(parset.flag_dim == 5) /* SA + RM */
+  if(parset.flag_dim == 5) /* SA + 2D RM */
   {
     if(parset.flag_postprc == 0)
     {
       reconstruct_con();
     }
     reconstruct_sa2d();
+  }
+
+  if(parset.flag_dim == 6) /* SARM */
+  {
+    if(parset.flag_postprc == 0)
+    {
+      reconstruct_con();
+    }
+    reconstruct_sarm();
   }
 #endif
 

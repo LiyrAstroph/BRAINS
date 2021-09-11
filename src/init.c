@@ -280,7 +280,7 @@ void init()
       }
     }
   
-    if(parset.flag_dim > 0 || parset.flag_dim == -1)
+    if( (parset.flag_dim > 0 && parset.flag_dim < 6) || parset.flag_dim == -1)
     {   
       /* set cadence and time span of data */
       Tspan_data_con = (Tcon_data[n_con_data -1] - Tcon_data[0]);
@@ -568,6 +568,9 @@ void free_memory()
   
     free(var_param);
     free(var_param_std);
+
+    gsl_interp_accel_free(gsl_acc);
+    gsl_interp_free(gsl_linear);
   }
   
 #ifdef SpecAstro
@@ -672,6 +675,75 @@ void scale_con_line()
   }
   return;
 }
+
+#ifdef SpecAstro
+/*!
+ * This function normalise the light curves to a scale of unity.
+ */
+void scale_con_line_sarm()
+{
+  int i, j;
+  double ave_con, ave_line;
+  
+  con_scale = 1.0;
+  line_sarm_scale = 1.0;
+
+  ave_con = 0.0;
+  ave_line = 0.0;
+  for(i=0; i<n_con_data; i++)
+  {
+    ave_con += Fcon_data[i];
+  }
+
+  ave_con /= n_con_data;
+  con_scale = 1.0/ave_con;
+
+  for(i=0; i<n_con_data; i++)
+  {
+    Fcon_data[i] *=con_scale;
+    Fcerrs_data[i] *=con_scale;
+  }
+
+  if(thistask == roottask)
+    printf("con scale: %e\t%e\n", con_scale, ave_con);
+  
+  con_error_mean *= con_scale;
+
+  for(i=0; i<n_epoch_sarm_data; i++)
+  {
+    ave_line += Fline_sarm_data[i];
+  }
+  ave_line /=n_epoch_sarm_data;
+
+  line_sarm_scale = 1.0/ave_line;
+  
+  if(thistask == roottask)
+    printf("sarm line scale: %e\t%e\n", line_sarm_scale, ave_line);
+
+  for(i=0; i<n_epoch_sarm_data; i++)
+  {
+    // note mask with error < 0.0
+    if(Flerrs_sarm_data[i] > 0.0)
+    {
+      Fcon_sarm_data[i] *= line_sarm_scale;  /* note that sarm continuum also needs to scale */
+      Fline_sarm_data[i] *= line_sarm_scale;
+      Flerrs_sarm_data[i] *= line_sarm_scale;
+    }
+
+    for(j=0; j<n_vel_sarm_data; j++)
+    {
+      // note mask with error < 0.0
+      if(Flerrs2d_sarm_data[i*n_vel_sarm_data + j] > 0.0)
+      {
+        Fline2d_sarm_data[i*n_vel_sarm_data + j] *= line_sarm_scale;
+        Flerrs2d_sarm_data[i*n_vel_sarm_data + j] *= line_sarm_scale;
+      } 
+    } 
+  }
+  line_sarm_error_mean *= line_sarm_scale;
+  return;
+}
+#endif
 
 /*!
  * This function copes with parameter fixing.\n
