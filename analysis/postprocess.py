@@ -19,9 +19,9 @@ def logdiffexp(x1, x2):    # log( exp(x1) - exp(x2))
 
 def postprocess(ndim, temp=1.0, fcut=0.0):
 
-  pdf = PdfPages('dnest.pdf')
+  pdf = PdfPages('cdnest.pdf')
 
-  cut = fcut;
+  cut = fcut
   numResampleLogX=1
   compression_bias_min=1.
   compression_scatter=0.
@@ -68,32 +68,29 @@ def postprocess(ndim, temp=1.0, fcut=0.0):
   sample = sample[0:lowest, :]
   sample_info = sample_info[0:lowest, :]
   
-  plt.figure(1)
-  plt.plot(sample_info[:,0], "k")
-  plt.xlabel("Iteration")
-  plt.ylabel("Level")
+  fig = plt.figure(figsize=(12, 8))
+  fig.subplots_adjust(wspace=0.2, hspace=0.3)
+  ax1 = fig.add_subplot(3, 1, 1)
+  ax1.plot(sample_info[:,0], "k", lw=1)
+  ax1.set_xlabel("Iteration")
+  ax1.set_ylabel("Level")
   
-  pdf.savefig()
-  
-  plt.figure(2)
-  plt.subplot(2,1,1)
-  plt.plot(np.diff(levels_orig[:,0]), "k")
-  plt.ylabel("Compression")
-  plt.xlabel("Level")
+  ax2=fig.add_subplot(3,2,3)
+  ax2.plot(np.diff(levels_orig[:,0]), "k")
+  ax2.set_ylabel("Compression")
+  ax2.set_xlabel("Level")
   xlim = plt.gca().get_xlim()
-  plt.axhline(-1., color='g')
-  plt.axhline(-np.log(10.), color='g', linestyle="--")
-  plt.ylim(ymax=0.05)
+  ax2.axhline(-1., color='g')
+  ax2.axhline(-np.log(10.), color='g', linestyle="--")
+  ax2.set_ylim(ymax=0.05)
   
-  plt.subplot(2,1,2)
+  ax3=fig.add_subplot(3,2,5)
   good = np.nonzero(levels_orig[:,4] > 0)[0]
-  plt.plot(levels_orig[good,3]/levels_orig[good,4], marker='o')
-  plt.xlim(xlim)
-  plt.ylim([0., 1.])
-  plt.xlabel("Level")
-  plt.ylabel("MH Acceptance")
-      
-  pdf.savefig()
+  ax3.plot(levels_orig[good,3]/levels_orig[good,4], marker='o')
+  ax3.set_xlim(xlim)
+  ax3.set_ylim([0., 1.])
+  ax3.set_xlabel("Level")
+  ax3.set_ylabel("MH Acceptance")
   
   logl_levels = [(levels_orig[i,1], levels_orig[i, 2]) for i in range(0, levels_orig.shape[0])]
   logl_samples = [(sample_info[i, 1], sample_info[i, 2], i) for i in range(0, sample.shape[0])]
@@ -167,14 +164,15 @@ def postprocess(ndim, temp=1.0, fcut=0.0):
     P_samples[:,z] = np.exp(logP_samples[:,z])
     H_estimates[z] = -logz_estimates[z] + np.sum(P_samples[:,z]*logl)
   
-    plt.figure(3)
-    plt.subplot(2,1,1)
-    plt.plot(logx_samples[:,z], sample_info[:,1], 'b.', label='Samples')
-    plt.plot(levels[1:,0], levels[1:,1], 'r.', label='Levels')
-    plt.legend(numpoints=1, loc='lower left')
-    plt.ylabel('log(L)')
-    plt.title(str(z+1) + "/" + str(numResampleLogX) + ", log(Z) = " + str(logz_estimates[z][0]))
-        # Use all plotted logl values to set ylim
+    ax4=fig.add_subplot(3,2,4)
+    ax4.plot(logx_samples[:,z], sample_info[:,1], 'b.', label='Samples')
+    ax4.plot(levels[1:,0], levels[1:,1], 'r.', label='Levels')
+    ax4.legend(numpoints=1, loc='lower left')
+    ax4.set_ylabel('log(L)')
+    ax4.set_xlabel('log(X)')
+    ax1.set_title(str(z+1) + "/" + str(numResampleLogX) + ", log(Z) = " + str(logz_estimates[z][0]))
+    
+    # Use all plotted logl values to set ylim
     combined_logl = np.hstack([sample_info[:,1], levels[1:, 1]])
     combined_logl = np.sort(combined_logl)
     lower = combined_logl[int(0.1*combined_logl.size)]
@@ -183,19 +181,31 @@ def postprocess(ndim, temp=1.0, fcut=0.0):
     lower -= 0.05*diff
     upper += 0.05*diff
     if zoom_in:
-      plt.ylim([lower, upper])
+      ax4.set_ylim([lower, upper])
   
-    xlim = plt.gca().get_xlim()
+    xlim = ax4.get_xlim()
   
-    plt.subplot(2,1,2)
-    plt.plot(logx_samples[:,z], P_samples[:,z], 'b.')
-    plt.ylabel('Posterior Weights')
-    plt.xlabel('log(X)')
-    plt.xlim(xlim)
-    ylim = plt.gca().get_ylim()
-    plt.text(xlim[0]+0.1*(xlim[1]-xlim[0]), ylim[1]-0.1*(ylim[1]-ylim[0]), 'T='+str(temperature))
+    ax5=fig.add_subplot(3,2,6)
+    ax5.plot(logx_samples[:,z], P_samples[:,z], 'b.')
+    ax5.set_ylabel('Posterior Weights')
+    ax5.set_xlabel('log(X)')
+    ax5.set_xlim(xlim)
+    
+    xlim = ax5.get_xlim()
+    ylim = ax5.get_ylim()
+    ax5.text(xlim[0]+0.1*(xlim[1]-xlim[0]), ylim[1]-0.1*(ylim[1]-ylim[0]), 'T='+str(temperature))
+    
+    fig.align_ylabels()
+
     pdf.savefig()
+
+    plt.show()
+    ax4.clear()
+    ax4.remove()
+    ax5.clear()
+    ax5.remove()
   
+  plt.close()
   pdf.close()
   P_samples = np.mean(P_samples, 1)
   P_samples = P_samples/np.sum(P_samples)
@@ -209,14 +219,12 @@ def postprocess(ndim, temp=1.0, fcut=0.0):
   print("Information = " + str(H_estimate) + " +- " + str(H_error) + " nats.")
   print("Effective sample size = " + str(ESS))
   
-  plt.show()
-  
   N = int(moreSamples*ESS)
   posterior_sample = np.zeros((N, sample.shape[1]))
   w = P_samples
   w = w/np.max(w)
   
-  np.savetxt('../data/weigths'+str_dim+'.txt', w)
+  #np.savetxt('../data/weigths'+str_dim+'.txt', w)
   
   for i in range(0, N):
     while True:
@@ -225,7 +233,7 @@ def postprocess(ndim, temp=1.0, fcut=0.0):
         break
     posterior_sample[i, :] = sample[which, :]
   
-  np.savetxt('../data/posterior_sample'+str_dim+'.txt', posterior_sample)
+  #np.savetxt('../data/posterior_sample'+str_dim+'.txt', posterior_sample)
 
 
 if __name__ == "__main__":
