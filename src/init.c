@@ -664,6 +664,7 @@ void scale_con_line()
       } 
   }
   line_error_mean *= line_scale;
+  line_error_mean_sq *= (line_scale*line_scale);
 
   if( (parset.flag_dim==2 || parset.flag_dim == -1 || parset.flag_dim == 5) && parset.flag_narrowline!=0)
   {
