@@ -249,6 +249,9 @@ void transfun_1d_cal_with_sample()
   {
     Trans1D[i] /= Anorm;
   }
+
+  smooth_transfer_function_tau(Trans1D);
+  
   return;
 }
 
@@ -326,6 +329,39 @@ void transfun_2d_cal_with_sample(double *transv, double *trans2d, int n_vel)
     for(j=0; j<n_vel; j++)
     {
       trans2d[i*n_vel+j] /= Anorm;
+    }
+  }
+
+  smooth_transfer_function2d_tau(trans2d, n_vel);
+
+  return;
+}
+
+/* 
+ * smooth the transfer function along time lag axis
+ * this is to surppress statistic noises
+ */
+void smooth_transfer_function_tau(double *trans1d)
+{
+  memcpy(hist_in->data, trans1d, parset.n_tau*sizeof(double));
+  gsl_filter_gaussian(GSL_FILTER_END_PADVALUE, alpha, 0, hist_in, hist_out, gauss_p);
+  memcpy(trans1d, hist_out->data, parset.n_tau*sizeof(double));
+
+  return;
+}
+void smooth_transfer_function2d_tau(double *trans2d, int n_vel)
+{
+  int i, j;
+  for(j=0; j<n_vel; j++)
+  {
+    for(i=0; i<parset.n_tau; i++)
+    {
+      hist_in->data[i] = trans2d[i*n_vel + j];
+    }
+    gsl_filter_gaussian(GSL_FILTER_END_PADVALUE, alpha, 0, hist_in, hist_out, gauss_p);
+    for(i=0; i<parset.n_tau; i++)
+    {
+      trans2d[i*n_vel + j] = hist_out->data[i];
     }
   }
   return;

@@ -21,6 +21,7 @@
 
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_interp.h>
+#include <gsl/gsl_filter.h>
 
 /*! \def GRAVITY
  *  \brief Gravitational constant. 
@@ -258,6 +259,12 @@ extern gsl_rng * gsl_r;
 extern gsl_interp_accel *gsl_acc;
 extern gsl_interp  *gsl_linear;
 
+/* Gaussian smooth transfer function along time lag axis */
+extern const size_t ngauss;
+extern const double alpha;
+extern gsl_filter_gaussian_workspace *gauss_p;
+extern gsl_vector *hist_in;
+extern gsl_vector *hist_out;
 
 #ifdef SpecAstro
 extern double PhaseFactor;

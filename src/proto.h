@@ -134,6 +134,9 @@ double second();
 double timediff(double t0, double t1);
 void get_hms(double dt, int *h, int *m, double *s);
 
+void smooth_transfer_function_tau(double *trans1d);
+void smooth_transfer_function2d_tau(double *trans2d, int n_vel);
+
 #ifdef SpecAstro
 
 void set_sa_blr_model();

@@ -19,6 +19,7 @@
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
 #include <gsl/gsl_interp.h>
+#include <gsl/gsl_filter.h>
 
 #include "brains.h"
 
@@ -234,8 +235,8 @@ void init()
 #endif
 
   /* default BH mass range */
-  mass_range[0] = 1.0;
-  mass_range[1] = 1.0e4;
+  mass_range[0] = 0.1;
+  mass_range[1] = 1.0e3;
 
   /* default rcloud_max_set */
   rcloud_max_set = 1.0e6;
@@ -504,6 +505,13 @@ void allocate_memory()
       var_param[i] = var_param_std[i] = 0.0;
     }
   }
+
+  if(parset.flag_dim != 0 && parset.flag_dim != 3)
+  {
+    gauss_p = gsl_filter_gaussian_alloc(ngauss);
+    hist_in = gsl_vector_alloc(parset.n_tau);
+    hist_out = gsl_vector_alloc(parset.n_tau);
+  }
   
 #ifdef SpecAstro
   if(parset.flag_dim > 2 || parset.flag_dim < 0)
@@ -568,6 +576,13 @@ void free_memory()
   
     free(var_param);
     free(var_param_std);
+  }
+
+  if(parset.flag_dim != 0 && parset.flag_dim != 3)
+  {
+    gsl_filter_gaussian_free(gauss_p);
+    gsl_vector_free(hist_in);
+    gsl_vector_free(hist_out);
   }
   
 #ifdef SpecAstro
