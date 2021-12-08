@@ -415,7 +415,7 @@ void reconstruct_sa1d_init()
   int i, j;
   double dT, Tspan;
 
-  sprintf(dnest_options_file, "%s/%s", parset.file_dir, "src/OPTIONSSA1D");
+  sprintf(dnest_options_file, "%s/%s", parset.file_dir, "param/OPTIONSSA1D");
   if(thistask == roottask)
   {
     get_num_particles(dnest_options_file);

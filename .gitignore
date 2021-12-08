@@ -10,10 +10,11 @@ data/*
 !data/sim_sa.txt
 analysis/*
 !analysis/*.py
-!src/OPTIONS*
 !src/*.[ch]
-!src/param
 !src/doxyfile
 !doc/*.tex
 !data/lcplot_v3.py
+!param
+!param/param
+!param/OPTIONS*
 brains

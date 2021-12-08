@@ -296,7 +296,7 @@ void reconstruct_sa()
 
 void reconstruct_sa_init()
 { 
-  sprintf(dnest_options_file, "%s/%s", parset.file_dir, "src/OPTIONSSA");
+  sprintf(dnest_options_file, "%s/%s", parset.file_dir, "param/OPTIONSSA");
   if(thistask == roottask)
   {
     get_num_particles(dnest_options_file);

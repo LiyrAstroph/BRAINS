@@ -632,7 +632,7 @@ void reconstruct_line2d_init()
   	TransV[i] = vel_min_set + dVel*i;
   }
 
-  sprintf(dnest_options_file, "%s/%s", parset.file_dir, "src/OPTIONS2D");
+  sprintf(dnest_options_file, "%s/%s", parset.file_dir, "param/OPTIONS2D");
   if(thistask == roottask)
   {
     get_num_particles(dnest_options_file);
