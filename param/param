@@ -12,7 +12,7 @@ Redshift                    0.0                                    % redshift of
 
 FileDir                     /home/liyropt/Projects/GIT/BRAINS      % directory for where all the output files are stored
 
-FlagDim                     1                           % -2, generate fully random lc; -1, mock lc based on input data; 
+FlagDim                     -2                           % -2, generate fully random lc; -1, mock lc based on input data; 
                                                         % 0, only continuum modeling; 1, 1d line RM; 2, 2d line RM
                                                         % if -DSA, 3: only SA; 4: SA+1d line RM; 5: SA+2d line RM 
 

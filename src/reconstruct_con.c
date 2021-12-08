@@ -890,7 +890,7 @@ void reconstruct_con_init()
       Larr_rec[i*nq + j] = pow(Tcon[i], j);
   }
 
-  sprintf(dnest_options_file, "%s/%s", parset.file_dir, "src/OPTIONSCON");
+  sprintf(dnest_options_file, "%s/%s", parset.file_dir, "param/OPTIONSCON");
   if(thistask == roottask)
   {
     get_num_particles(dnest_options_file);

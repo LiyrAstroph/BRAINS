@@ -445,7 +445,7 @@ void reconstruct_line1d_init()
     Tline[i] = Tline_min + i*dT;
   }
 
-  sprintf(dnest_options_file, "%s/%s", parset.file_dir, "src/OPTIONS1D");
+  sprintf(dnest_options_file, "%s/%s", parset.file_dir, "param/OPTIONS1D");
   if(thistask == roottask)
   {
     get_num_particles(dnest_options_file);
