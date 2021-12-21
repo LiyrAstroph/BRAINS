@@ -546,7 +546,7 @@ void reconstruct_line2d()
   reconstruct_line2d_end();
 
   //clear up argv
-  for(i=0; i<9; i++)
+  for(i=0; i<11; i++)
   {
     free(argv[i]);
   }
