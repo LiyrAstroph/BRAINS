@@ -20,7 +20,7 @@ def reconstruct_con():
   data = np.loadtxt("../data/mrk493_con.txt")
   scale =  np.mean(data[:, 1])
   
-  sample  = np.loadtxt("../data/posterior_sample.txt")
+  sample  = np.loadtxt("../data/posterior_sample_con.txt")
   
   pcon = np.loadtxt("../data/pcon.txt")
   
@@ -51,7 +51,7 @@ def reconstruct_line1d():
   #line_data[:, 1:] /= np.mean(line_data[:, 1])
 
   
-  sample  = np.loadtxt("../data/posterior_sample1d.txt")
+  sample  = np.loadtxt("../data/posterior_sample_1d.txt")
   
   pcon = np.loadtxt("../data/pcon.txt")
   pline = np.loadtxt("../data/pline.txt")

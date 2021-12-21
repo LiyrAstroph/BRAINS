@@ -102,9 +102,9 @@ class ParaName:
     elif flag_dim == '0':
       self.para_names_file = file_dir + "/data/para_names_con.txt"
     elif flag_dim == '1':
-      self.para_names_file = file_dir + "/data/para_names_model1d.txt"
+      self.para_names_file = file_dir + "/data/para_names_1d.txt"
     elif flag_dim == '2':
-      self.para_names_file = file_dir + "/data/para_names_model2d.txt"
+      self.para_names_file = file_dir + "/data/para_names_2d.txt"
     elif flag_dim == '3':
       self.para_names_file = file_dir + "/data/para_names_sa.txt"
     elif flag_dim == '4':
@@ -346,12 +346,12 @@ class BBackend(Param, Options, ParaName):
       self.results['line2d_sim'] = np.loadtxt(self.file_dir+"data/sim_hb2d.txt")
     
     elif self.param['flagdim'] == '0':
-      self.results['sample'] = np.loadtxt(self.file_dir + "data/posterior_sample.txt")
+      self.results['sample'] = np.loadtxt(self.file_dir + "data/posterior_sample_con.txt")
       self.sample_size = self.results['sample'].shape[0]
       self._load_con_rec()
     
     elif self.param['flagdim'] == '1':
-      self.results['sample'] = np.loadtxt(self.file_dir + "data/posterior_sample1d.txt")      
+      self.results['sample'] = np.loadtxt(self.file_dir + "data/posterior_sample_1d.txt")      
       self.sample_size = self.results['sample'].shape[0]
       self._load_con_rec()
       self._load_line_rec()
@@ -359,9 +359,9 @@ class BBackend(Param, Options, ParaName):
       
     elif self.param['flagdim'] == '2':
       # load posterior samples
-      self.results['sample'] = np.loadtxt(self.file_dir + 'data/posterior_sample2d.txt')
+      self.results['sample'] = np.loadtxt(self.file_dir + 'data/posterior_sample_2d.txt')
       # load likelihoods
-      self.results['sample_info'] = np.loadtxt(self.file_dir + 'data/posterior_sample_info2d.txt')
+      self.results['sample_info'] = np.loadtxt(self.file_dir + 'data/posterior_sample_info_2d.txt')
       self.sample_size = self.results['sample'].shape[0]
       
       # load continuum reconstructions

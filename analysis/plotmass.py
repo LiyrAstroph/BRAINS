@@ -31,8 +31,8 @@ def plotmass():
   	print "not 2d RM analysis. no mass parameter."
   	exit(0)
 
-  sample = np.loadtxt(params["FileDir"]+"/data/posterior_sample2d.txt", skiprows=1)
-  sample_info = np.loadtxt(params["FileDir"]+"/data/posterior_sample_info2d.txt", skiprows=1)
+  sample = np.loadtxt(params["FileDir"]+"/data/posterior_sample_2d.txt", skiprows=1)
+  sample_info = np.loadtxt(params["FileDir"]+"/data/posterior_sample_info_2d.txt", skiprows=1)
     
   idx_mass = [8, 8, 8, 8, 11, 10, 15]
   

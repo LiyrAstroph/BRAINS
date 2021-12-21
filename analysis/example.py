@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 
 from plotbackend import plotbackend 
 
-pb = plotbackend("../src/param")
+pb = plotbackend("../param/param")
 
 pb.load_results()
 

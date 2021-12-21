@@ -20,7 +20,7 @@ def plottran(ichimin):
   print(ccf)
   ccf[:, 0:3] = (ccf[:, 0:3]/(1.0+redshift) - 4861.0)/4861.0 * 3e5/1.0e3
 
-  logP = np.loadtxt("../data/posterior_sample_info2d.txt", skiprows=1)
+  logP = np.loadtxt("../data/posterior_sample_info_2d.txt", skiprows=1)
   nmax = np.argmax(logP)
   print(nmax, logP[nmax])
 

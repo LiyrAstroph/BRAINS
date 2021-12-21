@@ -15,11 +15,11 @@ from matplotlib.backends.backend_pdf import PdfPages
 def plothist(ndim):
   pdf = PdfPages('hist.pdf')
   if(ndim == 0):
-    samples = np.loadtxt("../data/posterior_sample.txt", skiprows=1)
+    samples = np.loadtxt("../data/posterior_sample_con.txt", skiprows=1)
   elif(ndim == 1):
-    samples = np.loadtxt("../data/posterior_sample1d.txt", skiprows=1)
+    samples = np.loadtxt("../data/posterior_sample_1d.txt", skiprows=1)
   elif(ndim == 2):
-    samples = np.loadtxt("../data/posterior_sample2d.txt", skiprows=1)
+    samples = np.loadtxt("../data/posterior_sample_2d.txt", skiprows=1)
   else:
     print("Incorrect dimension.")
     exit(0)

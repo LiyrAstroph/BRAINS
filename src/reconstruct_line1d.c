@@ -288,7 +288,7 @@ void reconstruct_line1d()
   
   // sample tag 
   strcpy(argv[argc++], "-g");
-  strcpy(argv[argc++], "1d");
+  strcpy(argv[argc++], "_1d");
 
   reconstruct_line1d_init();
 // dnest run

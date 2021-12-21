@@ -264,7 +264,7 @@ void print_par_names_model1d()
   FILE *fp;
   char fname[BRAINS_MAX_STR_LENGTH], str_fmt[BRAINS_MAX_STR_LENGTH];
 
-  sprintf(fname, "%s/%s", parset.file_dir, "data/para_names_model1d.txt");
+  sprintf(fname, "%s/%s", parset.file_dir, "data/para_names_1d.txt");
   fp = fopen(fname, "w");
   if(fp == NULL)
   {

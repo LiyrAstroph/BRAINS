@@ -161,8 +161,8 @@ void reconstruct_con()
   char **argv;
 
   // configure restart of dnest 
-  argv = malloc(9*sizeof(char *));
-  for(i=0; i<9; i++)
+  argv = malloc(11*sizeof(char *));
+  for(i=0; i<11; i++)
   {
     argv[i] = malloc(BRAINS_MAX_STR_LENGTH*sizeof(char));
   }
@@ -196,6 +196,10 @@ void reconstruct_con()
   {
     strcpy(argv[argc++], "-l");
   }
+
+  // sample tag 
+  strcpy(argv[argc++], "-g");
+  strcpy(argv[argc++], "_con");
 
   reconstruct_con_init();
   logz_con = dnest_con(argc, argv);
@@ -252,7 +256,7 @@ void reconstruct_con()
   reconstruct_con_end();
 
   //clear up argv 
-  for(i=0; i<9; i++)
+  for(i=0; i<11; i++)
   {
     free(argv[i]);
   }
