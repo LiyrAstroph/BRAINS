@@ -354,7 +354,7 @@ void reconstruct_line2d()
 
   // sample tag 
   strcpy(argv[argc++], "-g");
-  strcpy(argv[argc++], "2d");
+  strcpy(argv[argc++], "_2d");
   
   reconstruct_line2d_init();
   

@@ -79,10 +79,10 @@ def plotline2d():
   line_scale = np.mean(hblc[:, 0])
   syserr_con = np.exp(-25.049281) * con_scale
   syserr = np.exp(-6.421502) * line_scale
-  hd=np.loadtxt("../data/sample2d.txt", skiprows=1)
-  phd = np.loadtxt("../data/posterior_sample2d.txt")
-  hd_info = np.loadtxt("../data/sample_info2d.txt", skiprows=1)
-  level = np.loadtxt("../data/levels2d.txt", skiprows=1)
+  hd=np.loadtxt("../data/sample_2d.txt", skiprows=1)
+  phd = np.loadtxt("../data/posterior_sample_2d.txt")
+  hd_info = np.loadtxt("../data/sample_info_2d.txt", skiprows=1)
+  level = np.loadtxt("../data/levels_2d.txt", skiprows=1)
   idx = np.where(hd_info[:, 0]>level.shape[0] - 30)
   hd_sort=np.sort(hd[idx[0], 8]/np.log(10.0)+6.0)
   mbh1=hd_sort[int(len(hd_sort)*0.1585)]

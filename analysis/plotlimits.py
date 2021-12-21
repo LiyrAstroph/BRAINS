@@ -10,13 +10,13 @@ import sys
 
 def plotlimits(ndim):
   if ndim == 0:
-    str_dim = ''
+    str_dim = '_con'
     npar = 4+1
   elif ndim == 1:
-    str_dim = '1d'
+    str_dim = '_1d'
     npar =  8+4+1
   elif ndim == 2:
-    str_dim = '2d'
+    str_dim = '_2d'
     npar = 12+4+1
   else:
     print('incorrect dimension.')
@@ -44,6 +44,6 @@ if __name__ == '__main__':
 
   if(len(sys.argv) < 2):
     print("No dimension specified.")
-    exit(0);
+    exit(0)
 
-  plotlimits(int(sys.argv[1]));
+  plotlimits(int(sys.argv[1]))

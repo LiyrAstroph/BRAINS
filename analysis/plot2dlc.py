@@ -35,7 +35,7 @@ fp.close()
 grid_wave = grid_vel / 3e5 * 4861.0 + 4861.0
 dV = (grid_vel[1]-grid_vel[0]) / VelUnit
 
-logP = np.loadtxt("../data/posterior_sample_info2d.txt", skiprows=1)
+logP = np.loadtxt("../data/posterior_sample_info_2d.txt", skiprows=1)
 nmax = np.argmax(logP)
 print(nmax, logP[nmax])
 

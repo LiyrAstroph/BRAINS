@@ -9,7 +9,7 @@ import copy
 
 ncheck = 600
 
-logP = np.loadtxt("../data/posterior_sample_info2d.txt", skiprows=1)
+logP = np.loadtxt("../data/posterior_sample_info_2d.txt", skiprows=1)
 
 ncon = 100
 nline = 25

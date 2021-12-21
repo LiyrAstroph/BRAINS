@@ -128,7 +128,7 @@ gsl_rng * gsl_r;
 gsl_interp_accel *gsl_acc;
 gsl_interp  *gsl_linear;
 
-const size_t ngauss = 50;
+const size_t ngauss = 30;
 const double alpha  = (ngauss-1)/2.0/2.0;
 gsl_filter_gaussian_workspace *gauss_p;
 gsl_vector *hist_in;

@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 
-d=np.loadtxt("../data/posterior_sample2d.txt", skiprows=1)
+d=np.loadtxt("../data/posterior_sample_2d.txt", skiprows=1)
 
 fig = plt.figure(figsize=(10, 10))
 
