@@ -5,6 +5,10 @@
  * Thu, Aug 4, 2016
  */
 
+/*
+ * this file is to calculate spectroastrometric reverberation mapping.
+ */
+
 #ifdef SpecAstro
 
 #include <fftw3.h>
@@ -98,17 +102,22 @@ void transfun_sarm_cal_with_sample(double *transv, double *trans2d, double *tran
       trans_beta[i*n_vel+j] /= Anorm;
     }
   }
+
+  return;
 }
 
 /*
  * calculate SARM signal on simulated grids 
- *
+ * inputs:  pm, tline, vel_sa, trans2d, trans_alpha, trans_beta, n_vel, n_line,
+ *          base, n_base
+ * outputs: phase, fline, photocenter_alpha, photocenter_beta
  */
 void calculate_sarm_sim_with_sample(const void *pm, double *tline, double *vel_sa, double *trans2d, 
                                     double *trans_alpha, double *trans_beta,
                                     int n_vel, int n_line, double *base, 
                                     int n_base, double *phase, double *fline, 
-                                    double *momentum_alpha, double *momentum_beta)
+                                    double *momentum_alpha, double *momentum_beta,
+                                    double *photocenter_alpha, double *photocenter_beta)
 {
   int i, j, k, m;
   double tau, tl, tc, fcon_rm, dTransTau, ratio, flux_ratio, fcon;
@@ -126,6 +135,7 @@ void calculate_sarm_sim_with_sample(const void *pm, double *tline, double *vel_s
   cos_PA = cos(PA);
   sin_PA = sin(PA);
 
+  /* loop over time of line */
   for(j=0;j<n_line; j++)
   {
     for(i=0; i<n_vel; i++)
@@ -156,22 +166,25 @@ void calculate_sarm_sim_with_sample(const void *pm, double *tline, double *vel_s
 
     for(i=0; i<n_vel; i++)
     {
+      fline[j*n_vel + i] *= dTransTau;
+      momentum_alpha[j*n_vel + i] *= dTransTau;
+      momentum_beta[j*n_vel + i] *= dTransTau;
+
       y = momentum_alpha[j*n_vel + i];
       z = momentum_beta[j*n_vel + i];
 
       momentum_alpha[j*n_vel + i] = y * cos_PA + z * sin_PA;
       momentum_beta[j*n_vel + i] = -y * sin_PA + z * cos_PA;
 
-      momentum_alpha[j*n_vel + i] /= (fline[j*n_vel + i] + EPS);
-      momentum_beta[j*n_vel + i] /=  (fline[j*n_vel + i] + EPS);
+      photocenter_alpha[j*n_vel + i] = momentum_alpha[j*n_vel + i] / (fline[j*n_vel + i] + EPS);
+      photocenter_beta[j*n_vel + i]  = momentum_beta[j*n_vel + i] / (fline[j*n_vel + i] + EPS);
 
-      fline[j*n_vel + i] *= dTransTau;
       flux_ratio = fline[j*n_vel + i]/fcon;
       ratio = flux_ratio/(1.0+flux_ratio) / DA;
       for(m=0; m<n_base; m++)
       {
-        phase[j*n_vel*n_base + m*n_vel + i] =-( base[j*n_base*2+0] * momentum_alpha[j*n_vel + i]
-                                               +base[j*n_base*2+1] * momentum_beta[j*n_vel + i]) * ratio;
+        phase[j*n_vel*n_base + m*n_vel + i] =-( base[j*n_base*2 + m*2 + 0] * photocenter_alpha[j*n_vel + i]
+                                               +base[j*n_base*2 + m*2 + 1] * photocenter_beta[j*n_vel + i]) * ratio;
       }
     }
   }
@@ -180,6 +193,10 @@ void calculate_sarm_sim_with_sample(const void *pm, double *tline, double *vel_s
   return;
 }
 
+/*
+ * smooth the profile and phase with the instrument broadening funcition.
+ *
+ */
 int nd_fft_sarm, nd_fft_sarm_cal, npad_sarm;
 
 fftw_complex *sarm_data_fft, *sarm_resp_fft0, *sarm_resp_fft, *sarm_conv_fft;

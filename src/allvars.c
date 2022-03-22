@@ -165,6 +165,7 @@ double *Tline_sarm;
 double *phase_sarm_data, *pherrs_sarm_data;
 double *Trans_sarm_alpha, *Trans_sarm_beta;
 double *momentum_sarm_alpha, *momentum_sarm_beta;
+double *photocenter_sarm_alpha, *photocenter_sarm_beta;
 double *base_sarm, *phase_sarm, *Fline_sarm, *Fcon_sarm;
 
 double line_sarm_scale;

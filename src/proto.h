@@ -229,7 +229,8 @@ void calculate_sarm_sim_with_sample(const void *pm, double *tline_sarm, double *
                                     double *trans_alpha, double *trans_beta,
                                     int n_sa_vel, int n_sarm_line, double *base_sarm, 
                                     int n_sarm_base, double *phase_sarm, double *Fline_sarm, 
-                                    double *momentum_alpha, double *momentum_beta);
+                                    double *momentum_alpha, double *momentum_beta,
+                                    double *photocenter_alpha, double *photocenter_beta);
 
 void sarm_smooth_init(int n_v_sarm, const double *v_sarm, double sigV);
 void sarm_smooth_end();

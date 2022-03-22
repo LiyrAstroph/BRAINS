@@ -73,7 +73,8 @@ void sim()
   double *pm = (double *)model, error, fcon;
   
   smooth_init(parset.n_vel_recon, TransV);
-  
+
+/*==================================continuum============================================*/  
   if(parset.flag_dim == -1)
   {
     /* note that here use sigma_hat = sigma/sqrt(tau) */
@@ -137,6 +138,8 @@ void sim()
   fclose(fp);
   
   gsl_interp_init(gsl_linear, Tcon, Fcon_rm, parset.n_con_recon);
+
+/*==================================1d line============================================*/  
   transfun_1d_cal(model, 0);
   calculate_line_from_blrmodel(model, Tline, Fline, parset.n_line_recon);
   
@@ -177,6 +180,7 @@ void sim()
   }
   fclose(fp);
 
+/*==================================2d line============================================*/  
   transfun_2d_cal(model, TransV, Trans2D, parset.n_vel_recon, 1);
   calculate_line2d_from_blrmodel(model, Tline, TransV, 
           Trans2D, Fline2d, parset.n_line_recon, parset.n_vel_recon);
@@ -241,7 +245,7 @@ void sim()
 #ifdef SpecAstro
   double *sa_pm;
   sa_pm = (double *)pm + num_params_blr;
-
+/*==================================SA============================================*/  
   sa_smooth_init(parset.n_sa_vel_recon, vel_sa, parset.sa_InstRes);
 
   gen_sa_cloud_sample((void *)sa_pm, 3, 0);
@@ -276,7 +280,7 @@ void sim()
   fclose(fp);
   sa_smooth_end();
 
-  /* SARM */
+/*==================================SARM============================================*/  
   for(i=0; i<parset.n_sarm_line_recon; i++)
   {
     Fcon_sarm[i] = gsl_interp_eval(gsl_linear, Tcon, Fcon, Tline_sarm[i], gsl_acc);
@@ -287,8 +291,9 @@ void sim()
   calculate_sarm_sim_with_sample(pm, Tline_sarm, vel_sa, Trans2D, Trans_sarm_alpha, Trans_sarm_beta, 
                                      parset.n_sa_vel_recon, parset.n_sarm_line_recon, base_sarm, 
                                      parset.n_sarm_base_recon, phase_sarm, Fline_sarm, 
-                                     momentum_sarm_alpha, momentum_sarm_beta);
-  
+                                     momentum_sarm_alpha, momentum_sarm_beta,
+                                     photocenter_sarm_alpha, photocenter_sarm_beta); 
+
   sprintf(fname, "%s/%s", parset.file_dir, "data/sim_sarm.txt");
   fp = fopen(fname, "w");
   if(fp == NULL)
@@ -325,6 +330,77 @@ void sim()
     }
   }
   fclose(fp);
+
+  /* output SARM transfer function */
+  sprintf(fname, "%s/%s", parset.file_dir, "data/sarm_tran_alpha.txt");
+  fp = fopen(fname, "w");
+  if(fp == NULL)
+  {
+    fprintf(stderr, "# Error: Cannot open file %s.\n", fname);
+    exit(0);
+  }
+  for(i=0; i<parset.n_tau; i++)
+  {
+    for(j=0; j<parset.n_sa_vel_recon; j++)
+    {
+      fprintf(fp, "%e %e %e\n", vel_sa[j]*VelUnit, TransTau[i], Trans_sarm_alpha[i*parset.n_sa_vel_recon + j]);
+    }
+    fprintf(fp, "\n");
+  }
+  fclose(fp);
+
+  sprintf(fname, "%s/%s", parset.file_dir, "data/sarm_tran_beta.txt");
+  fp = fopen(fname, "w");
+  if(fp == NULL)
+  {
+    fprintf(stderr, "# Error: Cannot open file %s.\n", fname);
+    exit(0);
+  }
+  for(i=0; i<parset.n_tau; i++)
+  {
+    for(j=0; j<parset.n_sa_vel_recon; j++)
+    {
+      fprintf(fp, "%e %e %e\n", vel_sa[j]*VelUnit, TransTau[i], Trans_sarm_beta[i*parset.n_sa_vel_recon + j]);
+    }
+    fprintf(fp, "\n");
+  }
+  fclose(fp);
+
+  /* output SARM photocenter function */
+  sprintf(fname, "%s/%s", parset.file_dir, "data/sarm_photocenter_alpha.txt");
+  fp = fopen(fname, "w");
+  if(fp == NULL)
+  {
+    fprintf(stderr, "# Error: Cannot open file %s.\n", fname);
+    exit(0);
+  }
+  for(i=0; i<parset.n_sarm_line_recon; i++)
+  {
+    for(j=0; j<parset.n_sa_vel_recon; j++)
+    {
+      fprintf(fp, "%e %e %e\n", vel_sa[j]*VelUnit, TransTau[i], momentum_sarm_alpha[i*parset.n_sa_vel_recon + j]);
+    }
+    fprintf(fp, "\n");
+  }
+  fclose(fp);
+
+  sprintf(fname, "%s/%s", parset.file_dir, "data/sarm_photocenter_beta.txt");
+  fp = fopen(fname, "w");
+  if(fp == NULL)
+  {
+    fprintf(stderr, "# Error: Cannot open file %s.\n", fname);
+    exit(0);
+  }
+  for(i=0; i<parset.n_sarm_line_recon; i++)
+  {
+    for(j=0; j<parset.n_sa_vel_recon; j++)
+    {
+      fprintf(fp, "%e %e %e\n", vel_sa[j]*VelUnit, TransTau[i], momentum_sarm_beta[i*parset.n_sa_vel_recon + j]);
+    }
+    fprintf(fp, "\n");
+  }
+  fclose(fp);
+
   sarm_smooth_end();
   
 #endif  
@@ -665,7 +741,7 @@ void sim_init()
   else
   {
     sa_flux_norm = 1.0;
-    parset.n_sa_vel_recon = 40;
+    parset.n_sa_vel_recon = parset.n_vel_recon;  /* note SARM also uses tran2d, so no larger than "n_vel_recon" */
     if(parset.flag_gravity == 1)
       parset.n_sa_base_recon = n_base_sa_3c273;
     else
@@ -694,6 +770,8 @@ void sim_init()
   base_sarm = malloc(parset.n_sarm_base_recon * parset.n_sarm_line_recon * 2 * sizeof(double));
   momentum_sarm_alpha = malloc(parset.n_sa_vel_recon * parset.n_sarm_line_recon * sizeof(double));
   momentum_sarm_beta = malloc(parset.n_sa_vel_recon * parset.n_sarm_line_recon * sizeof(double));
+  photocenter_sarm_alpha = malloc(parset.n_sa_vel_recon * parset.n_sarm_line_recon * sizeof(double));
+  photocenter_sarm_beta = malloc(parset.n_sa_vel_recon * parset.n_sarm_line_recon * sizeof(double));
   phase_sarm = malloc(parset.n_sa_vel_recon * parset.n_sarm_base_recon * parset.n_sarm_line_recon * sizeof(double));
   Trans_sarm_alpha = malloc(parset.n_tau * parset.n_sa_vel_recon * sizeof(double));
   Trans_sarm_beta = malloc(parset.n_tau * parset.n_sa_vel_recon * sizeof(double));
@@ -749,7 +827,7 @@ void sim_init()
       Tline_sarm[i] = Tline[i];
       for(j=0; j<parset.n_sarm_base_recon; j++)
       {
-        base_sarm[i*parset.n_sarm_base_recon*2 + j*2 + 0] = 70.0 + 10*cos(PI/parset.n_sarm_base_recon * j);
+        base_sarm[i*parset.n_sarm_base_recon*2 + j*2 + 0] =  70.0 + 10*cos(PI/parset.n_sarm_base_recon * j);
         base_sarm[i*parset.n_sarm_base_recon*2 + j*2 + 1] = -70.0 + 10*sin(PI/parset.n_sarm_base_recon * j);
       }
     }
@@ -803,6 +881,8 @@ void sim_end()
   free(phase_sarm);
   free(momentum_sarm_alpha);
   free(momentum_sarm_beta);
+  free(photocenter_sarm_alpha);
+  free(photocenter_sarm_beta);
   free(Trans_sarm_alpha);
   free(Trans_sarm_beta);
   
