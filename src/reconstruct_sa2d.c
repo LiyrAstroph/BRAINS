@@ -567,7 +567,7 @@ void reconstruct_sa2d()
   reconstruct_sa2d_end();
 
   //clear up argv
-  for(i=0; i<9; i++)
+  for(i=0; i<11; i++)
   {
     free(argv[i]);
   }
