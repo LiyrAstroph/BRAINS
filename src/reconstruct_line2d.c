@@ -799,7 +799,7 @@ double prob_initial_line2d(const void *model)
     for(j=0; j<n_vel_data; j++)
     {
       //note mask with error < 0.0
-      if(Flerrs2d_data[i] > 0.0)
+      if(Flerrs2d_data[i*n_vel_data+j] > 0.0)
       {
         dy = Fline2d_data[i*n_vel_data + j] - Fline2d_at_data[i * n_vel_data_ext + (j+n_vel_data_incr)];
         var2 = Flerrs2d_data[i*n_vel_data+j]*Flerrs2d_data[i*n_vel_data+j] + var2_se;
@@ -841,7 +841,7 @@ double prob_restart_line2d(const void *model)
     for(j=0; j<n_vel_data; j++)
     {
       //note mask with error < 0.0
-      if(Flerrs2d_data[i] > 0.0)
+      if(Flerrs2d_data[i*n_vel_data+j] > 0.0)
       {
         dy = Fline2d_data[i*n_vel_data + j] - Fline2d_at_data[i * n_vel_data_ext + (j+n_vel_data_incr)];
         var2 = Flerrs2d_data[i*n_vel_data+j]*Flerrs2d_data[i*n_vel_data+j] + var2_se;
@@ -909,7 +909,7 @@ double prob_line2d(const void *model)
       for(j=0; j<n_vel_data; j++)
       {
         //note mask with error < 0.0
-        if(Flerrs2d_data[i] > 0.0)
+        if(Flerrs2d_data[i*n_vel_data+j] > 0.0)
         {
           dy = Fline2d_data[i*n_vel_data + j] - Fline2d_at_data[i * n_vel_data_ext + (j+n_vel_data_incr)];
           var2 = Flerrs2d_data[i*n_vel_data+j]*Flerrs2d_data[i*n_vel_data+j] + var2_se;
@@ -928,7 +928,7 @@ double prob_line2d(const void *model)
       for(j=0; j<n_vel_data; j++)
       {
         //note mask with error < 0.0
-        if(Flerrs2d_data[i] > 0.0)
+        if(Flerrs2d_data[i*n_vel_data+j] > 0.0)
         {
           dy = Fline2d_data[i*n_vel_data + j] - Fline2d_at_data[i * n_vel_data_ext + (j+n_vel_data_incr)];
           var2 = Flerrs2d_data[i*n_vel_data+j]*Flerrs2d_data[i*n_vel_data+j] + var2_se;
