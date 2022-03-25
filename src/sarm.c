@@ -22,7 +22,7 @@
 void transfun_sarm_cal_cloud(const void *pm, double *transv, double *trans2d, double *trans_sarm_alpha, double *trans_sarm_beta, 
                              int n_vel, int flag_save)
 {
-  gen_cloud_sample(pm, 5, 0);
+  gen_sa_cloud_sample(pm, 5, 0);
   transfun_sarm_cal_with_sample(transv, trans2d, trans_sarm_alpha, trans_sarm_beta, n_vel);
   return;
 }
@@ -102,6 +102,90 @@ void transfun_sarm_cal_with_sample(double *transv, double *trans2d, double *tran
       trans_beta[i*n_vel+j] /= Anorm;
     }
   }
+
+  return;
+}
+
+/*
+ * calculate SARM signal at data grids 
+ *
+ */
+void calculate_sarm_with_sample(const void *pm)
+{
+  int i, j, k, m;
+  double tau, tl, tc, fcon_rm, dTransTau, ratio, flux_ratio, fcon;
+  double DA, PA, cos_PA, sin_PA, y, z;
+  double *pmodel = (double *)pm;
+
+  dTransTau = TransTau[1] - TransTau[0];
+
+  /* angular size distance */
+  DA = exp(pmodel[num_params_blr + num_params_sa_blr_model]); 
+  /* position angle */         
+  PA = pmodel[num_params_blr + num_params_sa_blr_model + 1]/180.0 * PI;  
+
+  /* North through East (E of N), 180 deg ambiguity */
+  cos_PA = cos(PA);
+  sin_PA = sin(PA);
+
+  /* loop over time of line */
+  for(j=0;j<n_epoch_sarm_data; j++)
+  {
+    for(i=0; i<n_vel_sarm_data_ext; i++)
+    {
+      Fline2d_sarm_at_data[j*n_vel_sarm_data_ext + i] = 0.0;
+      momentum_sarm_alpha[j*n_vel_sarm_data_ext + i] = 0.0;
+      momentum_sarm_beta[j*n_vel_sarm_data_ext + i] = 0.0;
+    }
+    
+    tl = Tline_sarm_data[j];
+    /* interpret to get the present continuum flux */
+    fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon_rm, tl, gsl_acc);
+
+    for(k=0; k<parset.n_tau; k++)
+    {
+      tau = TransTau[k];
+      tc = tl - tau;
+      fcon_rm = gsl_interp_eval(gsl_linear, Tcon, Fcon_rm, tc, gsl_acc);
+
+      for(i=0; i<n_vel_sarm_data_ext; i++)
+      {
+        Fline2d_sarm_at_data[j*n_vel_sarm_data_ext + i] += Trans2D_at_veldata[k*n_vel_sarm_data_ext+i] * fcon_rm;
+      
+        momentum_sarm_alpha[j*n_vel_sarm_data_ext + i] += Trans_alpha_at_veldata[k*n_vel_sarm_data_ext + i] * fcon_rm;
+        momentum_sarm_beta[j*n_vel_sarm_data_ext + i] += Trans_alpha_at_veldata[k*n_vel_sarm_data_ext + i] * fcon_rm;
+      }
+    }
+    
+    for(i=0; i<n_vel_sarm_data_ext; i++)
+    {
+      Fline2d_sarm_at_data[j*n_vel_sarm_data_ext + i] *= dTransTau;
+      momentum_sarm_alpha[j*n_vel_sarm_data_ext + i] *= dTransTau;
+      momentum_sarm_beta[j*n_vel_sarm_data_ext + i] *= dTransTau;
+
+      y = momentum_sarm_alpha[j*n_vel_sarm_data_ext + i];
+      z = momentum_sarm_beta[j*n_vel_sarm_data_ext + i];
+
+      momentum_sarm_alpha[j*n_vel_sarm_data_ext + i] = y * cos_PA + z * sin_PA;
+      momentum_sarm_beta[j*n_vel_sarm_data_ext + i] = -y * sin_PA + z * cos_PA;
+
+      momentum_sarm_alpha[j*n_vel_sarm_data_ext + i] = momentum_sarm_alpha[j*n_vel_sarm_data_ext + i] 
+                                                   / (Fline2d_sarm_at_data[j*n_vel_sarm_data_ext + i] + EPS);
+      momentum_sarm_beta[j*n_vel_sarm_data_ext + i]  = momentum_sarm_beta[j*n_vel_sarm_data_ext + i] 
+                                                   / (Fline2d_sarm_at_data[j*n_vel_sarm_data_ext + i] + EPS);
+      
+      flux_ratio = Fline2d_sarm_at_data[j*n_vel_sarm_data_ext + i]/fcon * sarm_scale_ratio;
+      ratio = flux_ratio/(1.0+flux_ratio) / DA;
+      for(m=0; m<n_base_sarm_data; m++)
+      {
+        phase_sarm_at_data[j*n_vel_sarm_data_ext*n_base_sarm_data + m*n_vel_sarm_data_ext + i] 
+              =-( base_sarm_data[j*n_base_sarm_data*2 + m*2 + 0] * momentum_sarm_alpha[j*n_vel_sarm_data_ext + i]
+                 +base_sarm_data[j*n_base_sarm_data*2 + m*2 + 1] * momentum_sarm_beta[j*n_vel_sarm_data_ext + i]) * ratio;
+      }
+    }
+  }
+  
+  sarm_smooth_run(pm, vel_sa_data_ext, Fline2d_sarm_at_data, n_vel_sarm_data_ext, n_epoch_sarm_data, phase_sarm_at_data, n_base_sarm_data);
 
   return;
 }

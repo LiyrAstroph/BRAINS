@@ -265,12 +265,13 @@ extern gsl_interp  *gsl_linear;
 
 #ifdef SpecAstro
 extern double PhaseFactor;
+extern int n_vel_sa_data_incr;
 
 extern int num_params_rm;
 extern int num_params_sa, num_params_sa_blr_model, num_params_sa_extpar, num_params_sa_blr;
-extern int n_epoch_sa_data, n_vel_sa_data, n_base_sa_data;
-extern double *vel_sa_data, *base_sa_data, *Fline_sa_data, *Flerrs_sa_data, *phase_sa_data, *pherrs_sa_data;
-extern double *wave_sa_data;
+extern int n_epoch_sa_data, n_vel_sa_data, n_base_sa_data, n_vel_sa_data_ext;
+extern double *vel_sa_data, *vel_sa_data_ext, *base_sa_data, *Fline_sa_data, *Flerrs_sa_data, *phase_sa_data, *pherrs_sa_data;
+extern double *wave_sa_data, *wave_sa_data_ext;
 
 extern double sa_flux_norm;
 
@@ -289,12 +290,17 @@ extern double *prob_sa_particles, *prob_sa_particles_perturb;
 extern double sa_phase_error_mean, sa_line_error_mean;
 
 /* sarm */
-extern int n_epoch_sarm_data, n_base_sarm_data, n_vel_sarm_data;
+extern int n_epoch_sarm_data, n_base_sarm_data, n_vel_sarm_data, n_vel_sarm_data_ext;
 extern double *base_sarm_data, *Tline_sarm_data;
 extern double *Fcon_sarm_data;
 extern double *Fline_sarm_data, *Flerrs_sarm_data;
 extern double *Fline2d_sarm_data, *Flerrs2d_sarm_data;
 extern double *phase_sarm_data, *pherrs_sarm_data;
+
+extern double *Trans_alpha_at_veldata, *Trans_beta_at_veldata;
+extern double **Trans_alpha_at_veldata_particles, **Trans_beta_at_veldata_particles;
+extern double **Trans_alpha_at_veldata_particles_perturb, **Trans_beta_at_veldata_particles_perturb;
+extern double **phase_at_data_particles, **phase_at_data_particles_perturb;
 
 extern double *Tline_sarm;
 extern double *Trans_sarm_alpha, *Trans_sarm_beta;
@@ -302,9 +308,13 @@ extern double *momentum_sarm_alpha, *momentum_sarm_beta;
 extern double *photocenter_sarm_alpha, *photocenter_sarm_beta;
 extern double *base_sarm, *phase_sarm, *Fline_sarm, *Fcon_sarm;
 
-extern double line_sarm_scale;
+extern double line_sarm_scale, sarm_scale_ratio;
 extern double phase_sarm_error_mean, line_sarm_error_mean;
 
 extern double *workspace_phase;
+
+/* SARM reconstruction */
+extern double *Fline2d_sarm_at_data;
+extern double *phase_sarm_at_data;
 #endif
 #endif

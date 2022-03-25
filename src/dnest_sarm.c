@@ -45,6 +45,18 @@ int dnest_sarm(int argc, char **argv)
   par_prior_model = malloc( num_params * sizeof(int));
 
   fptrset_sarm = dnest_malloc_fptrset();
+  /* setup functions used for dnest*/
+  fptrset_sarm->from_prior = from_prior_sarm;
+  fptrset_sarm->print_particle = print_particle_sarm;
+  fptrset_sarm->restart_action = restart_action_sa;
+  fptrset_sarm->accept_action = accept_action_sarm;
+  fptrset_sarm->kill_action = kill_action_sarm;
+  fptrset_sarm->perturb = perturb_sarm;
+  fptrset_sarm->read_particle = read_particle_sarm;
+
+  fptrset_sarm->log_likelihoods_cal_initial = log_likelihoods_cal_initial_sarm;
+  fptrset_sarm->log_likelihoods_cal_restart = log_likelihoods_cal_restart_sarm;
+  fptrset_sarm->log_likelihoods_cal = log_likelihoods_cal_sarm;
 
   set_par_range_sarm();
   set_par_fix_sa_blrmodel();
@@ -62,7 +74,7 @@ int dnest_sarm(int argc, char **argv)
     par_fix_val[idx_resp + 1] = 0.0;
   }
 
-  /* fix FA */
+  /* fix FA, no need in SARM */
   par_fix[num_params_blr + num_params_sa_blr_model+2] = 1;
   par_fix_val[num_params_blr + num_params_sa_blr_model+2] = log(1.0);
 
@@ -296,5 +308,223 @@ void print_par_names_sarm()
   fclose(fp);
 }
 
+/*!
+ * this function generates a sample from prior.
+ */
+void from_prior_sarm(void *model)
+{
+  int i;
+  double *pm = (double *)model;
 
+  for(i=0; i<num_params; i++)
+  {
+    if(par_prior_model[i] == GAUSSIAN)
+    {
+      pm[i] = dnest_randn()*par_prior_gaussian[i][1] + par_prior_gaussian[i][0];
+      dnest_wrap(&pm[i], par_range_model[i][0], par_range_model[i][1]);
+    }
+    else
+    {
+      pm[i] = par_range_model[i][0] + dnest_rand() * (par_range_model[i][1] - par_range_model[i][0]);
+    }
+  }
+
+  /* cope with fixed parameters */
+  for(i=0; i<num_params; i++)
+  {
+    if(par_fix[i] == 1)
+      pm[i] = par_fix_val[i];
+  }
+
+  which_parameter_update = -1;
+
+  return;
+}
+
+/*!
+ * this function calculates likelihood at initial step.
+ */
+double log_likelihoods_cal_initial_sarm(const void *model)
+{
+  double logL;
+  logL = prob_initial_sarm(model);
+  return logL;
+}
+
+/*!
+ * this function calculates likelihood at initial step.
+ */
+double log_likelihoods_cal_restart_sarm(const void *model)
+{
+  double logL;
+  logL = prob_initial_sarm(model);
+  return logL;
+}
+
+/*!
+ * this function calculates likelihood.
+ */
+double log_likelihoods_cal_sarm(const void *model)
+{
+  double logL;
+  logL = prob_sarm(model);
+  return logL;
+}
+
+/*!
+ * this function perturbs parameters.
+ */
+double perturb_sarm(void *model)
+{
+  double *pm = (double *)model;
+  double logH = 0.0, limit1, limit2, width, rnd;
+  int which, which_level, size_levels, count_saves; 
+
+  /* 
+   * fixed parameters need not to update 
+   * perturb important parameters more frequently
+   */
+  do
+  {
+    rnd = dnest_rand();
+    if(rnd < rnd_frac)
+      which = dnest_rand_int(num_params_blr_tot + num_params_var);
+    else
+      which = dnest_rand_int(parset.n_con_recon) + num_params_blr_tot + num_params_var;
+
+  }while(par_fix[which] == 1);
+  
+  which_parameter_update = which;
+  
+  /* level-dependent width */
+  count_saves = dnest_get_count_saves();
+  which_level_update = dnest_get_which_level_update();
+  size_levels = dnest_get_size_levels();
+  which_level = which_level_update > (size_levels-10)?(size_levels-10):which_level_update;
+
+  if( which_level > 0)
+  {
+    limit1 = limits[(which_level-1) * num_params *2 + which *2];
+    limit2 = limits[(which_level-1) * num_params *2 + which *2 + 1];
+    width = (limit2 - limit1);
+  }
+  else
+  {
+    limit1 = par_range_model[which][0];
+    limit2 = par_range_model[which][1];
+    width = (par_range_model[which][1] - par_range_model[which][0]);
+  }
+  width /= (2.35);
+
+  if(par_prior_model[which] == GAUSSIAN)
+  {
+    logH -= (-0.5*pow((pm[which] - par_prior_gaussian[which][0])/par_prior_gaussian[which][1], 2.0) );
+    pm[which] += dnest_randh() * width;
+    dnest_wrap(&pm[which], par_range_model[which][0], par_range_model[which][1]);
+    //dnest_wrap(&pm[which], limit1, limit2);
+    logH += (-0.5*pow((pm[which] - par_prior_gaussian[which][0])/par_prior_gaussian[which][1], 2.0) );
+  }
+  else
+  {
+    pm[which] += dnest_randh() * width;
+    dnest_wrap(&(pm[which]), par_range_model[which][0], par_range_model[which][1]);
+    //dnest_wrap(&pm[which], limit1, limit2);
+  }
+
+  return logH;
+}
+
+/*!
+ * this function prints out parameters.
+ */
+void print_particle_sarm(FILE *fp, const void *model)
+{
+  int i;
+  double *pm = (double *)model;
+
+  for(i=0; i<num_params; i++)
+  {
+    fprintf(fp, "%e ", pm[i] );
+  }
+  fprintf(fp, "\n");
+  return;
+}
+
+/*!
+ * This function read the particle from the file.
+ */
+void read_particle_sarm(FILE *fp, void *model)
+{
+  int j;
+  double *psample = (double *)model;
+
+  for(j=0; j < num_params; j++)
+  {
+    if(fscanf(fp, "%lf", psample+j) < 1)
+    {
+      printf("%f\n", *psample);
+      fprintf(stderr, "#Error: Cannot read file sample_sa2d.txt.\n");
+      exit(0);
+    }
+  }
+  return;
+}
+
+void accept_action_sarm()
+{
+  int param;
+  double *ptemp;
+
+  // the parameter previously updated
+  param = which_parameter_update;
+
+  /* continuum parameter is updated */
+  if( param >= num_params_blr_tot )
+  {
+    /* 
+     *note that (response) Fline is also changed as long as Fcon is changed.
+     *num_params_blr-the parameter is the systematic error of continuum.
+     *the change of this parameter also changes continuum reconstruction.
+     */
+
+    ptemp = Fcon_rm_particles[which_particle_update];
+    Fcon_rm_particles[which_particle_update] = Fcon_rm_particles_perturb[which_particle_update];
+    Fcon_rm_particles_perturb[which_particle_update] = ptemp;
+  }
+  else if((which_parameter_update < num_params_blr_tot) && force_update != 1 )
+  {
+    /* RM and SA BLR parameter is updated 
+     * Note a) that the (num_par_blr-1)-th parameter is systematic error of line.
+     * when this parameter is updated, Trans2D, Fline, phase_sa, and Fline_sa are unchanged.
+     *      b) Fline is always changed, except param = num_params_blr-1.
+     */
+    
+    ptemp = TransTau_particles[which_particle_update];
+    TransTau_particles[which_particle_update] = TransTau_particles_perturb[which_particle_update];
+    TransTau_particles_perturb[which_particle_update] = ptemp;
+
+    ptemp = Trans2D_at_veldata_particles[which_particle_update];
+    Trans2D_at_veldata_particles[which_particle_update] = Trans2D_at_veldata_particles_perturb[which_particle_update];
+    Trans2D_at_veldata_particles_perturb[which_particle_update] = ptemp;
+
+    ptemp = Trans_alpha_at_veldata_particles[which_particle_update];
+    Trans_alpha_at_veldata_particles[which_particle_update] = Trans_alpha_at_veldata_particles_perturb[which_particle_update];
+    Trans_alpha_at_veldata_particles_perturb[which_particle_update] = ptemp;
+
+    ptemp = Trans_beta_at_veldata_particles[which_particle_update];
+    Trans_beta_at_veldata_particles[which_particle_update] = Trans_beta_at_veldata_particles_perturb[which_particle_update];
+    Trans_beta_at_veldata_particles_perturb[which_particle_update] = ptemp;
+  }
+  
+  return;
+}
+
+void kill_action_sarm(int i, int i_copy)
+{
+  memcpy(Fcon_rm_particles[i], Fcon_rm_particles[i_copy], parset.n_con_recon * sizeof(double));
+  memcpy(TransTau_particles[i], TransTau_particles[i_copy], parset.n_tau*sizeof(double));
+  memcpy(Trans2D_at_veldata_particles[i], Trans2D_at_veldata_particles[i_copy], parset.n_tau * n_vel_sarm_data_ext * sizeof(double));
+  memcpy(Trans_alpha_at_veldata_particles[i], Trans_alpha_at_veldata_particles[i_copy], parset.n_tau * n_vel_sarm_data_ext * sizeof(double));
+  memcpy(Trans_beta_at_veldata_particles[i], Trans_beta_at_veldata_particles[i_copy], parset.n_tau * n_vel_sarm_data_ext * sizeof(double));
+}
 #endif

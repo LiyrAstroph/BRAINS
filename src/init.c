@@ -437,6 +437,58 @@ void init()
   /* SA */
   if(parset.flag_dim > 2)
   {
+    if(parset.flag_dim >= 6) /* SARM, take into account SA line time */
+    {
+      double time_back_sarm_set;
+      /* set cadence and time span of data */
+      Tspan_data_con = (Tcon_data[n_con_data -1] - Tcon_data[0]);
+      Tspan_data = (Tline_sarm_data[n_epoch_sarm_data -1] - Tcon_data[0]);
+      if(Tspan_data < 0.0)
+      {
+        if(thistask == roottask)
+        {
+          printf("# Incorrect epochs in continuum and line, please check the input data.\n");
+          exit(0);
+        }
+      }
+      Tcad_data = Tspan_data;
+      for(i=1; i< n_con_data; i++)
+      {
+        if(Tcad_data > Tcon_data[i] - Tcon_data[i-1])
+          Tcad_data = Tcon_data[i] - Tcon_data[i-1];
+      }
+      for(i=1; i<n_epoch_sarm_data; i++)
+      {
+        if(Tcad_data > Tline_sarm_data[i] - Tline_sarm_data[i-1])
+          Tcad_data = Tline_sarm_data[i] - Tline_sarm_data[i-1];
+      }
+
+      /* set time back for continuum reconstruction */
+      time_back_sarm_set = Tspan_data_con + (Tcon_data[0] - Tline_sarm_data[0]);
+      time_back_sarm_set = fmax(2.0*Tcad_data, time_back_sarm_set);
+
+      /* make rcloud_max and time_back consistent with each other, rcloud_max has a higher priority */
+      double DT=Tcon_data[0] - time_back_sarm_set;
+      if(parset.rcloud_max > 0.0)
+      {
+        DT = fmax(DT, Tline_sarm_data[0] - parset.rcloud_max*2.0);
+      }
+      else if(parset.time_back > 0.0) /* neglect when parset.rcloud_max is set */
+      { 
+        DT = fmax(DT, Tcon_data[0] - parset.time_back);
+      }
+      time_back_sarm_set = Tcon_data[0] - DT;
+
+      time_back_set = fmax(time_back_set, time_back_sarm_set);
+  
+      /* set the range of cloud radial distribution */
+      rcloud_min_set = 0.0;
+      rcloud_max_set = Tspan_data/2.0;
+      
+      /* rcloud_max should smaller than  (Tl0 - Tc0)/2 */
+      rcloud_max_set = fmin( rcloud_max_set,  (Tline_sarm_data[0] - Tcon_data[0] + time_back_set)/2.0 );
+    }
+    
     if(parset.rcloud_max > 0.0)
     {
       rcloud_max_set = fmin(rcloud_max_set, parset.rcloud_max);
@@ -717,6 +769,7 @@ void scale_con_line_sarm()
   ave_line /=n_epoch_sarm_data;
 
   line_sarm_scale = 1.0/ave_line;
+  sarm_scale_ratio = con_scale/line_sarm_scale;  /* this is needed to cal flux ratio */
   
   if(thistask == roottask)
     printf("sarm line scale: %e\t%e\n", line_sarm_scale, ave_line);

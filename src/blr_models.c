@@ -2203,4 +2203,9 @@ void restart_action_sa(int iflag)
 {
   restart_action_1d(iflag);
 }
+
+void restart_action_sarm(int iflag)
+{
+  restart_action_1d(iflag);
+}
 #endif

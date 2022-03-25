@@ -131,12 +131,13 @@ gsl_interp  *gsl_linear;
 #ifdef SpecAstro
 
 double PhaseFactor;
+int n_vel_sa_data_incr=2;
 
 int num_params_rm;
 int num_params_sa, num_params_sa_blr_model, num_params_sa_extpar, num_params_sa_blr;
-int n_epoch_sa_data, n_vel_sa_data, n_base_sa_data;
-double *vel_sa_data, *base_sa_data, *Fline_sa_data, *Flerrs_sa_data, *phase_sa_data, *pherrs_sa_data;
-double *wave_sa_data;
+int n_epoch_sa_data, n_vel_sa_data, n_base_sa_data, n_vel_sa_data_ext;
+double *vel_sa_data, *vel_sa_data_ext, *base_sa_data, *Fline_sa_data, *Flerrs_sa_data, *phase_sa_data, *pherrs_sa_data;
+double *wave_sa_data, *wave_sa_data_ext;
 
 double sa_flux_norm;
 
@@ -155,7 +156,7 @@ double *prob_sa_particles, *prob_sa_particles_perturb;
 double sa_phase_error_mean, sa_line_error_mean;
 
 /* sarm */
-int n_epoch_sarm_data, n_base_sarm_data, n_vel_sarm_data;
+int n_epoch_sarm_data, n_base_sarm_data, n_vel_sarm_data, n_vel_sarm_data_ext;
 double *base_sarm_data, *Tline_sarm_data;
 double *Fcon_sarm_data;
 double *Fline_sarm_data, *Flerrs_sarm_data;
@@ -168,8 +169,18 @@ double *momentum_sarm_alpha, *momentum_sarm_beta;
 double *photocenter_sarm_alpha, *photocenter_sarm_beta;
 double *base_sarm, *phase_sarm, *Fline_sarm, *Fcon_sarm;
 
-double line_sarm_scale;
+double *Trans_alpha_at_veldata, *Trans_beta_at_veldata;
+double **Trans_alpha_at_veldata_particles, **Trans_beta_at_veldata_particles;
+double **Trans_alpha_at_veldata_particles_perturb, **Trans_beta_at_veldata_particles_perturb;
+double **phase_at_data_particles, **phase_at_data_particles_perturb;
+
+double line_sarm_scale, sarm_scale_ratio;
 double phase_sarm_error_mean, line_sarm_error_mean;
 
 double *workspace_phase;
+
+/* SARM reconstruction */
+double *Fline2d_sarm_at_data;
+double *phase_sarm_at_data;
+
 #endif

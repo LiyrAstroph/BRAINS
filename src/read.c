@@ -938,19 +938,23 @@ void read_data()
     MPI_Bcast(&n_epoch_sa_data, 1, MPI_INT, roottask, MPI_COMM_WORLD);
     MPI_Bcast(&n_vel_sa_data,   1, MPI_INT, roottask, MPI_COMM_WORLD);
     MPI_Bcast(&n_base_sa_data,  1, MPI_INT, roottask, MPI_COMM_WORLD);
+
+    n_vel_sa_data_ext = n_vel_sa_data + 2 * n_vel_sa_data_incr;
   }
   if(parset.flag_dim == 6 || parset.flag_dim == -1)
   {
     MPI_Bcast(&n_epoch_sarm_data, 1, MPI_INT, roottask, MPI_COMM_WORLD);
     MPI_Bcast(&n_vel_sarm_data,   1, MPI_INT, roottask, MPI_COMM_WORLD);
     MPI_Bcast(&n_base_sarm_data,  1, MPI_INT, roottask, MPI_COMM_WORLD);
+
+    n_vel_sarm_data_ext = n_vel_sarm_data + 2 * n_vel_sa_data_incr;
   }
 #endif
 
   // now allocate memory for data
   allocate_memory_data();
 
-  // now read data
+  /*================================== read continuum data ***********************************/
   if(parset.flag_dim >= -1 && parset.flag_dim != 3)
   {
     if(thistask == roottask)
@@ -1005,7 +1009,7 @@ void read_data()
     
   }
 
-  // read line
+  /*================================== read line data ***********************************/
   if(parset.flag_dim == 1 || parset.flag_dim == 4)
   {
     if(thistask == roottask)
@@ -1072,7 +1076,7 @@ void read_data()
     line_error_mean_sq = line_error_mean * line_error_mean;
   }
 
-  // read 2d line data
+  /*================================== read 2d line data ***********************************/
   if(parset.flag_dim == 2 || parset.flag_dim == -1 || parset.flag_dim == 5)
   {
     if(thistask == roottask)
@@ -1252,7 +1256,7 @@ void read_data()
   }
 
 #ifdef SpecAstro
-/* read SA data */
+  /*================================== read SA data ***********************************/
   if( (parset.flag_dim > 2 && parset.flag_dim < 6) || parset.flag_dim == -1)
   {
     int j;
@@ -1389,7 +1393,7 @@ void read_data()
     sa_flux_norm /= n_vel_sa_data;
   }
 
-  /* read SARM data */
+  /*================================== read SARM data ***********************************/
   if(parset.flag_dim == 6 || parset.flag_dim == -1)
   {
     int j, k;
@@ -1537,6 +1541,19 @@ void read_data()
     
     // each task calculates line fluxes
     cal_emission_flux_sarm();
+
+    /* extend velocity grid */
+    double dVel = vel_sa_data[1] - vel_sa_data[0];
+    double dW = wave_sa_data[1] - wave_sa_data[0];
+    for(i=n_vel_sa_data_incr-1; i>=0; i--)
+    {
+      /* left-hand side */
+      vel_sa_data_ext[i] = vel_sa_data_ext[i+1] - dVel;  
+      wave_sa_data_ext[i] = wave_sa_data_ext[i+1] - dW;
+      /* right-hand side */
+      vel_sa_data_ext[n_vel_sarm_data_ext - 1 - i] = vel_sa_data_ext[n_vel_sarm_data_ext - 1 - i - 1] + dVel;
+      wave_sa_data_ext[n_vel_sarm_data_ext - 1 - i] = wave_sa_data_ext[n_vel_sarm_data_ext - 1 - i - 1] + dW;
+    }
     
   }
 #endif  
@@ -1596,8 +1613,10 @@ void allocate_memory_data()
   }
   if(parset.flag_dim == 6 || parset.flag_dim == -1)
   {
-    wave_sa_data = malloc(n_vel_sarm_data*sizeof(double));
-    vel_sa_data = malloc(n_vel_sarm_data*sizeof(double));
+    wave_sa_data_ext = malloc(n_vel_sarm_data_ext*sizeof(double));
+    vel_sa_data_ext = malloc(n_vel_sarm_data_ext*sizeof(double));
+    wave_sa_data = wave_sa_data_ext + n_vel_sa_data_incr;
+    vel_sa_data = vel_sa_data_ext + n_vel_sa_data_incr;
     base_sarm_data = malloc(n_epoch_sarm_data * n_base_sarm_data * 2 * sizeof(double));
     Tline_sarm_data = malloc(n_epoch_sarm_data * sizeof(double));
     Fcon_sarm_data = malloc(n_epoch_sarm_data*sizeof(double));
@@ -1662,8 +1681,8 @@ void free_memory_data()
   }
   if(parset.flag_dim == 6 || parset.flag_dim == -1)
   {
-    free(wave_sa_data);
-    free(vel_sa_data);
+    free(wave_sa_data_ext);
+    free(vel_sa_data_ext);
     free(base_sarm_data);
     free(Tline_sarm_data);
     free(Fcon_sarm_data);
