@@ -348,6 +348,103 @@ void reconstruct_sarm()
   if(parset.flag_exam_prior != 1 && parset.flag_para_name != 1)
   {
     postprocess_sarm();
+
+    if(thistask == roottask)
+    {
+      FILE *fp;
+      char fname[200];
+      int j, k, m;
+
+      force_update = 1;
+      which_parameter_update = -1; // force to update the transfer function
+      which_particle_update = 0;
+      
+      sarm_smooth_init(n_vel_sarm_data_ext, vel_sa_data_ext, parset.sa_InstRes);
+
+      Fcon_rm = Fcon_rm_particles[which_particle_update];
+      TransTau = TransTau_particles[which_particle_update];
+      Trans2D_at_veldata = Trans2D_at_veldata_particles[which_particle_update];
+      Trans_alpha_at_veldata = Trans_alpha_at_veldata_particles[which_particle_update];
+      Trans_beta_at_veldata = Trans_beta_at_veldata_particles[which_particle_update];
+      Fline2d_sarm_at_data = Fline_at_data_particles[which_particle_update];
+      phase_sarm_at_data = phase_at_data_particles[which_particle_update];
+
+      calculate_con_from_model_semiseparable(best_model_sarm + num_params_blr_tot *sizeof(double));
+      calculate_con_rm(best_model_sarm);
+      gsl_interp_init(gsl_linear, Tcon, Fcon_rm, parset.n_con_recon);
+
+      transfun_sarm_cal_cloud(best_model_sarm, vel_sa_data_ext, Trans2D_at_veldata, Trans_alpha_at_veldata,
+                            Trans_beta_at_veldata, n_vel_sarm_data_ext, 0);
+  
+      calculate_sarm_with_sample(best_model_sarm);
+
+      sprintf(fname, "%s/%s", parset.file_dir, parset.pline2d_data_out_file);
+      fp = fopen(fname, "w");
+      if(fp == NULL)
+      {
+        fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+        exit(-1);
+      }
+    
+      fprintf(fp, "# %d %d\n", n_epoch_sarm_data, n_vel_sarm_data);
+      for(i=0; i<n_epoch_sarm_data; i++)
+      {
+        fprintf(fp, "# %f\n", Tline_sarm_data[i]*(1.0+parset.redshift));
+        for(j=0; j<n_vel_sarm_data; j++)
+        {
+          fprintf(fp, "%e %e\n", wave_sa_data[j],   
+                            Fline2d_sarm_at_data[i*n_vel_sarm_data_ext + (j+n_vel_sa_data_incr)] / line_sarm_scale);
+        }
+        fprintf(fp, "\n");
+      }
+      fclose(fp);
+
+      sprintf(fname, "%s/%s", parset.file_dir, parset.tran2d_data_out_file);
+      fp = fopen(fname, "w");
+      if(fp == NULL)
+      {
+        fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+        exit(-1);
+      }
+    
+      fprintf(fp, "# %d %d\n", parset.n_tau, n_vel_sarm_data);
+      for(i=0; i<parset.n_tau; i++)
+      {
+        fprintf(fp, "# %f\n", TransTau[i]);
+        for(j=0; j<n_vel_sarm_data; j++)
+        {
+          fprintf(fp, "%e %e\n", vel_sa_data[j]*VelUnit, Trans2D_at_veldata[i*n_vel_sarm_data_ext + (j+n_vel_sa_data_incr)]);
+        }
+        fprintf(fp, "\n");
+      }
+      fclose(fp);
+
+      /* output sarm phase */
+      sprintf(fname, "%s/%s", parset.file_dir, "data/psarm_phase_data.txt");
+      fp = fopen(fname, "w");
+      if(fp == NULL)
+      {
+        fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+        exit(-1);
+      }
+      for(m=0; m<n_epoch_sarm_data; m++)
+      {
+        for(k=0; k<n_base_sarm_data; k++)
+        {
+          for(j=0; j<n_vel_sarm_data; j++)
+          {
+            fprintf(fp, "%e %e\n", wave_sa_data[j], 
+                phase_sarm_at_data[m*n_vel_sarm_data_ext*n_base_sarm_data + k*n_vel_sarm_data_ext + (j+n_vel_sa_data_incr)]
+                /(PhaseFactor * wave_sa_data[j]) );
+          }
+          fprintf(fp, "\n");
+        }
+        fprintf(fp, "\n");
+      }
+      fclose(fp);
+
+      sarm_smooth_end();
+    }
   }
 
   reconstruct_sarm_end();
