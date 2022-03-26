@@ -962,7 +962,7 @@ void create_con_from_random(double sigma_hat, double tau, double alpha, double s
   mean = 0.0;
   for(i=0; i<parset.n_con_recon; i++)
   {
-    Fcon[i] += sigma*3.0; /* shift light curve to have positive fluxes*/
+    Fcon[i] += sigma*10.0; /* shift light curve to have positive fluxes*/
     mean += Fcon[i];
   }
   mean /= parset.n_con_recon;

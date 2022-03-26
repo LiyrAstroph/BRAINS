@@ -283,7 +283,7 @@ void sim()
 /*==================================SARM============================================*/  
   for(i=0; i<parset.n_sarm_line_recon; i++)
   {
-    Fcon_sarm[i] = gsl_interp_eval(gsl_linear, Tcon, Fcon, Tline_sarm[i], gsl_acc);
+    Fcon_sarm[i] = gsl_interp_eval(gsl_linear, Tcon, Fcon_rm, Tline_sarm[i], gsl_acc);
   }
   
   sarm_smooth_init(parset.n_sa_vel_recon, vel_sa, parset.sa_InstRes);
@@ -378,13 +378,48 @@ void sim()
   {
     for(j=0; j<parset.n_sa_vel_recon; j++)
     {
-      fprintf(fp, "%e %e %e\n", vel_sa[j]*VelUnit, TransTau[i], momentum_sarm_alpha[i*parset.n_sa_vel_recon + j]);
+      fprintf(fp, "%e %e %e\n", vel_sa[j]*VelUnit, TransTau[i], photocenter_sarm_alpha[i*parset.n_sa_vel_recon + j]);
     }
     fprintf(fp, "\n");
   }
   fclose(fp);
 
   sprintf(fname, "%s/%s", parset.file_dir, "data/sarm_photocenter_beta.txt");
+  fp = fopen(fname, "w");
+  if(fp == NULL)
+  {
+    fprintf(stderr, "# Error: Cannot open file %s.\n", fname);
+    exit(0);
+  }
+  for(i=0; i<parset.n_sarm_line_recon; i++)
+  {
+    for(j=0; j<parset.n_sa_vel_recon; j++)
+    {
+      fprintf(fp, "%e %e %e\n", vel_sa[j]*VelUnit, TransTau[i], photocenter_sarm_beta[i*parset.n_sa_vel_recon + j]);
+    }
+    fprintf(fp, "\n");
+  }
+  fclose(fp);
+
+  /* output SARM photocenter function */
+  sprintf(fname, "%s/%s", parset.file_dir, "data/sarm_momentum_alpha.txt");
+  fp = fopen(fname, "w");
+  if(fp == NULL)
+  {
+    fprintf(stderr, "# Error: Cannot open file %s.\n", fname);
+    exit(0);
+  }
+  for(i=0; i<parset.n_sarm_line_recon; i++)
+  {
+    for(j=0; j<parset.n_sa_vel_recon; j++)
+    {
+      fprintf(fp, "%e %e %e\n", vel_sa[j]*VelUnit, TransTau[i], momentum_sarm_alpha[i*parset.n_sa_vel_recon + j]);
+    }
+    fprintf(fp, "\n");
+  }
+  fclose(fp);
+
+  sprintf(fname, "%s/%s", parset.file_dir, "data/sarm_momentum_beta.txt");
   fp = fopen(fname, "w");
   if(fp == NULL)
   {
