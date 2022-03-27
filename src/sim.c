@@ -87,7 +87,7 @@ void sim()
     line_scale = 1.0;
     line_error_mean = con_error_mean = 0.01;
     /* arguments: sigma_hat, tau, alapha, and syserr */
-    create_con_from_random(0.03, 45.0, 1.0, 0.0); 
+    create_con_from_random(0.03, (Tcon[parset.n_con_recon-1] - Tcon[0])/10.0, 1.0, 0.0); 
   }
   calculate_con_rm(model);
   
