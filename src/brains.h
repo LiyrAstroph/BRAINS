@@ -30,6 +30,7 @@
 #include "dnest_sa1d.h"
 #include "dnest_sa2d.h"
 #include "dnest_sarm.h"
+#include "sa_gravity.h"
 #endif
 
 /* header files for CDNest */
