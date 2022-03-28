@@ -41,6 +41,8 @@ def postprocess(ndim, temp=1.0, fcut=0.0):
     str_dim = '_sa1d'
   elif ndim == 5:
     str_dim = '_sa2d'
+  elif ndim == 6:
+    str_dim = '_sarm'
   else:
     raise Exception('incorrect dimension.')
 
