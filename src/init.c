@@ -794,7 +794,7 @@ void scale_con_line_sarm()
       } 
     } 
   }
-  line_sarm_error_mean *= line_sarm_scale;
+  sarm_line_error_mean *= line_sarm_scale;
   return;
 }
 #endif

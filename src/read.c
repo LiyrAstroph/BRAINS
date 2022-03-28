@@ -1458,16 +1458,16 @@ void read_data()
       }
       if(error_flag == 0)
       {
-        phase_sarm_error_mean = 0.0;
-        line_sarm_error_mean = 0.0;
+        sarm_phase_error_mean = 0.0;
+        sarm_line_error_mean = 0.0;
         for(j=0; j<n_epoch_sarm_data; j++)
         {
           for(i=0; i<n_vel_sarm_data; i++)
           {
-            line_sarm_error_mean += Flerrs2d_sarm_data[i+j*n_vel_sarm_data];
+            sarm_line_error_mean += Flerrs2d_sarm_data[i+j*n_vel_sarm_data];
           }
         }
-        line_sarm_error_mean /= (n_epoch_sarm_data * n_vel_sarm_data);
+        sarm_line_error_mean /= (n_epoch_sarm_data * n_vel_sarm_data);
 
         for(j=0; j<n_epoch_sarm_data; j++)
         {
@@ -1475,11 +1475,11 @@ void read_data()
           {
             for(i=0; i<n_vel_sarm_data; i++)
             {
-              phase_sarm_error_mean += pherrs_sarm_data[i + j*n_vel_sarm_data * n_base_sarm_data + k*n_vel_sarm_data];
+              sarm_phase_error_mean += pherrs_sarm_data[i + j*n_vel_sarm_data * n_base_sarm_data + k*n_vel_sarm_data];
             }
           }
         }
-        phase_sarm_error_mean /= (n_base_sarm_data * n_vel_sarm_data * n_epoch_sarm_data);
+        sarm_phase_error_mean /= (n_base_sarm_data * n_vel_sarm_data * n_epoch_sarm_data);
       }
     }
 
@@ -1500,8 +1500,8 @@ void read_data()
     MPI_Bcast(Fline2d_sarm_data, n_vel_sarm_data * n_epoch_sarm_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
     MPI_Bcast(Flerrs2d_sarm_data, n_vel_sarm_data * n_epoch_sarm_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
 
-    MPI_Bcast(&line_sarm_error_mean, 1, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
-    MPI_Bcast(&phase_sarm_error_mean, 1, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(&sarm_line_error_mean, 1, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(&sarm_phase_error_mean, 1, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
     
     /* convert wavelength to velocity */
     for(i=0; i<n_vel_sarm_data; i++)
@@ -1537,7 +1537,7 @@ void read_data()
       }
     }
     /* in term of the central wavelength */
-    phase_sarm_error_mean *= (PhaseFactor * wave_sa_data[n_vel_sarm_data/2]);
+    sarm_phase_error_mean *= (PhaseFactor * wave_sa_data[n_vel_sarm_data/2]);
     
     // each task calculates line fluxes
     cal_emission_flux_sarm();

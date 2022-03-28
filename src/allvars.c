@@ -175,7 +175,7 @@ double **Trans_alpha_at_veldata_particles_perturb, **Trans_beta_at_veldata_parti
 double **phase_at_data_particles, **phase_at_data_particles_perturb;
 
 double line_sarm_scale, sarm_scale_ratio;
-double phase_sarm_error_mean, line_sarm_error_mean;
+double sarm_phase_error_mean, sarm_line_error_mean;
 
 double *workspace_phase;
 

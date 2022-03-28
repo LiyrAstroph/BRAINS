@@ -309,7 +309,7 @@ extern double *photocenter_sarm_alpha, *photocenter_sarm_beta;
 extern double *base_sarm, *phase_sarm, *Fline_sarm, *Fcon_sarm;
 
 extern double line_sarm_scale, sarm_scale_ratio;
-extern double phase_sarm_error_mean, line_sarm_error_mean;
+extern double sarm_phase_error_mean, sarm_line_error_mean;
 
 extern double *workspace_phase;
 
