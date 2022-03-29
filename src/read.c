@@ -1977,6 +1977,20 @@ int check_parset_isset()
     strcpy(this_tag[n_this_tag++], "NCloudPerCore");
     strcpy(this_tag[n_this_tag++], "NVPerCloud");
   }
+  else if(parset.flag_dim == 6)
+  {
+    strcpy(this_tag[n_this_tag++], "ContinuumFile");
+    strcpy(this_tag[n_this_tag++], "NConRecon");
+    strcpy(this_tag[n_this_tag++], "ConConstructFileOut");
+    strcpy(this_tag[n_this_tag++], "NTau");
+
+    strcpy(this_tag[n_this_tag++], "SALineCenter");
+    strcpy(this_tag[n_this_tag++], "FlagSABLRModel");
+    strcpy(this_tag[n_this_tag++], "SAInstRes");
+    strcpy(this_tag[n_this_tag++], "SARMFile");
+    strcpy(this_tag[n_this_tag++], "NCloudPerCore");
+    strcpy(this_tag[n_this_tag++], "NVPerCloud");
+  }
 #endif
 
   for(i=0; i<n_this_tag; i++)
