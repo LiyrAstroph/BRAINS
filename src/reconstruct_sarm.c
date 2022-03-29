@@ -232,13 +232,13 @@ void postprocess_sarm()
           {
             for(j=0; j<n_vel_sarm_data; j++)
             {
-              fprintf(fsa, "%e %e\n", wave_sa_data[j], 
-                  phase_sarm_at_data[m*n_vel_sarm_data_ext*n_base_sarm_data + k*n_vel_sarm_data_ext + (j+n_vel_sa_data_incr)]
+              fprintf(fsa, "%e ", phase_sarm_at_data[m*n_vel_sarm_data_ext*n_base_sarm_data + k*n_vel_sarm_data_ext + (j+n_vel_sa_data_incr)]
                   /(PhaseFactor * wave_sa_data[j]) );
             }
+            fprintf(fsa, "\n");
           }
+          fprintf(fsa, "\n");    
         }
-        fprintf(fsa, "\n");     
       }
     }
 
