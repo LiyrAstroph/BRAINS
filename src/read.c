@@ -947,7 +947,8 @@ void read_data()
     MPI_Bcast(&n_vel_sarm_data,   1, MPI_INT, roottask, MPI_COMM_WORLD);
     MPI_Bcast(&n_base_sarm_data,  1, MPI_INT, roottask, MPI_COMM_WORLD);
 
-    n_vel_sarm_data_ext = n_vel_sarm_data + 2 * n_vel_sa_data_incr;
+    n_vel_sa_data_ext = n_vel_sarm_data + 2 * n_vel_sa_data_incr;
+    n_vel_sarm_data_ext = n_vel_sa_data_ext;
   }
 #endif
 
@@ -1601,10 +1602,16 @@ void allocate_memory_data()
   }
 
 #ifdef SpecAstro
+  if(parset.flag_dim > 2 || parset.flag_dim == -1)
+  {
+    wave_sa_data_ext = malloc(n_vel_sa_data_ext*sizeof(double));
+    vel_sa_data_ext = malloc(n_vel_sa_data_ext*sizeof(double));
+    wave_sa_data = wave_sa_data_ext + n_vel_sa_data_incr;
+    vel_sa_data = vel_sa_data_ext + n_vel_sa_data_incr;
+  }
+
   if( (parset.flag_dim > 2 && parset.flag_dim < 6) || parset.flag_dim == -1)
   {
-    wave_sa_data = malloc(n_vel_sa_data*sizeof(double));
-    vel_sa_data = malloc(n_vel_sa_data*sizeof(double));
     base_sa_data = malloc(n_base_sa_data * 2 * sizeof(double));
     Fline_sa_data = malloc(n_vel_sa_data*n_epoch_sa_data*sizeof(double));
     Flerrs_sa_data = malloc(n_vel_sa_data*n_epoch_sa_data*sizeof(double));
@@ -1613,10 +1620,6 @@ void allocate_memory_data()
   }
   if(parset.flag_dim == 6 || parset.flag_dim == -1)
   {
-    wave_sa_data_ext = malloc(n_vel_sarm_data_ext*sizeof(double));
-    vel_sa_data_ext = malloc(n_vel_sarm_data_ext*sizeof(double));
-    wave_sa_data = wave_sa_data_ext + n_vel_sa_data_incr;
-    vel_sa_data = vel_sa_data_ext + n_vel_sa_data_incr;
     base_sarm_data = malloc(n_epoch_sarm_data * n_base_sarm_data * 2 * sizeof(double));
     Tline_sarm_data = malloc(n_epoch_sarm_data * sizeof(double));
     Fcon_sarm_data = malloc(n_epoch_sarm_data*sizeof(double));
@@ -1669,10 +1672,13 @@ void free_memory_data()
   }
 
 #ifdef SpecAstro
+  if(parset.flag_dim > 2 || parset.flag_dim == -1)
+  {
+    free(wave_sa_data_ext);
+    free(vel_sa_data_ext);
+  }
   if( (parset.flag_dim > 2 && parset.flag_dim < 6) || parset.flag_dim == -1)
   {
-    free(wave_sa_data);
-    free(vel_sa_data);
     free(base_sa_data);
     free(Fline_sa_data);
     free(Flerrs_sa_data);
@@ -1681,8 +1687,6 @@ void free_memory_data()
   }
   if(parset.flag_dim == 6 || parset.flag_dim == -1)
   {
-    free(wave_sa_data_ext);
-    free(vel_sa_data_ext);
     free(base_sarm_data);
     free(Tline_sarm_data);
     free(Fcon_sarm_data);
