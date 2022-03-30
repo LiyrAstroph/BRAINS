@@ -345,7 +345,7 @@ void sim()
   {
     for(j=0; j<parset.n_sa_vel_recon; j++)
     {
-      fprintf(fp, "%e %e %e\n", vel_sa[j]*VelUnit, TransTau[i], photocenter_sarm_alpha[i*parset.n_sa_vel_recon + j]);
+      fprintf(fp, "%e %e\n", vel_sa[j]*VelUnit, photocenter_sarm_alpha[i*parset.n_sa_vel_recon + j]);
     }
     fprintf(fp, "\n");
   }
@@ -362,7 +362,7 @@ void sim()
   {
     for(j=0; j<parset.n_sa_vel_recon; j++)
     {
-      fprintf(fp, "%e %e %e\n", vel_sa[j]*VelUnit, TransTau[i], photocenter_sarm_beta[i*parset.n_sa_vel_recon + j]);
+      fprintf(fp, "%e %e\n", vel_sa[j]*VelUnit, photocenter_sarm_beta[i*parset.n_sa_vel_recon + j]);
     }
     fprintf(fp, "\n");
   }
@@ -380,7 +380,7 @@ void sim()
   {
     for(j=0; j<parset.n_sa_vel_recon; j++)
     {
-      fprintf(fp, "%e %e %e\n", vel_sa[j]*VelUnit, TransTau[i], momentum_sarm_alpha[i*parset.n_sa_vel_recon + j]);
+      fprintf(fp, "%e %e\n", vel_sa[j]*VelUnit, momentum_sarm_alpha[i*parset.n_sa_vel_recon + j]);
     }
     fprintf(fp, "\n");
   }
@@ -397,7 +397,7 @@ void sim()
   {
     for(j=0; j<parset.n_sa_vel_recon; j++)
     {
-      fprintf(fp, "%e %e %e\n", vel_sa[j]*VelUnit, TransTau[i], momentum_sarm_beta[i*parset.n_sa_vel_recon + j]);
+      fprintf(fp, "%e %e\n", vel_sa[j]*VelUnit, momentum_sarm_beta[i*parset.n_sa_vel_recon + j]);
     }
     fprintf(fp, "\n");
   }
