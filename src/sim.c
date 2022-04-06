@@ -72,6 +72,7 @@ void sim()
   fclose(fp);
 
   sprintf(fname, "%s/%s", parset.file_dir, "/data/sim_con.txt");
+  printf("%-13s %s\n", "Continuum:", fname);
   fp = fopen(fname, "w");
   if(fp == NULL)
   {
@@ -110,6 +111,7 @@ void sim()
   calculate_line_from_blrmodel(model, Tline, Fline, parset.n_line_recon);
   
   sprintf(fname, "%s/%s", parset.file_dir, "/data/sim_line.txt");
+  printf("%-13s %s\n", "Line:", fname);
   fp = fopen(fname, "w");
   if(fp == NULL)
   {
@@ -153,6 +155,7 @@ void sim()
 
   
   sprintf(fname, "%s/%s", parset.file_dir, "/data/sim_line2d.txt");
+  printf("%-13s %s\n", "Line2d:", fname);
   fp = fopen(fname, "w");
   if(fp == NULL)
   {
@@ -175,6 +178,7 @@ void sim()
   fclose(fp);
   
   sprintf(fname, "%s/%s", parset.file_dir, "/data/sim_broadening.txt");
+  printf("%-13s %s\n", "Line Broaden:", fname);
   fp = fopen(fname, "w");
   if(fp == NULL)
   {
@@ -219,6 +223,7 @@ void sim()
                                    phase_sa, Fline_sa);
   
   sprintf(fname, "%s/%s", parset.file_dir, "data/sim_sa.txt");
+  printf("%-13s %s\n", "SA:", fname);
   fp = fopen(fname, "w");
   if(fp == NULL)
   {
@@ -261,6 +266,7 @@ void sim()
                                      photocenter_sarm_alpha, photocenter_sarm_beta); 
 
   sprintf(fname, "%s/%s", parset.file_dir, "data/sim_sarm.txt");
+  printf("%-13s %s\n", "SARM:", fname);
   fp = fopen(fname, "w");
   if(fp == NULL)
   {
