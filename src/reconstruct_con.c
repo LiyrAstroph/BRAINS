@@ -937,6 +937,10 @@ void reconstruct_con_end()
 
 /*!
  *  create continuum from random number generate based on damped random walk model.
+ *
+ *  note that the generated light curve is shifted to ensure positive values and 
+ *  rescaled to ensure a unity mean. this means that its sigma will no longer 
+ *  equal to the input value.
  */
 
 void create_con_from_random(double sigma_hat, double tau, double alpha, double syserr)
@@ -944,7 +948,7 @@ void create_con_from_random(double sigma_hat, double tau, double alpha, double s
   int i, info;
   double *Prandvec;
   double sigma = sigma_hat * sqrt(tau);
-  double mean;
+  double mean, max, min;
 
   Prandvec = malloc(parset.n_con_recon*sizeof(double));
 
@@ -959,10 +963,19 @@ void create_con_from_random(double sigma_hat, double tau, double alpha, double s
 
   multiply_matvec(PSmat, Prandvec, parset.n_con_recon, Fcon);
   
+  max = Fcon[0];
+  min = Fcon[0];
+  for(i=0; i<parset.n_con_recon; i++)
+  {
+    max = fmax(Fcon[i], max);
+    min = fmin(Fcon[i], min);
+  }
+  max = fmax(max, 0.0); /* ensure max is non negative */
+  
   mean = 0.0;
   for(i=0; i<parset.n_con_recon; i++)
   {
-    Fcon[i] += sigma*10.0; /* shift light curve to have positive fluxes*/
+    Fcon[i] += 1.5*(max-min); /* shift light curve to have positive fluxes*/
     mean += Fcon[i];
   }
   mean /= parset.n_con_recon;
