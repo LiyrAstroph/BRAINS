@@ -254,8 +254,8 @@ void calculate_sarm_sim_with_sample(const void *pm, double *tline, double *vel_s
     for(i=0; i<n_vel; i++)
     {
       fline[j*n_vel + i] *= dTransTau * FA;  /* scale to adjust the flux ratio */
-      momentum_alpha[j*n_vel + i] *= dTransTau;
-      momentum_beta[j*n_vel + i] *= dTransTau;
+      momentum_alpha[j*n_vel + i] *= dTransTau * FA;
+      momentum_beta[j*n_vel + i] *= dTransTau * FA;
 
       y = momentum_alpha[j*n_vel + i];
       z = momentum_beta[j*n_vel + i];
@@ -273,6 +273,10 @@ void calculate_sarm_sim_with_sample(const void *pm, double *tline, double *vel_s
         phase[j*n_vel*n_base + m*n_vel + i] =-( base[j*n_base*2 + m*2 + 0] * photocenter_alpha[j*n_vel + i]
                                                +base[j*n_base*2 + m*2 + 1] * photocenter_beta[j*n_vel + i]) * ratio;
       }
+
+      /* scale photocenters */
+      photocenter_alpha[j*n_vel + i] *= ratio;
+      photocenter_beta[j*n_vel + i]  *= ratio;
     }
   }
   

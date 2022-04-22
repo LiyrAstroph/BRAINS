@@ -37,6 +37,7 @@ void sim()
   sim_init();
   
   double *pm = (double *)model, error, fcon;
+  double sigma, taud;
   
   smooth_init(parset.n_vel_recon, TransV);
 
@@ -44,7 +45,9 @@ void sim()
   if(parset.flag_dim == -1)
   {
     /* note that here use sigma_hat = sigma/sqrt(tau) */
-    printf("sim with ln(sigma) = %f and  ln(taud) = %f.\n", var_param[1], var_param[2]);
+    sigma = var_param[1];
+    taud = var_param[2];
+    printf("Sim with ln(sigma) = %f and  ln(taud) = %f.\n", sigma, taud);
     reconstruct_con_from_varmodel(exp(var_param[1]), exp(var_param[2]), 1.0, 0.0); 
   }
   else
@@ -53,7 +56,10 @@ void sim()
     line_scale = 1.0;
     line_error_mean = con_error_mean = 0.01;
     /* arguments: sigma_hat, tau, alapha, and syserr */
-    create_con_from_random(0.03, (Tcon[parset.n_con_recon-1] - Tcon[0])/10.0, 1.0, 0.0); 
+    sigma = 0.03;
+    taud = (Tcon[parset.n_con_recon-1] - Tcon[0])/10.0;
+    printf("Sim with sigma = %f and  taud = %f.\n", sigma, taud);
+    create_con_from_random(sigma, taud, 1.0, 0.0); 
   }
   calculate_con_rm(model);
   
