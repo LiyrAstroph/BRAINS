@@ -236,7 +236,7 @@ void postprocess_sa2d()
         {
           for(j=0; j<n_vel_sa_data; j++)
           {
-            fprintf(fsa, "%e %e\n", wave_sa_data[j], phase_sa[k*n_vel_sa_data + j]/(PhaseFactor * wave_sa_data[j]) );
+            fprintf(fsa, "%e %e\n", wave_sa_data[j], phase_sa[k*n_vel_sa_data + j]/(ScaleFactor[j]) );
           }
         }
         fprintf(fsa, "\n");
@@ -459,7 +459,7 @@ void reconstruct_sa2d()
       {
         for(j=0; j<n_vel_sa_data; j++)
         {
-          fprintf(fp, "%e %e\n", wave_sa_data[j], phase_sa[k*n_vel_sa_data + j]/(PhaseFactor * wave_sa_data[j]) );
+          fprintf(fp, "%e %e\n", wave_sa_data[j], phase_sa[k*n_vel_sa_data + j]/(ScaleFactor[j]) );
         }
         fprintf(fp, "\n");
       }

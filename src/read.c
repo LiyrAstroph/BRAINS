@@ -280,6 +280,11 @@ void read_parset()
     pardict[nt++].id = INT;
 
 #ifdef SpecAstro
+    strcpy(pardict[nt].tag, "FlagSADataType");
+    pardict[nt].addr= &parset.flag_sa_datatype;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = INT;
+
     strcpy(pardict[nt].tag, "SAFile");
     pardict[nt].addr= &parset.sa_file;
     pardict[nt].isset = 0;
@@ -361,6 +366,7 @@ void read_parset()
     strcpy(parset.str_par_fix_val,"");
 
 #ifdef SpecAstro
+    parset.flag_sa_datatype = 0;  /* phase */
     parset.flag_sa_blrmodel = 1;
     parset.flag_sa_par_mutual = 0;
     parset.sa_linecenter = 1.875; 
@@ -661,6 +667,14 @@ void read_parset()
         parset.linecenter_err /= VelUnit;
       }
 #ifdef SpecAstro
+      /* check flag_sa_datatype */
+      if(parset.flag_sa_datatype < 0 || parset.flag_sa_datatype > 1)
+      {
+        fprintf(stderr, "# Error in FlagSADataType: value %d is not allowed.\n"
+          "# Please specify a value 0 or 1.\n", parset.flag_sa_datatype);
+          error_flag = 1;
+      }
+
       /* check flag_sa_blrmodel */
       if(parset.flag_sa_blrmodel > 9 || parset.flag_sa_blrmodel < -1)
       {
@@ -1372,18 +1386,34 @@ void read_data()
       free_memory_data();
       exit(0);
     }
+    
+    /* setup scale factor */
+    if(parset.flag_sa_datatype == 0)
+    {
+      for(i=0; i<n_vel_sa_data; i++)
+      {
+        ScaleFactor[i] = PhaseFactor * wave_sa_data[i];
+      }
+    }
+    else 
+    {
+      for(i=0; i<n_vel_sa_data; i++)
+      {
+        ScaleFactor[i] = PhotoFactor;
+      }
+    }
 
     /* normalize phase */
     for(j=0; j<n_base_sa_data; j++)
     {
       for(i=0; i<n_vel_sa_data; i++)
       {
-        phase_sa_data[i+j*n_vel_sa_data] *= (PhaseFactor * wave_sa_data[i]);
-        pherrs_sa_data[i+j*n_vel_sa_data] *= (PhaseFactor * wave_sa_data[i]);
+        phase_sa_data[i+j*n_vel_sa_data] *= (ScaleFactor[i]);
+        pherrs_sa_data[i+j*n_vel_sa_data] *= (ScaleFactor[i]);
       }
     }
     /* in term of the central wavelength */
-    sa_phase_error_mean *= (PhaseFactor * wave_sa_data[n_vel_sa_data/2]);
+    sa_phase_error_mean *= (ScaleFactor[n_vel_sa_data/2]);
 
     /* calculate sa flux norm */
     sa_flux_norm = 0.0;
@@ -1524,6 +1554,22 @@ void read_data()
       free_memory_data();
       exit(0);
     }
+    
+    /* setup scale factor */
+    if(parset.flag_sa_datatype == 0)
+    {
+      for(i=0; i<n_vel_sarm_data; i++)
+      {
+        ScaleFactor[i] = PhaseFactor * wave_sa_data[i];
+      }
+    }
+    else 
+    {
+      for(i=0; i<n_vel_sarm_data; i++)
+      {
+        ScaleFactor[i] = PhotoFactor;
+      }
+    }
 
     /* normalize phase */
     for(j=0; j<n_epoch_sarm_data; j++)
@@ -1532,13 +1578,13 @@ void read_data()
       {
         for(i=0; i<n_vel_sarm_data; i++)
         {
-          phase_sarm_data[i + k*n_vel_sarm_data + j*n_vel_sarm_data*n_base_sarm_data] *= (PhaseFactor * wave_sa_data[i]);
-          pherrs_sarm_data[i + k*n_vel_sarm_data + j*n_vel_sarm_data*n_base_sarm_data] *= (PhaseFactor * wave_sa_data[i]);
+          phase_sarm_data[i + k*n_vel_sarm_data + j*n_vel_sarm_data*n_base_sarm_data] *= (ScaleFactor[i]);
+          pherrs_sarm_data[i + k*n_vel_sarm_data + j*n_vel_sarm_data*n_base_sarm_data] *= (ScaleFactor[i]);
         }
       }
     }
     /* in term of the central wavelength */
-    sarm_phase_error_mean *= (PhaseFactor * wave_sa_data[n_vel_sarm_data/2]);
+    sarm_phase_error_mean *= (ScaleFactor[n_vel_sarm_data/2]);
     
     // each task calculates line fluxes
     cal_emission_flux_sarm();
@@ -1608,6 +1654,7 @@ void allocate_memory_data()
     vel_sa_data_ext = malloc(n_vel_sa_data_ext*sizeof(double));
     wave_sa_data = wave_sa_data_ext + n_vel_sa_data_incr;
     vel_sa_data = vel_sa_data_ext + n_vel_sa_data_incr;
+    ScaleFactor = malloc((n_vel_sa_data_ext - 2*n_vel_sa_data_incr) * sizeof(double));
   }
 
   if( (parset.flag_dim > 2 && parset.flag_dim < 6) || parset.flag_dim == -1)
@@ -1676,6 +1723,7 @@ void free_memory_data()
   {
     free(wave_sa_data_ext);
     free(vel_sa_data_ext);
+    free(ScaleFactor);
   }
   if( (parset.flag_dim > 2 && parset.flag_dim < 6) || parset.flag_dim == -1)
   {

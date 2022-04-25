@@ -148,7 +148,7 @@ typedef struct
 #ifdef SpecAstro
   char sa_file[BRAINS_MAX_STR_LENGTH];
   char sarm_file[BRAINS_MAX_STR_LENGTH];
-  int flag_sa_blrmodel, flag_sa_par_mutual;
+  int flag_sa_blrmodel, flag_sa_par_mutual, flag_sa_datatype;
   double sa_linecenter;
   double sa_InstRes;
   char sa_str_par_fix[BRAINS_MAX_STR_LENGTH], sa_str_par_fix_val[BRAINS_MAX_STR_LENGTH];
@@ -264,7 +264,7 @@ extern gsl_interp  *gsl_linear;
 
 
 #ifdef SpecAstro
-extern double PhaseFactor;
+extern double PhaseFactor, PhotoFactor, *ScaleFactor;
 extern int n_vel_sa_data_incr;
 
 extern int num_params_rm;

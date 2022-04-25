@@ -33,6 +33,13 @@ void begin_run()
    * extract the common unit: [2*PI * m/um * ld/Mpc] rad = [360 * ld/pc] deg 
    */
   PhaseFactor = (1.0/360.0 * CM_PER_PC/CM_PER_LD);
+
+  /* 
+   * photocenter = X[ld]/DA[Mpc]
+   * 
+   * extract the common unit: [ld/Mpc] rad = [ld/pc * 180/pi * 3600] uas
+   */
+  PhotoFactor = CM_PER_PC/CM_PER_LD * PI/180.0 / 3600;
 #endif
 
   /* dimensionless speed of light */

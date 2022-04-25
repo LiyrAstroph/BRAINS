@@ -249,7 +249,7 @@ void sim()
     for(j=0; j<parset.n_sa_vel_recon; j++)
     {
       fprintf(fp, "%e %e %e\n", wave_sa[j], 
-       phase_sa[i*parset.n_sa_vel_recon + j]/(PhaseFactor * wave_sa[j]) + gsl_ran_ugaussian(gsl_r)*sa_phase_error_mean, 
+       phase_sa[i*parset.n_sa_vel_recon + j]/(ScaleFactor[j]) + gsl_ran_ugaussian(gsl_r)*sa_phase_error_mean, 
        sa_phase_error_mean);
     }
     fprintf(fp, "\n");
@@ -301,7 +301,7 @@ void sim()
       for(j=0; j<parset.n_sa_vel_recon; j++)
       {
         fprintf(fp, "%e %e %e\n", wave_sa[j], 
-        phase_sarm[i*parset.n_sa_vel_recon*parset.n_sarm_base_recon + k*parset.n_sa_vel_recon + j]/(PhaseFactor * wave_sa[j]) 
+        phase_sarm[i*parset.n_sa_vel_recon*parset.n_sarm_base_recon + k*parset.n_sa_vel_recon + j]/(ScaleFactor[j]) 
         + gsl_ran_ugaussian(gsl_r)*sarm_phase_error_mean,
         sarm_phase_error_mean);
       }
@@ -745,7 +745,7 @@ void sim_init()
   }
 
 #ifdef SpecAstro
-  double saRblr;
+  double saRblr, norm;
 
   if(parset.flag_dim == -1)
   {
@@ -773,6 +773,7 @@ void sim_init()
     
   vel_sa = malloc(parset.n_sa_vel_recon * sizeof(double));
   wave_sa = malloc(parset.n_sa_vel_recon * sizeof(double));
+  ScaleFactor = malloc(parset.n_sa_vel_recon * sizeof(double));
   Fline_sa = malloc(parset.n_sa_vel_recon * sizeof(double));
   base_sa = malloc(parset.n_sa_base_recon * 2 * sizeof(double));
   phase_sa = malloc(parset.n_sa_vel_recon * parset.n_sa_base_recon * sizeof(double));
@@ -837,7 +838,18 @@ void sim_init()
         base_sa[i*2+1] = 100.0*sin(phi);
       }
     }
-
+    
+    /* convert to direction */
+    if(parset.flag_sa_datatype == 1)
+    {
+      for(i=0; i<parset.n_sa_base_recon; i++)
+      {
+        norm = pow(base_sa[i*2+0], 2) + pow(base_sa[i*2+1], 2);
+        base_sa[i*2+0] /= sqrt(norm);
+        base_sa[i*2+1] /= sqrt(norm);
+      }
+    }
+    
     /* SARM */
     for(i=0; i<parset.n_sarm_line_recon; i++)
     {
@@ -846,7 +858,33 @@ void sim_init()
       {
         base_sarm[i*parset.n_sarm_base_recon*2 + j*2 + 0] =  70.0 + 10*cos(PI/parset.n_sarm_base_recon * j);
         base_sarm[i*parset.n_sarm_base_recon*2 + j*2 + 1] = -70.0 + 10*sin(PI/parset.n_sarm_base_recon * j);
+        
+        /* convert to direction */
+        if(parset.flag_sa_datatype == 1)
+        {
+          norm = pow(base_sarm[i*parset.n_sarm_base_recon*2 + j*2 + 0], 2)
+                +pow(base_sarm[i*parset.n_sarm_base_recon*2 + j*2 + 1], 2);
+          
+          base_sarm[i*parset.n_sarm_base_recon*2 + j*2 + 0] /= sqrt(norm);
+          base_sarm[i*parset.n_sarm_base_recon*2 + j*2 + 1] /= sqrt(norm);
+        }
       }
+    }
+  }
+
+  /* setup scale factor */
+  if(parset.flag_sa_datatype == 0)
+  {
+    for(i=0; i<parset.n_sa_vel_recon; i++)
+    {
+      ScaleFactor[i] = PhaseFactor * wave_sa[i];
+    }
+  }
+  else 
+  {
+    for(i=0; i<parset.n_sa_vel_recon; i++)
+    {
+      ScaleFactor[i] = PhotoFactor;
     }
   }
 #endif
@@ -884,6 +922,7 @@ void sim_end()
   
   free(vel_sa);
   free(wave_sa);
+  free(ScaleFactor);
   free(Fline_sa);
   free(base_sa);
   free(phase_sa);
