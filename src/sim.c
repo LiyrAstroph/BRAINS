@@ -751,6 +751,9 @@ void sim_init()
   {
     parset.n_sa_vel_recon = n_vel_sa_data;
     parset.n_sa_base_recon = n_base_sa_data;
+
+    parset.n_sarm_base_recon = n_base_sarm_data;
+    parset.n_sarm_line_recon = n_epoch_sarm_data;
   }
   else
   {
@@ -769,11 +772,12 @@ void sim_init()
 
     parset.n_sarm_base_recon = 2;
     parset.n_sarm_line_recon = parset.n_line_recon;
+
+    ScaleFactor = malloc(parset.n_sa_vel_recon * sizeof(double));
   }
     
   vel_sa = malloc(parset.n_sa_vel_recon * sizeof(double));
   wave_sa = malloc(parset.n_sa_vel_recon * sizeof(double));
-  ScaleFactor = malloc(parset.n_sa_vel_recon * sizeof(double));
   Fline_sa = malloc(parset.n_sa_vel_recon * sizeof(double));
   base_sa = malloc(parset.n_sa_base_recon * 2 * sizeof(double));
   phase_sa = malloc(parset.n_sa_vel_recon * parset.n_sa_base_recon * sizeof(double));
@@ -809,10 +813,14 @@ void sim_init()
 
   if(parset.flag_dim == -1)
   {
+    /* SA */
     memcpy(vel_sa, vel_sa_data, parset.n_sa_vel_recon * sizeof(double));
     memcpy(wave_sa, wave_sa_data, parset.n_sa_vel_recon * sizeof(double));
 
     memcpy(base_sa, base_sa_data, parset.n_sa_base_recon * 2 * sizeof(double));
+    
+    /* SARM */
+    memcpy(base_sarm, base_sarm_data, n_epoch_sarm_data*n_base_sarm_data*2 * sizeof(double));
   }
   else
   {
@@ -870,21 +878,21 @@ void sim_init()
         }
       }
     }
-  }
 
-  /* setup scale factor */
-  if(parset.flag_sa_datatype == 0)
-  {
-    for(i=0; i<parset.n_sa_vel_recon; i++)
+    /* setup scale factor */
+    if(parset.flag_sa_datatype == 0)
     {
-      ScaleFactor[i] = PhaseFactor * wave_sa[i];
+      for(i=0; i<parset.n_sa_vel_recon; i++)
+      {
+        ScaleFactor[i] = PhaseFactor * wave_sa[i];
+      }
     }
-  }
-  else 
-  {
-    for(i=0; i<parset.n_sa_vel_recon; i++)
+    else 
     {
-      ScaleFactor[i] = PhotoFactor;
+      for(i=0; i<parset.n_sa_vel_recon; i++)
+      {
+        ScaleFactor[i] = PhotoFactor;
+      }
     }
   }
 #endif
@@ -919,10 +927,12 @@ void sim_end()
   }
 
 #ifdef SpecAstro
-  
+
+  if(parset.flag_dim == -2)
+    free(ScaleFactor);
+
   free(vel_sa);
   free(wave_sa);
-  free(ScaleFactor);
   free(Fline_sa);
   free(base_sa);
   free(phase_sa);
