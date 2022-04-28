@@ -12,7 +12,7 @@ Redshift                    0.0                                    % redshift of
 
 FileDir                     /home/liyropt/Projects/GIT/BRAINS      % directory for where all the output files are stored
 
-FlagDim                     6                           % -2, generate fully random lc; -1, mock lc based on input data; 
+FlagDim                     -2                           % -2, generate fully random lc; -1, mock lc based on input data; 
                                                         % 0, only continuum modeling; 1, 1d line RM; 2, 2d line RM
                                                         % if -DSA, 3: only SA; 4: SA+1d line RM; 5: SA+2d line RM 
 
@@ -20,7 +20,7 @@ FlagDim                     6                           % -2, generate fully ran
 % reverberation mapping data file
 %
 
-ContinuumFile               data/sim_con.txt            % file for continuum data
+ContinuumFile               data/sim_con.txt           % file for continuum data
 LineFile                    data/sim_line.txt           % file for line data
 Line2DFile                  data/sim_line2d.txt         % file for line 2d data
 
@@ -28,8 +28,9 @@ Line2DFile                  data/sim_line2d.txt         % file for line 2d data
 % spectro-astrometry (SA) configuration, only when "-DSA" is switched on in Makefile
 %
 
+FlagSADataType              1                         % 0: phase; 1: photocenter
 SALineCenter                1.875                     % rest frame, the unit must be the same as that of the wavelength in SA data           
-FlagSABLRModel              6                         % same as FlagBLRModel 
+FlagSABLRModel              9                         % same as FlagBLRModel 
 FlagSAParMutual             1                         % flag for mutual parameters with BLR model
                                                       % 0: all 
                                                       % 1: only BH mass and inclination
@@ -42,7 +43,7 @@ SARMFile                    data/sim_sarm.txt
 % reverberation mapping (RM) generic configuration
 %
 
-FlagBLRModel                6                           % 1, 2, 3, 4, 5, 6, 7, 8; BLR model type
+FlagBLRModel                9                           % 1, 2, 3, 4, 5, 6, 7, 8; BLR model type
                                                         % 5 is double power-law model; 6 is Pancoast's model; 7 is two-zone model
                                                         % 0 is user defined
                                                         % -1 is user defined, analytical transfer function
@@ -70,7 +71,7 @@ FlagLineSysErr              0                           % 0, not include systema
 
 FlagNonlinear               1                           % 0, linear response; 1, non-linear response
 
-FlagThetaSample             0                           % 0, sample over cos theta; 1, over theta
+FlagThetaSample             1                           % 0, sample over cos theta; 1, over theta
 %========================================================================
 % continuum configuration
 %
