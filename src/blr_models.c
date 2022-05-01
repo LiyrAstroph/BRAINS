@@ -25,7 +25,7 @@
 /* cluster around outer disk face, Lopn_cos1 < Lopn_cos2 */
 inline double theta_sample_outer(double gam, double Lopn_cos1, double Lopn_cos2)
 {
-  return acos(Lopn_cos1 + (Lopn_cos2-Lopn_cos1) * pow(gsl_rng_uniform(gsl_r), gam));
+  return acos(Lopn_cos1 + (Lopn_cos2-Lopn_cos1) * pow(gsl_rng_uniform(gsl_blr), gam));
 }
 
 /* cluster around equatorial plane, Lopn_cos1 < Lopn_cos2 */
@@ -33,7 +33,7 @@ inline double theta_sample_inner(double gam, double Lopn_cos1, double Lopn_cos2)
 {
   /* note that cosine is a decreaing function */
   double opn1 = acos(Lopn_cos1), opn2 = acos(Lopn_cos2);
-  return opn2 + (opn1-opn2)  * (1.0 - pow(gsl_rng_uniform(gsl_r), 1.0/gam));
+  return opn2 + (opn1-opn2)  * (1.0 - pow(gsl_rng_uniform(gsl_blr), 1.0/gam));
 }
 
 /*================================================================
@@ -83,8 +83,8 @@ void gen_cloud_sample_model1(const void *pm, int flag_type, int flag_save)
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
 // generate a direction of the angular momentum     
-    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    //Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
+    Lphi = 2.0*PI * gsl_rng_uniform(gsl_blr);
+    //Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_blr));
     Lthe = theta_sample(1.0, Lopn_cos, 1.0);
 
     nc = 0;
@@ -96,12 +96,12 @@ void gen_cloud_sample_model1(const void *pm, int flag_type, int flag_save)
         printf("# Error, too many tries in generating ridial location of clouds.\n");
         exit(0);
       }
-      rnd = gsl_ran_gamma(gsl_r, a, 1.0);
-//    r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
+      rnd = gsl_ran_gamma(gsl_blr, a, 1.0);
+//    r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_blr, 1.0/beta/beta, beta*beta*mu);
         r = rin + sig * rnd;
       nc++;
     }
-    phi = 2.0*PI * gsl_rng_uniform(gsl_r);
+    phi = 2.0*PI * gsl_rng_uniform(gsl_blr);
 
     x = r * cos(phi); 
     y = r * sin(phi);
@@ -192,20 +192,20 @@ void gen_cloud_sample_model1(const void *pm, int flag_type, int flag_save)
       
     for(j=0; j<parset.n_vel_per_cloud; j++)
     {
-      chi = lambda * gsl_ran_ugaussian(gsl_r);
+      chi = lambda * gsl_ran_ugaussian(gsl_blr);
       E = Emin / (1.0 + exp(-chi));
 
       Lmax = sqrt(2.0 * r*r * (E + mbh/r));      
 
       if(lambda>1.0e-2)   /* make sure that exp is caculatable. */
-        L = Lmax * lambda * log( (exp(1.0/lambda) - 1.0) * gsl_rng_uniform(gsl_r) + 1.0 );
+        L = Lmax * lambda * log( (exp(1.0/lambda) - 1.0) * gsl_rng_uniform(gsl_blr) + 1.0 );
       else
-        L = Lmax * (1.0 + lambda * log(gsl_rng_uniform(gsl_r)) );
+        L = Lmax * (1.0 + lambda * log(gsl_rng_uniform(gsl_blr)));
  
       Vr2 = 2.0 * (E + mbh/r) - L*L/r/r;
       if(Vr2>=0.0)
       {
-        u = gsl_rng_uniform(gsl_r);
+        u = gsl_rng_uniform(gsl_blr);
         Vr = sqrt(Vr2) * (u<q?-1.0:1.0);
       }
       else
@@ -302,8 +302,8 @@ void gen_cloud_sample_model2(const void *pm, int flag_type, int flag_save)
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
     /* generate a direction of the angular momentum */    
-    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    //Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
+    Lphi = 2.0*PI * gsl_rng_uniform(gsl_blr);
+    //Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_blr));
     Lthe = theta_sample(1.0, Lopn_cos, 1.0);
 
     nc = 0;
@@ -315,12 +315,12 @@ void gen_cloud_sample_model2(const void *pm, int flag_type, int flag_save)
         printf("# Error, too many tries in generating ridial location of clouds.\n");
         exit(0);
       }
-      rnd = gsl_ran_gamma(gsl_r, a, 1.0);
-//    r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
+      rnd = gsl_ran_gamma(gsl_blr, a, 1.0);
+//    r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_blr, 1.0/beta/beta, beta*beta*mu);
       r = rin + sig * rnd;
       nc++;
     }
-    phi = 2.0*PI * gsl_rng_uniform(gsl_r);
+    phi = 2.0*PI * gsl_rng_uniform(gsl_blr);
 
     x = r * cos(phi); 
     y = r * sin(phi);
@@ -413,8 +413,8 @@ void gen_cloud_sample_model2(const void *pm, int flag_type, int flag_save)
       
     for(j=0; j<parset.n_vel_per_cloud; j++)
     {    
-      rhor = gsl_ran_ugaussian(gsl_r) * sigr + 1.0;
-      rhotheta = gsl_ran_ugaussian(gsl_r) * sigtheta + 0.5*PI;
+      rhor = gsl_ran_ugaussian(gsl_blr) * sigr + 1.0;
+      rhotheta = gsl_ran_ugaussian(gsl_blr) * sigtheta + 0.5*PI;
 
       Vr = rhor * cos(rhotheta) * Vcirc;
       Vph = rhor * fabs(sin(rhotheta)) * Vcirc; /* RM cannot distinguish the orientation of the rotation. make all clouds co-rotate */
@@ -500,8 +500,8 @@ void gen_cloud_sample_model3(const void *pm, int flag_type, int flag_save)
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
 // generate a direction of the angular momentum     
-    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    //Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
+    Lphi = 2.0*PI * gsl_rng_uniform(gsl_blr);
+    //Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_blr));
     Lthe = theta_sample(1.0, Lopn_cos, 1.0);
 
     nc = 0;
@@ -514,13 +514,13 @@ void gen_cloud_sample_model3(const void *pm, int flag_type, int flag_save)
         exit(0);
       }
       if(fabs(1.0-alpha) > 1.0e-4)
-        rnd = pow( gsl_rng_uniform(gsl_r) * ( pow(F, 1.0-alpha) - 1.0) + 1.0,  1.0/(1.0-alpha) );
+        rnd = pow( gsl_rng_uniform(gsl_blr) * ( pow(F, 1.0-alpha) - 1.0) + 1.0,  1.0/(1.0-alpha) );
       else
-        rnd = exp( gsl_rng_uniform(gsl_r) * log(F) );
+        rnd = exp( gsl_rng_uniform(gsl_blr) * log(F) );
       r = Rin * rnd + Rs;
       nc++;
     }
-    phi = 2.0*PI * gsl_rng_uniform(gsl_r);
+    phi = 2.0*PI * gsl_rng_uniform(gsl_blr);
 
     x = r * cos(phi); 
     y = r * sin(phi);
@@ -697,8 +697,8 @@ void gen_cloud_sample_model4(const void *pm, int flag_type, int flag_save)
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
     /* generate a direction of the angular momentum   */ 
-    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    //Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
+    Lphi = 2.0*PI * gsl_rng_uniform(gsl_blr);
+    //Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_blr));
     Lthe = theta_sample(1.0, Lopn_cos, 1.0);
 
     nc = 0;
@@ -711,13 +711,13 @@ void gen_cloud_sample_model4(const void *pm, int flag_type, int flag_save)
         exit(0);
       }
       if(fabs(1.0-alpha) > 1.0e-4)
-        rnd = pow( gsl_rng_uniform(gsl_r) * ( pow(F, 1.0-alpha) - 1.0) + 1.0,  1.0/(1.0-alpha) );
+        rnd = pow( gsl_rng_uniform(gsl_blr) * ( pow(F, 1.0-alpha) - 1.0) + 1.0,  1.0/(1.0-alpha) );
       else
-        rnd = exp( gsl_rng_uniform(gsl_r) * log(F) );
+        rnd = exp( gsl_rng_uniform(gsl_blr) * log(F) );
       r = Rin * rnd + Rs;
       nc++;
     }
-    phi = 2.0*PI * gsl_rng_uniform(gsl_r);
+    phi = 2.0*PI * gsl_rng_uniform(gsl_blr);
 
     x = r * cos(phi); 
     y = r * sin(phi);
@@ -914,8 +914,8 @@ void gen_cloud_sample_model5(const void *pm, int flag_type, int flag_save)
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
     /* generate a direction of the angular momentum of the orbit  */ 
-    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    //Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_r), gam));
+    Lphi = 2.0*PI * gsl_rng_uniform(gsl_blr);
+    //Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_blr), gam));
     Lthe = theta_sample(gam, Lopn_cos, 1.0);
 
     cos_Lphi = cos(Lphi);
@@ -933,8 +933,8 @@ void gen_cloud_sample_model5(const void *pm, int flag_type, int flag_save)
         exit(0);
       }
       
-      rnd_frac = gsl_rng_uniform(gsl_r);
-      rnd = gsl_rng_uniform(gsl_r);
+      rnd_frac = gsl_rng_uniform(gsl_blr);
+      rnd = gsl_rng_uniform(gsl_blr);
       if(rnd_frac < ratio)
       {
         rndr = pow( 1.0 - rnd * (1.0 - pow(Fin, alpha+1.0)), 1.0/(1.0+alpha));
@@ -946,7 +946,7 @@ void gen_cloud_sample_model5(const void *pm, int flag_type, int flag_save)
       r = rndr*mu + Rs;
       nc++;
     }
-    phi = 2.0*PI * gsl_rng_uniform(gsl_r);
+    phi = 2.0*PI * gsl_rng_uniform(gsl_blr);
     cos_phi = cos(phi);
     sin_phi = sin(phi);
 
@@ -968,7 +968,7 @@ void gen_cloud_sample_model5(const void *pm, int flag_type, int flag_save)
     zb = sin_Lthe * x;
     
     zb0 = zb;
-    rnd_xi = gsl_rng_uniform(gsl_r);
+    rnd_xi = gsl_rng_uniform(gsl_blr);
     if( (rnd_xi < 1.0 - xi) && zb0 < 0.0)
       zb = -zb;
 
@@ -1039,24 +1039,24 @@ void gen_cloud_sample_model5(const void *pm, int flag_type, int flag_save)
 
     for(j=0; j<parset.n_vel_per_cloud; j++)
     {
-      rnd = gsl_rng_uniform(gsl_r);
+      rnd = gsl_rng_uniform(gsl_blr);
 
       if(rnd < fellip)
       {
-        rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_circ  + 1.0) * Vkep;
-        theV = (gsl_ran_ugaussian(gsl_r) * sigthe_circ + 0.5) * PI;
+        rhoV = (gsl_ran_ugaussian(gsl_blr) * sigr_circ  + 1.0) * Vkep;
+        theV = (gsl_ran_ugaussian(gsl_blr) * sigthe_circ + 0.5) * PI;
       }
       else
       {
         if(fflow <= 0.5)
         {
-          rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_rad  + 1.0) * Vkep;
-          theV = (gsl_ran_ugaussian(gsl_r) * sigthe_rad + 1.0) * PI + theta_rot;
+          rhoV = (gsl_ran_ugaussian(gsl_blr) * sigr_rad  + 1.0) * Vkep;
+          theV = (gsl_ran_ugaussian(gsl_blr) * sigthe_rad + 1.0) * PI + theta_rot;
         }
         else
         {
-          rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_rad  + 1.0) * Vkep;
-          theV = (gsl_ran_ugaussian(gsl_r) * sigthe_rad ) * PI + theta_rot;
+          rhoV = (gsl_ran_ugaussian(gsl_blr) * sigr_rad  + 1.0) * Vkep;
+          theV = (gsl_ran_ugaussian(gsl_blr) * sigthe_rad ) * PI + theta_rot;
         }
       }
       
@@ -1085,7 +1085,7 @@ void gen_cloud_sample_model5(const void *pm, int flag_type, int flag_save)
       V = -vx;  //note the definition of the line-of-sight velocity. postive means a receding 
                 // velocity relative to the observer.
 
-      V += gsl_ran_ugaussian(gsl_r) * sig_turb * Vkep; // add turbulence velocity
+      V += gsl_ran_ugaussian(gsl_blr) * sig_turb * Vkep; // add turbulence velocity
 
       if(fabs(V) >= C_Unit) // make sure that the velocity is smaller than speed of light
         V = 0.9999*C_Unit * (V>0.0?1.0:-1.0);
@@ -1165,8 +1165,8 @@ void gen_cloud_sample_model6(const void *pm, int flag_type, int flag_save)
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
 // generate a direction of the angular momentum of the orbit   
-    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    //Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_r), gam));
+    Lphi = 2.0*PI * gsl_rng_uniform(gsl_blr);
+    //Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_blr), gam));
     Lthe = theta_sample(gam, Lopn_cos, 1.0);
 
     sin_Lphi = sin(Lphi);
@@ -1183,12 +1183,12 @@ void gen_cloud_sample_model6(const void *pm, int flag_type, int flag_save)
         printf("# Error, too many tries in generating ridial location of clouds.\n");
         exit(0);
       }
-      rnd = gsl_ran_gamma(gsl_r, a, 1.0);
-//    r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
+      rnd = gsl_ran_gamma(gsl_blr, a, 1.0);
+//    r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_blr, 1.0/beta/beta, beta*beta*mu);
       r = rin + sig * rnd;
       nc++;
     }
-    phi = 2.0*PI * gsl_rng_uniform(gsl_r);
+    phi = 2.0*PI * gsl_rng_uniform(gsl_blr);
     cos_phi = cos(phi);
     sin_phi = sin(phi);
 
@@ -1210,7 +1210,7 @@ void gen_cloud_sample_model6(const void *pm, int flag_type, int flag_save)
     zb = sin_Lthe * x;
 
     zb0 = zb;
-    rnd_xi = gsl_rng_uniform(gsl_r);
+    rnd_xi = gsl_rng_uniform(gsl_blr);
     if( (rnd_xi < 1.0 - xi) && zb0 < 0.0)
       zb = -zb;
 
@@ -1285,24 +1285,24 @@ void gen_cloud_sample_model6(const void *pm, int flag_type, int flag_save)
     
     for(j=0; j<parset.n_vel_per_cloud; j++)
     {
-      rnd = gsl_rng_uniform(gsl_r);
+      rnd = gsl_rng_uniform(gsl_blr);
 
       if(rnd < fellip)
       {
-        rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_circ  + 1.0) * Vkep;
-        theV =  (gsl_ran_ugaussian(gsl_r) * sigthe_circ + 0.5)*PI;
+        rhoV = (gsl_ran_ugaussian(gsl_blr) * sigr_circ  + 1.0) * Vkep;
+        theV =  (gsl_ran_ugaussian(gsl_blr) * sigthe_circ + 0.5)*PI;
       }
       else
       {
         if(fflow <= 0.5) /* inflow */
         {
-          rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_rad   + 1.0) * Vkep;
-          theV = (gsl_ran_ugaussian(gsl_r) * sigthe_rad + 1.0) * PI + theta_rot;
+          rhoV = (gsl_ran_ugaussian(gsl_blr) * sigr_rad   + 1.0) * Vkep;
+          theV = (gsl_ran_ugaussian(gsl_blr) * sigthe_rad + 1.0) * PI + theta_rot;
         }
         else     /* outflow */
         {
-          rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_rad  + 1.0) * Vkep;
-          theV = (gsl_ran_ugaussian(gsl_r) * sigthe_rad) * PI + theta_rot;
+          rhoV = (gsl_ran_ugaussian(gsl_blr) * sigr_rad  + 1.0) * Vkep;
+          theV = (gsl_ran_ugaussian(gsl_blr) * sigthe_rad) * PI + theta_rot;
         }
       }
       
@@ -1336,7 +1336,7 @@ void gen_cloud_sample_model6(const void *pm, int flag_type, int flag_save)
       V = -vx;  //note the definition of the line-of-sight velocity. postive means a receding 
                 // velocity relative to the observer.
 
-      V += gsl_ran_ugaussian(gsl_r) * sig_turb * Vkep; // add turbulence velocity
+      V += gsl_ran_ugaussian(gsl_blr) * sig_turb * Vkep; // add turbulence velocity
 
       if(fabs(V) >= C_Unit) // make sure that the velocity is smaller than speed of light
         V = 0.9999*C_Unit * (V>0.0?1.0:-1.0);
@@ -1418,8 +1418,8 @@ void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save)
   for(i=0; i<num_sh; i++)
   {
 // generate a direction of the angular momentum of the orbit   
-    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    //Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_r), gam));
+    Lphi = 2.0*PI * gsl_rng_uniform(gsl_blr);
+    //Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_blr), gam));
     Lthe = theta_sample(gam, Lopn_cos, 1.0);
 
     sin_Lphi = sin(Lphi);
@@ -1436,12 +1436,12 @@ void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save)
         printf("# Error, too many tries in generating ridial location of clouds.\n");
         exit(0);
       }
-      rnd = gsl_ran_gamma(gsl_r, a, 1.0);
-//    r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
+      rnd = gsl_ran_gamma(gsl_blr, a, 1.0);
+//    r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_blr, 1.0/beta/beta, beta*beta*mu);
       r = rin + sig * rnd;
       nc++;
     }
-    phi = 2.0*PI * gsl_rng_uniform(gsl_r);
+    phi = 2.0*PI * gsl_rng_uniform(gsl_blr);
     cos_phi = cos(phi);
     sin_phi = sin(phi);
 
@@ -1463,7 +1463,7 @@ void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save)
     zb = sin_Lthe * x;
 
     zb0 = zb;
-    rnd_xi = gsl_rng_uniform(gsl_r);
+    rnd_xi = gsl_rng_uniform(gsl_blr);
     if( (rnd_xi < 1.0 - xi) && zb0 < 0.0)
       zb = -zb;
 
@@ -1534,24 +1534,24 @@ void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save)
 
     for(j=0; j<parset.n_vel_per_cloud; j++)
     {
-      rnd = gsl_rng_uniform(gsl_r);
+      rnd = gsl_rng_uniform(gsl_blr);
 
       if(rnd < fellip)
       {
-        rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_circ  + 1.0) * Vkep;
-        theV = (gsl_ran_ugaussian(gsl_r) * sigthe_circ + 0.5) * PI;
+        rhoV = (gsl_ran_ugaussian(gsl_blr) * sigr_circ  + 1.0) * Vkep;
+        theV = (gsl_ran_ugaussian(gsl_blr) * sigthe_circ + 0.5) * PI;
       }
       else
       {
         if(fflow <= 0.5)
         {
-          rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_rad  + 1.0) * Vkep;
-          theV = (gsl_ran_ugaussian(gsl_r) * sigthe_rad + 1.0) *PI + theta_rot;
+          rhoV = (gsl_ran_ugaussian(gsl_blr) * sigr_rad  + 1.0) * Vkep;
+          theV = (gsl_ran_ugaussian(gsl_blr) * sigthe_rad + 1.0) *PI + theta_rot;
         }
         else
         {
-          rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_rad  + 1.0) * Vkep;
-          theV = (gsl_ran_ugaussian(gsl_r) * sigthe_rad) * PI + theta_rot;
+          rhoV = (gsl_ran_ugaussian(gsl_blr) * sigr_rad  + 1.0) * Vkep;
+          theV = (gsl_ran_ugaussian(gsl_blr) * sigthe_rad) * PI + theta_rot;
         }
       }
       
@@ -1580,7 +1580,7 @@ void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save)
       V = -vx;  //note the definition of the line-of-sight velocity. postive means a receding 
                 // velocity relative to the observer.
 
-      V += gsl_ran_ugaussian(gsl_r) * sig_turb * Vkep;
+      V += gsl_ran_ugaussian(gsl_blr) * sig_turb * Vkep;
 
       if(fabs(V) >= C_Unit) // make sure that the velocity is smaller than speed of light
         V = 0.9999*C_Unit * (V>0.0?1.0:-1.0);
@@ -1619,9 +1619,9 @@ void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save)
   for(i=num_sh; i<parset.n_cloud_per_task; i++)
   {
 // generate a direction of the angular momentum of the orbit   
-    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    //Lthe = acos(Lopn_cos_un2 + (Lopn_cos_un1-Lopn_cos_un2) * pow(gsl_rng_uniform(gsl_r), gam));
-    //Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_r), gam));
+    Lphi = 2.0*PI * gsl_rng_uniform(gsl_blr);
+    //Lthe = acos(Lopn_cos_un2 + (Lopn_cos_un1-Lopn_cos_un2) * pow(gsl_rng_uniform(gsl_blr), gam));
+    //Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_blr), gam));
     Lthe = theta_sample(gam, Lopn_cos_un2, Lopn_cos_un1);
 
     sin_Lphi = sin(Lphi);
@@ -1638,12 +1638,12 @@ void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save)
         printf("# Error, too many tries in generating ridial location of clouds.\n");
         exit(0);
       }
-      rnd = gsl_ran_gamma(gsl_r, a, 1.0);
-//    r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
+      rnd = gsl_ran_gamma(gsl_blr, a, 1.0);
+//    r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_blr, 1.0/beta/beta, beta*beta*mu);
       r = rin + sig * rnd;
       nc++;
     }
-    phi = 2.0*PI * gsl_rng_uniform(gsl_r);
+    phi = 2.0*PI * gsl_rng_uniform(gsl_blr);
     cos_phi = cos(phi);
     sin_phi = sin(phi);
 
@@ -1665,7 +1665,7 @@ void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save)
     zb = sin_Lthe * x;
 
     zb0 = zb;
-    rnd_xi = gsl_rng_uniform(gsl_r);
+    rnd_xi = gsl_rng_uniform(gsl_blr);
     if( (rnd_xi < 1.0 - xi) && zb0 < 0.0)
       zb = -zb;
 
@@ -1736,24 +1736,24 @@ void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save)
 
     for(j=0; j<parset.n_vel_per_cloud; j++)
     {
-      rnd = gsl_rng_uniform(gsl_r);
+      rnd = gsl_rng_uniform(gsl_blr);
 
       if(rnd < fellip)
       {
-        rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_circ  + 1.0) * Vkep;
-        theV = (gsl_ran_ugaussian(gsl_r) * sigthe_circ + 0.5) * PI;
+        rhoV = (gsl_ran_ugaussian(gsl_blr) * sigr_circ  + 1.0) * Vkep;
+        theV = (gsl_ran_ugaussian(gsl_blr) * sigthe_circ + 0.5) * PI;
       }
       else
       {
         if(fflow <= 0.5)
         {
-          rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_rad  + 1.0) * Vkep;
-          theV = (gsl_ran_ugaussian(gsl_r) * sigthe_rad + 1.0) *PI + theta_rot;
+          rhoV = (gsl_ran_ugaussian(gsl_blr) * sigr_rad  + 1.0) * Vkep;
+          theV = (gsl_ran_ugaussian(gsl_blr) * sigthe_rad + 1.0) *PI + theta_rot;
         }
         else
         {
-          rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_rad  + 1.0) * Vkep;
-          theV = (gsl_ran_ugaussian(gsl_r) * sigthe_rad) * PI + theta_rot;
+          rhoV = (gsl_ran_ugaussian(gsl_blr) * sigr_rad  + 1.0) * Vkep;
+          theV = (gsl_ran_ugaussian(gsl_blr) * sigthe_rad) * PI + theta_rot;
         }
       }
       
@@ -1782,7 +1782,7 @@ void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save)
       V = -vx;  //note the definition of the line-of-sight velocity. postive means a receding 
                 // velocity relative to the observer.
 
-      V += gsl_ran_ugaussian(gsl_r) * sig_turb * Vkep;
+      V += gsl_ran_ugaussian(gsl_blr) * sig_turb * Vkep;
 
       if(fabs(V) >= C_Unit) // make sure that the velocity is smaller than speed of light
         V = 0.9999*C_Unit * (V>0.0?1.0:-1.0);
@@ -1847,26 +1847,26 @@ void gen_cloud_sample_model8(const void *pm, int flag_type, int flag_save)
 
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
-    rnd = gsl_rng_uniform(gsl_r);
+    rnd = gsl_rng_uniform(gsl_blr);
     r0 = r_min +  rnd * (r_max - r_min);
     theta = theta_min + (theta_max - theta_min) * pow(rnd, gamma); 
     /* the maximum allowed value of l */
     lmax = -r0*sin(theta) + sqrt(r0*r0*sin(theta)*sin(theta) + (Rblr*Rblr - r0*r0));
-    l = gsl_rng_uniform(gsl_r) * lmax;
+    l = gsl_rng_uniform(gsl_blr) * lmax;
 
     r = l * sin(theta) + r0;
-    if(gsl_rng_uniform(gsl_r) < 0.5)
+    if(gsl_rng_uniform(gsl_blr) < 0.5)
       zb = l * cos(theta);
     else
       zb =-l * cos(theta);
       
-    phi = gsl_rng_uniform(gsl_r) * 2.0*PI;
+    phi = gsl_rng_uniform(gsl_blr) * 2.0*PI;
 
     xb = r * cos(phi);
     yb = r * sin(phi);
 
     zb0 = zb;
-    rnd_xi = gsl_rng_uniform(gsl_r);
+    rnd_xi = gsl_rng_uniform(gsl_blr);
     if( (rnd_xi < 1.0 - xi) && zb0 < 0.0)
       zb = -zb;
 
@@ -2011,9 +2011,9 @@ void gen_cloud_sample_model9(const void *pm, int flag_type, int flag_save)
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
 // generate a direction of the angular momentum     
-    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    //Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_r));
-    //Lthe = gsl_rng_uniform(gsl_r) * Lopn;
+    Lphi = 2.0*PI * gsl_rng_uniform(gsl_blr);
+    //Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_blr));
+    //Lthe = gsl_rng_uniform(gsl_blr) * Lopn;
     Lthe = theta_sample(1.0, Lopn_cos, 1.0);
 
     nc = 0;
@@ -2025,12 +2025,12 @@ void gen_cloud_sample_model9(const void *pm, int flag_type, int flag_save)
         printf("# Error, too many tries in generating ridial location of clouds.\n");
         exit(0);
       }
-      rnd = gsl_ran_gamma(gsl_r, a, 1.0);
-//    r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
+      rnd = gsl_ran_gamma(gsl_blr, a, 1.0);
+//    r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_blr, 1.0/beta/beta, beta*beta*mu);
         r = rin + sig * rnd;
       nc++;
     }
-    phi = 2.0*PI * gsl_rng_uniform(gsl_r);
+    phi = 2.0*PI * gsl_rng_uniform(gsl_blr);
 
     x = r * cos(phi); 
     y = r * sin(phi);

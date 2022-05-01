@@ -123,7 +123,7 @@ int icr_cloud_save = 1;
 
 /* GSL */
 const gsl_rng_type * gsl_T;
-gsl_rng * gsl_r;
+gsl_rng *gsl_r, *gsl_blr;
 
 gsl_interp_accel *gsl_acc;
 gsl_interp  *gsl_linear;

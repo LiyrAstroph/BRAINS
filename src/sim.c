@@ -263,7 +263,6 @@ void sim()
   for(i=0; i<parset.n_sarm_line_recon; i++)
   {
     Fcon_sarm[i] = gsl_interp_eval(gsl_linear, Tcon, Fcon_rm, Tline_sarm[i], gsl_acc);
-    Fcon_sarm[i] += gsl_ran_ugaussian(gsl_r) * con_error_mean;
   }
   
   sarm_smooth_init(parset.n_sa_vel_recon, vel_sa, parset.sa_InstRes);
@@ -287,7 +286,7 @@ void sim()
   /* output line */
   for(i=0; i<parset.n_sarm_line_recon; i++)
   {
-    fprintf(fp, "# %f  %e\n", Tline_sarm[i]*(1.0+parset.redshift), Fcon_sarm[i]);
+    fprintf(fp, "# %f  %e\n", Tline_sarm[i]*(1.0+parset.redshift), Fcon_sarm[i] + gsl_ran_ugaussian(gsl_r) * con_error_mean);
     for(j=0; j<parset.n_sa_vel_recon; j++)
     {
       fprintf(fp, "%e %e %e\n", wave_sa[j], Fline_sarm[i*parset.n_sa_vel_recon + j] + gsl_ran_ugaussian(gsl_r)*sarm_line_error_mean, 

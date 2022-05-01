@@ -211,25 +211,30 @@ void init()
   /* initialize GSL */
   gsl_T = gsl_rng_default;
   gsl_r = gsl_rng_alloc (gsl_T);
+  gsl_blr = gsl_rng_alloc(gsl_T);
 
 #ifndef Debug 
   if(parset.flag_rng_seed != 1)
   {
     gsl_rng_set(gsl_r, time(NULL)+thistask+1350); 
+    gsl_rng_set(gsl_blr, time(NULL)+thistask+1350+50); 
   }
   else
   {
     gsl_rng_set(gsl_r, parset.rng_seed+thistask+1350); 
+    gsl_rng_set(gsl_blr, parset.rng_seed+thistask+1350+50); 
   }
 #else
   if(parset.flag_rng_seed != 1)
   {
     gsl_rng_set(gsl_r, 6666+thistask+1350); 
+    gsl_rng_set(gsl_blr, 6666+thistask+1350+50); 
     printf("# debugging, task %d brains random seed %d.\n", thistask, 6666+thistask+1350);
   }
   else
   {
     gsl_rng_set(gsl_r, parset.rng_seed+thistask+1350); 
+    gsl_rng_set(gsl_blr, parset.rng_seed+thistask+1350+50); 
   }
 #endif
 
@@ -647,6 +652,9 @@ void free_memory()
     }
   }
 #endif  
+
+  gsl_rng_free(gsl_r);
+  gsl_rng_free(gsl_blr);
   return;
 }
 

@@ -257,7 +257,7 @@ extern int icr_cloud_save;
 
 /* GSL */
 extern const gsl_rng_type * gsl_T;
-extern gsl_rng * gsl_r;
+extern gsl_rng *gsl_r, *gsl_blr;
 
 extern gsl_interp_accel *gsl_acc;
 extern gsl_interp  *gsl_linear;
