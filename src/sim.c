@@ -55,7 +55,8 @@ void sim()
     con_scale = 1.0;
     line_scale = 1.0;
     line_error_mean = con_error_mean = 0.01;
-    /* arguments: sigma_hat, tau, alapha, and syserr */
+    /* arguments: sigma_hat, tau, alapha, and syserr 
+     * note the light curve is shifted and scaled, so that sigma_hat maybe changed. */
     sigma = 0.03;
     taud = (Tcon[parset.n_con_recon-1] - Tcon[0])/10.0;
     printf("Sim with sigma = %f and  taud = %f.\n", sigma, taud);
@@ -104,7 +105,8 @@ void sim()
     {
       if(Tcon[i] >= 0.0)
       {
-        fprintf(fp, "%e %e %e\n", Tcon[i]*(1.0+parset.redshift), Fcon[i]/con_scale, Fcerrs[i]/con_scale);
+        fprintf(fp, "%e %e %e\n", Tcon[i]*(1.0+parset.redshift), 
+                (Fcon[i]+gsl_ran_ugaussian(gsl_r)*Fcerrs[i])/con_scale, Fcerrs[i]/con_scale);
       }
     }
   }
@@ -261,6 +263,7 @@ void sim()
   for(i=0; i<parset.n_sarm_line_recon; i++)
   {
     Fcon_sarm[i] = gsl_interp_eval(gsl_linear, Tcon, Fcon_rm, Tline_sarm[i], gsl_acc);
+    Fcon_sarm[i] += gsl_ran_ugaussian(gsl_r) * con_error_mean;
   }
   
   sarm_smooth_init(parset.n_sa_vel_recon, vel_sa, parset.sa_InstRes);
@@ -824,7 +827,7 @@ void sim_init()
   }
   else
   {
-    double vel_max_set, vel_min_set;
+    double vel_max_set, vel_min_set, phi;
     vel_max_set = sqrt(pow(2.0*sqrt(mbh/saRblr), 2.0) + pow(2.0*parset.sa_InstRes, 2.0));
     vel_min_set = - vel_max_set;
     double dVel = (vel_max_set- vel_min_set)/(parset.n_sa_vel_recon -1.0);
@@ -838,7 +841,6 @@ void sim_init()
       memcpy(base_sa, base_sa_3c273, n_base_sa_3c273*2*sizeof(double));
     else
     {
-      double phi;
       for(i=0; i<parset.n_sa_base_recon; i++)
       {
         phi = -PI/2.0 + PI/parset.n_sa_base_recon * i;
