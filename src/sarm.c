@@ -153,7 +153,7 @@ void calculate_sarm_with_sample(const void *pm)
         Fline2d_sarm_at_data[j*n_vel_sarm_data_ext + i] += Trans2D_at_veldata[k*n_vel_sarm_data_ext+i] * fcon_rm;
       
         momentum_sarm_alpha[j*n_vel_sarm_data_ext + i] += Trans_alpha_at_veldata[k*n_vel_sarm_data_ext + i] * fcon_rm;
-        momentum_sarm_beta[j*n_vel_sarm_data_ext + i] += Trans_alpha_at_veldata[k*n_vel_sarm_data_ext + i] * fcon_rm;
+        momentum_sarm_beta[j*n_vel_sarm_data_ext + i] += Trans_beta_at_veldata[k*n_vel_sarm_data_ext + i] * fcon_rm;
       }
     }
     
