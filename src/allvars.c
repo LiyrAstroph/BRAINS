@@ -131,6 +131,7 @@ gsl_interp  *gsl_linear;
 #ifdef SpecAstro
 
 double PhaseFactor, PhotoFactor, *ScaleFactor;
+int sign;
 int n_vel_sa_data_incr=2;
 
 int num_params_rm;

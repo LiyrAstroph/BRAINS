@@ -265,6 +265,7 @@ extern gsl_interp  *gsl_linear;
 
 #ifdef SpecAstro
 extern double PhaseFactor, PhotoFactor, *ScaleFactor;
+extern int sign;
 extern int n_vel_sa_data_incr;
 
 extern int num_params_rm;

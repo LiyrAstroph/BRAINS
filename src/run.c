@@ -39,9 +39,8 @@ void begin_run()
    * 
    * extract the common unit: [ld/Mpc] rad = [ld/pc * 180/pi * 3600] uas
    * 
-   * note that the minus sign is because positive in photocenter eq whereas negative in phase eq
    */
-  PhotoFactor = -CM_PER_PC/CM_PER_LD * PI/180.0 / 3600;
+  PhotoFactor = CM_PER_PC/CM_PER_LD * PI/180.0 / 3600;
 #endif
 
   /* dimensionless speed of light */

@@ -1390,6 +1390,7 @@ void read_data()
     /* setup scale factor */
     if(parset.flag_sa_datatype == 0)
     {
+      sign = -1; /* phase */
       for(i=0; i<n_vel_sa_data; i++)
       {
         ScaleFactor[i] = PhaseFactor * wave_sa_data[i];
@@ -1397,6 +1398,7 @@ void read_data()
     }
     else 
     {
+      sign = 1; /* photocenter */
       for(i=0; i<n_vel_sa_data; i++)
       {
         ScaleFactor[i] = PhotoFactor;
@@ -1558,6 +1560,7 @@ void read_data()
     /* setup scale factor */
     if(parset.flag_sa_datatype == 0)
     {
+      sign = -1; /* phase */
       for(i=0; i<n_vel_sarm_data; i++)
       {
         ScaleFactor[i] = PhaseFactor * wave_sa_data[i];
@@ -1565,6 +1568,7 @@ void read_data()
     }
     else 
     {
+      sign = 1; /* photocenter */
       for(i=0; i<n_vel_sarm_data; i++)
       {
         ScaleFactor[i] = PhotoFactor;

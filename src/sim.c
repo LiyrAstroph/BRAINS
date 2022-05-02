@@ -883,6 +883,7 @@ void sim_init()
     /* setup scale factor */
     if(parset.flag_sa_datatype == 0)
     {
+      sign = -1; /* phase */
       for(i=0; i<parset.n_sa_vel_recon; i++)
       {
         ScaleFactor[i] = PhaseFactor * wave_sa[i];
@@ -890,6 +891,7 @@ void sim_init()
     }
     else 
     {
+      sign = 1; /* photocenter */
       for(i=0; i<parset.n_sa_vel_recon; i++)
       {
         ScaleFactor[i] = PhotoFactor;
