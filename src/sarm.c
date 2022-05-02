@@ -179,6 +179,7 @@ void calculate_sarm_with_sample(const void *pm)
       ratio = flux_ratio/(1.0+flux_ratio) / DA;
       for(m=0; m<n_base_sarm_data; m++)
       {
+        /* note the different sign for phase and photocenter */
         phase_sarm_at_data[j*n_vel_sarm_data_ext*n_base_sarm_data + m*n_vel_sarm_data_ext + i] 
               =sign*( base_sarm_data[j*n_base_sarm_data*2 + m*2 + 0] * momentum_sarm_alpha[j*n_vel_sarm_data_ext + i]
                      +base_sarm_data[j*n_base_sarm_data*2 + m*2 + 1] * momentum_sarm_beta[j*n_vel_sarm_data_ext + i]) * ratio;
@@ -270,6 +271,7 @@ void calculate_sarm_sim_with_sample(const void *pm, double *tline, double *vel_s
       ratio = flux_ratio/(1.0+flux_ratio) / DA;
       for(m=0; m<n_base; m++)
       {
+        /* note the different sign for phase and photocenter */
         phase[j*n_vel*n_base + m*n_vel + i] =sign*( base[j*n_base*2 + m*2 + 0] * photocenter_alpha[j*n_vel + i]
                                                    +base[j*n_base*2 + m*2 + 1] * photocenter_beta[j*n_vel + i]) * ratio;
       }

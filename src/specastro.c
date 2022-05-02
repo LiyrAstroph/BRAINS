@@ -187,7 +187,11 @@ void calculate_sa_with_sample(const void *pm)
     beta_cent[j] =  (beta_cent[j]/(phase_norm[j]+EPS)) / DA;
   }
   
-  /* phi = -2*pi * f_line * B/lambda * X/DA */
+  /* phi = -2*pi * f_line * B/lambda * X/DA for phase
+   *     =         f_line * j * X/DA for photocenter
+   *
+   * note that phase and photocenter are scaled 
+   */
   for(k=0; k<n_base_sa_data; k++)
   {
     for(j=0; j<n_vel_sa_data; j++)
@@ -295,7 +299,11 @@ void calculate_sa_sim_with_sample(const void *pm, double *vel_sa, int n_vel_sa, 
     beta_cent[j] =  (beta_cent[j]/(phase_norm[j]+EPS)) / DA;
   }
   
-  /* phi = -2*pi * f_line * B/lambda * X/DA */
+  /* phi = -2*pi * f_line * B/lambda * X/DA for phase
+   *     =         f_line * j * X/DA for photocenter
+   *
+   * note that phase and photocenter are scaled 
+   */
   for(k=0; k<n_base_sa; k++)
   {
     for(j=0; j<n_vel_sa; j++)
