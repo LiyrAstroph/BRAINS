@@ -1440,7 +1440,7 @@ void read_data()
       /* read line profiles */
       for(j=0; j<n_epoch_sarm_data; j++)
       {
-        if(fscanf(fp, "# %lf %lf\n", &Tline_sarm_data[j], &Fcon_sarm_data[i]) < 2)
+        if(fscanf(fp, "# %lf %lf\n", &Tline_sarm_data[j], &Fcon_sarm_data[j]) < 2)
         {
           fprintf(stderr, "# Error in SARM data file %s.\n"
             "# Too few columns in line %d.\n", fname, j);
