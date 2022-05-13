@@ -108,6 +108,13 @@ int dnest_sa2d(int argc, char **argv)
     par_fix_val[i] = -DBL_MAX;
   }
   
+  /* cope with instrumental resolution */
+  if(parset.flag_InstRes == 0)
+  {
+    par_fix[num_params_blr_model+num_params_nlr] = 1;
+    par_fix_val[num_params_blr_model+num_params_nlr] = 0.0;
+  }
+
   /* fix non-linear response */
   if(parset.flag_nonlinear !=1)
   {

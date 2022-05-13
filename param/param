@@ -105,15 +105,16 @@ Tran2DDataFileOut           data/tran2d_data.txt        % output filename for 2d
 % Otherwise, InstRes includes: 1) instrument broadening and 2) intrinsic width 
 % of narrow line (added in square).
 %
-FlagInstRes                 0                           % 0, uniform prior, epoch-independent
-                                                        % 1, uniform prior, but epoch-dependent parameterization
-                                                        % 2, epoch-dependent parameterization, prior stored in "InstResFile"
+FlagInstRes                 0                           % 0, fixed to InstRes
+                                                        % 1, uniform prior, epoch-independent
+                                                        % 2, uniform prior, but epoch-dependent parameterization
+                                                        % 3, epoch-dependent parameterization, prior stored in "InstResFile"
 
 InstRes                     490                         % instrument broadening (modeled by a Gaussian), in km/s, for FlagInstRes=0, or 1
                                                           
 InstResErr                  50.0                        % instrument broadening error, in km/s, for FlagInstRes=0, or 1
 
-InstResFile                 data/sim_broaden.txt       % file for storing epoch-dependent instrument broadening
+InstResFile                 data/sim_broadening.txt       % file for storing epoch-dependent instrument broadening
                                                           % two columns: broadening width and error (km/s), in the order of time as the 2d line data
 
 %========================================================================

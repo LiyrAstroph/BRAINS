@@ -59,7 +59,7 @@ void init()
 
   /* number of parameters for spectral broadening, only valid for 2d RM */
   num_params_res = 1;
-  if(parset.flag_InstRes > 0)
+  if(parset.flag_InstRes > 1)
     num_params_res = n_line_data;
 
   /* number of parameters for line center, only valid for 2d RM */

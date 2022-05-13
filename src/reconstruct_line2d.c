@@ -461,7 +461,7 @@ void reconstruct_line2d()
        * and set InstRes_err=0.0.
        */ 
       double *pm = (double *)best_model_line2d;
-      if(parset.flag_InstRes > 0) 
+      if(parset.flag_InstRes > 1) 
       {
         parset.flag_InstRes = 0; /* force to be uniform prior */
         double instres_mean = 0.0;

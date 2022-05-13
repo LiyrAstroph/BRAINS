@@ -503,10 +503,10 @@ void read_parset()
                         error_flag = 1;
       }
   
-      if((parset.flag_InstRes < 0 || parset.flag_InstRes > 2) && (parset.flag_dim == 2 || parset.flag_dim == 5|| parset.flag_dim < 0))
+      if((parset.flag_InstRes < 0 || parset.flag_InstRes > 3) && (parset.flag_dim == 2 || parset.flag_dim == 5|| parset.flag_dim < 0))
       {
         fprintf(stderr, "# Error in FlagInstRes: value %d is not allowed.\n"
-                        "# Please specify a value in [0-2].\n", parset.flag_InstRes);
+                        "# Please specify a value in [0-3].\n", parset.flag_InstRes);
                         error_flag = 1;
       }
   
@@ -614,7 +614,7 @@ void read_parset()
         parset.shift_narrowline /= VelUnit;
         parset.shift_narrowline_err /= VelUnit;
   
-        if(parset.flag_InstRes > 1) /* epoch-dependent spectral broadening */
+        if(parset.flag_InstRes > 2) /* epoch-dependent spectral broadening */
         {
           if(strlen(parset.file_instres) == 0)
           {
@@ -1212,7 +1212,7 @@ void read_data()
   }
 
   /* read instrument broadening data */
-  if(parset.flag_InstRes == 2 && (parset.flag_dim == 2 || parset.flag_dim == 5))
+  if(parset.flag_InstRes == 3 && (parset.flag_dim == 2 || parset.flag_dim == 5))
   {
     if(thistask == roottask)
     {
@@ -1261,7 +1261,7 @@ void read_data()
     MPI_Bcast(instres_err_epoch, n_line_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
   }
   /*uniform prior of line broadening*/
-  if(parset.flag_InstRes == 1 && (parset.flag_dim == 2 || parset.flag_dim == 5))
+  if(parset.flag_InstRes == 2 && (parset.flag_dim == 2 || parset.flag_dim == 5))
   {
     for(i=0; i<n_line_data; i++)
     {
@@ -1645,7 +1645,7 @@ void allocate_memory_data()
     Flerrs2d_data = malloc(n_line_data * n_vel_data * sizeof(double *));
   }
 
-  if(parset.flag_InstRes > 0 && (parset.flag_dim == 2 || parset.flag_dim == 5))
+  if(parset.flag_InstRes > 1 && (parset.flag_dim == 2 || parset.flag_dim == 5))
   {
     instres_epoch = malloc(n_line_data * sizeof(double));
     instres_err_epoch = malloc(n_line_data * sizeof(double));
@@ -1716,7 +1716,7 @@ void free_memory_data()
   }
 
 
-  if(parset.flag_InstRes > 0 && (parset.flag_dim == 2 || parset.flag_dim == 5))
+  if(parset.flag_InstRes > 1 && (parset.flag_dim == 2 || parset.flag_dim == 5))
   {
     free(instres_epoch); 
     free(instres_err_epoch);

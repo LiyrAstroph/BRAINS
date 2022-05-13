@@ -522,7 +522,7 @@ void sim_init()
 #endif
   
   /* use epoch-independent broadening */
-  if(parset.flag_InstRes > 1)
+  if(parset.flag_InstRes > 2)
   {
     num_params_res = 1;
     parset.InstRes = 220.0/VelUnit;

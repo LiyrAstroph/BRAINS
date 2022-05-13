@@ -116,6 +116,13 @@ int dnest_line2d(int argc, char **argv)
     }
   }
 
+  /* cope with instrumental resolution */
+  if(parset.flag_InstRes == 0)
+  {
+    par_fix[num_params_blr_model+num_params_nlr] = 1;
+    par_fix_val[num_params_blr_model+num_params_nlr] = 0.0;
+  }
+
   /* if flag_fixvar is true, fix continuum variation parameter sigma and tau */
   if(parset.flag_fixvar == 1)
   {
