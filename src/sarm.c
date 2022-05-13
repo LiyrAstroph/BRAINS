@@ -22,7 +22,7 @@
 void transfun_sarm_cal_cloud(const void *pm, double *transv, double *trans2d, double *trans_sarm_alpha, double *trans_sarm_beta, 
                              int n_vel, int flag_save)
 {
-  gen_sa_cloud_sample(pm, 5, 0);
+  gen_sa_cloud_sample(pm, 5, flag_save);
   transfun_sarm_cal_with_sample(transv, trans2d, trans_sarm_alpha, trans_sarm_beta, n_vel);
   return;
 }

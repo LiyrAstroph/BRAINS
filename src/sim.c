@@ -157,7 +157,7 @@ void sim()
   fclose(fp);
 
 /*==================================2d line============================================*/  
-  transfun_2d_cal(model, TransV, Trans2D, parset.n_vel_recon, 1);
+  transfun_2d_cal(model, TransV, Trans2D, parset.n_vel_recon, 0);
   calculate_line2d_from_blrmodel(model, Tline, TransV, 
           Trans2D, Fline2d, parset.n_line_recon, parset.n_vel_recon);
 
@@ -266,7 +266,7 @@ void sim()
   }
   
   sarm_smooth_init(parset.n_sa_vel_recon, vel_sa, parset.sa_InstRes);
-  transfun_sarm_cal_cloud((void *)sa_pm, vel_sa, Trans2D, Trans_sarm_alpha, Trans_sarm_beta, parset.n_sa_vel_recon, 0);
+  transfun_sarm_cal_cloud((void *)sa_pm, vel_sa, Trans2D, Trans_sarm_alpha, Trans_sarm_beta, parset.n_sa_vel_recon, 1);
   calculate_sarm_sim_with_sample(pm, Tline_sarm, vel_sa, Trans2D, Trans_sarm_alpha, Trans_sarm_beta, 
                                      parset.n_sa_vel_recon, parset.n_sarm_line_recon, base_sarm, 
                                      parset.n_sarm_base_recon, phase_sarm, Fline_sarm, 
