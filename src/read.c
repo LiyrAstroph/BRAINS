@@ -1536,6 +1536,11 @@ void read_data()
     MPI_Bcast(&sarm_line_error_mean, 1, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
     MPI_Bcast(&sarm_phase_error_mean, 1, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
     
+    /* convert time to rest frame */
+    for(i=0; i<n_epoch_sarm_data; i++)
+    {
+      Tline_sarm_data[i] /= (1.0+parset.redshift);
+    }
     /* convert wavelength to velocity */
     for(i=0; i<n_vel_sarm_data; i++)
     {
