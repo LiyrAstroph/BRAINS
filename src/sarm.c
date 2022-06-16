@@ -140,13 +140,15 @@ void calculate_sarm_with_sample(const void *pm)
     
     tl = Tline_sarm_data[j];
     /* interpret to get the present continuum flux */
-    fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon_rm, tl, gsl_acc);
+    //fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon_rm, tl, gsl_acc);
+    fcon = interp_con_rm(tl);
 
     for(k=0; k<parset.n_tau; k++)
     {
       tau = TransTau[k];
       tc = tl - tau;
-      fcon_rm = gsl_interp_eval(gsl_linear, Tcon, Fcon_rm, tc, gsl_acc);
+      //fcon_rm = gsl_interp_eval(gsl_linear, Tcon, Fcon_rm, tc, gsl_acc);
+      fcon_rm = interp_con_rm(tc);
 
       for(i=0; i<n_vel_sarm_data_ext; i++)
       {
@@ -235,13 +237,15 @@ void calculate_sarm_sim_with_sample(const void *pm, double *tline, double *vel_s
 
     tl = tline[j];
     /* interpret to get the present continuum flux */
-    fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon_rm, tl, gsl_acc);
+    //fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon_rm, tl, gsl_acc);
+    fcon = interp_con_rm(tl);
 
     for(k=0; k<parset.n_tau; k++)
     {
       tau = TransTau[k];
       tc = tl - tau;
-      fcon_rm = gsl_interp_eval(gsl_linear, Tcon, Fcon_rm, tc, gsl_acc);
+      //fcon_rm = gsl_interp_eval(gsl_linear, Tcon, Fcon_rm, tc, gsl_acc);
+      fcon_rm = interp_con_rm(tc);
 
       for(i=0; i<n_vel; i++)
       {

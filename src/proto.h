@@ -65,6 +65,7 @@ void postprocess_con();
 void set_par_range_con();
 void print_par_names_con();
 void calculate_con_rm(const void *pm);
+double interp_con_rm(double tp);
 
 void set_blr_model1d();
 void set_blr_model2d();
