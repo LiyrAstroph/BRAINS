@@ -280,8 +280,18 @@ void read_parset()
     pardict[nt++].id = INT;
 
 #ifdef SpecAstro
+    strcpy(pardict[nt].tag, "FlagSADataType");
+    pardict[nt].addr= &parset.flag_sa_datatype;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = INT;
+
     strcpy(pardict[nt].tag, "SAFile");
     pardict[nt].addr= &parset.sa_file;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = STRING;
+
+    strcpy(pardict[nt].tag, "SARMFile");
+    pardict[nt].addr= &parset.sarm_file;
     pardict[nt].isset = 0;
     pardict[nt++].id = STRING;
 
@@ -356,6 +366,7 @@ void read_parset()
     strcpy(parset.str_par_fix_val,"");
 
 #ifdef SpecAstro
+    parset.flag_sa_datatype = 0;  /* phase */
     parset.flag_sa_blrmodel = 1;
     parset.flag_sa_par_mutual = 0;
     parset.sa_linecenter = 1.875; 
@@ -440,10 +451,10 @@ void read_parset()
                         error_flag = 1;
       }
 #else 
-      if(parset.flag_dim > 5 || parset.flag_dim < -2)
+      if(parset.flag_dim > 6 || parset.flag_dim < -2)
       {
         fprintf(stderr, "# Error in FlagDim: value %d is not allowed.\n"
-                        "# Please specify a value in [-2-5].\n", parset.flag_dim);
+                        "# Please specify a value in [-2-6].\n", parset.flag_dim);
                         error_flag = 1;
       }
 #endif
@@ -492,10 +503,10 @@ void read_parset()
                         error_flag = 1;
       }
   
-      if((parset.flag_InstRes < 0 || parset.flag_InstRes > 2) && (parset.flag_dim == 2 || parset.flag_dim == 5|| parset.flag_dim < 0))
+      if((parset.flag_InstRes < 0 || parset.flag_InstRes > 3) && (parset.flag_dim == 2 || parset.flag_dim == 5|| parset.flag_dim < 0))
       {
         fprintf(stderr, "# Error in FlagInstRes: value %d is not allowed.\n"
-                        "# Please specify a value in [0-2].\n", parset.flag_InstRes);
+                        "# Please specify a value in [0-3].\n", parset.flag_InstRes);
                         error_flag = 1;
       }
   
@@ -603,7 +614,7 @@ void read_parset()
         parset.shift_narrowline /= VelUnit;
         parset.shift_narrowline_err /= VelUnit;
   
-        if(parset.flag_InstRes > 1) /* epoch-dependent spectral broadening */
+        if(parset.flag_InstRes > 2) /* epoch-dependent spectral broadening */
         {
           if(strlen(parset.file_instres) == 0)
           {
@@ -635,7 +646,7 @@ void read_parset()
       if(parset.flag_dim < 0) // create mock data
       {
         // set large values
-        parset.n_cloud_per_task = fmax(2.0e5, parset.n_cloud_per_task);
+        parset.n_cloud_per_task = fmax(5.0e5, parset.n_cloud_per_task);
         parset.n_vel_per_cloud = fmax(10.0, parset.n_vel_per_cloud);
         printf("# set NCloudPerCore and NVPerCloud: %d %d\n", parset.n_cloud_per_task, parset.n_vel_per_cloud);
   
@@ -656,6 +667,14 @@ void read_parset()
         parset.linecenter_err /= VelUnit;
       }
 #ifdef SpecAstro
+      /* check flag_sa_datatype */
+      if(parset.flag_sa_datatype < 0 || parset.flag_sa_datatype > 1)
+      {
+        fprintf(stderr, "# Error in FlagSADataType: value %d is not allowed.\n"
+          "# Please specify a value 0 or 1.\n", parset.flag_sa_datatype);
+          error_flag = 1;
+      }
+
       /* check flag_sa_blrmodel */
       if(parset.flag_sa_blrmodel > 9 || parset.flag_sa_blrmodel < -1)
       {
@@ -703,7 +722,7 @@ void read_parset()
       }
 
       /* SA + 2D RM */
-      if(parset.flag_dim > 4)
+      if(parset.flag_dim == 5)
       {
         if(parset.flag_sa_par_mutual == 0 || parset.flag_sa_par_mutual == 2)
         {
@@ -724,12 +743,22 @@ void read_parset()
           printf("# For BLRModel 8, force all parameters to be identical!\n");
         }
       }
-
-      if(parset.flag_dim > 2 )
+      
+      /* check file name */
+      if(parset.flag_dim > 2 && parset.flag_dim < 6)
       {
         if(strlen(parset.sa_file) == 0)
         {
           fprintf(stderr, "# Please specify SA data file in parameter file.\n");
+          error_flag = 4;
+        }
+      }
+      /* check file name */
+      if(parset.flag_dim == 6)
+      {
+        if(strlen(parset.sarm_file) == 0)
+        {
+          fprintf(stderr, "# Please specify SARM data file in parameter file.\n");
           error_flag = 4;
         }
       }
@@ -855,7 +884,7 @@ void read_data()
     }
 
 #ifdef SpecAstro
-    if( (parset.flag_dim > 2 || parset.flag_dim == -1) && error_flag == 0 )
+    if( ( (parset.flag_dim > 2 && parset.flag_dim < 6) || parset.flag_dim == -1) && error_flag == 0 )
     {
       sprintf(fname, "%s/%s", parset.file_dir, parset.sa_file);
       fp = fopen(fname, "r");
@@ -869,6 +898,23 @@ void read_data()
         fscanf(fp, "%s %d %d %d\n", buf, &n_epoch_sa_data, &n_vel_sa_data, &n_base_sa_data);
         fclose(fp);
         printf("sa data points: %d %d %d\n", n_epoch_sa_data, n_vel_sa_data, n_base_sa_data);
+      }
+    }
+
+    if( (parset.flag_dim == 6 || parset.flag_dim == -1) && error_flag == 0 )
+    {
+      sprintf(fname, "%s/%s", parset.file_dir, parset.sarm_file);
+      fp = fopen(fname, "r");
+      if(fp == NULL)
+      {
+        fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+        error_flag = 2;
+      }
+      else
+      {
+        fscanf(fp, "%s %d %d %d\n", buf, &n_epoch_sarm_data, &n_vel_sarm_data, &n_base_sarm_data);
+        fclose(fp);
+        printf("sarm data points: %d %d %d\n", n_epoch_sarm_data, n_vel_sarm_data, n_base_sarm_data);
       }
     }
 #endif 
@@ -901,18 +947,29 @@ void read_data()
   }
 
 #ifdef SpecAstro
-  if(parset.flag_dim > 2 || parset.flag_dim == -1)
+  if((parset.flag_dim > 2 && parset.flag_dim < 6) || parset.flag_dim == -1)
   {
     MPI_Bcast(&n_epoch_sa_data, 1, MPI_INT, roottask, MPI_COMM_WORLD);
     MPI_Bcast(&n_vel_sa_data,   1, MPI_INT, roottask, MPI_COMM_WORLD);
     MPI_Bcast(&n_base_sa_data,  1, MPI_INT, roottask, MPI_COMM_WORLD);
+
+    n_vel_sa_data_ext = n_vel_sa_data + 2 * n_vel_sa_data_incr;
+  }
+  if(parset.flag_dim == 6 || parset.flag_dim == -1)
+  {
+    MPI_Bcast(&n_epoch_sarm_data, 1, MPI_INT, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(&n_vel_sarm_data,   1, MPI_INT, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(&n_base_sarm_data,  1, MPI_INT, roottask, MPI_COMM_WORLD);
+
+    n_vel_sa_data_ext = n_vel_sarm_data + 2 * n_vel_sa_data_incr;
+    n_vel_sarm_data_ext = n_vel_sa_data_ext;
   }
 #endif
 
   // now allocate memory for data
   allocate_memory_data();
 
-  // now read data
+  /*================================== read continuum data ***********************************/
   if(parset.flag_dim >= -1 && parset.flag_dim != 3)
   {
     if(thistask == roottask)
@@ -967,7 +1024,7 @@ void read_data()
     
   }
 
-  // read line
+  /*================================== read line data ***********************************/
   if(parset.flag_dim == 1 || parset.flag_dim == 4)
   {
     if(thistask == roottask)
@@ -1034,7 +1091,7 @@ void read_data()
     line_error_mean_sq = line_error_mean * line_error_mean;
   }
 
-  // read 2d line data
+  /*================================== read 2d line data ***********************************/
   if(parset.flag_dim == 2 || parset.flag_dim == -1 || parset.flag_dim == 5)
   {
     if(thistask == roottask)
@@ -1155,7 +1212,7 @@ void read_data()
   }
 
   /* read instrument broadening data */
-  if(parset.flag_InstRes == 2 && (parset.flag_dim == 2 || parset.flag_dim == 5))
+  if(parset.flag_InstRes == 3 && (parset.flag_dim == 2 || parset.flag_dim == 5))
   {
     if(thistask == roottask)
     {
@@ -1204,7 +1261,7 @@ void read_data()
     MPI_Bcast(instres_err_epoch, n_line_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
   }
   /*uniform prior of line broadening*/
-  if(parset.flag_InstRes == 1 && (parset.flag_dim == 2 || parset.flag_dim == 5))
+  if(parset.flag_InstRes == 2 && (parset.flag_dim == 2 || parset.flag_dim == 5))
   {
     for(i=0; i<n_line_data; i++)
     {
@@ -1214,8 +1271,8 @@ void read_data()
   }
 
 #ifdef SpecAstro
-/* read SA data */
-  if(parset.flag_dim > 2 || parset.flag_dim == -1)
+  /*================================== read SA data ***********************************/
+  if( (parset.flag_dim > 2 && parset.flag_dim < 6) || parset.flag_dim == -1)
   {
     int j;
     if(thistask == roottask)
@@ -1329,18 +1386,36 @@ void read_data()
       free_memory_data();
       exit(0);
     }
+    
+    /* setup scale factor */
+    if(parset.flag_sa_datatype == 0)
+    {
+      sign = -1; /* phase */
+      for(i=0; i<n_vel_sa_data; i++)
+      {
+        ScaleFactor[i] = PhaseFactor * wave_sa_data[i];
+      }
+    }
+    else 
+    {
+      sign = 1; /* photocenter */
+      for(i=0; i<n_vel_sa_data; i++)
+      {
+        ScaleFactor[i] = PhotoFactor;
+      }
+    }
 
     /* normalize phase */
     for(j=0; j<n_base_sa_data; j++)
     {
       for(i=0; i<n_vel_sa_data; i++)
       {
-        phase_sa_data[i+j*n_vel_sa_data] *= (PhaseFactor * wave_sa_data[i]);
-        pherrs_sa_data[i+j*n_vel_sa_data] *= (PhaseFactor * wave_sa_data[i]);
+        phase_sa_data[i+j*n_vel_sa_data] *= (ScaleFactor[i]);
+        pherrs_sa_data[i+j*n_vel_sa_data] *= (ScaleFactor[i]);
       }
     }
     /* in term of the central wavelength */
-    sa_phase_error_mean *= (PhaseFactor * wave_sa_data[n_vel_sa_data/2]);
+    sa_phase_error_mean *= (ScaleFactor[n_vel_sa_data/2]);
 
     /* calculate sa flux norm */
     sa_flux_norm = 0.0;
@@ -1349,6 +1424,193 @@ void read_data()
       sa_flux_norm += Fline_sa_data[i];
     }
     sa_flux_norm /= n_vel_sa_data;
+  }
+
+  /*================================== read SARM data ***********************************/
+  if(parset.flag_dim == 6 || parset.flag_dim == -1)
+  {
+    int j, k;
+    if(thistask == roottask)
+    {
+      sprintf(fname, "%s/%s", parset.file_dir, parset.sarm_file);
+      fp = fopen(fname, "r");
+  
+      fgets(buf, 200, fp);
+
+      /* read line profiles */
+      for(j=0; j<n_epoch_sarm_data; j++)
+      {
+        if(fscanf(fp, "# %lf %lf\n", &Tline_sarm_data[j], &Fcon_sarm_data[j]) < 2)
+        {
+          fprintf(stderr, "# Error in SARM data file %s.\n"
+            "# Too few columns in line %d.\n", fname, j);
+          error_flag = 5;
+          break;
+        }
+        for(i=0; i<n_vel_sarm_data; i++)
+        {
+          if(fscanf(fp, "%lf %lf %lf\n", &wave_sa_data[i], 
+                     &Fline2d_sarm_data[i+j*n_vel_sarm_data], &Flerrs2d_sarm_data[i+j*n_vel_sarm_data]) < 3)
+          {
+            fprintf(stderr, "# Error in SARM data file %s.\n"
+            "# Too few columns.\n", fname);
+            error_flag = 5;
+            break;
+          }
+        }
+        fscanf(fp, "\n");
+      }
+
+      /* read phase data */
+      for(j=0; j<n_epoch_sarm_data; j++)
+      {
+        for(k=0; k<n_base_sarm_data; k++)
+        {
+          if(fscanf(fp, "# %lf %lf\n", &base_sarm_data[j*n_base_sarm_data*2 + k*2 + 0], &base_sarm_data[j*n_base_sarm_data*2 + k*2 + 1]) < 2)
+          {
+            fprintf(stderr, "# Error in SARM data file %s.\n"
+            "# Too few columns in line %d.\n", fname, j);
+            error_flag = 5;
+            break;
+          }
+
+          for(i=0; i<n_vel_sarm_data; i++)
+          {
+            if(fscanf(fp, "%lf %lf %lf\n", &wave_sa_data[i], 
+                      &phase_sarm_data[j*n_base_sarm_data*n_vel_sarm_data + k*n_vel_sarm_data + i], 
+                      &pherrs_sarm_data[j*n_base_sarm_data*n_vel_sarm_data + k*n_vel_sarm_data + i]) < 3)
+            {
+              fprintf(stderr, "# Error in SARM data file %s.\n"
+              "# Too few columns in line %d.\n", fname, j);
+              error_flag = 5;
+              break;
+            }
+          }
+          fscanf(fp, "\n");
+        }
+      }
+      if(error_flag == 0)
+      {
+        sarm_phase_error_mean = 0.0;
+        sarm_line_error_mean = 0.0;
+        for(j=0; j<n_epoch_sarm_data; j++)
+        {
+          for(i=0; i<n_vel_sarm_data; i++)
+          {
+            sarm_line_error_mean += Flerrs2d_sarm_data[i+j*n_vel_sarm_data];
+          }
+        }
+        sarm_line_error_mean /= (n_epoch_sarm_data * n_vel_sarm_data);
+
+        for(j=0; j<n_epoch_sarm_data; j++)
+        {
+          for(k=0; k<n_base_sarm_data; k++)
+          {
+            for(i=0; i<n_vel_sarm_data; i++)
+            {
+              sarm_phase_error_mean += pherrs_sarm_data[i + j*n_vel_sarm_data * n_base_sarm_data + k*n_vel_sarm_data];
+            }
+          }
+        }
+        sarm_phase_error_mean /= (n_base_sarm_data * n_vel_sarm_data * n_epoch_sarm_data);
+      }
+    }
+
+    MPI_Bcast(&error_flag, 1, MPI_INT, roottask, MPI_COMM_WORLD);
+    if(error_flag != 0)
+    {
+      MPI_Finalize();
+      free_memory_data();
+      exit(0);
+    }
+    
+    MPI_Bcast(wave_sa_data, n_vel_sarm_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(base_sarm_data, n_epoch_sarm_data*n_base_sarm_data*2, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(phase_sarm_data, n_epoch_sarm_data*n_vel_sarm_data*n_base_sarm_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(pherrs_sarm_data, n_epoch_sarm_data*n_vel_sarm_data*n_base_sarm_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(Tline_sarm_data, n_epoch_sarm_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(Fcon_sarm_data, n_epoch_sarm_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(Fline2d_sarm_data, n_vel_sarm_data * n_epoch_sarm_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(Flerrs2d_sarm_data, n_vel_sarm_data * n_epoch_sarm_data, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+
+    MPI_Bcast(&sarm_line_error_mean, 1, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(&sarm_phase_error_mean, 1, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+    
+    /* convert time to rest frame */
+    for(i=0; i<n_epoch_sarm_data; i++)
+    {
+      Tline_sarm_data[i] /= (1.0+parset.redshift);
+    }
+    /* convert wavelength to velocity */
+    for(i=0; i<n_vel_sarm_data; i++)
+    {
+      vel_sa_data[i] = (wave_sa_data[i]/(1.0+parset.redshift) - parset.sa_linecenter)/parset.sa_linecenter;
+      vel_sa_data[i] *= C_Unit;
+    }
+
+    /* check velocity grid: the starting and end point must have different sign */
+    if(vel_sa_data[0] * vel_sa_data[n_vel_sarm_data -1] > 0.0)
+    {
+      if(thistask == roottask)
+      {
+        fprintf(stderr, "# Error: SARM wavelength bins too red or too blue. \n"
+                        "# this usually happens on an incorrect redshift option.\n");
+      }
+      MPI_Barrier(MPI_COMM_WORLD);
+      MPI_Finalize();
+      free_memory_data();
+      exit(0);
+    }
+    
+    /* setup scale factor */
+    if(parset.flag_sa_datatype == 0)
+    {
+      sign = -1; /* phase */
+      for(i=0; i<n_vel_sarm_data; i++)
+      {
+        ScaleFactor[i] = PhaseFactor * wave_sa_data[i];
+      }
+    }
+    else 
+    {
+      sign = 1; /* photocenter */
+      for(i=0; i<n_vel_sarm_data; i++)
+      {
+        ScaleFactor[i] = PhotoFactor;
+      }
+    }
+
+    /* normalize phase */
+    for(j=0; j<n_epoch_sarm_data; j++)
+    {
+      for(k=0; k<n_base_sarm_data; k++)
+      {
+        for(i=0; i<n_vel_sarm_data; i++)
+        {
+          phase_sarm_data[i + k*n_vel_sarm_data + j*n_vel_sarm_data*n_base_sarm_data] *= (ScaleFactor[i]);
+          pherrs_sarm_data[i + k*n_vel_sarm_data + j*n_vel_sarm_data*n_base_sarm_data] *= (ScaleFactor[i]);
+        }
+      }
+    }
+    /* in term of the central wavelength */
+    sarm_phase_error_mean *= (ScaleFactor[n_vel_sarm_data/2]);
+    
+    // each task calculates line fluxes
+    cal_emission_flux_sarm();
+
+    /* extend velocity grid */
+    double dVel = vel_sa_data[1] - vel_sa_data[0];
+    double dW = wave_sa_data[1] - wave_sa_data[0];
+    for(i=n_vel_sa_data_incr-1; i>=0; i--)
+    {
+      /* left-hand side */
+      vel_sa_data_ext[i] = vel_sa_data_ext[i+1] - dVel;  
+      wave_sa_data_ext[i] = wave_sa_data_ext[i+1] - dW;
+      /* right-hand side */
+      vel_sa_data_ext[n_vel_sarm_data_ext - 1 - i] = vel_sa_data_ext[n_vel_sarm_data_ext - 1 - i - 1] + dVel;
+      wave_sa_data_ext[n_vel_sarm_data_ext - 1 - i] = wave_sa_data_ext[n_vel_sarm_data_ext - 1 - i - 1] + dW;
+    }
+    
   }
 #endif  
 
@@ -1388,7 +1650,7 @@ void allocate_memory_data()
     Flerrs2d_data = malloc(n_line_data * n_vel_data * sizeof(double *));
   }
 
-  if(parset.flag_InstRes > 0 && (parset.flag_dim == 2 || parset.flag_dim == 5))
+  if(parset.flag_InstRes > 1 && (parset.flag_dim == 2 || parset.flag_dim == 5))
   {
     instres_epoch = malloc(n_line_data * sizeof(double));
     instres_err_epoch = malloc(n_line_data * sizeof(double));
@@ -1397,13 +1659,32 @@ void allocate_memory_data()
 #ifdef SpecAstro
   if(parset.flag_dim > 2 || parset.flag_dim == -1)
   {
-    wave_sa_data = malloc(n_vel_sa_data*sizeof(double));
-    vel_sa_data = malloc(n_vel_sa_data*sizeof(double));
+    wave_sa_data_ext = malloc(n_vel_sa_data_ext*sizeof(double));
+    vel_sa_data_ext = malloc(n_vel_sa_data_ext*sizeof(double));
+    wave_sa_data = wave_sa_data_ext + n_vel_sa_data_incr;
+    vel_sa_data = vel_sa_data_ext + n_vel_sa_data_incr;
+    ScaleFactor = malloc((n_vel_sa_data_ext - 2*n_vel_sa_data_incr) * sizeof(double));
+  }
+
+  if( (parset.flag_dim > 2 && parset.flag_dim < 6) || parset.flag_dim == -1)
+  {
     base_sa_data = malloc(n_base_sa_data * 2 * sizeof(double));
     Fline_sa_data = malloc(n_vel_sa_data*n_epoch_sa_data*sizeof(double));
     Flerrs_sa_data = malloc(n_vel_sa_data*n_epoch_sa_data*sizeof(double));
     phase_sa_data = malloc(n_vel_sa_data * n_base_sa_data * sizeof(double));
     pherrs_sa_data = malloc(n_vel_sa_data * n_base_sa_data * sizeof(double));
+  }
+  if(parset.flag_dim == 6 || parset.flag_dim == -1)
+  {
+    base_sarm_data = malloc(n_epoch_sarm_data * n_base_sarm_data * 2 * sizeof(double));
+    Tline_sarm_data = malloc(n_epoch_sarm_data * sizeof(double));
+    Fcon_sarm_data = malloc(n_epoch_sarm_data*sizeof(double));
+    Fline_sarm_data = malloc(n_epoch_sarm_data*sizeof(double));
+    Flerrs_sarm_data = malloc(n_epoch_sarm_data*sizeof(double));
+    Fline2d_sarm_data = malloc(n_vel_sarm_data*n_epoch_sarm_data*sizeof(double));
+    Flerrs2d_sarm_data = malloc(n_vel_sarm_data*n_epoch_sarm_data*sizeof(double));
+    phase_sarm_data = malloc(n_vel_sarm_data * n_base_sarm_data * n_epoch_sarm_data * sizeof(double));
+    pherrs_sarm_data = malloc(n_vel_sarm_data * n_base_sarm_data * n_epoch_sarm_data * sizeof(double));
   }
 #endif
 }
@@ -1440,7 +1721,7 @@ void free_memory_data()
   }
 
 
-  if(parset.flag_InstRes > 0 && (parset.flag_dim == 2 || parset.flag_dim == 5))
+  if(parset.flag_InstRes > 1 && (parset.flag_dim == 2 || parset.flag_dim == 5))
   {
     free(instres_epoch); 
     free(instres_err_epoch);
@@ -1449,13 +1730,29 @@ void free_memory_data()
 #ifdef SpecAstro
   if(parset.flag_dim > 2 || parset.flag_dim == -1)
   {
-    free(wave_sa_data);
-    free(vel_sa_data);
+    free(wave_sa_data_ext);
+    free(vel_sa_data_ext);
+    free(ScaleFactor);
+  }
+  if( (parset.flag_dim > 2 && parset.flag_dim < 6) || parset.flag_dim == -1)
+  {
     free(base_sa_data);
     free(Fline_sa_data);
     free(Flerrs_sa_data);
     free(phase_sa_data);
     free(pherrs_sa_data); 
+  }
+  if(parset.flag_dim == 6 || parset.flag_dim == -1)
+  {
+    free(base_sarm_data);
+    free(Tline_sarm_data);
+    free(Fcon_sarm_data);
+    free(Fline_sarm_data);
+    free(Flerrs_sarm_data);
+    free(Fline2d_sarm_data);
+    free(Flerrs2d_sarm_data);
+    free(phase_sarm_data);
+    free(pherrs_sarm_data);   
   }
 #endif
 }
@@ -1488,6 +1785,37 @@ void cal_emission_flux()
     Flerrs_data[j] = sqrt(Flerrs_data[j]) * dV;
   }
 }
+
+#ifdef SpecAstro
+/*! 
+ * calculate the integrated emission line flux of SARM data.
+ */
+void cal_emission_flux_sarm()
+{
+  int i, j;
+  double dV;
+  
+  // assume that velocity grid is equally spaced 
+  dV = vel_sa_data[1]-vel_sa_data[0];
+  
+// using trapezoid formula.
+  for(j=0; j<n_epoch_sarm_data; j++)
+  { 
+    Fline_sarm_data[j] = Fline2d_sarm_data[j*n_vel_sarm_data + 0]/2.0;
+    Flerrs_sarm_data[j] = (Flerrs2d_sarm_data[j*n_vel_sarm_data + 0] * Flerrs2d_sarm_data[j*n_vel_sarm_data + 0])/2.0;
+    for(i=1; i<n_vel_sarm_data-1; i++)
+    {
+      Fline_sarm_data[j] += Fline2d_sarm_data[j*n_vel_sarm_data + i];
+      Flerrs_sarm_data[j] += Flerrs2d_sarm_data[j*n_vel_sarm_data + i]*Flerrs2d_sarm_data[j*n_vel_sarm_data + i];
+    }
+    Fline_sarm_data[j] += Fline2d_sarm_data[j*n_vel_sarm_data + n_vel_sarm_data-1]/2.0;
+    Flerrs_sarm_data[j] += (Flerrs2d_sarm_data[j*n_vel_sarm_data + n_vel_sarm_data-1]*Flerrs2d_sarm_data[j*n_vel_sarm_data + n_vel_sarm_data-1])/2.0;
+
+    Fline_sarm_data[j] *= dV;
+    Flerrs_sarm_data[j] = sqrt(Flerrs_sarm_data[j]) * dV;
+  }
+}
+#endif
 
 /*!
  * get number of particles from the option file.
@@ -1703,6 +2031,20 @@ int check_parset_isset()
     strcpy(this_tag[n_this_tag++], "FlagSABLRModel");
     strcpy(this_tag[n_this_tag++], "SAInstRes");
     strcpy(this_tag[n_this_tag++], "SAFile");
+    strcpy(this_tag[n_this_tag++], "NCloudPerCore");
+    strcpy(this_tag[n_this_tag++], "NVPerCloud");
+  }
+  else if(parset.flag_dim == 6)
+  {
+    strcpy(this_tag[n_this_tag++], "ContinuumFile");
+    strcpy(this_tag[n_this_tag++], "NConRecon");
+    strcpy(this_tag[n_this_tag++], "ConConstructFileOut");
+    strcpy(this_tag[n_this_tag++], "NTau");
+
+    strcpy(this_tag[n_this_tag++], "SALineCenter");
+    strcpy(this_tag[n_this_tag++], "FlagSABLRModel");
+    strcpy(this_tag[n_this_tag++], "SAInstRes");
+    strcpy(this_tag[n_this_tag++], "SARMFile");
     strcpy(this_tag[n_this_tag++], "NCloudPerCore");
     strcpy(this_tag[n_this_tag++], "NVPerCloud");
   }

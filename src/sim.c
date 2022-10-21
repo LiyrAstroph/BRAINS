@@ -23,40 +23,6 @@
 
 #include "brains.h"
 
-/////////////////////////////////////////////////////////////////////////////////
-#ifdef SpecAstro
-/* baselines for 3C 273 dataset observed by the GRAVITY (Nature, 2020, 563, 657), 
- * unit is meter */
-int n_base_sa_3c273 = 24;
-double base_sa_3c273[]={
-  -39.847287,   18.757261,
-  -72.901618,  -13.864206,
-  -105.767452, -59.897942,
-  -32.453674,  -32.669331,
-  -64.714063,  -78.769286,
-  -32.064961,  -46.108491,
-  -53.774627,   21.045077,
-  -71.062525,  -10.421538,
-  -79.670158,  -55.520144,
-  -16.867270,  -31.447448,
-  -25.151512,  -76.555774,
-   -8.846202,  -45.116789,
-  -54.064283,   19.430318,
-  -86.349699,  -12.827258,
-  -115.711019, -58.525511,
-  -32.484928,  -32.180585,
-  -61.579109,  -77.881063,
-  -29.231494,  -45.704607,
-  -52.779207,   21.321411,
-  -83.468788,  -12.802497,
-  -107.827509, -59.908816,
-  -28.601448,  -33.449429,
-  -50.961674,  -81.626333,
-  -23.699820,  -46.979455
-};
-#endif
-//////////////////////////////////////////////////////////////////////////////////////
-
 void *model;
 
 void sim()
@@ -66,18 +32,22 @@ void sim()
 
   FILE *fp;
   char fname[200];
-  int i, j, incr;
+  int i, j, k, incr;
 
   sim_init();
   
   double *pm = (double *)model, error, fcon;
+  double sigma, taud;
   
   smooth_init(parset.n_vel_recon, TransV);
-  
+
+/*==================================continuum============================================*/  
   if(parset.flag_dim == -1)
   {
     /* note that here use sigma_hat = sigma/sqrt(tau) */
-    printf("sim with ln(sigma) = %f and  ln(taud) = %f.\n", var_param[1], var_param[2]);
+    sigma = var_param[1];
+    taud = var_param[2];
+    printf("Sim with ln(sigma) = %f and  ln(taud) = %f.\n", sigma, taud);
     reconstruct_con_from_varmodel(exp(var_param[1]), exp(var_param[2]), 1.0, 0.0); 
   }
   else
@@ -85,8 +55,12 @@ void sim()
     con_scale = 1.0;
     line_scale = 1.0;
     line_error_mean = con_error_mean = 0.01;
-    /* arguments: sigma_hat, tau, alapha, and syserr */
-    create_con_from_random(0.03, (Tcon[parset.n_con_recon-1] - Tcon[0])/10.0, 1.0, 0.0);
+    /* arguments: sigma_hat, tau, alapha, and syserr 
+     * note the light curve is shifted and scaled, so that sigma_hat maybe changed. */
+    sigma = 0.03;
+    taud = (Tcon[parset.n_con_recon-1] - Tcon[0])/10.0;
+    printf("Sim with sigma = %f and  taud = %f.\n", sigma, taud);
+    create_con_from_random(sigma, taud, 1.0, 0.0); 
   }
   calculate_con_rm(model);
   
@@ -105,6 +79,7 @@ void sim()
   fclose(fp);
 
   sprintf(fname, "%s/%s", parset.file_dir, "/data/sim_con.txt");
+  printf("%-13s %s\n", "Continuum:", fname);
   fp = fopen(fname, "w");
   if(fp == NULL)
   {
@@ -130,17 +105,21 @@ void sim()
     {
       if(Tcon[i] >= 0.0)
       {
-        fprintf(fp, "%e %e %e\n", Tcon[i]*(1.0+parset.redshift), Fcon[i]/con_scale, Fcerrs[i]/con_scale);
+        fprintf(fp, "%e %e %e\n", Tcon[i]*(1.0+parset.redshift), 
+                (Fcon[i]+gsl_ran_ugaussian(gsl_r)*Fcerrs[i])/con_scale, Fcerrs[i]/con_scale);
       }
     }
   }
   fclose(fp);
   
   gsl_interp_init(gsl_linear, Tcon, Fcon_rm, parset.n_con_recon);
+
+/*==================================1d line============================================*/  
   transfun_1d_cal(model, 0);
   calculate_line_from_blrmodel(model, Tline, Fline, parset.n_line_recon);
   
   sprintf(fname, "%s/%s", parset.file_dir, "/data/sim_line.txt");
+  printf("%-13s %s\n", "Line:", fname);
   fp = fopen(fname, "w");
   if(fp == NULL)
   {
@@ -177,12 +156,14 @@ void sim()
   }
   fclose(fp);
 
-  transfun_2d_cal(model, TransV, Trans2D, parset.n_vel_recon, 1);
+/*==================================2d line============================================*/  
+  transfun_2d_cal(model, TransV, Trans2D, parset.n_vel_recon, 0);
   calculate_line2d_from_blrmodel(model, Tline, TransV, 
           Trans2D, Fline2d, parset.n_line_recon, parset.n_vel_recon);
 
   
   sprintf(fname, "%s/%s", parset.file_dir, "/data/sim_line2d.txt");
+  printf("%-13s %s\n", "Line2d:", fname);
   fp = fopen(fname, "w");
   if(fp == NULL)
   {
@@ -205,6 +186,7 @@ void sim()
   fclose(fp);
   
   sprintf(fname, "%s/%s", parset.file_dir, "/data/sim_broadening.txt");
+  printf("%-13s %s\n", "Line Broaden:", fname);
   fp = fopen(fname, "w");
   if(fp == NULL)
   {
@@ -241,7 +223,7 @@ void sim()
 #ifdef SpecAstro
   double *sa_pm;
   sa_pm = (double *)pm + num_params_blr;
-
+/*==================================SA============================================*/  
   sa_smooth_init(parset.n_sa_vel_recon, vel_sa, parset.sa_InstRes);
 
   gen_sa_cloud_sample((void *)sa_pm, 3, 0);
@@ -249,6 +231,7 @@ void sim()
                                    phase_sa, Fline_sa);
   
   sprintf(fname, "%s/%s", parset.file_dir, "data/sim_sa.txt");
+  printf("%-13s %s\n", "SA:", fname);
   fp = fopen(fname, "w");
   if(fp == NULL)
   {
@@ -268,13 +251,173 @@ void sim()
     for(j=0; j<parset.n_sa_vel_recon; j++)
     {
       fprintf(fp, "%e %e %e\n", wave_sa[j], 
-       phase_sa[i*parset.n_sa_vel_recon + j]/(PhaseFactor * wave_sa[j]) + gsl_ran_ugaussian(gsl_r)*sa_phase_error_mean, 
+       phase_sa[i*parset.n_sa_vel_recon + j]/(ScaleFactor[j]) + gsl_ran_ugaussian(gsl_r)*sa_phase_error_mean, 
        sa_phase_error_mean);
     }
     fprintf(fp, "\n");
   }
   fclose(fp);
   sa_smooth_end();
+
+/*==================================SARM============================================*/  
+  for(i=0; i<parset.n_sarm_line_recon; i++)
+  {
+    Fcon_sarm[i] = gsl_interp_eval(gsl_linear, Tcon, Fcon_rm, Tline_sarm[i], gsl_acc);
+  }
+  
+  sarm_smooth_init(parset.n_sa_vel_recon, vel_sa, parset.sa_InstRes);
+  transfun_sarm_cal_cloud((void *)sa_pm, vel_sa, Trans2D, Trans_sarm_alpha, Trans_sarm_beta, parset.n_sa_vel_recon, 1);
+  calculate_sarm_sim_with_sample(pm, Tline_sarm, vel_sa, Trans2D, Trans_sarm_alpha, Trans_sarm_beta, 
+                                     parset.n_sa_vel_recon, parset.n_sarm_line_recon, base_sarm, 
+                                     parset.n_sarm_base_recon, phase_sarm, Fline_sarm, 
+                                     momentum_sarm_alpha, momentum_sarm_beta,
+                                     photocenter_sarm_alpha, photocenter_sarm_beta); 
+
+  sprintf(fname, "%s/%s", parset.file_dir, "data/sim_sarm.txt");
+  printf("%-13s %s\n", "SARM:", fname);
+  fp = fopen(fname, "w");
+  if(fp == NULL)
+  {
+    fprintf(stderr, "# Error: Cannot open file %s.\n", fname);
+    exit(0);
+  }
+  
+  fprintf(fp, "# %d %d %d\n", parset.n_sarm_line_recon, parset.n_sa_vel_recon, parset.n_sarm_base_recon);
+  /* output line */
+  for(i=0; i<parset.n_sarm_line_recon; i++)
+  {
+    fprintf(fp, "# %f  %e\n", Tline_sarm[i]*(1.0+parset.redshift), Fcon_sarm[i] + gsl_ran_ugaussian(gsl_r) * con_error_mean);
+    for(j=0; j<parset.n_sa_vel_recon; j++)
+    {
+      fprintf(fp, "%e %e %e\n", wave_sa[j], Fline_sarm[i*parset.n_sa_vel_recon + j] + gsl_ran_ugaussian(gsl_r)*sarm_line_error_mean, 
+                                            sarm_line_error_mean);
+    }
+    fprintf(fp,"\n");
+  }
+  /* output phase */
+  for(i=0; i<parset.n_sarm_line_recon; i++)
+  {
+    for(k=0; k<parset.n_sarm_base_recon; k++)
+    {
+      fprintf(fp, "# %f %f\n", base_sarm[i*parset.n_sarm_base_recon*2+k*2+0], base_sarm[i*parset.n_sarm_base_recon*2+k*2+1]);
+      for(j=0; j<parset.n_sa_vel_recon; j++)
+      {
+        fprintf(fp, "%e %e %e\n", wave_sa[j], 
+        phase_sarm[i*parset.n_sa_vel_recon*parset.n_sarm_base_recon + k*parset.n_sa_vel_recon + j]/(ScaleFactor[j]) 
+        + gsl_ran_ugaussian(gsl_r)*sarm_phase_error_mean,
+        sarm_phase_error_mean);
+      }
+      fprintf(fp,"\n");
+    }
+  }
+  fclose(fp);
+
+  /* output SARM transfer function */
+  sprintf(fname, "%s/%s", parset.file_dir, "data/sarm_tran_alpha.txt");
+  fp = fopen(fname, "w");
+  if(fp == NULL)
+  {
+    fprintf(stderr, "# Error: Cannot open file %s.\n", fname);
+    exit(0);
+  }
+  for(i=0; i<parset.n_tau; i++)
+  {
+    for(j=0; j<parset.n_sa_vel_recon; j++)
+    {
+      fprintf(fp, "%e %e %e\n", vel_sa[j]*VelUnit, TransTau[i], Trans_sarm_alpha[i*parset.n_sa_vel_recon + j]);
+    }
+    fprintf(fp, "\n");
+  }
+  fclose(fp);
+
+  sprintf(fname, "%s/%s", parset.file_dir, "data/sarm_tran_beta.txt");
+  fp = fopen(fname, "w");
+  if(fp == NULL)
+  {
+    fprintf(stderr, "# Error: Cannot open file %s.\n", fname);
+    exit(0);
+  }
+  for(i=0; i<parset.n_tau; i++)
+  {
+    for(j=0; j<parset.n_sa_vel_recon; j++)
+    {
+      fprintf(fp, "%e %e %e\n", vel_sa[j]*VelUnit, TransTau[i], Trans_sarm_beta[i*parset.n_sa_vel_recon + j]);
+    }
+    fprintf(fp, "\n");
+  }
+  fclose(fp);
+
+  /* output SARM photocenter function */
+  sprintf(fname, "%s/%s", parset.file_dir, "data/sarm_photocenter_alpha.txt");
+  fp = fopen(fname, "w");
+  if(fp == NULL)
+  {
+    fprintf(stderr, "# Error: Cannot open file %s.\n", fname);
+    exit(0);
+  }
+  for(i=0; i<parset.n_sarm_line_recon; i++)
+  {
+    for(j=0; j<parset.n_sa_vel_recon; j++)
+    {
+      fprintf(fp, "%e %e\n", vel_sa[j]*VelUnit, photocenter_sarm_alpha[i*parset.n_sa_vel_recon + j]);
+    }
+    fprintf(fp, "\n");
+  }
+  fclose(fp);
+
+  sprintf(fname, "%s/%s", parset.file_dir, "data/sarm_photocenter_beta.txt");
+  fp = fopen(fname, "w");
+  if(fp == NULL)
+  {
+    fprintf(stderr, "# Error: Cannot open file %s.\n", fname);
+    exit(0);
+  }
+  for(i=0; i<parset.n_sarm_line_recon; i++)
+  {
+    for(j=0; j<parset.n_sa_vel_recon; j++)
+    {
+      fprintf(fp, "%e %e\n", vel_sa[j]*VelUnit, photocenter_sarm_beta[i*parset.n_sa_vel_recon + j]);
+    }
+    fprintf(fp, "\n");
+  }
+  fclose(fp);
+
+  /* output SARM photocenter function */
+  sprintf(fname, "%s/%s", parset.file_dir, "data/sarm_momentum_alpha.txt");
+  fp = fopen(fname, "w");
+  if(fp == NULL)
+  {
+    fprintf(stderr, "# Error: Cannot open file %s.\n", fname);
+    exit(0);
+  }
+  for(i=0; i<parset.n_sarm_line_recon; i++)
+  {
+    for(j=0; j<parset.n_sa_vel_recon; j++)
+    {
+      fprintf(fp, "%e %e\n", vel_sa[j]*VelUnit, momentum_sarm_alpha[i*parset.n_sa_vel_recon + j]);
+    }
+    fprintf(fp, "\n");
+  }
+  fclose(fp);
+
+  sprintf(fname, "%s/%s", parset.file_dir, "data/sarm_momentum_beta.txt");
+  fp = fopen(fname, "w");
+  if(fp == NULL)
+  {
+    fprintf(stderr, "# Error: Cannot open file %s.\n", fname);
+    exit(0);
+  }
+  for(i=0; i<parset.n_sarm_line_recon; i++)
+  {
+    for(j=0; j<parset.n_sa_vel_recon; j++)
+    {
+      fprintf(fp, "%e %e\n", vel_sa[j]*VelUnit, momentum_sarm_beta[i*parset.n_sa_vel_recon + j]);
+    }
+    fprintf(fp, "\n");
+  }
+  fclose(fp);
+
+  sarm_smooth_end();
   
 #endif  
 
@@ -379,7 +522,7 @@ void sim_init()
 #endif
   
   /* use epoch-independent broadening */
-  if(parset.flag_InstRes > 1)
+  if(parset.flag_InstRes > 2)
   {
     num_params_res = 1;
     parset.InstRes = 220.0/VelUnit;
@@ -604,17 +747,20 @@ void sim_init()
   }
 
 #ifdef SpecAstro
-  double saRblr;
+  double saRblr, norm;
 
   if(parset.flag_dim == -1)
   {
     parset.n_sa_vel_recon = n_vel_sa_data;
     parset.n_sa_base_recon = n_base_sa_data;
+
+    parset.n_sarm_base_recon = n_base_sarm_data;
+    parset.n_sarm_line_recon = n_epoch_sarm_data;
   }
   else
   {
     sa_flux_norm = 1.0;
-    parset.n_sa_vel_recon = 40;
+    parset.n_sa_vel_recon = parset.n_vel_recon;  /* note SARM also uses tran2d, so no larger than "n_vel_recon" */
     if(parset.flag_gravity == 1)
       parset.n_sa_base_recon = n_base_sa_3c273;
     else
@@ -622,6 +768,14 @@ void sim_init()
 
     sa_phase_error_mean = 0.01;
     sa_line_error_mean = 0.01;
+
+    sarm_phase_error_mean = 0.01;
+    sarm_line_error_mean = 0.01;
+
+    parset.n_sarm_base_recon = 2;
+    parset.n_sarm_line_recon = parset.n_line_recon;
+
+    ScaleFactor = malloc(parset.n_sa_vel_recon * sizeof(double));
   }
     
   vel_sa = malloc(parset.n_sa_vel_recon * sizeof(double));
@@ -632,6 +786,19 @@ void sim_init()
   
   clouds_alpha = malloc(parset.n_cloud_per_task * sizeof(double));
   clouds_beta = malloc(parset.n_cloud_per_task * sizeof(double));
+
+  /* sarm */
+  Tline_sarm = malloc(parset.n_sarm_line_recon * sizeof(double));
+  Fcon_sarm = malloc(parset.n_sarm_line_recon * sizeof(double));
+  Fline_sarm = malloc(parset.n_sarm_line_recon * parset.n_sa_vel_recon * sizeof(double));
+  base_sarm = malloc(parset.n_sarm_base_recon * parset.n_sarm_line_recon * 2 * sizeof(double));
+  momentum_sarm_alpha = malloc(parset.n_sa_vel_recon * parset.n_sarm_line_recon * sizeof(double));
+  momentum_sarm_beta = malloc(parset.n_sa_vel_recon * parset.n_sarm_line_recon * sizeof(double));
+  photocenter_sarm_alpha = malloc(parset.n_sa_vel_recon * parset.n_sarm_line_recon * sizeof(double));
+  photocenter_sarm_beta = malloc(parset.n_sa_vel_recon * parset.n_sarm_line_recon * sizeof(double));
+  phase_sarm = malloc(parset.n_sa_vel_recon * parset.n_sarm_base_recon * parset.n_sarm_line_recon * sizeof(double));
+  Trans_sarm_alpha = malloc(parset.n_tau * parset.n_sa_vel_recon * sizeof(double));
+  Trans_sarm_beta = malloc(parset.n_tau * parset.n_sa_vel_recon * sizeof(double));
 
   workspace_phase = malloc(parset.n_sa_vel_recon * 3 * sizeof(double));
   
@@ -648,14 +815,18 @@ void sim_init()
 
   if(parset.flag_dim == -1)
   {
+    /* SA */
     memcpy(vel_sa, vel_sa_data, parset.n_sa_vel_recon * sizeof(double));
     memcpy(wave_sa, wave_sa_data, parset.n_sa_vel_recon * sizeof(double));
 
     memcpy(base_sa, base_sa_data, parset.n_sa_base_recon * 2 * sizeof(double));
+    
+    /* SARM */
+    memcpy(base_sarm, base_sarm_data, n_epoch_sarm_data*n_base_sarm_data*2 * sizeof(double));
   }
   else
   {
-    double vel_max_set, vel_min_set;
+    double vel_max_set, vel_min_set, phi;
     vel_max_set = sqrt(pow(2.0*sqrt(mbh/saRblr), 2.0) + pow(2.0*parset.sa_InstRes, 2.0));
     vel_min_set = - vel_max_set;
     double dVel = (vel_max_set- vel_min_set)/(parset.n_sa_vel_recon -1.0);
@@ -669,7 +840,6 @@ void sim_init()
       memcpy(base_sa, base_sa_3c273, n_base_sa_3c273*2*sizeof(double));
     else
     {
-      double phi;
       for(i=0; i<parset.n_sa_base_recon; i++)
       {
         phi = -PI/2.0 + PI/parset.n_sa_base_recon * i;
@@ -677,7 +847,56 @@ void sim_init()
         base_sa[i*2+1] = 100.0*sin(phi);
       }
     }
+    
+    /* convert to direction */
+    if(parset.flag_sa_datatype == 1)
+    {
+      for(i=0; i<parset.n_sa_base_recon; i++)
+      {
+        norm = pow(base_sa[i*2+0], 2) + pow(base_sa[i*2+1], 2);
+        base_sa[i*2+0] /= sqrt(norm);
+        base_sa[i*2+1] /= sqrt(norm);
+      }
+    }
+    
+    /* SARM */
+    for(i=0; i<parset.n_sarm_line_recon; i++)
+    {
+      Tline_sarm[i] = Tline[i];
+      for(j=0; j<parset.n_sarm_base_recon; j++)
+      {
+        base_sarm[i*parset.n_sarm_base_recon*2 + j*2 + 0] =  70.0 + 10*cos(PI/parset.n_sarm_base_recon * j);
+        base_sarm[i*parset.n_sarm_base_recon*2 + j*2 + 1] = -70.0 + 10*sin(PI/parset.n_sarm_base_recon * j);
+        
+        /* convert to direction */
+        if(parset.flag_sa_datatype == 1)
+        {
+          norm = pow(base_sarm[i*parset.n_sarm_base_recon*2 + j*2 + 0], 2)
+                +pow(base_sarm[i*parset.n_sarm_base_recon*2 + j*2 + 1], 2);
+          
+          base_sarm[i*parset.n_sarm_base_recon*2 + j*2 + 0] /= sqrt(norm);
+          base_sarm[i*parset.n_sarm_base_recon*2 + j*2 + 1] /= sqrt(norm);
+        }
+      }
+    }
 
+    /* setup scale factor */
+    if(parset.flag_sa_datatype == 0)
+    {
+      sign = -1; /* phase */
+      for(i=0; i<parset.n_sa_vel_recon; i++)
+      {
+        ScaleFactor[i] = PhaseFactor * wave_sa[i];
+      }
+    }
+    else 
+    {
+      sign = 1; /* photocenter */
+      for(i=0; i<parset.n_sa_vel_recon; i++)
+      {
+        ScaleFactor[i] = PhotoFactor;
+      }
+    }
   }
 #endif
 
@@ -711,7 +930,10 @@ void sim_end()
   }
 
 #ifdef SpecAstro
-  
+
+  if(parset.flag_dim == -2)
+    free(ScaleFactor);
+
   free(vel_sa);
   free(wave_sa);
   free(Fline_sa);
@@ -720,6 +942,18 @@ void sim_end()
   
   free(clouds_alpha);
   free(clouds_beta);
+ 
+  free(Tline_sarm);
+  free(Fcon_sarm);
+  free(Fline_sarm);
+  free(base_sarm);
+  free(phase_sarm);
+  free(momentum_sarm_alpha);
+  free(momentum_sarm_beta);
+  free(photocenter_sarm_alpha);
+  free(photocenter_sarm_beta);
+  free(Trans_sarm_alpha);
+  free(Trans_sarm_beta);
   
   free(workspace_phase);
 #endif

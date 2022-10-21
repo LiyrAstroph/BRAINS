@@ -108,7 +108,7 @@ void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int
     sigV_instrinsic = parset.width_narrowline + pmodel[num_params_blr_model+1] * parset.width_narrowline_err;
   }
   
-  if(parset.flag_InstRes == 0)
+  if(parset.flag_InstRes <= 1) /* fixed InstRes or uniform prior for InstRes */
   {
     sigV = parset.InstRes + pmodel[num_params_blr_model+num_params_nlr]*parset.InstRes_err;
     sigV = fmax(0.0, sigV*sigV - sigV_instrinsic*sigV_instrinsic);

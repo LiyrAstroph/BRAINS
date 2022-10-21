@@ -187,13 +187,17 @@ void calculate_sa_with_sample(const void *pm)
     beta_cent[j] =  (beta_cent[j]/(phase_norm[j]+EPS)) / DA;
   }
   
-  /* phi = -2*pi * f_line * B/lambda * X/DA */
+  /* phi = -2*pi * f_line * B/lambda * X/DA for phase
+   *     =         f_line * j * X/DA for photocenter
+   *
+   * note that phase and photocenter are scaled 
+   */
   for(k=0; k<n_base_sa_data; k++)
   {
     for(j=0; j<n_vel_sa_data; j++)
     { 
       phase = base_sa_data[k*2] * alpha_cent[j] + base_sa_data[k*2 + 1] * beta_cent[j];
-      phase_sa[k*n_vel_sa_data + j] = -Fline_sa[j]/(1.0+Fline_sa[j]) * phase;
+      phase_sa[k*n_vel_sa_data + j] = sign * Fline_sa[j]/(1.0+Fline_sa[j]) * phase;
     }
   }
 
@@ -295,13 +299,17 @@ void calculate_sa_sim_with_sample(const void *pm, double *vel_sa, int n_vel_sa, 
     beta_cent[j] =  (beta_cent[j]/(phase_norm[j]+EPS)) / DA;
   }
   
-  /* phi = -2*pi * f_line * B/lambda * X/DA */
+  /* phi = -2*pi * f_line * B/lambda * X/DA for phase
+   *     =         f_line * j * X/DA for photocenter
+   *
+   * note that phase and photocenter are scaled 
+   */
   for(k=0; k<n_base_sa; k++)
   {
     for(j=0; j<n_vel_sa; j++)
     { 
       phase = base_sa[k*2] * alpha_cent[j] + base_sa[k*2 + 1] * beta_cent[j];
-      p_sa[k*n_vel_sa + j] = -F_sa[j]/(1.0+F_sa[j]) * phase;
+      p_sa[k*n_vel_sa + j] = sign * F_sa[j]/(1.0+F_sa[j]) * phase;
     }
   }
 

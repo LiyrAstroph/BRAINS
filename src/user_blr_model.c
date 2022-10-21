@@ -139,8 +139,8 @@ void gen_cloud_sample_mymodel(const void *pm, int flag_type, int flag_save)
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
 // generate a direction of the angular momentum of the orbit   
-    Lphi = 2.0*PI * gsl_rng_uniform(gsl_r);
-    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_r), gam));
+    Lphi = 2.0*PI * gsl_rng_uniform(gsl_blr);
+    Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_blr), gam));
     sin_Lphi = sin(Lphi);
     cos_Lphi = cos(Lphi);
     sin_Lthe = sin(Lthe);
@@ -155,12 +155,12 @@ void gen_cloud_sample_mymodel(const void *pm, int flag_type, int flag_save)
         printf("# Error, too many tries in generating ridial location of clouds.\n");
         exit(0);
       }
-      rnd = gsl_ran_gamma(gsl_r, a, 1.0);
-//    r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_r, 1.0/beta/beta, beta*beta*mu);
+      rnd = gsl_ran_gamma(gsl_blr, a, 1.0);
+//    r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_blr, 1.0/beta/beta, beta*beta*mu);
       r = rin + sig * rnd;
       nc++;
     }
-    phi = 2.0*PI * gsl_rng_uniform(gsl_r);
+    phi = 2.0*PI * gsl_rng_uniform(gsl_blr);
     cos_phi = cos(phi);
     sin_phi = sin(phi);
 
@@ -182,7 +182,7 @@ void gen_cloud_sample_mymodel(const void *pm, int flag_type, int flag_save)
     zb = sin_Lthe * x;
 
     zb0 = zb;
-    rnd_xi = gsl_rng_uniform(gsl_r);
+    rnd_xi = gsl_rng_uniform(gsl_blr);
     if( (rnd_xi < 1.0 - xi) && zb0 < 0.0)
       zb = -zb;
 
@@ -257,24 +257,24 @@ void gen_cloud_sample_mymodel(const void *pm, int flag_type, int flag_save)
     
     for(j=0; j<parset.n_vel_per_cloud; j++)
     {
-      rnd = gsl_rng_uniform(gsl_r);
+      rnd = gsl_rng_uniform(gsl_blr);
 
       if(rnd < fellip)
       {
-        rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_circ  + 1.0) * Vkep;
-        theV =  (gsl_ran_ugaussian(gsl_r) * sigthe_circ + 0.5)*PI;
+        rhoV = (gsl_ran_ugaussian(gsl_blr) * sigr_circ  + 1.0) * Vkep;
+        theV =  (gsl_ran_ugaussian(gsl_blr) * sigthe_circ + 0.5)*PI;
       }
       else
       {
         if(fflow <= 0.5) /* inflow */
         {
-          rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_rad   + 1.0) * Vkep;
-          theV = (gsl_ran_ugaussian(gsl_r) * sigthe_rad + 1.0) * PI + theta_rot;
+          rhoV = (gsl_ran_ugaussian(gsl_blr) * sigr_rad   + 1.0) * Vkep;
+          theV = (gsl_ran_ugaussian(gsl_blr) * sigthe_rad + 1.0) * PI + theta_rot;
         }
         else     /* outflow */
         {
-          rhoV = (gsl_ran_ugaussian(gsl_r) * sigr_rad  + 1.0) * Vkep;
-          theV = (gsl_ran_ugaussian(gsl_r) * sigthe_rad) * PI + theta_rot;
+          rhoV = (gsl_ran_ugaussian(gsl_blr) * sigr_rad  + 1.0) * Vkep;
+          theV = (gsl_ran_ugaussian(gsl_blr) * sigthe_rad) * PI + theta_rot;
         }
       }
       
@@ -308,7 +308,7 @@ void gen_cloud_sample_mymodel(const void *pm, int flag_type, int flag_save)
       V = -vx;  //note the definition of the line-of-sight velocity. postive means a receding 
                 // velocity relative to the observer.
 
-      V += gsl_ran_ugaussian(gsl_r) * sig_turb * Vkep; // add turbulence velocity
+      V += gsl_ran_ugaussian(gsl_blr) * sig_turb * Vkep; // add turbulence velocity
 
       if(fabs(V) >= C_Unit) // make sure that the velocity is smaller than speed of light
         V = 0.9999*C_Unit * (V>0.0?1.0:-1.0);

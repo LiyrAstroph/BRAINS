@@ -12,7 +12,7 @@ OPTIMIZE = -O2 -Wall -finline-functions -fcommon
 #OPTIMIZE += -DDebug
 
 # include spectro-astrometry analysis
-# OPTIMIZE += -DSpecAstro
+OPTIMIZE += -DSpecAstro
 
 # get GIT description
 GITCHECK := $(shell git 2>/dev/null)
@@ -89,14 +89,17 @@ OBJS     = $(SRC)/main.o $(SRC)/allvars.o $(SRC)/read.o $(SRC)/run.o     \
            $(SRC)/user_blr_model.o   $(SRC)/user_transfun.o              \
            $(SRC)/reconstruct_sa.o   $(SRC)/dnest_sa.o                   \
            $(SRC)/specastro.o $(SRC)/dnest_sa1d.o $(SRC)/dnest_sa2d.o    \
-           $(SRC)/reconstruct_sa1d.o  $(SRC)/reconstruct_sa2d.o                    
+           $(SRC)/reconstruct_sa1d.o  $(SRC)/reconstruct_sa2d.o          \
+           $(SRC)/sarm.o  $(SRC)/reconstruct_sarm.o  $(SRC)/dnest_sarm.o \
+           $(SRC)/sa_gravity.o          
  
 INCL     = Makefile $(SRC)/allvars.h $(SRC)/proto.h $(SRC)/dnest_con.h   \
            $(SRC)/dnest_line1d.h  $(SRC)/dnest_line2d.h $(SRC)/nrutil.h  \
            $(SRC)/blr_models.h   $(SRC)/brains.h $(SRC)/version.h        \
            $(SRC)/command_line.h  $(SRC)/user_blr_model.h                \
            $(SRC)/user_transfun.h  $(SRC)/dnest_sa.h $(SRC)/dnest_sa1d.h \
-           $(SRC)/dnest_sa2d.h  $(SRC)/mathfun.h
+           $(SRC)/dnest_sa2d.h  $(SRC)/mathfun.h  $(SRC)/dnest_sarm.h    \
+           $(SRC)/sa_gravity.h
 
 OPTIONS  = $(OPTIMIZE)
 CFLAGS   = $(OPTIONS) $(GSL_INCL) $(LAPACK_INCL) $(MPICHINCL) $(DNEST_INCL) $(FFTW_INCL)

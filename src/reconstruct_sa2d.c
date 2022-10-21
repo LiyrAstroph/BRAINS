@@ -236,7 +236,7 @@ void postprocess_sa2d()
         {
           for(j=0; j<n_vel_sa_data; j++)
           {
-            fprintf(fsa, "%e %e\n", wave_sa_data[j], phase_sa[k*n_vel_sa_data + j]/(PhaseFactor * wave_sa_data[j]) );
+            fprintf(fsa, "%e %e\n", wave_sa_data[j], phase_sa[k*n_vel_sa_data + j]/(ScaleFactor[j]) );
           }
         }
         fprintf(fsa, "\n");
@@ -459,7 +459,7 @@ void reconstruct_sa2d()
       {
         for(j=0; j<n_vel_sa_data; j++)
         {
-          fprintf(fp, "%e %e\n", wave_sa_data[j], phase_sa[k*n_vel_sa_data + j]/(PhaseFactor * wave_sa_data[j]) );
+          fprintf(fp, "%e %e\n", wave_sa_data[j], phase_sa[k*n_vel_sa_data + j]/(ScaleFactor[j]) );
         }
         fprintf(fp, "\n");
       }
@@ -479,7 +479,7 @@ void reconstruct_sa2d()
        * and set InstRes_err=0.0.
        */ 
       double *pm = (double *)best_model_sa2d;
-      if(parset.flag_InstRes > 0) 
+      if(parset.flag_InstRes > 1) 
       {
         parset.flag_InstRes = 0; /* force to be uniform prior */
         double instres_mean = 0.0;
@@ -567,7 +567,7 @@ void reconstruct_sa2d()
   reconstruct_sa2d_end();
 
   //clear up argv
-  for(i=0; i<9; i++)
+  for(i=0; i<11; i++)
   {
     free(argv[i]);
   }

@@ -60,7 +60,7 @@ void init()
 
   /* number of parameters for spectral broadening, only valid for 2d RM */
   num_params_res = 1;
-  if(parset.flag_InstRes > 0)
+  if(parset.flag_InstRes > 1)
     num_params_res = n_line_data;
 
   /* number of parameters for line center, only valid for 2d RM */
@@ -212,25 +212,30 @@ void init()
   /* initialize GSL */
   gsl_T = gsl_rng_default;
   gsl_r = gsl_rng_alloc (gsl_T);
+  gsl_blr = gsl_rng_alloc(gsl_T);
 
 #ifndef Debug 
   if(parset.flag_rng_seed != 1)
   {
     gsl_rng_set(gsl_r, time(NULL)+thistask+1350); 
+    gsl_rng_set(gsl_blr, time(NULL)+thistask+1350+50); 
   }
   else
   {
     gsl_rng_set(gsl_r, parset.rng_seed+thistask+1350); 
+    gsl_rng_set(gsl_blr, parset.rng_seed+thistask+1350+50); 
   }
 #else
   if(parset.flag_rng_seed != 1)
   {
     gsl_rng_set(gsl_r, 6666+thistask+1350); 
+    gsl_rng_set(gsl_blr, 6666+thistask+1350+50); 
     printf("# debugging, task %d brains random seed %d.\n", thistask, 6666+thistask+1350);
   }
   else
   {
     gsl_rng_set(gsl_r, parset.rng_seed+thistask+1350); 
+    gsl_rng_set(gsl_blr, parset.rng_seed+thistask+1350+50); 
   }
 #endif
 
@@ -281,7 +286,7 @@ void init()
       }
     }
   
-    if(parset.flag_dim > 0 || parset.flag_dim == -1)
+    if( (parset.flag_dim > 0 && parset.flag_dim < 6) || parset.flag_dim == -1)
     {   
       /* set cadence and time span of data */
       Tspan_data_con = (Tcon_data[n_con_data -1] - Tcon_data[0]);
@@ -438,6 +443,58 @@ void init()
   /* SA */
   if(parset.flag_dim > 2)
   {
+    if(parset.flag_dim >= 6) /* SARM, take into account SA line time */
+    {
+      double time_back_sarm_set;
+      /* set cadence and time span of data */
+      Tspan_data_con = (Tcon_data[n_con_data -1] - Tcon_data[0]);
+      Tspan_data = (Tline_sarm_data[n_epoch_sarm_data -1] - Tcon_data[0]);
+      if(Tspan_data < 0.0)
+      {
+        if(thistask == roottask)
+        {
+          printf("# Incorrect epochs in continuum and line, please check the input data.\n");
+          exit(0);
+        }
+      }
+      Tcad_data = Tspan_data;
+      for(i=1; i< n_con_data; i++)
+      {
+        if(Tcad_data > Tcon_data[i] - Tcon_data[i-1])
+          Tcad_data = Tcon_data[i] - Tcon_data[i-1];
+      }
+      for(i=1; i<n_epoch_sarm_data; i++)
+      {
+        if(Tcad_data > Tline_sarm_data[i] - Tline_sarm_data[i-1])
+          Tcad_data = Tline_sarm_data[i] - Tline_sarm_data[i-1];
+      }
+
+      /* set time back for continuum reconstruction */
+      time_back_sarm_set = Tspan_data_con + (Tcon_data[0] - Tline_sarm_data[0]);
+      time_back_sarm_set = fmax(2.0*Tcad_data, time_back_sarm_set);
+
+      /* make rcloud_max and time_back consistent with each other, rcloud_max has a higher priority */
+      double DT=Tcon_data[0] - time_back_sarm_set;
+      if(parset.rcloud_max > 0.0)
+      {
+        DT = fmax(DT, Tline_sarm_data[0] - parset.rcloud_max*2.0);
+      }
+      else if(parset.time_back > 0.0) /* neglect when parset.rcloud_max is set */
+      { 
+        DT = fmax(DT, Tcon_data[0] - parset.time_back);
+      }
+      time_back_sarm_set = Tcon_data[0] - DT;
+
+      time_back_set = fmax(time_back_set, time_back_sarm_set);
+  
+      /* set the range of cloud radial distribution */
+      rcloud_min_set = 0.0;
+      rcloud_max_set = Tspan_data/2.0;
+      
+      /* rcloud_max should smaller than  (Tl0 - Tc0)/2 */
+      rcloud_max_set = fmin( rcloud_max_set,  (Tline_sarm_data[0] - Tcon_data[0] + time_back_set)/2.0 );
+    }
+    
     if(parset.rcloud_max > 0.0)
     {
       rcloud_max_set = fmin(rcloud_max_set, parset.rcloud_max);
@@ -576,6 +633,9 @@ void free_memory()
   
     free(var_param);
     free(var_param_std);
+
+    gsl_interp_accel_free(gsl_acc);
+    gsl_interp_free(gsl_linear);
   }
 
   if(parset.flag_dim != 0 && parset.flag_dim != 3)
@@ -607,6 +667,9 @@ void free_memory()
     }
   }
 #endif  
+
+  gsl_rng_free(gsl_r);
+  gsl_rng_free(gsl_blr);
   return;
 }
 
@@ -688,6 +751,76 @@ void scale_con_line()
   }
   return;
 }
+
+#ifdef SpecAstro
+/*!
+ * This function normalise the light curves to a scale of unity.
+ */
+void scale_con_line_sarm()
+{
+  int i, j;
+  double ave_con, ave_line;
+  
+  con_scale = 1.0;
+  line_sarm_scale = 1.0;
+
+  ave_con = 0.0;
+  ave_line = 0.0;
+  for(i=0; i<n_con_data; i++)
+  {
+    ave_con += Fcon_data[i];
+  }
+
+  ave_con /= n_con_data;
+  con_scale = 1.0/ave_con;
+
+  for(i=0; i<n_con_data; i++)
+  {
+    Fcon_data[i] *=con_scale;
+    Fcerrs_data[i] *=con_scale;
+  }
+
+  if(thistask == roottask)
+    printf("con scale: %e\t%e\n", con_scale, ave_con);
+  
+  con_error_mean *= con_scale;
+
+  for(i=0; i<n_epoch_sarm_data; i++)
+  {
+    ave_line += Fline_sarm_data[i];
+  }
+  ave_line /=n_epoch_sarm_data;
+
+  line_sarm_scale = 1.0/ave_line;
+  sarm_scale_ratio = con_scale/line_sarm_scale;  /* this is needed to cal flux ratio */
+  
+  if(thistask == roottask)
+    printf("sarm line scale: %e\t%e\n", line_sarm_scale, ave_line);
+
+  for(i=0; i<n_epoch_sarm_data; i++)
+  {
+    // note mask with error < 0.0
+    if(Flerrs_sarm_data[i] > 0.0)
+    {
+      Fcon_sarm_data[i] *= line_sarm_scale;  /* note that sarm continuum also needs to scale */
+      Fline_sarm_data[i] *= line_sarm_scale;
+      Flerrs_sarm_data[i] *= line_sarm_scale;
+    }
+
+    for(j=0; j<n_vel_sarm_data; j++)
+    {
+      // note mask with error < 0.0
+      if(Flerrs2d_sarm_data[i*n_vel_sarm_data + j] > 0.0)
+      {
+        Fline2d_sarm_data[i*n_vel_sarm_data + j] *= line_sarm_scale;
+        Flerrs2d_sarm_data[i*n_vel_sarm_data + j] *= line_sarm_scale;
+      } 
+    } 
+  }
+  sarm_line_error_mean *= line_sarm_scale;
+  return;
+}
+#endif
 
 /*!
  * This function copes with parameter fixing.\n

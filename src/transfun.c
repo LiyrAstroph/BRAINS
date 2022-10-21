@@ -22,6 +22,24 @@
 
 #include "brains.h"
 
+/* 
+ * interpolating continuum light curve at time tp
+ */
+inline double interp_con_rm(double tp)
+{
+  if(tp < Tcon[0])
+  {
+    return Fcon_rm[0];
+  }
+  else if(tp < Tcon[parset.n_con_recon-1])
+  {
+    return gsl_interp_eval(gsl_linear, Tcon, Fcon_rm, tp, gsl_acc);
+  }
+  else 
+  {
+    return Fcon_rm[parset.n_con_recon-1];
+  }
+}
 
 /* 
  * calculate (Fcon + ftrend)^Ag 
@@ -106,7 +124,8 @@ void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl
     {
       tau = TransTau[j];
       tc = tl - tau;
-      fcon_rm = gsl_interp_eval(gsl_linear, Tcon, Fcon_rm, tc, gsl_acc); /* interpolation */
+      //fcon_rm = gsl_interp_eval(gsl_linear, Tcon, Fcon_rm, tc, gsl_acc); /* interpolation */
+      fcon_rm = interp_con_rm(tc);
     
       fline += Trans1D[j] * fcon_rm;     /*  line response */
     }
@@ -138,7 +157,8 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
     {
       tau = TransTau[k];
       tc = tl - tau;
-      fcon_rm = gsl_interp_eval(gsl_linear, Tcon, Fcon_rm, tc, gsl_acc);
+      //fcon_rm = gsl_interp_eval(gsl_linear, Tcon, Fcon_rm, tc, gsl_acc);
+      fcon_rm = interp_con_rm(tc);
 
       for(i=0; i<nv; i++)
       {

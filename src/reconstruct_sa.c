@@ -123,7 +123,7 @@ void postprocess_sa()
         {
           for(j=0; j<n_vel_sa_data; j++)
           {
-            fprintf(fsa, "%e %e\n", wave_sa_data[j], phase_sa[k*n_vel_sa_data + j]/(PhaseFactor * wave_sa_data[j]) );
+            fprintf(fsa, "%e %e\n", wave_sa_data[j], phase_sa[k*n_vel_sa_data + j]/(ScaleFactor[j]) );
           }
         }
         fprintf(fsa, "\n");
@@ -274,7 +274,7 @@ void reconstruct_sa()
       {
         for(j=0; j<n_vel_sa_data; j++)
         {
-          fprintf(fp, "%e %e\n", wave_sa_data[j], phase_sa[k*n_vel_sa_data + j]/(PhaseFactor * wave_sa_data[j]) );
+          fprintf(fp, "%e %e\n", wave_sa_data[j], phase_sa[k*n_vel_sa_data + j]/(ScaleFactor[j]) );
         }
         fprintf(fp, "\n");
       }
@@ -285,7 +285,7 @@ void reconstruct_sa()
   reconstruct_sa_end();
 
   //clear up argv
-  for(i=0; i<9; i++)
+  for(i=0; i<11; i++)
   {
     free(argv[i]);
   }

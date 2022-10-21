@@ -20,7 +20,7 @@ FlagDim                     -2                           % -2, generate fully ra
 % reverberation mapping data file
 %
 
-ContinuumFile               data/sim_con.txt            % file for continuum data
+ContinuumFile               data/sim_con.txt           % file for continuum data
 LineFile                    data/sim_line.txt           % file for line data
 Line2DFile                  data/sim_line2d.txt         % file for line 2d data
 
@@ -28,20 +28,22 @@ Line2DFile                  data/sim_line2d.txt         % file for line 2d data
 % spectro-astrometry (SA) configuration, only when "-DSA" is switched on in Makefile
 %
 
-%SALineCenter                1.875                     % rest frame, the unit must be the same as that of the wavelength in SA data           
-%FlagSABLRModel              6                         % same as FlagBLRModel 
-%FlagSAParMutual             1                         % flag for mutual parameters with BLR model
-                                                       % 0: all 
-                                                       % 1: only BH mass and inclination
-                                                       % 2: inclination and all dyamical parameters
-%SAInstRes                   235.0                     % km/s, fixed
-%SAFile                      data/sim_sa.txt 
+FlagSADataType              1                         % 0: phase; 1: photocenter
+SALineCenter                1.875                     % rest frame, the unit must be the same as that of the wavelength in SA data           
+FlagSABLRModel              9                         % same as FlagBLRModel 
+FlagSAParMutual             1                         % flag for mutual parameters with BLR model
+                                                      % 0: all 
+                                                      % 1: only BH mass and inclination
+                                                      % 2: inclination and all dyamical parameters
+SAInstRes                   235.0                     % km/s, fixed
+SAFile                      data/sim_sa.txt 
+SARMFile                    data/sim_sarm.txt 
 
 %=========================================================================
 % reverberation mapping (RM) generic configuration
 %
 
-FlagBLRModel                6                           % 1, 2, 3, 4, 5, 6, 7, 8; BLR model type
+FlagBLRModel                9                           % 1, 2, 3, 4, 5, 6, 7, 8; BLR model type
                                                         % 5 is double power-law model; 6 is Pancoast's model; 7 is two-zone model
                                                         % 0 is user defined
                                                         % -1 is user defined, analytical transfer function
@@ -69,7 +71,7 @@ FlagLineSysErr              0                           % 0, not include systema
 
 FlagNonlinear               1                           % 0, linear response; 1, non-linear response
 
-FlagThetaSample             0                           % 0, sample over cos theta; 1, over theta
+FlagThetaSample             1                           % 0, sample over cos theta; 1, over theta
 %========================================================================
 % continuum configuration
 %
@@ -103,15 +105,16 @@ Tran2DDataFileOut           data/tran2d_data.txt        % output filename for 2d
 % Otherwise, InstRes includes: 1) instrument broadening and 2) intrinsic width 
 % of narrow line (added in square).
 %
-FlagInstRes                 0                           % 0, uniform prior, epoch-independent
-                                                        % 1, uniform prior, but epoch-dependent parameterization
-                                                        % 2, epoch-dependent parameterization, prior stored in "InstResFile"
+FlagInstRes                 0                           % 0, fixed to InstRes
+                                                        % 1, uniform prior, epoch-independent
+                                                        % 2, uniform prior, but epoch-dependent parameterization
+                                                        % 3, epoch-dependent parameterization, prior stored in "InstResFile"
 
 InstRes                     490                         % instrument broadening (modeled by a Gaussian), in km/s, for FlagInstRes=0, or 1
                                                           
 InstResErr                  50.0                        % instrument broadening error, in km/s, for FlagInstRes=0, or 1
 
-InstResFile                 data/sim_broaden.txt       % file for storing epoch-dependent instrument broadening
+InstResFile                 data/sim_broadening.txt       % file for storing epoch-dependent instrument broadening
                                                           % two columns: broadening width and error (km/s), in the order of time as the 2d line data
 
 %========================================================================
