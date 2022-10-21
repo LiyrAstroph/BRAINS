@@ -12,39 +12,40 @@ Redshift                    0.0                                    % redshift of
 
 FileDir                     /home/liyropt/Projects/GIT/BRAINS      % directory for where all the output files are stored
 
-FlagDim                     -2                           % -2, generate fully random lc; -1, mock lc based on input data; 
+FlagDim                     -2                          % -2, generate fully random lc; -1, mock lc based on input data; 
                                                         % 0, only continuum modeling; 1, 1d line RM; 2, 2d line RM
-                                                        % if -DSA, 3: only SA; 4: SA+1d line RM; 5: SA+2d line RM 
+                                                        % if -DSA, 3: only SA; 4: SA+1d line RM; 5: SA+2d line RM; 6: SARM
 
 %========================================================================
 % reverberation mapping data file
 %
 
-ContinuumFile               data/sim_con.txt           % file for continuum data
+ContinuumFile               data/sim_con.txt            % file for continuum data
 LineFile                    data/sim_line.txt           % file for line data
 Line2DFile                  data/sim_line2d.txt         % file for line 2d data
 
 %========================================================================
-% spectro-astrometry (SA) configuration, only when "-DSA" is switched on in Makefile
+% spectro-astrometry (SA) configuration, only when "-DSA" is switched on in Makefile, otherwise, errors raised
 %
 
-FlagSADataType              1                         % 0: phase; 1: photocenter
-SALineCenter                1.875                     % rest frame, the unit must be the same as that of the wavelength in SA data           
-FlagSABLRModel              9                         % same as FlagBLRModel 
-FlagSAParMutual             1                         % flag for mutual parameters with BLR model
-                                                      % 0: all 
-                                                      % 1: only BH mass and inclination
-                                                      % 2: inclination and all dyamical parameters
-SAInstRes                   235.0                     % km/s, fixed
-SAFile                      data/sim_sa.txt 
-SARMFile                    data/sim_sarm.txt 
+%FlagSADataType              1                         % 0: phase; 1: photocenter
+%SALineCenter                1.875                     % rest frame, the unit must be the same as that of the wavelength in SA data           
+%FlagSABLRModel              9                         % same as FlagBLRModel 
+%FlagSAParMutual             1                         % flag for mutual parameters with BLR model
+                                                       % 0: all 
+                                                       % 1: only BH mass and inclination
+                                                       % 2: inclination and all dyamical parameters
+%SAInstRes                   235.0                     % km/s, fixed
+%SAFile                      data/sim_sa.txt 
+%SARMFile                    data/sim_sarm.txt 
 
 %=========================================================================
 % reverberation mapping (RM) generic configuration
 %
 
-FlagBLRModel                9                           % 1, 2, 3, 4, 5, 6, 7, 8; BLR model type
+FlagBLRModel                6                           % 1, 2, 3, 4, 5, 6, 7, 8, 9; BLR model type
                                                         % 5 is double power-law model; 6 is Pancoast's model; 7 is two-zone model
+                                                        % 8 is a disk-wind model; 9 is GRAVITY's 3C 273 model
                                                         % 0 is user defined
                                                         % -1 is user defined, analytical transfer function
 
