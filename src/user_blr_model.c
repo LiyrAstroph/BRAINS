@@ -22,6 +22,9 @@
 #include <gsl/gsl_randist.h>
 #include "brains.h"
 
+char *MyBLRmodel_name[] = {"ln(Rblr)", "beta", "F", "Inc", "Opn", "Kappa", "gamma", "xi", 
+                           "ln(Mbh)", "fellip", "fflow", "ln(sigr_circ)", "ln(sigthe_circ)", "ln(sigr_rad)", "ln(sigthe_rad)", "theta_rot", "sig_turb"};
+
 const int num_params_MyBLRmodel1d = 8;   /*!< number of parameters for 1D model */
 const int num_params_MyBLRmodel2d = 17;  /*!< number of parameters for 2D model */
 

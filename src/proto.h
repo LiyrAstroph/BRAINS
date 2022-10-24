@@ -129,6 +129,7 @@ void sim();
 void sim_init();
 void sim_end();
 void set_par_value_sim(double *pm, int flag_model);
+void print_par_value_sim(double *pm, int np);
 
 /* time */
 double second();

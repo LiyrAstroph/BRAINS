@@ -444,6 +444,7 @@ void sim_init()
       gen_cloud_sample = gen_cloud_sample_mymodel;
       transfun_1d_cal = transfun_1d_cal_cloud;
       transfun_2d_cal = transfun_2d_cal_cloud;
+      BLRmodel_name = MyBLRmodel_name;
       break;
 
     case 1:
@@ -451,30 +452,35 @@ void sim_init()
       gen_cloud_sample = gen_cloud_sample_model1;
       transfun_1d_cal = transfun_1d_cal_cloud;
       transfun_2d_cal = transfun_2d_cal_cloud;
+      BLRmodel_name = BLRmodel1_name;
       break;
     case 2:
       num_params_blr_model = sizeof(BLRmodel2)/sizeof(double);
       gen_cloud_sample = gen_cloud_sample_model2;
       transfun_1d_cal = transfun_1d_cal_cloud;
       transfun_2d_cal = transfun_2d_cal_cloud;
+      BLRmodel_name = BLRmodel2_name;
       break;
     case 3:
       num_params_blr_model = sizeof(BLRmodel3)/sizeof(double);
       gen_cloud_sample = gen_cloud_sample_model3;
       transfun_1d_cal = transfun_1d_cal_cloud;
       transfun_2d_cal = transfun_2d_cal_cloud;
+      BLRmodel_name = BLRmodel3_name;
       break;
     case 4:
       num_params_blr_model = sizeof(BLRmodel4)/sizeof(double);
       gen_cloud_sample = gen_cloud_sample_model4;
       transfun_1d_cal = transfun_1d_cal_cloud;
       transfun_2d_cal = transfun_2d_cal_cloud;
+      BLRmodel_name = BLRmodel4_name;
       break;
     case 5:
       num_params_blr_model = sizeof(BLRmodel5)/sizeof(double);
       gen_cloud_sample = gen_cloud_sample_model5;
       transfun_1d_cal = transfun_1d_cal_cloud;
       transfun_2d_cal = transfun_2d_cal_cloud;
+      BLRmodel_name = BLRmodel5_name;
       break;
 
     case 6:
@@ -482,6 +488,7 @@ void sim_init()
       gen_cloud_sample = gen_cloud_sample_model6;
       transfun_1d_cal = transfun_1d_cal_cloud;
       transfun_2d_cal = transfun_2d_cal_cloud;
+      BLRmodel_name = BLRmodel6_name;
       break;
 
     case 7:
@@ -489,6 +496,7 @@ void sim_init()
       gen_cloud_sample = gen_cloud_sample_model7;
       transfun_1d_cal = transfun_1d_cal_cloud;
       transfun_2d_cal = transfun_2d_cal_cloud;
+      BLRmodel_name = BLRmodel7_name;
       break;
 
     case 8:
@@ -496,6 +504,7 @@ void sim_init()
       gen_cloud_sample = gen_cloud_sample_model8;
       transfun_1d_cal = transfun_1d_cal_cloud;
       transfun_2d_cal = transfun_2d_cal_cloud;
+      BLRmodel_name = BLRmodel8_name;
       break;
     
     case 9:
@@ -503,6 +512,7 @@ void sim_init()
       gen_cloud_sample = gen_cloud_sample_model9;
       transfun_1d_cal = transfun_1d_cal_cloud;
       transfun_2d_cal = transfun_2d_cal_cloud;
+      BLRmodel_name = BLRmodel9_name;
       break;
 
     default:
@@ -510,6 +520,7 @@ void sim_init()
       gen_cloud_sample = gen_cloud_sample_model1;
       transfun_1d_cal = transfun_1d_cal_cloud;
       transfun_2d_cal = transfun_2d_cal_cloud;
+      BLRmodel_name = BLRmodel1_name;
       break;
   }
 
@@ -589,6 +600,10 @@ void sim_init()
       }
     }
   }
+  printf("=================================\n");
+  printf("RM model parameter values:\n");
+  print_par_value_sim(pm, num_params_blr_model);
+  printf("=================================\n");
   
   /* spectral broadening, note this is a deviation from the input value */
   pm[num_params_blr_model + num_params_nlr ] = 0.0; 
@@ -1122,6 +1137,22 @@ void set_par_value_sim(double *pm, int flag_model)
       pm[i++] = 30.0;       //opn
       pm[i++] = log(4.0);   // mbh
       break;
+  }
+  return;
+}
+
+/*
+ * print out the parameter values
+ */
+void print_par_value_sim(double *pm, int np)
+{
+  if(BLRmodel_name == NULL)
+    return;
+  
+  int i;
+  for(i=0; i<np; i++)
+  {
+    printf("%02d %15s = %f\n", i, BLRmodel_name[i], pm[i]);
   }
   return;
 }

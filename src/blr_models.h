@@ -17,6 +17,17 @@ double (*theta_sample)(double gam, double Lopn_cos1, double Lopn_cos2);
 double theta_sample_outer(double gam, double Lopn_cos1, double Lopn_cos2);
 double theta_sample_inner(double gam, double Lopn_cos1, double Lopn_cos2);
 
+extern char **BLRmodel_name;
+extern char *BLRmodel1_name[];
+extern char *BLRmodel2_name[];
+extern char *BLRmodel3_name[];
+extern char *BLRmodel4_name[];
+extern char *BLRmodel5_name[];
+extern char *BLRmodel6_name[];
+extern char *BLRmodel7_name[];
+extern char *BLRmodel8_name[];
+extern char *BLRmodel9_name[];
+
 /*!
  *  \struct BLRmodel1
  *  \brief broad-line region model 1. 

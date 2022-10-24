@@ -37,6 +37,8 @@ typedef struct
   double sig_turb;      /*!< \brief 17. turbulence velocity */
 }MyBLRmodel;
 
+extern char *MyBLRmodel_name[];
+
 extern const int num_params_MyBLRmodel1d;  /*!< number of parameters for 1D model */
 extern const int num_params_MyBLRmodel2d;  /*!< number of parameters for 2D model */
 

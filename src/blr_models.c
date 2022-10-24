@@ -22,6 +22,28 @@
 
 #include "brains.h"
 
+char **BLRmodel_name;
+
+char *BLRmodel1_name[] = {"ln(Rblr)", "beta", "F", "Inc", "Opn", "Kappa", 
+                          "ln(Mbh)", "Lambda", "fq"};
+char *BLRmodel2_name[] = {"ln(Rblr)", "beta", "F", "Inc", "Opn", "Kappa", 
+                          "ln(Mbh)", "sig_r", "sig_theta"};
+char *BLRmodel3_name[] = {"ln(Rin)", "F", "alpha", "Inc", "Opn", "Kappa", 
+                          "ln(Mbh)", "xi", "fq"};
+char *BLRmodel4_name[] = {"ln(Rin)", "F", "alpha", "Inc", "Opn", "Kappa", 
+                          "ln(Mbh)", "xi", "fq"};
+char *BLRmodel5_name[] = {"ln(Rblr)", "Fin", "log(Fout)", "alpha", "Inc", "Opn", "Kappa", "gamma", "xi", 
+                         "ln(Mbh)", "fellip", "fflow", "ln(sigr_circ)", "ln(sigthe_circ)", "ln(sigr_rad)", "ln(sigthe_rad)", "theta_rot", "ln(sig_turb)"};
+char *BLRmodel6_name[] = {"ln(Rblr)", "beta", "F", "Inc", "Opn", "Kappa", "gamma", "xi", 
+                         "ln(Mbh)", "fellip", "fflow", "ln(sigr_circ)", "ln(sigthe_circ)", "ln(sigr_rad)", "ln(sigthe_rad)", "theta_rot", "ln(sig_turb)"};
+char *BLRmodel7_name[] = {"ln(Rblr)", "beta", "F", "Inc", "Opn", "Kappa", "gamma", "xi",
+                          "fsh", "ln(Rblr_un)", "beta_un", "F_un", "opn_un", 
+                          "ln(Mbh)", "fellip", "fflow", "ln(sigr_circ)", "ln(sigthe_circ)", "ln(sigr_rad)", "ln(sigthe_rad)", 
+                          "theta_rot", "fellip_un", "fflow_un", "ln(sig_turb)"};
+char *BLRmodel8_name[] = {"theta_min", "dtheta_max", "ln(r_min)", "fr_max", "gamma", "alpha", "lambda", "k", "xi", "ln(Rv)", 
+                          "ln(Rblr)", "Inc", "ln(Mbh)"};
+char *BLRmodel9_name[] = {"ln(Rblr)", "beta", "F", "Inc", "Opn", "ln(Mbh)"};
+
 /* cluster around outer disk face, Lopn_cos1 < Lopn_cos2 */
 inline double theta_sample_outer(double gam, double Lopn_cos1, double Lopn_cos2)
 {
