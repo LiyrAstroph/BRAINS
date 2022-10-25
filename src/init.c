@@ -358,7 +358,8 @@ void init()
           printf("# Too small NConRecon.\n" 
                "# Better to change it to %d or set RCloudMax/TimeBack to smaller than %f/%f.\n", 
                (int)(parset.n_con_recon * med_cad_recon/med_cad), 
-               (Tline_data[0] - Tcon_data[0] + time_back_set)/2.0 ,time_back_set);
+               ((parset.n_con_recon-1) * med_cad - (Tcon_data[n_con_data-1] - Tcon_data[0]))/2.0,
+               ((parset.n_con_recon-1) * med_cad - (Tcon_data[n_con_data-1] - Tcon_data[0])));
           printf("\e[1;35m" "# Use '-f' option in command line if want to ignore this check.\n" "\e[0m");
         }
         if(parset.flag_force_run != 1)
