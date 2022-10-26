@@ -336,56 +336,67 @@ void set_sa_blr_model()
     case 0:
       num_params_sa_blr_model = num_params_MyBLRmodel2d;
       gen_sa_cloud_sample = gen_cloud_sample_mymodel;
+      BLRmodel_sa_name = MyBLRmodel_name;
       break;
 
     case 1:
       num_params_sa_blr_model = sizeof(BLRmodel1)/sizeof(double);
       gen_sa_cloud_sample = gen_cloud_sample_model1;
+      BLRmodel_sa_name = BLRmodel1_name;
       break;
 
     case 2:
       num_params_sa_blr_model = sizeof(BLRmodel2)/sizeof(double);
       gen_sa_cloud_sample = gen_cloud_sample_model2;
+      BLRmodel_sa_name = BLRmodel2_name;
       break;
 
     case 3:
       num_params_sa_blr_model = sizeof(BLRmodel3)/sizeof(double);
       gen_sa_cloud_sample = gen_cloud_sample_model3;
+      BLRmodel_sa_name = BLRmodel3_name;
       break;
 
     case 4:
       num_params_sa_blr_model = sizeof(BLRmodel4)/sizeof(double);
       gen_sa_cloud_sample = gen_cloud_sample_model4;
+      BLRmodel_sa_name = BLRmodel4_name;
       break;
 
     case 5:
       num_params_sa_blr_model = sizeof(BLRmodel5)/sizeof(double);
       gen_sa_cloud_sample = gen_cloud_sample_model5;
+      BLRmodel_sa_name = BLRmodel5_name;
       break;
     
     case 6:
       num_params_sa_blr_model = sizeof(BLRmodel6)/sizeof(double);
       gen_sa_cloud_sample = gen_cloud_sample_model6;
+      BLRmodel_sa_name = BLRmodel6_name;
       break;
     
     case 7:
       num_params_sa_blr_model = sizeof(BLRmodel7)/sizeof(double);
       gen_sa_cloud_sample = gen_cloud_sample_model7;
+      BLRmodel_sa_name = BLRmodel7_name;
       break;
 
     case 8:
       num_params_sa_blr_model = sizeof(BLRmodel8)/sizeof(double);
       gen_sa_cloud_sample = gen_cloud_sample_model8;
+      BLRmodel_sa_name = BLRmodel8_name;
       break;
     
     case 9:
       num_params_sa_blr_model = sizeof(BLRmodel9)/sizeof(double);
       gen_sa_cloud_sample = gen_cloud_sample_model9;
+      BLRmodel_sa_name = BLRmodel9_name;
       break;
 
     default:
       num_params_sa_blr_model = sizeof(BLRmodel1)/sizeof(double);
       gen_sa_cloud_sample = gen_cloud_sample_model1;
+      BLRmodel_sa_name = BLRmodel1_name;
       break;
   }
 

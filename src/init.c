@@ -356,7 +356,8 @@ void init()
         if(thistask == roottask)
         {
           printf("# Too small NConRecon.\n" 
-               "# Better to change it to %d or set RCloudMax/TimeBack to smaller than %f/%f.\n", 
+               "# Better to change it to %d or set RCloudMax/TimeBack to smaller than %f/%f.\n"
+               "# Note that too small RCloudMax/TimeBack might result in biases.\n", 
                (int)(parset.n_con_recon * med_cad_recon/med_cad), 
                ((parset.n_con_recon-1) * med_cad - (Tcon_data[n_con_data-1] - Tcon_data[0]))/2.0,
                ((parset.n_con_recon-1) * med_cad - (Tcon_data[n_con_data-1] - Tcon_data[0])));
@@ -1344,66 +1345,77 @@ void set_blr_model1d()
       num_params_blr_model = num_params_MyBLRmodel1d;
       gen_cloud_sample = gen_cloud_sample_mymodel;
       transfun_1d_cal = transfun_1d_cal_cloud;
+      BLRmodel_name = MyBLRmodel_name;
       break;
 
     case 1:
       num_params_blr_model = 6;
       gen_cloud_sample = gen_cloud_sample_model1;
       transfun_1d_cal = transfun_1d_cal_cloud;
+      BLRmodel_name = BLRmodel1_name;
       break;
 
     case 2:
       num_params_blr_model = 6;
       gen_cloud_sample = gen_cloud_sample_model1;
       transfun_1d_cal = transfun_1d_cal_cloud;
+      BLRmodel_name = BLRmodel2_name;
       break;
 
     case 3:
       num_params_blr_model = 6;
       gen_cloud_sample = gen_cloud_sample_model3;
       transfun_1d_cal = transfun_1d_cal_cloud;
+      BLRmodel_name = BLRmodel3_name;
       break;
 
     case 4:
       num_params_blr_model = 6;
       gen_cloud_sample = gen_cloud_sample_model3;
       transfun_1d_cal = transfun_1d_cal_cloud;
+      BLRmodel_name = BLRmodel4_name;
       break;
 
     case 5:
       num_params_blr_model = 9;
       gen_cloud_sample = gen_cloud_sample_model5;
       transfun_1d_cal = transfun_1d_cal_cloud;
+      BLRmodel_name = BLRmodel5_name;
       break;
 
     case 6:
       num_params_blr_model = 8;
       gen_cloud_sample = gen_cloud_sample_model6;
       transfun_1d_cal = transfun_1d_cal_cloud;
+      BLRmodel_name = BLRmodel6_name;
       break;
 
     case 7:
       num_params_blr_model = 13;
       gen_cloud_sample = gen_cloud_sample_model7;
       transfun_1d_cal = transfun_1d_cal_cloud;
+      BLRmodel_name = BLRmodel7_name;
       break;
 
     case 8:
       num_params_blr_model = 13;
       gen_cloud_sample = gen_cloud_sample_model8;
       transfun_1d_cal = transfun_1d_cal_cloud;
+      BLRmodel_name = BLRmodel8_name;
       break;
     
     case 9:
       num_params_blr_model = 5;
       gen_cloud_sample = gen_cloud_sample_model9;
       transfun_1d_cal = transfun_1d_cal_cloud;
+      BLRmodel_name = BLRmodel9_name;
       break;
 
     default:
       num_params_blr_model = 6;
       gen_cloud_sample = gen_cloud_sample_model1;
       transfun_1d_cal = transfun_1d_cal_cloud;
+      BLRmodel_name = BLRmodel1_name;
       break;
   }
   return;
@@ -1425,66 +1437,77 @@ void set_blr_model2d()
       num_params_blr_model = num_params_MyBLRmodel2d;
       gen_cloud_sample = gen_cloud_sample_mymodel;
       transfun_2d_cal = transfun_2d_cal_cloud;
+      BLRmodel_name = MyBLRmodel_name;
       break;
 
     case 1:
       num_params_blr_model = sizeof(BLRmodel1)/sizeof(double);
       gen_cloud_sample = gen_cloud_sample_model1;
       transfun_2d_cal = transfun_2d_cal_cloud;
+      BLRmodel_name = BLRmodel1_name;
       break;
 
     case 2:
       num_params_blr_model = sizeof(BLRmodel2)/sizeof(double);
       gen_cloud_sample = gen_cloud_sample_model2;
       transfun_2d_cal = transfun_2d_cal_cloud;
+      BLRmodel_name = BLRmodel2_name;
       break;
 
     case 3:
       num_params_blr_model = sizeof(BLRmodel3)/sizeof(double);
       gen_cloud_sample = gen_cloud_sample_model3;
       transfun_2d_cal = transfun_2d_cal_cloud;
+      BLRmodel_name = BLRmodel3_name;
       break;
 
     case 4:
       num_params_blr_model = sizeof(BLRmodel4)/sizeof(double);
       gen_cloud_sample = gen_cloud_sample_model4;
       transfun_2d_cal = transfun_2d_cal_cloud;
+      BLRmodel_name = BLRmodel4_name;
       break;
 
     case 5:
       num_params_blr_model = sizeof(BLRmodel5)/sizeof(double);
       gen_cloud_sample = gen_cloud_sample_model5;
       transfun_2d_cal = transfun_2d_cal_cloud;
+      BLRmodel_name = BLRmodel5_name;
       break;
     
     case 6:
       num_params_blr_model = sizeof(BLRmodel6)/sizeof(double);
       gen_cloud_sample = gen_cloud_sample_model6;
       transfun_2d_cal = transfun_2d_cal_cloud;
+      BLRmodel_name = BLRmodel6_name;
       break;
     
     case 7:
       num_params_blr_model = sizeof(BLRmodel7)/sizeof(double);
       gen_cloud_sample = gen_cloud_sample_model7;
       transfun_2d_cal = transfun_2d_cal_cloud;
+      BLRmodel_name = BLRmodel7_name;
       break;
 
     case 8:
       num_params_blr_model = sizeof(BLRmodel8)/sizeof(double);
       gen_cloud_sample = gen_cloud_sample_model8;
       transfun_2d_cal = transfun_2d_cal_cloud;
+      BLRmodel_name = BLRmodel8_name;
       break;
     
     case 9:
       num_params_blr_model = sizeof(BLRmodel9)/sizeof(double);
       gen_cloud_sample = gen_cloud_sample_model9;
       transfun_2d_cal = transfun_2d_cal_cloud;
+      BLRmodel_name = BLRmodel9_name;
       break;
 
     default:
       num_params_blr_model = sizeof(BLRmodel1)/sizeof(double);
       gen_cloud_sample = gen_cloud_sample_model1;
       transfun_2d_cal = transfun_2d_cal_cloud;
+      BLRmodel_name = BLRmodel1_name;
       break;
   }
   return;

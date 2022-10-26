@@ -18,6 +18,7 @@ double theta_sample_outer(double gam, double Lopn_cos1, double Lopn_cos2);
 double theta_sample_inner(double gam, double Lopn_cos1, double Lopn_cos2);
 
 extern char **BLRmodel_name;
+extern char **BLRmodel_sa_name;
 extern char *BLRmodel1_name[];
 extern char *BLRmodel2_name[];
 extern char *BLRmodel3_name[];

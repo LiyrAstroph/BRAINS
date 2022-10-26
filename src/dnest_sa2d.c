@@ -369,7 +369,7 @@ void print_par_names_sa2d()
 
   int i, j;
   FILE *fp;
-  char fname[BRAINS_MAX_STR_LENGTH], str_fmt[BRAINS_MAX_STR_LENGTH];
+  char fname[BRAINS_MAX_STR_LENGTH], str_fmt[BRAINS_MAX_STR_LENGTH], str_name[BRAINS_MAX_STR_LENGTH];
 
   sprintf(fname, "%s/%s", parset.file_dir, "data/para_names_sa2d.txt");
   fp = fopen(fname, "w");
@@ -379,7 +379,7 @@ void print_par_names_sa2d()
     exit(0);
   }
   
-  strcpy(str_fmt, "%4d %-15s %10.6f %10.6f %4d %4d %15.6e\n");
+  strcpy(str_fmt, "%4d %-28s %10.6f %10.6f %4d %4d %15.6e\n");
 
   printf("# Print parameter name in %s\n", fname);
 
@@ -387,13 +387,22 @@ void print_par_names_sa2d()
   fprint_version(fp);
   fprintf(fp, "#*************************************************\n");
 
-  fprintf(fp, "%4s %-15s %10s %10s %4s %4s %15s\n", "#", "Par", "Min", "Max", "Prior", "Fix", "Val");
+  fprintf(fp, "%4s %-28s %10s %10s %4s %4s %15s\n", "#", "Par", "Min", "Max", "Prior", "Fix", "Val");
 
   i=-1;
   for(j=0; j<num_params_blr_model; j++)
   {
     i++;
-    fprintf(fp, str_fmt, i, "BLR model", par_range_model[i][0], par_range_model[i][1], par_prior_model[i],
+    if(BLRmodel_name!=NULL)
+    {
+      strcpy(str_name, "BLR model ");
+      strcat(str_name, BLRmodel_name[i]);
+    }
+    else 
+    {
+      strcat(str_name, "BLR model");
+    }
+    fprintf(fp, str_fmt, i, str_name, par_range_model[i][0], par_range_model[i][1], par_prior_model[i],
                             par_fix[i], par_fix_val[i]);
   }
 
@@ -423,7 +432,16 @@ void print_par_names_sa2d()
   for(j=0; j<num_params_sa_blr_model; j++)
   {
     i++;
-    fprintf(fp, str_fmt, i, "SA BLR model", par_range_model[i][0], par_range_model[i][1], par_prior_model[i],
+    if(BLRmodel_sa_name!=NULL)
+    {
+      strcpy(str_name, "SA BLR model ");
+      strcat(str_name, BLRmodel_sa_name[j]);
+    }
+    else 
+    {
+      strcat(str_name, "SA BLR model");
+    }
+    fprintf(fp, str_fmt, i, str_name, par_range_model[i][0], par_range_model[i][1], par_prior_model[i],
                             par_fix[i], par_fix_val[i]);
   }
 

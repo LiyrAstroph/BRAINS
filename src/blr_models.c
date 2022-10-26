@@ -23,6 +23,7 @@
 #include "brains.h"
 
 char **BLRmodel_name;
+char **BLRmodel_sa_name;
 
 char *BLRmodel1_name[] = {"ln(Rblr)", "beta", "F", "Inc", "Opn", "Kappa", 
                           "ln(Mbh)", "Lambda", "fq"};
