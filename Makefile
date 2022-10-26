@@ -8,7 +8,7 @@
 SHELL=/bin/bash
 
 CC       = mpicc
-OPTIMIZE = -O2 -Wall -finline-functions -fcommon
+OPTIMIZE = -O2 -Wall -finline-functions -fcommon -ffast-math
 #OPTIMIZE += -DDebug
 
 # include spectro-astrometry analysis

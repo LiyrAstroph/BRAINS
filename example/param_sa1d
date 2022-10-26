@@ -19,7 +19,7 @@ FlagBLRModel                9                           % 1, 2, 3, 4, 5, 6, 7, 8
 % data file
 
 ContinuumFile               data/sim_con.txt          % file for continuum data
-LineFile                    data/sim_hb.txt           % file for line data
+LineFile                    data/sim_line.txt           % file for line data
 
 %========================================================================
 % SA data

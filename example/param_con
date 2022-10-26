@@ -8,9 +8,10 @@ Redshift                    0.158                               % redshift of th
 FileDir                     /home/liyropt/Projects/GIT/BRAINS      % directory for where all the output files are stored
 
 FlagDim                     0                          % -2, generate fully random lc; -1, mock lc based on input data; 
-                                                        % 0, only continuum modeling; 1, 1d line RM; 2, 2d line RM
+                                                       % 0, only continuum modeling; 1, 1d line RM; 2, 2d line RM
+                                                       % if -DSA, 3: only SA; 4: SA+1d line RM; 5: SA+2d line RM; 6: SARM
 
-ContinuumFile               data/sim_con.txt          % file for continuum data
+ContinuumFile               data/sim_con.txt           % file for continuum data
 
 NConRecon                   200                         % number of points for continuum reconstruction
 FlagTrend                   0                           % 0, mean; 1, first-order trend

@@ -19,7 +19,7 @@ LineCenter                  4861.0                      %  rest frame, A
 % data file
 
 ContinuumFile               data/sim_con.txt          % file for continuum data
-Line2DFile                  data/sim_hb2d.txt         % file for line 2d data
+Line2DFile                  data/sim_line2d.txt         % file for line 2d data
 
 %========================================================================
 % SA data
