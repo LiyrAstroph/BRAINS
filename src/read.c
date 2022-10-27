@@ -1949,7 +1949,7 @@ int check_parset_isset()
   {
     strcpy(this_tag[n_this_tag++], "FlagBLRModel");
     strcpy(this_tag[n_this_tag++], "ContinuumFile");
-    strcpy(this_tag[n_this_tag++], "LineFile");
+    strcpy(this_tag[n_this_tag++], "Line2DFile");
 #ifdef SpecAstro
     strcpy(this_tag[n_this_tag++], "FlagSABLRModel");
     strcpy(this_tag[n_this_tag++], "SALineCenter");
