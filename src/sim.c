@@ -63,6 +63,7 @@ void sim()
     create_con_from_random(sigma, taud, 1.0, 0.0); 
   }
   calculate_con_rm(model);
+  gsl_interp_init(gsl_linear, Tcon, Fcon_rm, parset.n_con_recon);
   
   sprintf(fname, "%s/%s", parset.file_dir, "/data/sim_con_full.txt");
   fp = fopen(fname, "w");
@@ -89,11 +90,11 @@ void sim()
   
   if(parset.flag_dim != -2)
   {
-    gsl_interp_init(gsl_linear, Tcon, Fcon, parset.n_con_recon);
+    gsl_interp_init(gsl_linear, Tcon, Fcon_rm, parset.n_con_recon);
     for(i=0; i<n_con_data; i++)
     {
       //fprintf(fp, "%f %f %f\n", Tcon[i], Fcon[i]/con_scale, Fcerrs[i]/con_scale);
-      fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon, Tcon_data[i], gsl_acc);
+      fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon_rm, Tcon_data[i], gsl_acc);
       fprintf(fp, "%e %e %e\n", Tcon_data[i]*(1.0+parset.redshift), 
             (fcon+gsl_ran_ugaussian(gsl_r)*con_error_mean)/con_scale, con_error_mean/con_scale);
     }
@@ -111,8 +112,6 @@ void sim()
     }
   }
   fclose(fp);
-  
-  gsl_interp_init(gsl_linear, Tcon, Fcon_rm, parset.n_con_recon);
 
 /*==================================1d line============================================*/  
   transfun_1d_cal(model, 0);
@@ -838,6 +837,7 @@ void sim_init()
     
     /* SARM */
     memcpy(base_sarm, base_sarm_data, n_epoch_sarm_data*n_base_sarm_data*2 * sizeof(double));
+    memcpy(Tline_sarm, Tline_sarm_data, n_epoch_sarm_data * sizeof(double));
   }
   else
   {
