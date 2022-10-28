@@ -1,5 +1,15 @@
 .. :changelog:
 
+0.1.7 (2022-10-27)
+++++++++++++++++++
+
+- include spectro-astrometric reverberation mapping analysis.
+
+0.1.6 (2021-06-20)
+++++++++++++++++++
+
+- include minor updates and bugs fixed.
+
 0.1.5 (2020-03-02)
 ++++++++++++++++++
 
