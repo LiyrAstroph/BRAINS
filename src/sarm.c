@@ -139,9 +139,12 @@ void calculate_sarm_with_sample(const void *pm)
     }
     
     tl = Tline_sarm_data[j];
-    /* interpret to get the present continuum flux */
+    /* interpret to get the present continuum flux 
+     * note that the continuum underlying the line might have a lag 
+     * with respect to the ionizing continuum
+     */
     //fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon_rm, tl, gsl_acc);
-    fcon = interp_con_rm(tl);
+    fcon = interp_con_rm(tl - sarm_lag_con_under_line);
 
     for(k=0; k<parset.n_tau; k++)
     {
@@ -238,7 +241,7 @@ void calculate_sarm_sim_with_sample(const void *pm, double *tline, double *vel_s
     tl = tline[j];
     /* interpret to get the present continuum flux */
     //fcon = gsl_interp_eval(gsl_linear, Tcon, Fcon_rm, tl, gsl_acc);
-    fcon = interp_con_rm(tl);
+    fcon = interp_con_rm(tl - sarm_lag_con_under_line);
 
     for(k=0; k<parset.n_tau; k++)
     {

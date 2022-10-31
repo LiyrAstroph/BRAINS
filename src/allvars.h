@@ -321,6 +321,8 @@ extern double sarm_phase_error_mean, sarm_line_error_mean;
 
 extern double *workspace_phase;
 
+extern const double sarm_lag_con_under_line;
+
 /* SARM reconstruction */
 extern double *Fline2d_sarm_at_data;
 extern double *phase_sarm_at_data;

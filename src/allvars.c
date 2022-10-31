@@ -186,6 +186,9 @@ double sarm_phase_error_mean, sarm_line_error_mean;
 
 double *workspace_phase;
 
+/* lag of the continuum underlying the sarm line with respect to the ionzing continuum */
+const double sarm_lag_con_under_line = 0.0;
+
 /* SARM reconstruction */
 double *Fline2d_sarm_at_data;
 double *phase_sarm_at_data;
