@@ -22,7 +22,7 @@ If using spectro-astrometric analysis, please cite our papers
 
 If using spectro-astrometric RM analysis, please cite our papers 
 
-  * `Li, Y.-R., Wang, J.-M. 2022, ApJ submitted <https://ui.adsabs.harvard.edu/abs/2022ApJ...927...58L/abstract>`_.
+  * `Li, Y.-R., Wang, J.-M. 2022, ApJ in press <https://arxiv.org/abs/2211.14767>`_.
   
   * `Li, Y.-R., Wang, J.-M., Ho, L. C. et al. 2013, ApJ, 779, 110 <http://adsabs.harvard.edu/abs/2013ApJ...779..110L>`_.
 
