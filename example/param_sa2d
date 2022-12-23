@@ -25,7 +25,7 @@ Line2DFile                  data/sim_line2d.txt         % file for line 2d data
 % SA data
 SALineCenter                1.875                       % reset frame, um       
 FlagSABLRModel              9                           % BLRModel                                                     
-SAInstRes                   235.0                       % km/s, fixed
+SAInstRes                   235.0                       % km/s, fixed, Gaussian standard deviation
 SAFile                      data/3C273_sa.txt 
 FlagSAParMutual             1                         % flag for mutual parameters with BLR model
                                                       % 0: all 
@@ -79,6 +79,7 @@ FlagInstRes                 1                           % 0, uniform prior, epoc
                                                         % 2, epoch-dependent parameterization, prior stored in "InstResFile"
 
 InstRes                     220                           % instrument broadening (modeled by a Gaussian), in km/s, for FlagInstRes=0, or 1
+                                                          % Gaussian standard deviation
                                                           
 InstResErr                  50.0                         % instrument broadening error, in km/s, for FlagInstRes=0, or 1
 

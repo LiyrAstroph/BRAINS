@@ -77,6 +77,7 @@ Parameter File
                                                           % 2, epoch-dependent parameterization, prior stored in "InstResFile"
   
   InstRes                     220                           % instrument broadening (modeled by a Gaussian), in km/s, for FlagInstRes=0, or 1
+                                                            % Gaussian standard deviation
                                                             
   InstResErr                  50.0                         % instrument broadening error, in km/s, for FlagInstRes=0, or 1
   

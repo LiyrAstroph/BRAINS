@@ -14,7 +14,7 @@ SALineCenter                1.875                       % reset frame, um
      
 FlagSABLRModel              9                           % BLRModel 
                                                       
-SAInstRes                   235.0                       % km/s, fixed
+SAInstRes                   235.0                       % km/s, fixed, Gaussian standard deviation
 
 SAFile                      data/3C273_sa.txt 
 

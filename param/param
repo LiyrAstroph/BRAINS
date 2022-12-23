@@ -112,7 +112,8 @@ FlagInstRes                 0                           % 0, fixed to InstRes
                                                         % 3, epoch-dependent parameterization, prior stored in "InstResFile"
 
 InstRes                     490                         % instrument broadening (modeled by a Gaussian), in km/s, for FlagInstRes=0, or 1
-                                                          
+                                                        % Gaussian standard deviation
+
 InstResErr                  50.0                        % instrument broadening error, in km/s, for FlagInstRes=0, or 1
 
 InstResFile                 data/sim_broadening.txt       % file for storing epoch-dependent instrument broadening
