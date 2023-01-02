@@ -58,6 +58,7 @@ InstResFile                 data/sim_broaden.txt        % file for storing epoch
 %========================================================================
 % narrow-line component
 % use a gaussian to model the narrow-line component
+% width refers to the gaussian standard deviation
 
 FlagNarrowLine              0                           % 0, no narrow line; 
                                                         % 1, add fixed narrow line; 
