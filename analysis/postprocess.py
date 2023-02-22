@@ -69,6 +69,10 @@ def postprocess(ndim, temp=1.0, fcut=0.0):
   lowest = np.min([sample.shape[0], sample_info.shape[0]])
   sample = sample[0:lowest, :]
   sample_info = sample_info[0:lowest, :]
+
+  # reset level assignment
+  idx = (sample_info[:, 0] > levels_orig.shape[0] - 1)
+  sample_info[idx, 0] = levels_orig.shape[0] - 1
   
   fig = plt.figure(figsize=(12, 8))
   fig.subplots_adjust(wspace=0.2, hspace=0.3)
