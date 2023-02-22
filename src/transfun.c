@@ -89,7 +89,15 @@ void calculate_con_rm(const void *pm)
   {
     for(i=0; i<parset.n_con_recon; i++)
     {
-      Fcon_rm[i] = A * pow(Fcon[i], 1.0+Ag);
+      /* if fcon is negative, its pow raises an error */
+      if(Fcon[i] >= 0.0)
+      {
+        Fcon_rm[i] = A * pow(Fcon[i], 1.0+Ag);
+      }
+      else 
+      {
+        Fcon_rm[i] = 0.0;
+      }
     }
   }
 
