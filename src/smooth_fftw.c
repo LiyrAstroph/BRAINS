@@ -94,25 +94,15 @@ void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int
 {
   int i, j;
   // initialize response and its fft.
-  double sigV, sigV_instrinsic, dV, linecenter=0.0;
+  double sigV, dV, linecenter=0.0;
   double *pmodel = (double *)pm;
 
   dV = transv[1] - transv[0];
-
-  if(parset.flag_narrowline < 2)
-  {
-    sigV_instrinsic = parset.width_narrowline;
-  }
-  else
-  {
-    sigV_instrinsic = parset.width_narrowline + pmodel[num_params_blr_model+1] * parset.width_narrowline_err;
-  }
   
   if(parset.flag_InstRes <= 1) /* fixed InstRes or uniform prior for InstRes */
   {
     sigV = parset.InstRes + pmodel[num_params_blr_model+num_params_nlr]*parset.InstRes_err;
-    sigV = fmax(0.0, sigV*sigV - sigV_instrinsic*sigV_instrinsic);
-    sigV = sqrt(sigV);
+    sigV = fmax(0.0, sigV);
 
     /* setup response 
        note the factor nd_fft. 
@@ -176,8 +166,7 @@ void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int
     for(j=0; j<nl; j++)
     {
       sigV = instres_epoch[j] + pmodel[num_params_blr_model + num_params_nlr + j]*instres_err_epoch[j];
-      sigV = fmax(0.0, sigV*sigV - sigV_instrinsic*sigV_instrinsic);
-      sigV = sqrt(sigV);
+      sigV = fmax(0.0, sigV);
 
       /* line center */
       if(parset.flag_linecenter > 0) /* uniform  */

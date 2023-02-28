@@ -628,12 +628,6 @@ void read_parset()
           parset.InstRes /= VelUnit;
           parset.InstRes_err /= VelUnit;
   
-          if(parset.width_narrowline > parset.InstRes)
-          {
-            printf("# Error narrow line width %f should be smaller than InstRes %f. \n", 
-                    parset.width_narrowline*VelUnit, parset.InstRes*VelUnit);
-            error_flag = 1;
-          }
         }
       }
   
@@ -1237,13 +1231,6 @@ void read_data()
           instres_epoch[i] /= VelUnit;
           instres_err_epoch[i] /= VelUnit;
   
-          if(instres_epoch[i] < parset.width_narrowline)
-          {
-            printf("# Error narrow line width %f should be smaller than InstRes %f at %d epoch.\n",
-              parset.width_narrowline*VelUnit, parset.InstRes*VelUnit, i);    
-            error_flag = 1;   
-            break;   
-          }
         }
         fclose(fp);
       }
