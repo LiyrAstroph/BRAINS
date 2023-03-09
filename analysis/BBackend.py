@@ -16,6 +16,7 @@ import numpy as np
 import configparser as cp
 import matplotlib.pyplot as plt
 from scipy.ndimage import gaussian_filter
+from matplotlib.backends.backend_pdf import PdfPages
 
 class Param:
   """
@@ -821,3 +822,116 @@ class BBackend(Param, Options, ParaName):
     
     fig.savefig("results_2d.pdf", bbox_inches='tight')
     plt.show()
+  
+  def find_max_prob(self):
+    """
+    find the parameter set with the maximum prob
+    """
+    idx = np.argmax(self.results['sample_info'])
+    return idx, self.results['sample'][idx, :]
+  
+  def check_cloud_dist_p14(self):
+    """
+    check Appendix A in Pancoast et al. 2014a
+    """
+    Ec = -0.5
+    Lc = 1.0
+    lam = 0.1
+    n = 10000
+    chi = np.random.randn(n) * lam
+    E =(chi+ 1.0) * Ec
+    #plt.hist(E)
+    Lmax = np.sqrt(2.0 * (E + 1.0))
+    L = Lmax * lam * np.log( (np.exp(1.0/lam) - 1.0) * np.random.random(n)  + 1.0)
+    
+    vr2 = 2.0*(E + 1.0) - L*L
+    u = np.random.rand(n)
+    sig = [1 if ut > 0.5 else -1 for ut in u]
+    
+    idx = np.where(vr2 < 0)
+    vr2[idx[0]] = 0
+    vr = np.sqrt(vr2) * sig
+    
+    u = np.random.rand(n)
+    sig = [1 if ut > 0.5 else -1 for ut in u]
+    vphi = L * sig
+    
+    
+    plt.plot(vr, vphi, ls='none', marker='.', markersize=1)
+    
+    r= 1.0
+    theta = np.linspace(0, 2.0*np.pi, 100)
+    x = r * np.cos(theta)
+    y = r * np.sin(theta)
+    
+    plt.plot(x, y)
+    plt.show()
+  
+  def plot_limits(self):
+    """
+    plot CDNest limits of parameters with levels
+    """
+    str_dim = '2d'  
+    pdf = PdfPages("limits_"+str_dim+".pdf")
+  
+    limits = np.loadtxt("../data/limits_"+str_dim+".txt", comments='#')
+  
+    for i in range(self.num_param_blrmodel_rm):
+      fig = plt.figure()
+      ax = fig.add_subplot(111)
+      ax.plot(limits[:, 0], limits[:, (i+1)*2-1], marker='o')
+      ax.plot(limits[:, 0], limits[:, (i+1)*2], marker='o')
+      ax.set_xlabel("Level")
+      ax.set_ylabel("Limits " + self.para_names['name'][i])
+      pdf.savefig()
+      plt.close()
+  
+    pdf.close()
+  
+  def plot_tran2d(self):
+    """
+    plot transfer function with the maximum prob
+    """
+    idx, par = self.find_max_prob()
+    
+    plt.rcParams['xtick.direction'] = 'out'
+    plt.rcParams['ytick.direction'] = 'out'
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.imshow(self.results['tran2d_rec'][idx], aspect='auto', origin='lower', \
+              extent=[self.data['line2d_data']['profile'][0,0,0],self.data['line2d_data']['profile'][0,-1,0], \
+                      self.results['tau_rec'][idx][0], self.results['tau_rec'][idx][-1]],\
+              interpolation='gaussian')
+    ax.set_xlabel(r'Wavelength')
+    ax.set_ylabel(r'Time Lag')
+    ax.set_title("Transfer function with the maximum prob")
+    plt.rcParams['xtick.direction'] = 'in'
+    plt.rcParams['ytick.direction'] = 'in'
+    plt.show()
+  
+  def plot_tran1d(self):
+    """
+    plot transfer function 1d
+    """
+    if int(self.param['flagdim']) in [1, 4]:
+      tran_rec = self.results['tran_rec']
+      fig = plt.figure()
+      ax = fig.add_subplot(111)
+      for i in range(0, tran_rec.shape[0], int(tran_rec.shape[0]/100+1.0)):
+        ax.plot(tran_rec[i, :, 0], tran_rec[i, :, 1], lw=0.5)
+      plt.show()
+    else:
+      tau_rec = self.results['tau_rec']
+      tran2d_rec = self.results['tran2d_rec']
+      tran1d_rec = np.sum(tran2d_rec, axis=2)
+      
+      fig = plt.figure()
+      ax = fig.add_subplot(111)
+      for i in range(0, tran1d_rec.shape[0], int(tran1d_rec.shape[0]/100+1.0)):
+        ax.plot(tau_rec[i, :], tran1d_rec[i, :], lw=0.5)
+      
+      ax.set_xlabel(r"Time Lag")
+      ax.set_ylabel(r"Transfer Function")
+      plt.show()
+
+
