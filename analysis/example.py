@@ -1,10 +1,14 @@
 import matplotlib.pyplot as plt 
 
-from plotbackend import plotbackend 
+from BBackend import BBackend 
 
-pb = plotbackend("../param/param")
+pb = BBackend("../param/param")
 
-pb.load_results()
-
+# plot continuum DRW parameters
 fig = pb.plot_drw_parameters()
-plt.show()
+
+# plot RM 2D results
+# 
+# pb.plot_results_2d_style2018()
+pb.plot_results_2d_style2022()
+

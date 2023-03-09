@@ -6,13 +6,16 @@
 # Yan-Rong Li, liyanrong@ihep.ac.cn
 # Thu, Aug 4, 2016
 #
+# a plotting backend for BRAINS
 
 import os
+import re
 import sys
 import corner
 import numpy as np 
 import configparser as cp
 import matplotlib.pyplot as plt
+from scipy.ndimage import gaussian_filter
 
 class Param:
   """
@@ -62,19 +65,19 @@ class Options:
     if flag_dim == '-2':
       self.option_file = ""
     elif flag_dim == '-1':
-      self.option_file = file_dir + "/src/OPTIONSCON"
+      self.option_file = file_dir + "/param/OPTIONSCON"
     elif flag_dim == '0':
-      self.option_file = file_dir + "/src/OPTIONSCON"
+      self.option_file = file_dir + "/param/OPTIONSCON"
     elif flag_dim == '1':
-      self.option_file = file_dir + "/src/OPTIONS1D"
+      self.option_file = file_dir + "/param/OPTIONS1D"
     elif flag_dim == '2':
-      self.option_file = file_dir + "/src/OPTIONS2D"
+      self.option_file = file_dir + "/param/OPTIONS2D"
     elif flag_dim == '3':
-      self.option_file = file_dir + "/src/OPTIONSSA"
+      self.option_file = file_dir + "/param/OPTIONSSA"
     elif flag_dim == '4':
-      self.option_file = file_dir + "/src/OPTIONSSA1D"
+      self.option_file = file_dir + "/param/OPTIONSSA1D"
     elif flag_dim == '5':
-      self.option_file = file_dir + "/src/OPTIONSSA2D"
+      self.option_file = file_dir + "/param/OPTIONSSA2D"
 
     if self.option_file != "":
       with open(self.option_file) as f:
@@ -111,6 +114,8 @@ class ParaName:
       self.para_names_file = file_dir + "/data/para_names_sa1d.txt"
     elif flag_dim == '5':
       self.para_names_file = file_dir + "/data/para_names_sa2d.txt"
+    elif flag_dim == '6':
+      self.para_names_file = file_dir + "/data/para_names_sarm.txt"
     else:
       raise Exception("Incorrect FlagDim.")
 
@@ -132,25 +137,23 @@ class ParaName:
     self.num_param_blrmodel_sa = 0
     self.num_param_sa_extra = 0
     
-    if 'BLR model' in self.para_names['name']:
-      self.num_param_blrmodel_rm = np.count_nonzero(self.para_names['name'] == 'BLR model')
-    else:
-      self.num_param_blrmodel_rm = 0
+    self.num_param_blrmodel_rm = 0
+    self.num_param_blrmodel_sa = 0
+    self.num_param_sa_extra = 0
+    for name in self.para_names['name']:
+      if re.match("BLR model", name):
+        self.num_param_blrmodel_rm += 1
       
-    if 'SA BLR model' in self.para_names['name']:
-      idx = np.nonzero(self.para_names['name'] == 'SA BLR model')
-      self.num_param_rm_extra = idx[0][0] - self.num_param_blrmodel_rm
-      self.num_param_blr_rm = self.num_param_rm_extra + self.num_param_blrmodel_rm
-      self.num_param_blrmodel_sa = np.count_nonzero(self.para_names['name'] == 'SA BLR model')
-      self.num_param_sa_extra = np.count_nonzero(self.para_names['name'] ==  'SA Extra Par')
-      self.num_param_sa = self.num_param_blrmodel_sa + self.num_param_sa_extra
-    else:
-      self.num_param_sa = 0
-      self.num_param_blrmodel_sa = 0
-      self.num_param_sa_extra = 0
-      idx_con =  np.nonzero(self.para_names['name'] == 'sys_err_con')
-      self.num_param_rm_extra = idx_con[0][0] - self.num_param_blrmodel_rm
-      self.num_param_blr_rm = self.num_param_rm_extra + self.num_param_blrmodel_rm
+      if re.match("SA BLR model", name):
+        self.num_param_blrmodel_sa += 1
+      
+      if re.match("SA Extra Par", name):
+        self.num_param_sa_extra += 1
+    
+    self.num_param_sa = self.num_param_blrmodel_sa + self.num_param_sa_extra
+    idx_con =  np.nonzero(self.para_names['name'] == 'sys_err_con')
+    self.num_param_rm_extra = idx_con[0][0] - self.num_param_blrmodel_rm - self.num_param_sa
+    self.num_param_blr_rm = self.num_param_rm_extra + self.num_param_blrmodel_rm
 
     if 'time series' in self.para_names['name']:
       idx = np.nonzero(self.para_names['name'] == 'time series')
@@ -159,8 +162,6 @@ class ParaName:
       self.num_param_con = 0
 
     #print(self.num_param_blr_rm, self.num_param_sa, self.num_param_con)
-    
-
 
 class BBackend(Param, Options, ParaName):
   """
@@ -171,7 +172,9 @@ class BBackend(Param, Options, ParaName):
     Options.__init__(self, self.param['filedir'], self.param['flagdim'])
     ParaName.__init__(self, self.param['filedir'], self.param['flagdim'])
     
-    self.file_dir = self.param['filedir']+"/"
+    self.VelUnit = np.sqrt( 6.672e-8 * 1.0e6 * 1.989e33 / (2.9979e10*8.64e4)) / 1.0e5
+
+    self.file_dir = self.param['filedir'] +"/"
     self._load_data()
     self._load_results() 
 
@@ -399,16 +402,422 @@ class BBackend(Param, Options, ParaName):
   
   
   def get_con_data(self):
-    return self.data['con_data']
+    if self.data.__contains__('con_data'):
+      return self.data['con_data']
+    else:
+      raise ValueError("No con data!")
+  
   def get_line_data(self):
-    return self.data['line_data']
+    if self.data.__contains__('line_data'):
+      return self.data['line_data']
+    else:
+      raise ValueError("No 1d line data!")
+    
   def get_line2d_data(self):
-    return self.data['line2d_data']
+    if self.data.__contains__('line2d_data'):
+      return self.data['line2d_data']
+    else:
+      raise ValueError("No 2d line data!")
+    
   def get_sa_data(self):
-    return self.data['sa_data']
+    if self.data.__contains__('sa_data'):
+      return self.data['sa_data']
+    else:
+      raise ValueError("No sa data!")
 
   def plot_drw_parameters(self):
-    idx = self.num_param_blr_rm+self.num_param_sa
-    fig = corner.corner(self.results['sample'][:, idx:idx+3], labels=['syserr', 'ln sigma', 'ln tau'], smooth=True)
-    return fig
+    """
+    plot drw paramete distributions
+    """
+    print(self.param['flagdim'])
 
+    if int(self.param['flagdim']) in [0, 1, 2, 4, 5, 6]:
+      idx = self.num_param_blr_rm+self.num_param_sa
+      if np.std(self.results['sample'][:, idx]) == 0.0:
+        fig = corner.corner(self.results['sample'][:, idx+1:idx+3], labels=['ln sigma', 'ln tau'], smooth=True)
+      else:
+        fig = corner.corner(self.results['sample'][:, idx:idx+3], labels=['syserr', 'ln sigma', 'ln tau'], smooth=True)
+      plt.show()
+      return fig
+    else:
+      print("The running does not have continnum reconstruction.")
+  
+  def plot_results_2d_style2018(self):
+    """
+    plot 2d results in the style of 2018 ApJ paper
+    """
+    wave0 = float(self.param['linecenter'])
+
+    idx_con =  np.nonzero(self.para_names['name'] == 'sys_err_con')[0][0]
+    idx_line =  np.nonzero(self.para_names['name'] == 'sys_err_line')[0][0]
+    
+    date_line =  self.data['line2d_data']['time']
+    prof = self.data['line2d_data']['profile'][:,:, 1]
+    prof_err = self.data['line2d_data']['profile'][:, :, 2]
+
+    nt, nv = prof.shape
+    grid_wav = np.zeros(nv)
+    grid_wav[:] = self.data['line2d_data']['profile'][0, :, 0]
+    grid_vel = (grid_wav[:]/(1.0+float(self.param['redshift'])) - wave0)/wave0 *3.0e5
+    dV = (grid_vel[1]-grid_vel[0]) / self.VelUnit
+    
+    conlc = self.data["con_data"]
+    hblc=np.zeros((nt, 3))
+    hblc[:, 1]=np.sum(prof, axis=1) * dV
+    hblc[:, 2]=np.sqrt(np.sum(prof_err**2, axis=1)) * dV
+    
+    date0 = conlc[0, 0]
+    conlc[:, 0]=conlc[:, 0]-date0
+    date_line = date_line - date0 
+    hblc[:, 0] = date_line
+    
+    con_mean_err = np.mean(conlc[:, 2])
+    line_mean_err = np.mean(prof_err)
+    sample = self.results['sample']
+    syserr_con = (np.exp(np.mean(sample[:, idx_con])) - 1.0) * con_mean_err
+    syserr_line = (np.exp(np.mean(sample[:, idx_line])) - 1.0) * line_mean_err
+
+    plt.rc('text', usetex=True)
+    plt.rc('font', family='serif', size=15)
+
+    #========================================================================
+    fig=plt.figure(1, figsize=(9, 8))
+    cmap=plt.get_cmap('jet')
+    
+    
+    plt.rcParams['xtick.direction'] = 'in'
+    plt.rcParams['ytick.direction'] = 'in'
+    #========================================================================
+    # subfig 5
+    ax5=fig.add_axes([0.1, 0.2, 0.52, 0.15])
+
+    prof_rec = np.zeros((nt, nv))
+    prof_rec_max = np.zeros((nt, nv))
+    line_rec = np.zeros(nt)
+    line_rec_max = np.zeros(nt)
+    
+    chi = np.zeros(sample.shape[0])
+    for i in range(self.results['line2d_rec'].shape[0]):
+      prof_rec = self.results['line2d_rec'][i, :, :]
+      line_rec = np.sum(prof_rec, axis=1) * dV
+      #chi[i] = np.sum( (line_rec - hblc[:, 1]) * (line_rec - hblc[:, 1]))
+      chi[i] = np.sum( ((prof_rec - prof)/prof_err)**2 )
+    
+    
+    imax = np.argmin(chi)
+    prof_rec_max = self.results['line2d_rec'][imax]
+    line_rec_max = np.sum(prof_rec_max, axis=1) * dV
+
+    plt.errorbar(hblc[:, 0], hblc[:, 1] * wave0*self.VelUnit/3e5, \
+                 yerr=np.sqrt(hblc[:, 2]*hblc[:, 2] + syserr_line * syserr_line * dV*dV)* wave0*self.VelUnit/3e5, \
+                 marker='None', markersize=3, ls='none', lw=1.0, capsize=0.7, markeredgewidth=0.5, zorder=32)
+    #plt.plot(date_line, line_rec_max* wave0*self.VelUnit/3e5, color='red')
+    
+    # 68.3% quantile of reconstruction
+    line_rec = np.sum(self.results['line2d_rec'], axis=2) * dV
+    line_mean = np.quantile(line_rec, axis=0, q=0.5)
+    line_mean_upp = np.quantile(line_rec, axis=0, q=(1.0-0.683)/2.0)
+    line_mean_low = np.quantile(line_rec, axis=0, q=1.0 - (1.0-0.683)/2.0)
+    ax5.plot(date_line, line_mean* wave0*self.VelUnit/3e5, color='red', zorder=20)
+    ax5.fill_between(date_line, y1 = line_mean_upp* wave0*self.VelUnit/3e5, y2 = line_mean_low * wave0*self.VelUnit/3e5, color='grey')
+    
+    ax5.set_xlabel(r'$\rm Time\ (day)$')
+    ax5.set_ylabel(r'$F_{\rm H\beta}$')
+    
+    ymax = np.max(hblc[:, 1]* wave0*self.VelUnit/3e5)
+    ymin = np.min(hblc[:, 1]* wave0*self.VelUnit/3e5)
+    ax5.set_ylim(ymin - 0.2*(ymax-ymin), ymax + 0.2*(ymax- ymin))
+    
+    xmax = hblc[-1, 0]
+    xmin = hblc[0, 0]
+    ax5.set_xlim(xmin - 0.2*(xmax-xmin), xmax + 0.2*(xmax- xmin))
+    
+    #========================================================================
+     # subfig 4
+    ax4=fig.add_axes([0.1, 0.35, 0.52, 0.15])
+    plt.errorbar(conlc[:, 0], conlc[:, 1], yerr=np.sqrt(conlc[:, 2]*conlc[:, 2] + syserr_con*syserr_con), \
+                 marker='None', markersize=3, ls='none', lw=1.0, capsize=1, markeredgewidth=0.5, zorder=32)
+    
+    con_rec = self.results['con_rec']
+    con_date = con_rec[0, :, 0]
+    con_mean = np.quantile(con_rec[:, :, 1], axis=0, q=0.5)
+    con_mean_upp = np.quantile(con_rec[:, :, 1], axis=0, q=(1.0-0.683)/2.0)
+    con_mean_low = np.quantile(con_rec[:, :, 1], axis=0, q=1.0 - (1.0-0.683)/2.0)
+    
+    ax4.plot(con_date-date0, con_mean, color='red', zorder=20) 
+    ax4.fill_between(con_date-date0, y1=con_mean_low, y2=con_mean_upp, color='grey')
+
+    ax4.set_ylabel(r'$F_{\rm 5100}$')
+
+    [i.set_visible(False) for i in ax4.get_xticklabels()]
+
+    # set a proper range
+    xmin = min(conlc[0, 0], date_line[0])
+    xmax = max(conlc[-1, 0], date_line[-1])
+    dx = xmax-xmin
+    xmin -= 0.1*dx 
+    xmax += 0.1*dx 
+    ax4.set_xlim(xmin, xmax)
+    ax5.set_xlim(xmin, xmax)
+    
+    plt.rcParams['xtick.direction'] = 'out'
+    plt.rcParams['ytick.direction'] = 'out'
+    #========================================================================
+    # subfig 1
+    ax1 = fig.add_axes([0.1, 0.6, 0.25, 0.3])
+    
+    plt.imshow(prof, cmap=cmap, interpolation='gaussian', aspect='auto', \
+               extent=[grid_vel[0]/1.0e3, grid_vel[nv-1]/1.0e3, date_line[-1], date_line[0]], vmax = np.amax(prof), vmin=np.amin(prof))
+    ax1.set_xlabel(r'$\rm Velocity\ (10^3km\ s^{-1})$')
+    ax1.set_ylabel(r'$\rm Epoch~Number$')
+    plt.text(0.08, 0.9, r'$\rm Data$', color='white', transform=ax1.transAxes)
+    
+    #========================================================================
+    # subfig 2
+    ax2=fig.add_axes([0.37, 0.6, 0.25, 0.3])
+    
+    plt.imshow(prof_rec_max, cmap=cmap, interpolation='gaussian',  aspect='auto', \
+               extent=[grid_vel[0]/1.0e3, grid_vel[nv-1]/1.0e3, date_line[-1], date_line[0]], vmax = np.amax(prof), vmin=np.amin(prof))
+    ax2.set_xlabel(r'$\rm Velocity\ (10^3km\ s^{-1})$')
+    ax2.text(0.08, 0.9, r'$\rm Model$', color='white', transform=ax2.transAxes)
+    
+    [i.set_visible(False) for i in ax2.get_yticklabels()]
+
+    plt.rcParams['xtick.direction'] = 'in'
+    plt.rcParams['ytick.direction'] = 'in'
+    #========================================================================
+    # subfig 3, plot the best two epochs
+    ax3=fig.add_axes([0.7, 0.6, 0.25, 0.3])
+    chifit = np.zeros(nt)
+    for i in range(nt):
+      chifit[i] = np.sum( (prof_rec_max[i, :] - prof[i, :]) * (prof_rec_max[i, :] - prof[i, :]) )
+    chifit_sort = np.sort(chifit)
+
+    offset = np.max(prof.flatten()) * 0.2
+    
+    idx = np.where(chifit == chifit_sort[0])
+    i = idx[0][0]
+    j = 0
+    plt.errorbar(grid_vel/1.0e3, prof[i, :]+j*offset, yerr=np.sqrt(prof_err[i, :]*prof_err[i, :] + syserr_line*syserr_line), \
+                 ls='none', ecolor='k', capsize=1, markeredgewidth=1)
+    plt.plot(grid_vel/1.0e3, prof_rec_max[i, :]+j*offset, color='b', lw=2)
+    
+    idx = np.where(chifit == chifit_sort[1])
+    i = idx[0][0]
+    j = 1
+    plt.errorbar(grid_vel/1.0e3, prof[i, :]+j*offset, yerr=np.sqrt(prof_err[i, :]*prof_err[i, :] + syserr_line*syserr_line), \
+                 ls='none', ecolor='k', capsize=1, markeredgewidth=1)
+    plt.plot(grid_vel/1.0e3, prof_rec_max[i, :]+j*offset, color='b', lw=2)
+    
+    ax3.set_xlabel(r'$\rm Velocity\ (10^3km\ s^{-1})$')
+    ax3.set_ylabel(r'$\rm Flux$')
+    ax3.set_xlim([grid_vel[0]/1.0e3, grid_vel[-1]/1.0e3])
+    ax3.text(0.08, 0.9, r'$\rm Profile$', color='k', transform=ax3.transAxes)
+    
+    #========================================================================
+    # subfig 6
+    ax6=fig.add_axes([0.7, 0.2, 0.25, 0.3])
+    
+    nhist, bhist = np.histogram(sample[:, 8]/np.log(10.0)+6.0, bins=25, density=True)
+    nhist = gaussian_filter(nhist, 1.0)
+    x0 = np.array(list(zip(bhist[:-1], bhist[1:]))).flatten()
+    y0 = np.array(list(zip(nhist, nhist))).flatten()
+    
+    plt.stairs(nhist, bhist, fill=True)
+    
+    ax6.set_xlabel(r'$\log(M_\bullet/M_\odot)$')
+    ax6.set_ylabel(r'$\rm Hist$')
+    
+    fig.savefig("results_2d.pdf", bbox_inches='tight')
+    plt.show()
+  
+  def plot_results_2d_style2022(self):
+    """
+    plot 2d results in the style of 2022 ApJ paper
+    """
+    wave0 = float(self.param['linecenter'])
+
+    idx_con =  np.nonzero(self.para_names['name'] == 'sys_err_con')[0][0]
+    idx_line =  np.nonzero(self.para_names['name'] == 'sys_err_line')[0][0]
+    
+    date_line =  self.data['line2d_data']['time']
+    prof = self.data['line2d_data']['profile'][:,:, 1]
+    prof_err = self.data['line2d_data']['profile'][:, :, 2]
+
+    nt, nv = prof.shape
+    grid_wav = np.zeros(nv)
+    grid_wav[:] = self.data['line2d_data']['profile'][0, :, 0]
+    grid_vel = (grid_wav[:]/(1.0+float(self.param['redshift'])) - wave0)/wave0 *3.0e5
+    dV = (grid_vel[1]-grid_vel[0]) / self.VelUnit
+    
+    conlc = self.data["con_data"]
+    hblc=np.zeros((nt, 3))
+    hblc[:, 1]=np.sum(prof, axis=1) * dV
+    hblc[:, 2]=np.sqrt(np.sum(prof_err**2, axis=1)) * dV
+    
+    date0 = conlc[0, 0]
+    conlc[:, 0]=conlc[:, 0]-date0
+    date_line = date_line - date0 
+    hblc[:, 0] = date_line
+    
+    con_mean_err = np.mean(conlc[:, 2])
+    line_mean_err = np.mean(prof_err)
+    sample = self.results['sample']
+    syserr_con = (np.exp(np.mean(sample[:, idx_con])) - 1.0) * con_mean_err
+    syserr_line = (np.exp(np.mean(sample[:, idx_line])) - 1.0) * line_mean_err
+
+    plt.rc('text', usetex=True)
+    plt.rc('font', family='serif', size=15)
+
+    #========================================================================
+    fig=plt.figure(1, figsize=(9, 8))
+    cmap=plt.get_cmap('jet')
+    
+    
+    plt.rcParams['xtick.direction'] = 'in'
+    plt.rcParams['ytick.direction'] = 'in'
+    #========================================================================
+    # subfig 6
+    ax6=fig.add_axes([0.37, 0.2, 0.55, 0.15])
+
+    prof_rec = np.zeros((nt, nv))
+    prof_rec_max = np.zeros((nt, nv))
+    line_rec = np.zeros(nt)
+    line_rec_max = np.zeros(nt)
+    
+    chi = np.zeros(sample.shape[0])
+    for i in range(self.results['line2d_rec'].shape[0]):
+      prof_rec = self.results['line2d_rec'][i, :, :]
+      line_rec = np.sum(prof_rec, axis=1) * dV
+      #chi[i] = np.sum( (line_rec - hblc[:, 1]) * (line_rec - hblc[:, 1]))
+      chi[i] = np.sum( ((prof_rec - prof)/prof_err)**2 )
+    
+    imax = np.argmin(chi)
+    prof_rec_max = self.results['line2d_rec'][imax]
+    line_rec_max = np.sum(prof_rec_max, axis=1) * dV
+
+    plt.errorbar(hblc[:, 0], hblc[:, 1] * wave0*self.VelUnit/3e5, \
+                 yerr=np.sqrt(hblc[:, 2]*hblc[:, 2] + syserr_line * syserr_line * dV*dV)* wave0*self.VelUnit/3e5, \
+                 marker='None', markersize=3, ls='none', lw=1.0, capsize=0.7, markeredgewidth=0.5, zorder=32)
+    #plt.plot(date_line, line_rec_max* wave0*self.VelUnit/3e5, color='red')
+    
+    # 68.3% quantile of reconstruction
+    line_rec = np.sum(self.results['line2d_rec'], axis=2) * dV
+    line_mean = np.quantile(line_rec, axis=0, q=0.5)
+    line_mean_upp = np.quantile(line_rec, axis=0, q=(1.0-0.683)/2.0)
+    line_mean_low = np.quantile(line_rec, axis=0, q=1.0 - (1.0-0.683)/2.0)
+    ax6.plot(date_line, line_mean* wave0*self.VelUnit/3e5, color='red', zorder=20)
+    ax6.fill_between(date_line, y1 = line_mean_upp* wave0*self.VelUnit/3e5, y2 = line_mean_low * wave0*self.VelUnit/3e5, color='grey')
+    
+    ax6.set_xlabel(r'$\rm Time\ (day)$')
+    ax6.set_ylabel(r'$F_{\rm H\beta}$')
+    
+    ymax = np.max(hblc[:, 1]* wave0*self.VelUnit/3e5)
+    ymin = np.min(hblc[:, 1]* wave0*self.VelUnit/3e5)
+    ax6.set_ylim(ymin - 0.2*(ymax-ymin), ymax + 0.2*(ymax- ymin))
+    
+    xmax = hblc[-1, 0]
+    xmin = hblc[0, 0]
+    ax6.set_xlim(xmin - 0.2*(xmax-xmin), xmax + 0.2*(xmax- xmin))
+    ax6.tick_params(right=True, labelright=True, left=True, labelleft=False)
+    ax6.yaxis.set_label_position('right')
+    #========================================================================
+     # subfig 5
+    ax5=fig.add_axes([0.37, 0.35, 0.55, 0.15])
+    plt.errorbar(conlc[:, 0], conlc[:, 1], yerr=np.sqrt(conlc[:, 2]*conlc[:, 2] + syserr_con*syserr_con), \
+                 marker='None', markersize=3, ls='none', lw=1.0, capsize=1, markeredgewidth=0.5, zorder=32)
+    
+    con_rec = self.results['con_rec']
+    con_date = con_rec[0, :, 0]
+    con_mean = np.quantile(con_rec[:, :, 1], axis=0, q=0.5)
+    con_mean_upp = np.quantile(con_rec[:, :, 1], axis=0, q=(1.0-0.683)/2.0)
+    con_mean_low = np.quantile(con_rec[:, :, 1], axis=0, q=1.0 - (1.0-0.683)/2.0)
+    
+    ax5.plot(con_date-date0, con_mean, color='red', zorder=20) 
+    ax5.fill_between(con_date-date0, y1=con_mean_low, y2=con_mean_upp, color='grey')
+
+    ax5.set_ylabel(r'$F_{\rm 5100}$')
+
+    [i.set_visible(False) for i in ax5.get_xticklabels()]
+
+    # set a proper range
+    xmin = min(conlc[0, 0], date_line[0])
+    xmax = max(conlc[-1, 0], date_line[-1])
+    dx = xmax-xmin
+    xmin -= 0.1*dx 
+    xmax += 0.1*dx 
+    ax5.set_xlim(xmin, xmax)
+    ax5.set_xlim(xmin, xmax)
+    ax5.tick_params(labelright=True, labelleft=False)
+    ax5.yaxis.set_label_position('right')
+    
+    plt.rcParams['xtick.direction'] = 'out'
+    plt.rcParams['ytick.direction'] = 'out'
+    #========================================================================
+    # subfig 1
+    ax1 = fig.add_axes([0.1, 0.6, 0.25, 0.3])
+    
+    plt.imshow(prof, cmap=cmap, interpolation='gaussian', aspect='auto', \
+               extent=[grid_vel[0]/1.0e3, grid_vel[nv-1]/1.0e3, date_line[-1], date_line[0]], vmax = np.amax(prof), vmin=np.amin(prof))
+    ax1.set_xlabel(r'$\rm Velocity\ (10^3km\ s^{-1})$')
+    ax1.set_ylabel(r'$\rm Epoch~Number$')
+    plt.text(0.08, 0.9, r'\bf Data', color='white', transform=ax1.transAxes)
+    
+    #========================================================================
+    # subfig 2
+    ax2=fig.add_axes([0.37, 0.6, 0.25, 0.3])
+    
+    plt.imshow(prof_rec_max, cmap=cmap, interpolation='gaussian',  aspect='auto', \
+               extent=[grid_vel[0]/1.0e3, grid_vel[nv-1]/1.0e3, date_line[-1], date_line[0]], vmax = np.amax(prof), vmin=np.amin(prof))
+    ax2.set_xlabel(r'$\rm Velocity\ (10^3km\ s^{-1})$')
+    ax2.text(0.08, 0.9, r'\bf Model', color='white', transform=ax2.transAxes)
+    
+    [i.set_visible(False) for i in ax2.get_yticklabels()]
+
+    #========================================================================
+    # subfig 3
+    prof_diff = prof - prof_rec_max
+    ax3=fig.add_axes([0.64, 0.6, 0.31, 0.3])
+    img = prof_diff/np.sqrt(prof_err**2 + syserr_line**2)
+    cmap=ax3.imshow(img,  aspect='auto', extent=[grid_vel[0]/1.0e3, grid_vel[nv-1]/1.0e3, date_line[-1], date_line[0]], vmax=7.0, vmin = -7.0)
+    
+    plt.colorbar(cmap, ticks=[-5, -2.5, 0.0, 2.5, 5.0])
+    ax3.text(0.08, 0.9, r'\bf Residuals', color='white', transform=ax3.transAxes)
+    ax3.set_xlabel(r'$\rm Velocity\ (10^3\ km\ s^{-1})$')
+    [i.set_visible(False) for i in ax3.get_yticklabels()]
+
+    plt.rcParams['xtick.direction'] = 'in'
+    plt.rcParams['ytick.direction'] = 'in'
+
+    #========================================================================
+    # subfig 4, plot the best two epochs
+    ax4=fig.add_axes([0.1, 0.2, 0.25, 0.3])
+    chifit = np.zeros(nt)
+    for i in range(nt):
+      chifit[i] = np.sum( (prof_rec_max[i, :] - prof[i, :]) * (prof_rec_max[i, :] - prof[i, :]) )
+    chifit_sort = np.sort(chifit)
+
+    offset = np.max(prof.flatten()) * 0.2
+    
+    idx = np.where(chifit == chifit_sort[0])
+    i = idx[0][0]
+    j = 0
+    plt.errorbar(grid_vel/1.0e3, prof[i, :]+j*offset, yerr=np.sqrt(prof_err[i, :]*prof_err[i, :] + syserr_line*syserr_line), \
+                 ls='none', ecolor='k', capsize=1, markeredgewidth=1)
+    plt.plot(grid_vel/1.0e3, prof_rec_max[i, :]+j*offset, color='b', lw=2)
+    
+    idx = np.where(chifit == chifit_sort[1])
+    i = idx[0][0]
+    j = 1
+    plt.errorbar(grid_vel/1.0e3, prof[i, :]+j*offset, yerr=np.sqrt(prof_err[i, :]*prof_err[i, :] + syserr_line*syserr_line), \
+                 ls='none', ecolor='k', capsize=1, markeredgewidth=1)
+    plt.plot(grid_vel/1.0e3, prof_rec_max[i, :]+j*offset, color='b', lw=2)
+    
+    ax4.set_xlabel(r'$\rm Velocity\ (10^3km\ s^{-1})$')
+    ax4.set_ylabel(r'$\rm Flux$')
+    ax4.set_xlim([grid_vel[0]/1.0e3, grid_vel[-1]/1.0e3])
+    ax4.text(0.08, 0.9, r'$\rm Profile$', color='k', transform=ax4.transAxes)
+    
+    
+    fig.savefig("results_2d.pdf", bbox_inches='tight')
+    plt.show()
