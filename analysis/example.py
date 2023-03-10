@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt 
 
-from BBackend import BBackend 
+from bbackend import bplotlib 
 
-pb = BBackend("../param/param")
+pb = bplotlib("../param/param")
 
 # plot continuum DRW parameters
 fig = pb.plot_drw_parameters()

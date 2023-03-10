@@ -18,6 +18,8 @@ import matplotlib.pyplot as plt
 from scipy.ndimage import gaussian_filter
 from matplotlib.backends.backend_pdf import PdfPages
 
+__all__ = ['bplotlib']
+
 class Param:
   """
   load param file
@@ -164,7 +166,7 @@ class ParaName:
 
     #print(self.num_param_blr_rm, self.num_param_sa, self.num_param_con)
 
-class BBackend(Param, Options, ParaName):
+class bplotlib(Param, Options, ParaName):
   """
   backend for ploting BRAINS results
   """

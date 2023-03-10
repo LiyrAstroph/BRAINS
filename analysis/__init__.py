@@ -2,6 +2,7 @@
 
 __version__ = "0.0.0"
 
-__all__ = ["libbackend", "postprocess"]
+__all__ = ["bplotlib", "postprocess"]
 
-from . import libbackend, postprocess
+from .plotlib import bplotlib
+from .postprocess import postprocess

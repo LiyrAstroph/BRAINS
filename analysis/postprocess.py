@@ -1,8 +1,10 @@
+import sys
 import copy
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
-import sys
+
+__all__ = ["postprocess"]
 
 def logsumexp(values):     # log SUM( exp(values) )
   biggest = np.max(values)
