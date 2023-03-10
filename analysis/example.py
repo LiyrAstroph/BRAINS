@@ -4,6 +4,9 @@ from bbackend import bplotlib
 
 pb = bplotlib("../param/param")
 
+# print parameter names
+pb.print_blrmodel_para_names()
+
 # plot continuum DRW parameters
 fig = pb.plot_drw_parameters()
 

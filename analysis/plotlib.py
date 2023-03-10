@@ -123,7 +123,7 @@ class ParaName:
       raise Exception("Incorrect FlagDim.")
 
     names = np.genfromtxt(self.para_names_file, skip_header=7, \
-      dtype=[int, 'S16', float, float, int, int, float], delimiter=[4, 16, 12, 12, 4, 5, 15])
+      dtype=[int, 'S25', float, float, int, int, float], delimiter=[4, 25, 12, 12, 4, 5, 15])
     
     self.para_names = {}
     self.para_names['name'] = np.array([str(f.strip(), encoding='utf8') for f in names['f1']])
@@ -165,6 +165,29 @@ class ParaName:
       self.num_param_con = 0
 
     #print(self.num_param_blr_rm, self.num_param_sa, self.num_param_con)
+  
+  def print_blrmodel_para_names(self):
+    """
+    print blr model parameter names
+    """
+    for i in range(self.num_param_blrmodel_rm):
+      print("{:3d} {}".format(i, self.para_names['name'][i]))
+  
+  def locate_bhmass(self):
+    """
+    locate the index of black hole mass parameter
+    """
+    idx = -1
+    for i in range(self.num_param_blrmodel_rm):
+      if re.match("BLR model ln\(Mbh\)", self.para_names['name'][i]):
+        idx = i 
+        break
+    
+    if idx == -1:
+      raise ValueError("No black hole mass parameter")
+    else:
+      return idx
+
 
 class bplotlib(Param, Options, ParaName):
   """
@@ -180,6 +203,8 @@ class bplotlib(Param, Options, ParaName):
     self.file_dir = self.param['filedir'] +"/"
     self._load_data()
     self._load_results() 
+
+    self.postfix=["con", "1d","2d", "sa", "sa1d", "sa2d", "sarm"]
 
   def _load_line2d_data(self):
     """
@@ -432,7 +457,6 @@ class bplotlib(Param, Options, ParaName):
     """
     plot drw paramete distributions
     """
-    print(self.param['flagdim'])
 
     if int(self.param['flagdim']) in [0, 1, 2, 4, 5, 6]:
       idx = self.num_param_blr_rm+self.num_param_sa
@@ -449,6 +473,11 @@ class bplotlib(Param, Options, ParaName):
     """
     plot 2d results in the style of 2018 ApJ paper
     """
+
+    if not int(self.param['flagdim']) in [2, 5, 6]:
+      print("Flagdim =", self.param['flagdim'], "no 2D RM data.")
+      return
+    
     wave0 = float(self.param['linecenter'])
 
     idx_con =  np.nonzero(self.para_names['name'] == 'sys_err_con')[0][0]
@@ -621,7 +650,8 @@ class bplotlib(Param, Options, ParaName):
     # subfig 6
     ax6=fig.add_axes([0.7, 0.2, 0.25, 0.3])
     
-    nhist, bhist = np.histogram(sample[:, 8]/np.log(10.0)+6.0, bins=25, density=True)
+    idx = self.locate_bhmass()
+    nhist, bhist = np.histogram(sample[:, idx]/np.log(10.0)+6.0, bins=25, density=True)
     nhist = gaussian_filter(nhist, 1.0)
     x0 = np.array(list(zip(bhist[:-1], bhist[1:]))).flatten()
     y0 = np.array(list(zip(nhist, nhist))).flatten()
@@ -638,6 +668,11 @@ class bplotlib(Param, Options, ParaName):
     """
     plot 2d results in the style of 2022 ApJ paper
     """
+
+    if not int(self.param['flagdim']) in [2, 5, 6]:
+      print("Flagdim =", self.param['flagdim'], "no 2D RM data.")
+      return
+
     wave0 = float(self.param['linecenter'])
 
     idx_con =  np.nonzero(self.para_names['name'] == 'sys_err_con')[0][0]
@@ -873,7 +908,12 @@ class bplotlib(Param, Options, ParaName):
     """
     plot CDNest limits of parameters with levels
     """
-    str_dim = '2d'  
+    if int(self.param['flagdim']) < 0:
+      print("Flagdim =", self.param["flagdim"], "no limits")
+      return 
+    
+    str_dim = self.postfix[int(self.param['flagdim'])] 
+
     pdf = PdfPages("limits_"+str_dim+".pdf")
   
     limits = np.loadtxt("../data/limits_"+str_dim+".txt", comments='#')
@@ -894,22 +934,27 @@ class bplotlib(Param, Options, ParaName):
     """
     plot transfer function with the maximum prob
     """
-    idx, par = self.find_max_prob()
-    
-    plt.rcParams['xtick.direction'] = 'out'
-    plt.rcParams['ytick.direction'] = 'out'
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-    ax.imshow(self.results['tran2d_rec'][idx], aspect='auto', origin='lower', \
-              extent=[self.data['line2d_data']['profile'][0,0,0],self.data['line2d_data']['profile'][0,-1,0], \
-                      self.results['tau_rec'][idx][0], self.results['tau_rec'][idx][-1]],\
-              interpolation='gaussian')
-    ax.set_xlabel(r'Wavelength')
-    ax.set_ylabel(r'Time Lag')
-    ax.set_title("Transfer function with the maximum prob")
-    plt.rcParams['xtick.direction'] = 'in'
-    plt.rcParams['ytick.direction'] = 'in'
-    plt.show()
+
+    if int(self.param['flagdim']) in [2, 5, 6]:
+      idx, par = self.find_max_prob()
+      
+      plt.rcParams['xtick.direction'] = 'out'
+      plt.rcParams['ytick.direction'] = 'out'
+      fig = plt.figure()
+      ax = fig.add_subplot(111)
+      ax.imshow(self.results['tran2d_rec'][idx], aspect='auto', origin='lower', \
+                extent=[self.data['line2d_data']['profile'][0,0,0],self.data['line2d_data']['profile'][0,-1,0], \
+                        self.results['tau_rec'][idx][0], self.results['tau_rec'][idx][-1]],\
+                interpolation='gaussian')
+      ax.set_xlabel(r'Wavelength')
+      ax.set_ylabel(r'Time Lag')
+      ax.set_title("Transfer function with the maximum prob")
+      plt.rcParams['xtick.direction'] = 'in'
+      plt.rcParams['ytick.direction'] = 'in'
+      plt.show()
+    else:
+      print("Flagdim =", self.param["flagdim"], "no trans2d")
+      return
   
   def plot_tran1d(self):
     """
@@ -922,7 +967,7 @@ class bplotlib(Param, Options, ParaName):
       for i in range(0, tran_rec.shape[0], int(tran_rec.shape[0]/100+1.0)):
         ax.plot(tran_rec[i, :, 0], tran_rec[i, :, 1], lw=0.5)
       plt.show()
-    else:
+    elif int(self.param['flagdim']) in [2, 5, 6]:
       tau_rec = self.results['tau_rec']
       tran2d_rec = self.results['tran2d_rec']
       tran1d_rec = np.sum(tran2d_rec, axis=2)
@@ -935,5 +980,8 @@ class bplotlib(Param, Options, ParaName):
       ax.set_xlabel(r"Time Lag")
       ax.set_ylabel(r"Transfer Function")
       plt.show()
+    else:
+      print("Flagdim =", self.param["flagdim"], "no trans1d")
+      return
 
 
