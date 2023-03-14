@@ -599,7 +599,7 @@ class bplotlib(Param, Options, ParaName):
     ax1 = fig.add_axes([0.1, 0.6, 0.25, 0.3])
     
     plt.imshow(prof, cmap=cmap, interpolation='gaussian', aspect='auto', \
-               extent=[grid_vel[0]/1.0e3, grid_vel[nv-1]/1.0e3, date_line[-1], date_line[0]], vmax = np.amax(prof), vmin=np.amin(prof))
+               extent=[grid_vel[0]/1.0e3, grid_vel[nv-1]/1.0e3, 1, prof.shape[0]], vmax = np.amax(prof), vmin=np.amin(prof))
     ax1.set_xlabel(r'$\rm Velocity\ (10^3km\ s^{-1})$')
     ax1.set_ylabel(r'$\rm Epoch~Number$')
     plt.text(0.08, 0.9, r'$\rm Data$', color='white', transform=ax1.transAxes)
@@ -609,7 +609,7 @@ class bplotlib(Param, Options, ParaName):
     ax2=fig.add_axes([0.37, 0.6, 0.25, 0.3])
     
     plt.imshow(prof_rec_max, cmap=cmap, interpolation='gaussian',  aspect='auto', \
-               extent=[grid_vel[0]/1.0e3, grid_vel[nv-1]/1.0e3, date_line[-1], date_line[0]], vmax = np.amax(prof), vmin=np.amin(prof))
+               extent=[grid_vel[0]/1.0e3, grid_vel[nv-1]/1.0e3, 1, prof.shape[0]], vmax = np.amax(prof), vmin=np.amin(prof))
     ax2.set_xlabel(r'$\rm Velocity\ (10^3km\ s^{-1})$')
     ax2.text(0.08, 0.9, r'$\rm Model$', color='white', transform=ax2.transAxes)
     
@@ -796,7 +796,7 @@ class bplotlib(Param, Options, ParaName):
     ax1 = fig.add_axes([0.1, 0.6, 0.25, 0.3])
     
     plt.imshow(prof, cmap=cmap, interpolation='gaussian', aspect='auto', \
-               extent=[grid_vel[0]/1.0e3, grid_vel[nv-1]/1.0e3, date_line[-1], date_line[0]], vmax = np.amax(prof), vmin=np.amin(prof))
+               extent=[grid_vel[0]/1.0e3, grid_vel[nv-1]/1.0e3, 1, prof.shape[0]], vmax = np.amax(prof), vmin=np.amin(prof))
     ax1.set_xlabel(r'$\rm Velocity\ (10^3km\ s^{-1})$')
     ax1.set_ylabel(r'$\rm Epoch~Number$')
     plt.text(0.08, 0.9, r'\bf Data', color='white', transform=ax1.transAxes)
@@ -806,7 +806,7 @@ class bplotlib(Param, Options, ParaName):
     ax2=fig.add_axes([0.37, 0.6, 0.25, 0.3])
     
     plt.imshow(prof_rec_max, cmap=cmap, interpolation='gaussian',  aspect='auto', \
-               extent=[grid_vel[0]/1.0e3, grid_vel[nv-1]/1.0e3, date_line[-1], date_line[0]], vmax = np.amax(prof), vmin=np.amin(prof))
+               extent=[grid_vel[0]/1.0e3, grid_vel[nv-1]/1.0e3, 1, prof.shape[0]], vmax = np.amax(prof), vmin=np.amin(prof))
     ax2.set_xlabel(r'$\rm Velocity\ (10^3km\ s^{-1})$')
     ax2.text(0.08, 0.9, r'\bf Model', color='white', transform=ax2.transAxes)
     
@@ -817,7 +817,7 @@ class bplotlib(Param, Options, ParaName):
     prof_diff = prof - prof_rec_max
     ax3=fig.add_axes([0.64, 0.6, 0.31, 0.3])
     img = prof_diff/np.sqrt(prof_err**2 + syserr_line**2)
-    cmap=ax3.imshow(img,  aspect='auto', extent=[grid_vel[0]/1.0e3, grid_vel[nv-1]/1.0e3, date_line[-1], date_line[0]], vmax=7.0, vmin = -7.0)
+    cmap=ax3.imshow(img,  aspect='auto', extent=[grid_vel[0]/1.0e3, grid_vel[nv-1]/1.0e3, 1, prof.shape[0]], vmax=7.0, vmin = -7.0)
     
     plt.colorbar(cmap, ticks=[-5, -2.5, 0.0, 2.5, 5.0])
     ax3.text(0.08, 0.9, r'\bf Residuals', color='white', transform=ax3.transAxes)
