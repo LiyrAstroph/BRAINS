@@ -16,6 +16,8 @@
 extern const int num_params_MyTransfun1d;  /*!< number of parameters for 1D model */
 extern const int num_params_MyTransfun2d;  /*!< number of parameters for 1D model */
 
+extern char *MyTFmodel_name[];
+
 void set_par_range_mytransfun();
 void transfun_1d_cal_mytransfun(const void *pm, int flag_save);
 void transfun_2d_cal_mytransfun(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save);

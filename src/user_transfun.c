@@ -23,6 +23,8 @@
 const int num_params_MyTransfun1d = 2; /* number of parameters for 1D transfer function */
 const int num_params_MyTransfun2d = 4; /* number of parameters for 2D transfer function */
 
+char *MyTFmodel_name[] = {"tau_cent", "tau_width", "vel_cent", "vel_width"};
+
 /*!
  * this function set the parameter prior range.
  * 

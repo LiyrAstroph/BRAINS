@@ -1339,6 +1339,7 @@ void set_blr_model1d()
     case -1:
       num_params_blr_model = num_params_MyTransfun1d;
       transfun_1d_cal = transfun_1d_cal_mytransfun;
+      BLRmodel_name = MyTFmodel_name;
       break;
 
     case 0: 
