@@ -199,6 +199,8 @@ class bplotlib(Param, Options, ParaName):
     ParaName.__init__(self, self.param['filedir'], self.param['flagdim'])
     
     self.VelUnit = np.sqrt( 6.672e-8 * 1.0e6 * 1.989e33 / (2.9979e10*8.64e4)) / 1.0e5
+    self.con_scale = 1.0
+    self.line_scale = 1.0
 
     self.file_dir = self.param['filedir'] +"/"
     self._load_data()
@@ -226,6 +228,16 @@ class bplotlib(Param, Options, ParaName):
       fp.readline()
 
     fp.close()
+
+    # calculate line scale
+    redshift = float(self.param["redshift"])
+    linecenter = float(self.param["linecenter"])
+    Vline = (line2d_profile[0, :, 0]/(1.0+redshift) - linecenter)/linecenter * (2.9979e5/self.VelUnit)
+    dV = Vline[1]-Vline[0]
+    flux = np.sum(line2d_profile[:, :, 1], axis=1) - 0.5*(line2d_profile[:, 0, 1] + line2d_profile[:, -1, 1])
+    flux *= dV
+
+    self.line_scale = nt/np.sum(flux)
     return {"time":line2d_time, "profile":line2d_profile}
   
   def _load_sa_data(self):
@@ -270,6 +282,9 @@ class bplotlib(Param, Options, ParaName):
 
     if self.param['flagdim'] == '0':
       self.data['con_data'] = np.loadtxt(self.file_dir+self.param['continuumfile'])
+
+      # calculate con_scale and line_scale
+      self.con_scale = self.data['con_data'].shape[0]/np.sum(self.data['con_data'][:, 1])
     
     elif self.param['flagdim'] == '1':
       # load continuum data
@@ -277,11 +292,18 @@ class bplotlib(Param, Options, ParaName):
       # load line data
       self.data['line_data'] = np.loadtxt(self.file_dir+self.param['linefile'])
 
+      # calculate con_scale and line_scale
+      self.con_scale = self.data['con_data'].shape[0]/np.sum(self.data['con_data'][:, 1])
+      self.line_scale = self.data['line_data'].shape[0]/np.sum(self.data['line_data'][:, 1])
+
     elif self.param['flagdim'] == '2':
       # load continuum data
       self.data['con_data'] = np.loadtxt(self.file_dir+self.param['continuumfile'])
       # load line2d data
       self.data['line2d_data'] = self._load_line2d_data()
+
+      # calculate con_scale and line_scale
+      self.con_scale = self.data['con_data'].shape[0]/np.sum(self.data['con_data'][:, 1])
     
     elif self.param['flagdim'] == '3':
       self.data["sa_data"] = self._load_sa_data()
@@ -469,6 +491,63 @@ class bplotlib(Param, Options, ParaName):
     else:
       print("The running does not have continnum reconstruction.")
   
+  def get_narrow_line(self, grid_vel, imax, iepoch):
+    """
+    get narrow line component
+    """
+    
+    width_na = float(self.param["widthnarrowline"])
+    width_na_err = float(self.param["widthnarrowlineerr"])
+    shift_na = float(self.param["shiftnarrowline"])
+    shift_na_err = float(self.param["shiftnarrowlineerr"])
+    
+    num_param_na = 0
+    if int(self.param["flagnarrowline"]) > 0:
+      num_param_na = 3
+
+    # first treat the broadening
+    if int(self.param["flaginstres"]) == 0:
+      broad = float(self.param["instres"])
+    elif int(self.param["flaginstres"]) == 1:
+      broad = float(self.param["instres"]) + float(self.param["instreserr"]) \
+            * self.results['sample'][imax, self.num_param_blrmodel_rm + num_param_na]
+    elif int(self.param["flaginstres"]) == 2:
+      broad = float(self.param["instres"]) + float(self.param["instreserr"]) \
+            * self.results['sample'][imax, self.num_param_blrmodel_rm + num_param_na + iepoch]
+
+    if int(self.param["flagnarrowline"]) == 1:
+      flux = float(self.param["fluxnarrowline"])
+      width = width_na
+      shift = shift_na
+      
+      width_br = np.sqrt(width**2 + broad**2)
+      flux *= width/width_br
+      prof = flux * np.exp( -0.5 *(grid_vel - shift)**2/width_br**2)
+      return prof
+    elif int(self.param["flagnarrowline"]) == 2:
+      flux_na = float(self.param["fluxnarrowline"])
+      flux_na_err = float(self.param["fluxnarrowlineerr"])
+      flux = self.results['sample'][imax, self.num_param_blrmodel_rm] * flux_na_err + flux_na
+      width = self.results['sample'][imax, self.num_param_blrmodel_rm+1] * width_na_err + width_na 
+      shift = self.results['sample'][imax, self.num_param_blrmodel_rm+2] * shift_na_err + shift_na
+      
+      width_br = np.sqrt(width**2 + broad**2)
+      flux *= width/width_br
+      prof = flux * np.exp( -0.5 *(grid_vel - shift)**2/width_br**2)
+      return prof
+    elif int(self.param["flagnarrowline"]) == 3:
+      flux = np.exp(self.results['sample'][imax, self.num_param_blrmodel_rm])
+      width = self.results['sample'][imax, self.num_param_blrmodel_rm+1] * width_na_err + width_na 
+      shift = self.results['sample'][imax, self.num_param_blrmodel_rm+2] * shift_na_err + shift_na
+      
+      width_br = np.sqrt(width**2 + broad**2)
+      flux *= width/width_br
+      # note line scale
+      flux /= self.line_scale
+      prof = flux * np.exp(-0.5 *(grid_vel - shift)**2/width_br**2)
+      return prof
+      
+
   def plot_results_2d_style2018(self):
     """
     plot 2d results in the style of 2018 ApJ paper
@@ -587,10 +666,12 @@ class bplotlib(Param, Options, ParaName):
     xmin = min(conlc[0, 0], date_line[0])
     xmax = max(conlc[-1, 0], date_line[-1])
     dx = xmax-xmin
-    xmin -= 0.1*dx 
-    xmax += 0.1*dx 
+    xmin -= 0.05*dx 
+    xmax += 0.05*dx 
     ax4.set_xlim(xmin, xmax)
     ax5.set_xlim(xmin, xmax)
+    ax4.minorticks_on()
+    ax5.minorticks_on()
     
     plt.rcParams['xtick.direction'] = 'out'
     plt.rcParams['ytick.direction'] = 'out'
@@ -598,7 +679,7 @@ class bplotlib(Param, Options, ParaName):
     # subfig 1
     ax1 = fig.add_axes([0.1, 0.6, 0.25, 0.3])
     
-    plt.imshow(prof, cmap=cmap, interpolation='gaussian', aspect='auto', \
+    plt.imshow(prof, cmap=cmap, interpolation='gaussian', aspect='auto', origin='lower', \
                extent=[grid_vel[0]/1.0e3, grid_vel[nv-1]/1.0e3, 1, prof.shape[0]], vmax = np.amax(prof), vmin=np.amin(prof))
     ax1.set_xlabel(r'$\rm Velocity\ (10^3km\ s^{-1})$')
     ax1.set_ylabel(r'$\rm Epoch~Number$')
@@ -608,7 +689,7 @@ class bplotlib(Param, Options, ParaName):
     # subfig 2
     ax2=fig.add_axes([0.37, 0.6, 0.25, 0.3])
     
-    plt.imshow(prof_rec_max, cmap=cmap, interpolation='gaussian',  aspect='auto', \
+    plt.imshow(prof_rec_max, cmap=cmap, interpolation='gaussian',  aspect='auto', origin='lower', \
                extent=[grid_vel[0]/1.0e3, grid_vel[nv-1]/1.0e3, 1, prof.shape[0]], vmax = np.amax(prof), vmin=np.amin(prof))
     ax2.set_xlabel(r'$\rm Velocity\ (10^3km\ s^{-1})$')
     ax2.text(0.08, 0.9, r'$\rm Model$', color='white', transform=ax2.transAxes)
@@ -633,6 +714,10 @@ class bplotlib(Param, Options, ParaName):
     plt.errorbar(grid_vel/1.0e3, prof[i, :]+j*offset, yerr=np.sqrt(prof_err[i, :]*prof_err[i, :] + syserr_line*syserr_line), \
                  ls='none', ecolor='k', capsize=1, markeredgewidth=1)
     plt.plot(grid_vel/1.0e3, prof_rec_max[i, :]+j*offset, color='b', lw=2)
+
+    if int(self.param["flagnarrowline"]) > 0:
+      prof_na = self.get_narrow_line(grid_vel, imax, i)
+      plt.plot(grid_vel/1.0e3, prof_na+j*offset, lw=1, color='k', ls='--', label='Narrow Line')
     
     idx = np.where(chifit == chifit_sort[1])
     i = idx[0][0]
@@ -641,10 +726,17 @@ class bplotlib(Param, Options, ParaName):
                  ls='none', ecolor='k', capsize=1, markeredgewidth=1)
     plt.plot(grid_vel/1.0e3, prof_rec_max[i, :]+j*offset, color='b', lw=2)
     
+    if int(self.param["flagnarrowline"]) > 0:
+      prof_na = self.get_narrow_line(grid_vel, imax, i)
+      plt.plot(grid_vel/1.0e3, prof_na+j*offset, lw=1, color='k', ls='--')
+    
     ax3.set_xlabel(r'$\rm Velocity\ (10^3km\ s^{-1})$')
     ax3.set_ylabel(r'$\rm Flux$')
     ax3.set_xlim([grid_vel[0]/1.0e3, grid_vel[-1]/1.0e3])
     ax3.text(0.08, 0.9, r'$\rm Profile$', color='k', transform=ax3.transAxes)
+
+    if int(self.param["flagnarrowline"]) > 0:
+      ax3.legend(fontsize=8, handlelength=1.0, handletextpad=0.2, loc=(0.02, 0.8), frameon=False)
     
     #========================================================================
     # subfig 6
@@ -782,20 +874,24 @@ class bplotlib(Param, Options, ParaName):
     xmin = min(conlc[0, 0], date_line[0])
     xmax = max(conlc[-1, 0], date_line[-1])
     dx = xmax-xmin
-    xmin -= 0.1*dx 
-    xmax += 0.1*dx 
-    ax5.set_xlim(xmin, xmax)
+    xmin -= 0.05*dx 
+    xmax += 0.05*dx 
     ax5.set_xlim(xmin, xmax)
     ax5.tick_params(labelright=True, labelleft=False)
     ax5.yaxis.set_label_position('right')
     
+    xlim = ax5.get_xlim()
+    ax6.set_xlim(xlim[0], xlim[1])
+    ax5.minorticks_on()
+    ax6.minorticks_on()
+
     plt.rcParams['xtick.direction'] = 'out'
     plt.rcParams['ytick.direction'] = 'out'
     #========================================================================
     # subfig 1
     ax1 = fig.add_axes([0.1, 0.6, 0.25, 0.3])
     
-    plt.imshow(prof, cmap=cmap, interpolation='gaussian', aspect='auto', \
+    plt.imshow(prof, cmap=cmap, interpolation='gaussian', aspect='auto', origin='lower',\
                extent=[grid_vel[0]/1.0e3, grid_vel[nv-1]/1.0e3, 1, prof.shape[0]], vmax = np.amax(prof), vmin=np.amin(prof))
     ax1.set_xlabel(r'$\rm Velocity\ (10^3km\ s^{-1})$')
     ax1.set_ylabel(r'$\rm Epoch~Number$')
@@ -805,7 +901,7 @@ class bplotlib(Param, Options, ParaName):
     # subfig 2
     ax2=fig.add_axes([0.37, 0.6, 0.25, 0.3])
     
-    plt.imshow(prof_rec_max, cmap=cmap, interpolation='gaussian',  aspect='auto', \
+    plt.imshow(prof_rec_max, cmap=cmap, interpolation='gaussian',  aspect='auto', origin='lower', \
                extent=[grid_vel[0]/1.0e3, grid_vel[nv-1]/1.0e3, 1, prof.shape[0]], vmax = np.amax(prof), vmin=np.amin(prof))
     ax2.set_xlabel(r'$\rm Velocity\ (10^3km\ s^{-1})$')
     ax2.text(0.08, 0.9, r'\bf Model', color='white', transform=ax2.transAxes)
@@ -817,7 +913,8 @@ class bplotlib(Param, Options, ParaName):
     prof_diff = prof - prof_rec_max
     ax3=fig.add_axes([0.64, 0.6, 0.31, 0.3])
     img = prof_diff/np.sqrt(prof_err**2 + syserr_line**2)
-    cmap=ax3.imshow(img,  aspect='auto', extent=[grid_vel[0]/1.0e3, grid_vel[nv-1]/1.0e3, 1, prof.shape[0]], vmax=7.0, vmin = -7.0)
+    cmap=ax3.imshow(img,  aspect='auto', origin='lower', cmap='jet',
+                    extent=[grid_vel[0]/1.0e3, grid_vel[nv-1]/1.0e3, 1, prof.shape[0]], vmax=7.0, vmin = -7.0)
     
     plt.colorbar(cmap, ticks=[-5, -2.5, 0.0, 2.5, 5.0])
     ax3.text(0.08, 0.9, r'\bf Residuals', color='white', transform=ax3.transAxes)
@@ -844,6 +941,10 @@ class bplotlib(Param, Options, ParaName):
                  ls='none', ecolor='k', capsize=1, markeredgewidth=1)
     plt.plot(grid_vel/1.0e3, prof_rec_max[i, :]+j*offset, color='b', lw=2)
     
+    if int(self.param["flagnarrowline"]) > 0:
+      prof_na = self.get_narrow_line(grid_vel, imax, i)
+      plt.plot(grid_vel/1.0e3, prof_na, lw=1, color='k', ls='--', label='Narrow Line')
+
     idx = np.where(chifit == chifit_sort[1])
     i = idx[0][0]
     j = 1
@@ -851,11 +952,17 @@ class bplotlib(Param, Options, ParaName):
                  ls='none', ecolor='k', capsize=1, markeredgewidth=1)
     plt.plot(grid_vel/1.0e3, prof_rec_max[i, :]+j*offset, color='b', lw=2)
     
+    if int(self.param["flagnarrowline"]) > 0:
+      prof_na = self.get_narrow_line(grid_vel, imax, i)
+      plt.plot(grid_vel/1.0e3, prof_na+j*offset, lw=1, color='k', ls='--')
+
     ax4.set_xlabel(r'$\rm Velocity\ (10^3km\ s^{-1})$')
     ax4.set_ylabel(r'$\rm Flux$')
     ax4.set_xlim([grid_vel[0]/1.0e3, grid_vel[-1]/1.0e3])
     ax4.text(0.08, 0.9, r'$\rm Profile$', color='k', transform=ax4.transAxes)
     
+    if int(self.param["flagnarrowline"]) > 0:
+      ax4.legend(fontsize=8, handlelength=1.0, handletextpad=0.2, loc=(0.02, 0.8), frameon=False)
     
     fig.savefig("results_2d.pdf", bbox_inches='tight')
     plt.show()
