@@ -10,6 +10,7 @@ data/*
 !data/sim_sa.txt
 analysis/*
 !analysis/*.py
+!analysis/readme.txt
 !src/*.[ch]
 !src/doxyfile
 !doc/*.tex
