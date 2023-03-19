@@ -557,6 +557,8 @@ class bplotlib(Param, Options, ParaName):
       print("Flagdim =", self.param['flagdim'], "no 2D RM data.")
       return
     
+    cycle = plt.rcParams['axes.prop_cycle'].by_key()['color']
+
     wave0 = float(self.param['linecenter'])
 
     idx_con =  np.nonzero(self.para_names['name'] == 'sys_err_con')[0][0]
@@ -706,32 +708,34 @@ class bplotlib(Param, Options, ParaName):
       chifit[i] = np.sum( (prof_rec_max[i, :] - prof[i, :]) * (prof_rec_max[i, :] - prof[i, :]) )
     chifit_sort = np.sort(chifit)
 
-    offset = np.max(prof.flatten()) * 0.2
+    offset = np.max(prof.flatten()) * 0.25
     
     idx = np.where(chifit == chifit_sort[0])
     i = idx[0][0]
     j = 0
     plt.errorbar(grid_vel/1.0e3, prof[i, :]+j*offset, yerr=np.sqrt(prof_err[i, :]*prof_err[i, :] + syserr_line*syserr_line), \
-                 ls='none', ecolor='k', capsize=1, markeredgewidth=1)
-    plt.plot(grid_vel/1.0e3, prof_rec_max[i, :]+j*offset, color='b', lw=2)
+                 ls='none', ecolor='k', capsize=1, markeredgewidth=1, zorder=10)
+    plt.plot(grid_vel/1.0e3, prof_rec_max[i, :]+j*offset, color=cycle[0], lw=2, zorder=1)
 
     if int(self.param["flagnarrowline"]) > 0:
       prof_na = self.get_narrow_line(grid_vel, imax, i)
-      plt.plot(grid_vel/1.0e3, prof_na+j*offset, lw=1, color='k', ls='--', label='Narrow Line')
+      plt.plot(grid_vel/1.0e3, (prof_rec_max[i, :]-prof_na)+j*offset, lw=1, color=cycle[0], ls='--', zorder=1)
+      plt.plot(grid_vel/1.0e3, prof_na+j*offset, lw=1, color='k', ls='--', label='Narrow Line', zorder=1)
     
     idx = np.where(chifit == chifit_sort[1])
     i = idx[0][0]
     j = 1
     plt.errorbar(grid_vel/1.0e3, prof[i, :]+j*offset, yerr=np.sqrt(prof_err[i, :]*prof_err[i, :] + syserr_line*syserr_line), \
-                 ls='none', ecolor='k', capsize=1, markeredgewidth=1)
-    plt.plot(grid_vel/1.0e3, prof_rec_max[i, :]+j*offset, color='b', lw=2)
+                 ls='none', ecolor='k', capsize=1, markeredgewidth=1, zorder=10)
+    plt.plot(grid_vel/1.0e3, prof_rec_max[i, :]+j*offset, color=cycle[1], lw=2, zorder=1)
     
     if int(self.param["flagnarrowline"]) > 0:
       prof_na = self.get_narrow_line(grid_vel, imax, i)
-      plt.plot(grid_vel/1.0e3, prof_na+j*offset, lw=1, color='k', ls='--')
+      plt.plot(grid_vel/1.0e3, (prof_rec_max[i, :]-prof_na)+j*offset, lw=1, color=cycle[1], ls='--', zorder=1)
+      plt.plot(grid_vel/1.0e3, prof_na+j*offset, lw=1, color='k', ls='--', zorder=1)
     
     ax3.set_xlabel(r'$\rm Velocity\ (10^3km\ s^{-1})$')
-    ax3.set_ylabel(r'$\rm Flux$')
+    ax3.set_ylabel(r'$\rm Flux + offset$')
     ax3.set_xlim([grid_vel[0]/1.0e3, grid_vel[-1]/1.0e3])
     ax3.text(0.08, 0.9, r'$\rm Profile$', color='k', transform=ax3.transAxes)
 
@@ -764,6 +768,8 @@ class bplotlib(Param, Options, ParaName):
     if not int(self.param['flagdim']) in [2, 5, 6]:
       print("Flagdim =", self.param['flagdim'], "no 2D RM data.")
       return
+    
+    cycle = plt.rcParams['axes.prop_cycle'].by_key()['color']
 
     wave0 = float(self.param['linecenter'])
 
@@ -939,25 +945,27 @@ class bplotlib(Param, Options, ParaName):
     j = 0
     plt.errorbar(grid_vel/1.0e3, prof[i, :]+j*offset, yerr=np.sqrt(prof_err[i, :]*prof_err[i, :] + syserr_line*syserr_line), \
                  ls='none', ecolor='k', capsize=1, markeredgewidth=1)
-    plt.plot(grid_vel/1.0e3, prof_rec_max[i, :]+j*offset, color='b', lw=2)
+    plt.plot(grid_vel/1.0e3, prof_rec_max[i, :]+j*offset, color=cycle[0], lw=2)
     
     if int(self.param["flagnarrowline"]) > 0:
       prof_na = self.get_narrow_line(grid_vel, imax, i)
-      plt.plot(grid_vel/1.0e3, prof_na, lw=1, color='k', ls='--', label='Narrow Line')
+      plt.plot(grid_vel/1.0e3, (prof_rec_max[i, :]-prof_na)+j*offset, lw=1, color=cycle[0], ls='--', zorder=1)
+      plt.plot(grid_vel/1.0e3, prof_na+j*offset, lw=1, color='k', ls='--', zorder=1, label='Narrow Line')
 
     idx = np.where(chifit == chifit_sort[1])
     i = idx[0][0]
     j = 1
     plt.errorbar(grid_vel/1.0e3, prof[i, :]+j*offset, yerr=np.sqrt(prof_err[i, :]*prof_err[i, :] + syserr_line*syserr_line), \
                  ls='none', ecolor='k', capsize=1, markeredgewidth=1)
-    plt.plot(grid_vel/1.0e3, prof_rec_max[i, :]+j*offset, color='b', lw=2)
+    plt.plot(grid_vel/1.0e3, prof_rec_max[i, :]+j*offset, color=cycle[1], lw=2)
     
     if int(self.param["flagnarrowline"]) > 0:
       prof_na = self.get_narrow_line(grid_vel, imax, i)
-      plt.plot(grid_vel/1.0e3, prof_na+j*offset, lw=1, color='k', ls='--')
+      plt.plot(grid_vel/1.0e3, (prof_rec_max[i, :]-prof_na)+j*offset, lw=1, color=cycle[1], ls='--', zorder=1)
+      plt.plot(grid_vel/1.0e3, prof_na+j*offset, lw=1, color='k', ls='--', zorder=1)
 
     ax4.set_xlabel(r'$\rm Velocity\ (10^3km\ s^{-1})$')
-    ax4.set_ylabel(r'$\rm Flux$')
+    ax4.set_ylabel(r'$\rm Flux + offset$')
     ax4.set_xlim([grid_vel[0]/1.0e3, grid_vel[-1]/1.0e3])
     ax4.text(0.08, 0.9, r'$\rm Profile$', color='k', transform=ax4.transAxes)
     
