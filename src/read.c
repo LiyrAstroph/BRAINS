@@ -219,6 +219,16 @@ void read_parset()
     pardict[nt].isset = 0;
     pardict[nt++].id = DOUBLE;
 
+    strcpy(pardict[nt].tag, "FluxNarrowLineLimitLow");
+    pardict[nt].addr= &parset.flux_narrowline_low;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = DOUBLE;
+
+    strcpy(pardict[nt].tag, "FluxNarrowLineLimitUpp");
+    pardict[nt].addr= &parset.flux_narrowline_upp;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = DOUBLE;
+
     strcpy(pardict[nt].tag, "BLRParFix");
     pardict[nt].addr= &parset.str_par_fix;
     pardict[nt].isset = 0;
@@ -349,6 +359,8 @@ void read_parset()
     parset.n_vel_per_cloud = 1;
     parset.flag_bintype = 0;
     parset.flag_theta_sample = 0;
+    parset.flux_narrowline_low = 1.0e-1;
+    parset.flux_narrowline_low = 1.0e2;
 
     strcpy(parset.continuum_file, "");
     strcpy(parset.line_file, "");
@@ -564,6 +576,35 @@ void read_parset()
           fprintf(stderr, "# Error in NCloudPerCore: value %d is not allowed.\n"
                           "# Please specify a larger number.\n", 
                           parset.n_cloud_per_task);
+          error_flag = 1;
+        }
+      }
+
+
+      if(parset.flag_narrowline == 2)
+      {
+        if(parset.flux_narrowline < 0)
+        {
+          fprintf(stderr, "# FluxNarrowLine should be positive.\n");
+          error_flag = 1;
+        }
+      }
+
+      if(parset.flag_narrowline == 3)
+      {
+        if(parset.flux_narrowline_low < 0)
+        {
+          fprintf(stderr, "# FluxNarrowLineLimitLow should be positive.\n");
+          error_flag = 1;
+        }
+        if(parset.flux_narrowline_upp < 0)
+        {
+          fprintf(stderr, "# FluxNarrowLineLimitUpp should be positive.\n");
+          error_flag = 1;
+        }
+        if(parset.flux_narrowline_low >= parset.flux_narrowline_upp)
+        {
+          fprintf(stderr, "# FluxNarrowLineLimitLow should be smaller than FluxNarrowLineLimitUpp.\n");
           error_flag = 1;
         }
       }

@@ -206,7 +206,7 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
 
     for(i=0; i<nv; i++)
     {
-      fnarrow = flux * exp( -0.5 * pow( (transv[i] - shift)/(width), 2.0) );
+      fnarrow = flux/sqrt(2.0*PI)/width * exp( -0.5 * pow( (transv[i] - shift)/(width), 2.0) );
       for(j = 0; j<nl; j++)
       {
         fl2d[j*nv + i] += fnarrow;

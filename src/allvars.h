@@ -116,6 +116,7 @@ typedef struct
   int flag_narrowline;
   double flux_narrowline, width_narrowline, shift_narrowline;
   double flux_narrowline_err, width_narrowline_err, shift_narrowline_err;
+  double flux_narrowline_upp, flux_narrowline_low;
   
   int flag_linecenter;
   double linecenter_err;

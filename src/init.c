@@ -416,8 +416,8 @@ void init()
       }
       else
       {
-        nlr_range_model[0][0] = log(1.0e-1); /* logrithmic prior */
-        nlr_range_model[0][1] = log(1.0e4);
+        nlr_range_model[0][0] = log(parset.flux_narrowline_low); /* logrithmic prior */
+        nlr_range_model[0][1] = log(parset.flux_narrowline_upp);
   
         nlr_prior_model[0] = UNIFORM;
       }
@@ -748,8 +748,16 @@ void scale_con_line()
 
   if( (parset.flag_dim==2 || parset.flag_dim == -1 || parset.flag_dim == 5) && parset.flag_narrowline!=0)
   {
-    parset.flux_narrowline *= line_scale;
-    parset.flux_narrowline_err *= line_scale;
+    if(parset.flag_narrowline < 3)  /* fixed or Gaussian prior */
+    {
+      parset.flux_narrowline *= line_scale;
+      parset.flux_narrowline_err *= line_scale;
+    }
+    else /* logarithm prior, scale the limit */
+    {
+      parset.flux_narrowline_low *= line_scale;
+      parset.flux_narrowline_upp *= line_scale;
+    }
   }
   return;
 }
