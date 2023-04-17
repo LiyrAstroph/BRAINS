@@ -1098,5 +1098,29 @@ class bplotlib(Param, Options, ParaName):
     else:
       print("Flagdim =", self.param["flagdim"], "no trans1d")
       return
+  
+  def plot_blrmodel_para_hist(self, para_indx=None):
+    """
+    plot histograms of BLR model parameters
+    """
+    
+    prange = np.zeros((self.results['sample'].shape[1], 2))
+    prange[:, 0] = np.min(self.results['sample'], axis=0)
+    prange[:, 1] = np.max(self.results['sample'], axis=0)
+    dprange = prange[:, 1]-prange[:, 0]
+    prange[:, 0] -= 0.1*dprange 
+    prange[:, 1] += 0.1*dprange
 
-
+    if int(self.param['flagdim']) >= 1:
+      if para_indx == None:
+        fig = corner.corner(self.results['sample'][:, :self.num_param_blrmodel_rm], \
+                            range = prange[:self.num_param_blrmodel_rm, :], \
+                            smooth=True, smooth1d=True)
+      else:
+        fig = corner.corner(self.results['sample'][:, para_indx], range = prange[para_indx, :], \
+                            smooth=True, smooth1d=True)
+      fig.savefig("hist.pdf", bbox_inches='tight')
+      plt.show()
+    else:
+      print("Flagdim =", self.param["flagdim"], "no BLR parameters")
+      return
