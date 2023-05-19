@@ -19,6 +19,7 @@ and emit broad emission lines.
 
 BLR model 1
 ===========
+This model is from Brewer et al. (2011).
 Clouds' distribution has a disk-like shape (see the figure) and is axis-symetric.
 
 * Radial distribution: :math:`\Gamma`-distribution
@@ -92,6 +93,8 @@ BLR model 5
   r^{-\alpha},& {\rm for}~1\leqslant r/R_0 \leqslant F_{\rm out},
   \end{array}\right.
 
+* The dyanmics and emissivity are the same as Pancoast et al. (2014)'s model.
+
 BLR model 6
 ===========
 This is compatible with Pancoast et al. (2014)'s model.
@@ -152,8 +155,31 @@ The density along the stream line is given by
 
 where :math:`\dot m` is the mass-loss rate at the root of the stream line.
 
+BLR model 9
+===========
+This is the model adopted in the spectroastrometric modeling on 3C 273 by GRAVITY Collaboration (2018).
+
+* Radial distribution: :math:`\Gamma`-distribution
+
+  .. math::
+  
+    \Gamma(r|\alpha, \theta) = 
+    \frac{1}{\Gamma(\alpha)\theta^{\alpha-1}}r^{\alpha-1}\exp\left(-\frac{r}{\theta}\right)
+
+* Dynamics: circular Keplerian motion,
+
+  .. math::
+
+    V_{Kep} = \frac{GM}{r}.
+
+* Emissivity: isotropic prescription.
+
 References
 ==========
+* Brewer, B. et al. 2011, ApJL, 733, 33
+
+* GRAVITY Collaboration et al. 2018, Nature, 563, 657
+  
 * Higginbottom, N. et al. 2013, MNRAS, 436, 1390
 
 * Li, Y.-R. et al. 2013, ApJ, 779, 110
