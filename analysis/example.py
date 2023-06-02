@@ -10,8 +10,16 @@ pb.print_blrmodel_para_names()
 # plot continuum DRW parameters
 fig = pb.plot_drw_parameters()
 
-# plot RM 2D results
+#===============================================
+# RM 2D results, flagdim == 2
 # 
+
+# get continuum data 
+con_data = pb.get_con_data()
+
+# get line 2D data 
+line2d_data = pb.get_line2d_data()
+
 # pb.plot_results_2d_style2018()
 pb.plot_results_2d_style2022()
 
@@ -20,3 +28,6 @@ pb.plot_tran2d()
 
 # plot 1d transfer function
 pb.plot_tran1d()
+
+# plot histograms of BLR model parameters
+pb.plot_blrmodel_para_hist()

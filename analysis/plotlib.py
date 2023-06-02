@@ -81,6 +81,8 @@ class Options:
       self.option_file = file_dir + "/param/OPTIONSSA1D"
     elif flag_dim == '5':
       self.option_file = file_dir + "/param/OPTIONSSA2D"
+    elif flag_dim == '6':
+      self.option_file = file_dir + "/param/OPTIONSSARM"
 
     if self.option_file != "":
       with open(self.option_file) as f:
@@ -1112,7 +1114,7 @@ class bplotlib(Param, Options, ParaName):
     prange[:, 1] += 0.1*dprange
 
     if int(self.param['flagdim']) >= 1:
-      if para_indx == None:
+      if para_indx is None:
         fig = corner.corner(self.results['sample'][:, :self.num_param_blrmodel_rm], \
                             range = prange[:self.num_param_blrmodel_rm, :], \
                             smooth=True, smooth1d=True)
