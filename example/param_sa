@@ -1,7 +1,7 @@
 % parameter file
 % lines beginning with '%' are regarded as comments and are neglected
 % 
-% an example parameter file for only continuum reconstruction.
+% an example parameter file for only spectroastrometric analysis.
 
 Redshift                    0.158399                               % redshift of the object
 
@@ -21,6 +21,12 @@ SAFile                      data/3C273_sa.txt
 NCloudPerCore               10000                        % number of clouds per task
 
 NVPerCloud                  1  
+
+%========================================================================
+% set fixed BLR parameters and their fixed values
+% do not put sapce in the strings
+% 1: fixed; 0: not fixed;
+% values are separated by ":"
 
 SABLRParFix                 000000000
 SABLRParFixVal              2.0:1.0                       

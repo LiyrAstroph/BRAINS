@@ -1,7 +1,7 @@
 % parameter file
 % lines beginning with '%' are regarded as comments and are neglected
 % 
-% an example parameter file for 2D analysis.
+% an example parameter file for SA + RM 2D analysis.
 
 Redshift                    0.158399                               % redshift of the object
 
