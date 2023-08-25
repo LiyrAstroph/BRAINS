@@ -1897,6 +1897,11 @@ void fprint_param()
   
   sprintf(fname, "%s/%s", parset.file_dir, "data/BRAINS_param.txt");
   fp = fopen(fname, "w");
+  if(fp == NULL)
+  {
+    printf("Cannot open file %s!\n", fname);
+    exit(0);
+  }
   fprintf(fp, "#*************************************************\n");
   fprint_version(fp);
   fprintf(fp, "#*************************************************\n");
