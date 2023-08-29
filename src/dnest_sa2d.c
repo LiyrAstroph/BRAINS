@@ -393,14 +393,15 @@ void print_par_names_sa2d()
   for(j=0; j<num_params_blr_model; j++)
   {
     i++;
-    if(BLRmodel_name!=NULL)
+    strcpy(str_name, "\0");
+    if(BLRmodel_name!=NULL && BLRmodel_name[i] != NULL)
     {
       strcpy(str_name, "BLR model ");
       strcat(str_name, BLRmodel_name[i]);
     }
     else 
     {
-      strcat(str_name, "BLR model");
+      strcpy(str_name, "BLR model");
     }
     fprintf(fp, str_fmt, i, str_name, par_range_model[i][0], par_range_model[i][1], par_prior_model[i],
                             par_fix[i], par_fix_val[i]);
@@ -432,14 +433,15 @@ void print_par_names_sa2d()
   for(j=0; j<num_params_sa_blr_model; j++)
   {
     i++;
-    if(BLRmodel_sa_name!=NULL)
+    strcpy(str_name, "\0");
+    if(BLRmodel_sa_name!=NULL && BLRmodel_sa_name[j] != NULL)
     {
       strcpy(str_name, "SA BLR model ");
       strcat(str_name, BLRmodel_sa_name[j]);
     }
     else 
     {
-      strcat(str_name, "SA BLR model");
+      strcpy(str_name, "SA BLR model");
     }
     fprintf(fp, str_fmt, i, str_name, par_range_model[i][0], par_range_model[i][1], par_prior_model[i],
                             par_fix[i], par_fix_val[i]);

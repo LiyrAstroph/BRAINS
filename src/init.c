@@ -1440,6 +1440,7 @@ void set_blr_model2d()
     case -1:
       num_params_blr_model = num_params_MyTransfun2d;
       transfun_2d_cal = transfun_2d_cal_mytransfun;
+      BLRmodel_name = MyTFmodel_name;
       break;
 
     case 0:
