@@ -694,6 +694,11 @@ void scale_con_line()
   }
 
   ave_con /= n_con_data;
+  if(ave_con <= 0.0)
+  {
+    printf("Error in continuum data, a negative mean %f!\n", ave_con);
+    exit(0);
+  }
   con_scale = 1.0/ave_con;
 
   for(i=0; i<n_con_data; i++)
@@ -717,7 +722,11 @@ void scale_con_line()
     ave_line += Fline_data[i];
   }
   ave_line /=n_line_data;
-
+  if(ave_line <= 0.0)
+  {
+    printf("Error in line data, a negative mean %f!\n", ave_line);
+    exit(0);
+  }
   line_scale = 1.0/ave_line;
   
   if(thistask == roottask)
@@ -782,6 +791,11 @@ void scale_con_line_sarm()
   }
 
   ave_con /= n_con_data;
+  if(ave_con <= 0.0)
+  {
+    printf("Error in continuum data, a negative mean %f!\n", ave_con);
+    exit(0);
+  }
   con_scale = 1.0/ave_con;
 
   for(i=0; i<n_con_data; i++)
@@ -800,7 +814,12 @@ void scale_con_line_sarm()
     ave_line += Fline_sarm_data[i];
   }
   ave_line /=n_epoch_sarm_data;
-
+  if(ave_line <= 0.0)
+  {
+    printf("Error in line data, a negative mean %f!\n", ave_line);
+    exit(0);
+  }
+  
   line_sarm_scale = 1.0/ave_line;
   sarm_scale_ratio = con_scale/line_sarm_scale;  /* this is needed to cal flux ratio */
   
