@@ -1047,7 +1047,7 @@ class bplotlib(Param, Options, ParaName):
   
     pdf.close()
   
-  def plot_tran2d(self):
+  def plot_tran2d(self, tau_range=None, vel_range=None):
     """
     plot transfer function with the maximum prob
     """
@@ -1055,25 +1055,34 @@ class bplotlib(Param, Options, ParaName):
     if int(self.param['flagdim']) in [2, 5, 6]:
       idx, par = self.find_max_prob()
       
+      extent = [self.data['line2d_data']['profile'][0,0,0],self.data['line2d_data']['profile'][0,-1,0], \
+                        self.results['tau_rec'][idx][0], self.results['tau_rec'][idx][-1]]
+
       plt.rcParams['xtick.direction'] = 'out'
       plt.rcParams['ytick.direction'] = 'out'
       fig = plt.figure()
       ax = fig.add_subplot(111)
       ax.imshow(self.results['tran2d_rec'][idx], aspect='auto', origin='lower', \
-                extent=[self.data['line2d_data']['profile'][0,0,0],self.data['line2d_data']['profile'][0,-1,0], \
-                        self.results['tau_rec'][idx][0], self.results['tau_rec'][idx][-1]],\
+                extent=extent,\
                 interpolation='gaussian')
+      
+      if tau_range is not None:
+        ax.set_ylim(tau_range[0], tau_range[1])
+      if vel_range is not None:
+        ax.set_xlim(vel_range[0], vel_range[1])
+
       ax.set_xlabel(r'Wavelength')
       ax.set_ylabel(r'Time Lag')
       ax.set_title("Transfer function with the maximum prob")
       plt.rcParams['xtick.direction'] = 'in'
       plt.rcParams['ytick.direction'] = 'in'
       plt.show()
+      fig.savefig("tran2d.pdf", bbox_inches='tight')
     else:
       print("Flagdim =", self.param["flagdim"], "no trans2d")
       return
   
-  def plot_tran1d(self):
+  def plot_tran1d(self, tau_range=None):
     """
     plot transfer function 1d
     """
@@ -1083,6 +1092,10 @@ class bplotlib(Param, Options, ParaName):
       ax = fig.add_subplot(111)
       for i in range(0, tran_rec.shape[0], int(tran_rec.shape[0]/100+1.0)):
         ax.plot(tran_rec[i, :, 0], tran_rec[i, :, 1], lw=0.5)
+      
+      if tau_range is not None:
+        ax.set_xlim(tau_range[0], tau_range[1])
+
       plt.show()
     elif int(self.param['flagdim']) in [2, 5, 6]:
       tau_rec = self.results['tau_rec']
@@ -1094,6 +1107,9 @@ class bplotlib(Param, Options, ParaName):
       for i in range(0, tran1d_rec.shape[0], int(tran1d_rec.shape[0]/100+1.0)):
         ax.plot(tau_rec[i, :], tran1d_rec[i, :], lw=0.5)
       
+      if tau_range is not None:
+        ax.set_xlim(tau_range[0], tau_range[1])
+
       ax.set_xlabel(r"Time Lag")
       ax.set_ylabel(r"Transfer Function")
       plt.show()
