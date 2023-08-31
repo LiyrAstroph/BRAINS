@@ -707,7 +707,7 @@ class bplotlib(Param, Options, ParaName):
     ax3=fig.add_axes([0.7, 0.6, 0.25, 0.3])
     chifit = np.zeros(nt)
     for i in range(nt):
-      chifit[i] = np.sum( (prof_rec_max[i, :] - prof[i, :]) * (prof_rec_max[i, :] - prof[i, :]) )
+      chifit[i] = np.sum( (prof_rec_max[i, :] - prof[i, :])**2/(prof_err[i, :]**2 + syserr_line**2) )
     chifit_sort = np.sort(chifit)
 
     offset = np.max(prof.flatten()) * 0.25
@@ -937,7 +937,7 @@ class bplotlib(Param, Options, ParaName):
     ax4=fig.add_axes([0.1, 0.2, 0.25, 0.3])
     chifit = np.zeros(nt)
     for i in range(nt):
-      chifit[i] = np.sum( (prof_rec_max[i, :] - prof[i, :]) * (prof_rec_max[i, :] - prof[i, :]) )
+      chifit[i] = np.sum( (prof_rec_max[i, :] - prof[i, :])**2 /(prof_err[i, :]**2 + syserr_line**2) )
     chifit_sort = np.sort(chifit)
 
     offset = np.max(prof.flatten()) * 0.2
