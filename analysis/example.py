@@ -14,6 +14,10 @@ fig = pb.plot_drw_parameters()
 # RM 2D results, flagdim == 2
 # 
 
+# plot CDNest diagnoistics
+temperature = 1
+pb.postprocess(temperature)
+
 # get continuum data 
 con_data = pb.get_con_data()
 

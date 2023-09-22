@@ -19,7 +19,7 @@ def logdiffexp(x1, x2):    # log( exp(x1) - exp(x2))
   result = np.log(np.exp(xx1) - np.exp(xx2)) + biggest
   return result
 
-def postprocess(ndim, temp=1.0, fcut=0.0):
+def postprocess(ndim, temp=1.0, fcut=0.0, fdir="../"):
 
   pdf = PdfPages('cdnest.pdf')
 
@@ -47,21 +47,23 @@ def postprocess(ndim, temp=1.0, fcut=0.0):
     str_dim = '_sarm'
   else:
     raise Exception('incorrect dimension.')
-
+  
+  print(fdir)
+  
   try:
-    levels_orig = np.loadtxt("../data/levels"+str_dim+".txt", comments='#')
+    levels_orig = np.loadtxt(fdir+"/data/levels"+str_dim+".txt", comments='#')
   except:
-    levels_orig = np.genfromtxt("../data/levels"+str_dim+".txt", comments='#', skip_footer=1)
+    levels_orig = np.genfromtxt(fdir+"/data/levels"+str_dim+".txt", comments='#', skip_footer=1)
 
   try:  
-    sample_info = np.loadtxt("../data/sample_info"+str_dim+".txt", comments='#')
+    sample_info = np.loadtxt(fdir+"/data/sample_info"+str_dim+".txt", comments='#')
   except:
-    sample_info = np.genfromtxt("../data/sample_info"+str_dim+".txt", comments='#', skip_footer=1)
+    sample_info = np.genfromtxt(fdir+"/data/sample_info"+str_dim+".txt", comments='#', skip_footer=1)
 
   try:
-    sample = np.atleast_2d(np.loadtxt("../data/sample"+str_dim+".txt"))
+    sample = np.atleast_2d(np.loadtxt(fdir+"/data/sample"+str_dim+".txt"))
   except:
-    sample = np.atleast_2d(np.genfromtxt("../data/sample"+str_dim+".txt", skip_footer=1))
+    sample = np.atleast_2d(np.genfromtxt(fdir+"/data/sample"+str_dim+".txt", skip_footer=1))
   
   sample = sample[int(cut*sample.shape[0]):, :]
   sample_info = sample_info[int(cut*sample_info.shape[0]):, :]

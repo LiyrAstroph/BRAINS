@@ -17,6 +17,7 @@ import configparser as cp
 import matplotlib.pyplot as plt
 from scipy.ndimage import gaussian_filter
 from matplotlib.backends.backend_pdf import PdfPages
+from .postprocess import postprocess as pt
 
 __all__ = ['bplotlib']
 
@@ -125,7 +126,7 @@ class ParaName:
       raise Exception("Incorrect FlagDim.")
 
     names = np.genfromtxt(self.para_names_file, skip_header=7, \
-      dtype=[int, 'S25', float, float, int, int, float], delimiter=[4, 25, 12, 12, 4, 5, 15])
+      dtype=[int, 'S30', float, float, int, int, float], delimiter=[4, 30, 12, 12, 4, 5, 15])
     
     self.para_names = {}
     self.para_names['name'] = np.array([str(f.strip(), encoding='utf8') for f in names['f1']])
@@ -1142,3 +1143,10 @@ class bplotlib(Param, Options, ParaName):
     else:
       print("Flagdim =", self.param["flagdim"], "no BLR parameters")
       return
+  
+  def postprocess(self, temperature=1):
+    """
+    do posterior process, output results into "cdnest.pdf"
+    """
+    pt(int(self.param["flagdim"]), temp=temperature, fcut=0.0, fdir=self.param["filedir"])
+    return
