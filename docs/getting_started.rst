@@ -101,6 +101,11 @@ The parameter names and prior ranges are stored in ``data/para_names_con.txt`` f
 
 One need to tune the corresponding option files ``OPTIONSCON``, ``OPTIONS1D``, and ``OPTIONS2D`` accordingly, which specify configurations for nested sampling.
 
+
+Outputs
+=======
+``brains`` outputs a series files for modeling results and visualizations. See :ref:`Outputs` for details.
+
 An Exemplary Test
 =================
 Application to a mock reverberation mapping dataset, see Li, Y.-R., Songshen, Y.-Y., Qiu, J., et al. 2018, ApJ, 869, 137:

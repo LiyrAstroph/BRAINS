@@ -24,6 +24,7 @@ Documentation
    
    getting_started.rst
    param.rst
+   output.rst
    data.rst
    mcmc.rst
    model.rst
