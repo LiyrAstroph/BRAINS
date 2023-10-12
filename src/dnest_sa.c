@@ -31,6 +31,7 @@ int dnest_sa(int argc, char **argv)
 {
   int i;
   double logz_sa;
+  char dnest_data_dir[BRAINS_MAX_STR_LENGTH];
 
   set_sa_blr_model();
   
@@ -86,7 +87,9 @@ int dnest_sa(int argc, char **argv)
 
   force_update = parset.flag_force_update;
   if(parset.flag_para_name != 1)
-    logz_sa = dnest(argc, argv, fptrset_sa, num_params, NULL, NULL, NULL, "data/", dnest_options_file, NULL, NULL);
+    strcpy(dnest_data_dir,parset.file_dir);
+    strcat(dnest_data_dir, "/data/");
+    logz_sa = dnest(argc, argv, fptrset_sa, num_params, NULL, NULL, NULL, dnest_data_dir, dnest_options_file, NULL, NULL);
   
   dnest_free_fptrset(fptrset_sa);
 

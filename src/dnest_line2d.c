@@ -32,6 +32,7 @@ DNestFptrSet *fptrset_line2d;
 int dnest_line2d(int argc, char **argv)
 {
   int i;
+  char dnest_data_dir[BRAINS_MAX_STR_LENGTH];
 
   set_blr_model2d();
     
@@ -157,7 +158,9 @@ int dnest_line2d(int argc, char **argv)
 
   force_update = parset.flag_force_update;
   if(parset.flag_para_name != 1)
-    logz_line2d = dnest(argc, argv, fptrset_line2d, num_params, NULL, NULL, NULL, "data/", dnest_options_file, NULL, NULL);
+    strcpy(dnest_data_dir,parset.file_dir);
+    strcat(dnest_data_dir, "/data/");
+    logz_line2d = dnest(argc, argv, fptrset_line2d, num_params, NULL, NULL, NULL, dnest_data_dir, dnest_options_file, NULL, NULL);
   
   dnest_free_fptrset(fptrset_line2d);
   return 0;

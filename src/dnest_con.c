@@ -30,6 +30,7 @@ DNestFptrSet *fptrset_con;
 int dnest_con(int argc, char **argv)
 {
   int i;
+  char dnest_data_dir[BRAINS_MAX_STR_LENGTH];
 
   num_params = parset.n_con_recon + num_params_var;
   rnd_frac = fmax(0.2, 1.0*(num_params_var)/num_params);
@@ -91,7 +92,9 @@ int dnest_con(int argc, char **argv)
 
   /* if not only print parameter name */
   if(parset.flag_para_name != 1)
-    logz_con = dnest(argc, argv, fptrset_con, num_params, NULL, NULL, NULL, "data/", dnest_options_file, NULL, NULL);
+    strcpy(dnest_data_dir,parset.file_dir);
+    strcat(dnest_data_dir, "/data/");
+    logz_con = dnest(argc, argv, fptrset_con, num_params, NULL, NULL, NULL, dnest_data_dir, dnest_options_file, NULL, NULL);
   
   dnest_free_fptrset(fptrset_con);
   return 0;

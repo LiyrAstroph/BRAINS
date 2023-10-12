@@ -12,7 +12,7 @@ Redshift                    0.0                                    % redshift of
 
 FileDir                     /home/liyropt/Projects/GIT/BRAINS      % directory for where all the output files are stored
 
-FlagDim                     -2                          % -2, generate fully random lc; -1, mock lc based on input data; 
+FlagDim                     1                          % -2, generate fully random lc; -1, mock lc based on input data; 
                                                         % 0, only continuum modeling; 1, 1d line RM; 2, 2d line RM
                                                         % if -DSA, 3: only SA; 4: SA+1d line RM; 5: SA+2d line RM; 6: SARM
 
@@ -102,9 +102,7 @@ Tran2DDataFileOut           data/tran2d_data.txt        % output filename for 2d
 
 %========================================================================
 % RM spectral broadening, referring to the standard deviation of Gaussian
-% If FlagNarrowLine = 0, InstRes only means instrument broadening 
-% Otherwise, InstRes includes: 1) instrument broadening and 2) intrinsic width 
-% of narrow line (added in square).
+% InstRes means instrument broadening 
 %
 FlagInstRes                 0                           % 0, fixed to InstRes
                                                         % 1, uniform prior, epoch-independent
