@@ -549,7 +549,48 @@ class bplotlib(Param, Options, ParaName):
       flux /= self.line_scale
       prof = flux * np.exp(-0.5 *(grid_vel - shift)**2/width_br**2)
       return prof
+
       
+  def plot_results_con(self):
+    """
+    plot continuum results
+    """
+
+    if not int(self.param['flagdim']) in [0]:
+      print("Flagdim =", self.param['flagdim'], "not continuum analysis.")
+      return
+    
+    plt.rc('text', usetex=True)
+    plt.rc('font', family='serif', size=15)
+
+    fig = plt.figure(figsize=(8, 4))
+    ax = fig.add_subplot(111)
+    
+    conlc = self.data["con_data"]
+
+    con_mean_err = np.mean(conlc[:, 2])
+    idx_con =  np.nonzero(self.para_names['name'] == 'sys_err_con')[0][0]
+    sample = self.results['sample']
+    syserr_con = (np.exp(np.mean(sample[:, idx_con])) - 1.0) * con_mean_err
+
+    ax.errorbar(conlc[:, 0], conlc[:, 1], yerr=np.sqrt(conlc[:, 2]*conlc[:, 2] + syserr_con*syserr_con), \
+                marker='None', markersize=3, ls='none', lw=1.0, capsize=1, markeredgewidth=0.5, zorder=32)
+    
+    con_rec = self.results['con_rec']
+    con_date = con_rec[0, :, 0]
+    con_mean = np.quantile(con_rec[:, :, 1], axis=0, q=0.5)
+    con_mean_upp = np.quantile(con_rec[:, :, 1], axis=0, q=(1.0-0.683)/2.0)
+    con_mean_low = np.quantile(con_rec[:, :, 1], axis=0, q=1.0 - (1.0-0.683)/2.0)
+    
+    ax.plot(con_date, con_mean, color='red', zorder=20) 
+    ax.fill_between(con_date, y1=con_mean_low, y2=con_mean_upp, color='grey')
+    
+    ax.set_xlabel("Time")
+    ax.set_ylabel("Flux")
+    ax.minorticks_on()
+
+    fig.savefig("results_con.pdf", bbox_inches='tight')
+    plt.close()
 
   def plot_results_2d_style2018(self):
     """
