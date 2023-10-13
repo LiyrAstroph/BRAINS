@@ -8,7 +8,33 @@ flagdim = int(pb.param["flagdim"])
 #===============================================
 # continuum results, flagdim == 0
 if flagdim == 0:
+  # plot continuum DRW parameters
+  fig = pb.plot_drw_parameters()
+  
+  # plot CDNest diagnoistics
+  temperature = 1
+  pb.postprocess(temperature)
+
   pb.plot_results_con()
+
+#===============================================
+# RM 1D results, flagdim == 1
+if flagdim == 1:
+  # plot continuum DRW parameters
+  fig = pb.plot_drw_parameters()
+  
+  # plot CDNest diagnoistics
+  temperature = 1
+  pb.postprocess(temperature)
+
+  pb.plot_results_1d()
+
+  # plot 1d transfer function
+  # pb.plot_tran1d(tau_range=[a, b])
+  pb.plot_tran1d()
+
+  # plot histograms of BLR model parameters
+  pb.plot_blrmodel_para_hist()
 
 #===============================================
 # RM 2D results, flagdim == 2
