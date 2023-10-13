@@ -45,7 +45,8 @@ void postprocess_sarm()
       fprintf(stderr, "# Error: Cannot open file %s.\n", posterior_sample_file);
       exit(0);
     }
-    fcon = fopen("data/con_rec.txt", "w");
+    sprintf(fname, "%s/%s", parset.file_dir, "data/con_rec.txt");
+    fcon = fopen(fname, "w");
     if(fcon == NULL)
     {
       fprintf(stderr, "# Error: Cannot open file data/con_rec.txt.\n");
@@ -55,7 +56,8 @@ void postprocess_sarm()
     //file for continuum reconstruction after detrending
     if(parset.flag_trend_diff > 0)
     {
-      fcon_rm = fopen("data/con_rm_rec.txt", "w");
+      sprintf(fname, "%s/%s", parset.file_dir, "data/con_rm_rec.txt");
+      fcon_rm = fopen(fname, "w");
       if(fcon_rm == NULL)
       {
         fprintf(stderr, "# Error: Cannot open file data/con_rm_rec.txt.\n");

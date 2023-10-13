@@ -72,7 +72,8 @@ void postprocess2d()
     //file for continuum reconstruction after detrending
     if(parset.flag_trend_diff > 0)
     {
-      fcon_rm = fopen("data/con_rm_rec.txt", "w");
+      sprintf(fname, "%s/%s", parset.file_dir, "data/con_rm_rec.txt");
+      fcon_rm = fopen(fname, "w");
       if(fcon_rm == NULL)
       {
         fprintf(stderr, "# Error: Cannot open file data/con_rm_rec.txt.\n");
