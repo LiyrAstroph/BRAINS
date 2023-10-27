@@ -14,6 +14,7 @@ import sys
 import corner
 import numpy as np 
 import configparser as cp
+from matplotlib import colors
 import matplotlib.pyplot as plt
 from scipy.ndimage import gaussian_filter
 from matplotlib.backends.backend_pdf import PdfPages
@@ -1252,6 +1253,63 @@ class bplotlib(Param, Options, ParaName):
       print("Flagdim =", self.param["flagdim"], "no BLR parameters")
       return
   
+  def plot_clouds(self, fname=None, cmap='bwr', range=[-10, 10], objname=None, format="jpg"):
+    """
+    plot clouds' distribution
+    """
+    
+    if fname is None:
+      raise ValueError("please input a file that restores the data for clouds' distribution.")
+    
+    plt.rc('text', usetex=True)
+    plt.rc('font', family='serif')
+
+    fig, axes = plt.subplots(2, 1)
+    fig.subplots_adjust(hspace=0.02, wspace=0)
+    fig.set_size_inches(4, 8)
+    
+    clouds  = np.loadtxt(fname)
+    if clouds.shape[0] > 20000:
+      clouds_rm = clouds[::10, :] 
+    else:
+      clouds_rm = clouds
+
+    vlos_max = np.max(np.abs(clouds_rm[:, 3]))
+    
+    norm = colors.Normalize(vmin=-vlos_max, vmax=vlos_max)
+    clouds_rm[:, 3] = -clouds_rm[:, 3]  # positive is recending
+      
+    ax1 = axes[0]
+    ax2 = axes[1]
+    
+    cax=ax1.scatter(clouds_rm[:, 0], clouds_rm[:, 1], c=clouds_rm[:, 3], cmap=cmap, norm=norm, alpha=0.7, s=10, edgecolors='k', linewidths=0.5)
+    ax2.scatter(clouds_rm[:, 0], clouds_rm[:, 2], c=clouds_rm[:, 3], cmap=cmap, norm=norm, alpha=0.7, s=10, edgecolors='k', linewidths=0.5)
+    
+    ax1.set_xlim(range[0], range[1])
+    ax1.set_ylim(range[0], range[1])
+    ax2.set_xlim(range[0], range[1])
+    ax2.set_ylim(range[0], range[1])
+    ax1.minorticks_on()
+    ax2.minorticks_on()
+
+    if objname is not None:
+      ax1.text(0.06, 0.95, r"\bf "+ objname, transform=ax1.transAxes, horizontalalignment='left', verticalalignment='top', bbox=dict(boxstyle="round", facecolor='w', alpha=0.7))
+    
+    [xt.set_visible(False) for xt in ax1.get_xticklabels()]
+    
+    ax1.set_ylabel(r"$y$ (lt-day)")
+    ax2.set_xlabel(r"$x$ (lt-day)")
+    ax2.set_ylabel(r"$z$ (lt-day)")
+    
+    cbar = plt.colorbar(cax, ax=ax1,location='top', label=r"$V_{\rm LOS}~(\rm km~s^{-1})$")
+
+    if format=="jpg":    
+      fig.savefig("fig_clouds.jpg", bbox_inches='tight', dpi=500)
+    else:
+      fig.savefig("fig_clouds.pdf", bbox_inches='tight')
+
+    plt.show()
+
   def postprocess(self, temperature=1):
     """
     do posterior process, output results into "cdnest.pdf"
