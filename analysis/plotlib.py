@@ -1253,7 +1253,7 @@ class bplotlib(Param, Options, ParaName):
       print("Flagdim =", self.param["flagdim"], "no BLR parameters")
       return
   
-  def plot_clouds(self, fname=None, cmap='bwr', range=[-10, 10], objname=None, format="jpg"):
+  def plot_clouds(self, fname=None, cmap='bwr', range=[-10, 10], objname=None, velocity=True, format="jpg"):
     """
     plot clouds' distribution
     """
@@ -1261,12 +1261,18 @@ class bplotlib(Param, Options, ParaName):
     if fname is None:
       raise ValueError("please input a file that restores the data for clouds' distribution.")
     
+    if int(self.param["flagdim"]) == 1:
+      velocity = False 
+    
     plt.rc('text', usetex=True)
     plt.rc('font', family='serif')
 
-    fig, axes = plt.subplots(2, 1)
-    fig.subplots_adjust(hspace=0.02, wspace=0)
-    fig.set_size_inches(4, 8)
+    fig = plt.figure(figsize=(4, 8))
+    ax1 = fig.add_axes((0.2, 0.405, 0.6, 0.3))
+    ax2 = fig.add_axes((0.2, 0.1, 0.6, 0.3))
+
+    if velocity == True:
+      ax3 = fig.add_axes((0.2, 0.715, 0.6, 0.02))
     
     clouds  = np.loadtxt(fname)
     if clouds.shape[0] > 20000:
@@ -1274,23 +1280,30 @@ class bplotlib(Param, Options, ParaName):
     else:
       clouds_rm = clouds
 
-    vlos_max = np.max(np.abs(clouds_rm[:, 3]))
-    
-    norm = colors.Normalize(vmin=-vlos_max, vmax=vlos_max)
-    clouds_rm[:, 3] = -clouds_rm[:, 3]  # positive is recending
+    if velocity==True:
+      vlos_max = np.max(np.abs(clouds_rm[:, 3]))
       
-    ax1 = axes[0]
-    ax2 = axes[1]
+      norm = colors.Normalize(vmin=-vlos_max, vmax=vlos_max)
+      clouds_rm[:, 3] = -clouds_rm[:, 3]  # positive is recending
     
-    cax=ax1.scatter(clouds_rm[:, 0], clouds_rm[:, 1], c=clouds_rm[:, 3], cmap=cmap, norm=norm, alpha=0.7, s=10, edgecolors='k', linewidths=0.5)
-    ax2.scatter(clouds_rm[:, 0], clouds_rm[:, 2], c=clouds_rm[:, 3], cmap=cmap, norm=norm, alpha=0.7, s=10, edgecolors='k', linewidths=0.5)
-    
+    if velocity == True:
+      cax=ax1.scatter(clouds_rm[:, 0], clouds_rm[:, 1], c=clouds_rm[:, 3], cmap=cmap, norm=norm, alpha=0.7, s=10, edgecolors='k', linewidths=0.5)
+      ax2.scatter(clouds_rm[:, 0], clouds_rm[:, 2], c=clouds_rm[:, 3], cmap=cmap, norm=norm, alpha=0.7, s=10, edgecolors='k', linewidths=0.5)
+    else:
+      ax1.scatter(clouds_rm[:, 0], clouds_rm[:, 1], alpha=0.7, s=10, linewidths=0.5)
+      ax2.scatter(clouds_rm[:, 0], clouds_rm[:, 2], alpha=0.7, s=10, linewidths=0.5)
+
     ax1.set_xlim(range[0], range[1])
     ax1.set_ylim(range[0], range[1])
     ax2.set_xlim(range[0], range[1])
     ax2.set_ylim(range[0], range[1])
     ax1.minorticks_on()
     ax2.minorticks_on()
+
+    xt = ax1.get_ticks()
+    ax1.set_ticks(xt)
+    xt = ax2.get_ticks()
+    ax2.set_ticks(xt)
 
     if objname is not None:
       ax1.text(0.06, 0.95, r"\bf "+ objname, transform=ax1.transAxes, horizontalalignment='left', verticalalignment='top', bbox=dict(boxstyle="round", facecolor='w', alpha=0.7))
@@ -1301,7 +1314,8 @@ class bplotlib(Param, Options, ParaName):
     ax2.set_xlabel(r"$x$ (lt-day)")
     ax2.set_ylabel(r"$z$ (lt-day)")
     
-    cbar = plt.colorbar(cax, ax=ax1,location='top', label=r"$V_{\rm LOS}~(\rm km~s^{-1})$")
+    if velocity == True:
+      cbar = plt.colorbar(cax, cax=ax3, location='top', label=r"LOS Velocity (km~s$^{-1}$)")
 
     if format=="jpg":    
       fig.savefig("fig_clouds.jpg", bbox_inches='tight', dpi=500)
@@ -1309,6 +1323,69 @@ class bplotlib(Param, Options, ParaName):
       fig.savefig("fig_clouds.pdf", bbox_inches='tight')
 
     plt.show()
+  
+  def plot_clouds_los(self, fname=None, cmap='bwr', range=[-10, 10], objname=None, velocity=True, format="jpg"):
+    """
+    plot clouds' distribution viewed from line of sight
+    """
+    if fname is None:
+      raise ValueError("please input a file that restores the data for clouds' distribution.")
+    
+    if int(self.param["flagdim"]) == 1:
+      velocity = False
+
+    velocity=True
+    
+    plt.rc('text', usetex=True)
+    plt.rc('font', family='serif')
+
+    fig = plt.figure(figsize=(4, 4))
+    ax1 = fig.add_axes((0.2, 0.2, 0.6, 0.6))
+
+    if velocity == True:
+      ax2 = fig.add_axes((0.2, 0.815, 0.6, 0.02))
+    
+    clouds  = np.loadtxt(fname)
+    if clouds.shape[0] > 20000:
+      clouds_rm = clouds[::10, :] 
+    else:
+      clouds_rm = clouds
+
+    if velocity == True:
+      vlos_max = np.max(np.abs(clouds_rm[:, 3]))
+      
+      norm = colors.Normalize(vmin=-vlos_max, vmax=vlos_max)
+      clouds_rm[:, 3] = -clouds_rm[:, 3]  # positive is recending
+    
+    if velocity == True:
+      cax=ax1.scatter(clouds_rm[:, 1], clouds_rm[:, 2], c=clouds_rm[:, 3], cmap=cmap, norm=norm, alpha=0.7, s=10, edgecolors='k', linewidths=0.5)
+    else:
+      ax1.scatter(clouds_rm[:, 1], clouds_rm[:, 2], alpha=0.7, s=10, linewidths=0.5)
+
+    ax1.set_xlim(range[0], range[1])
+    ax1.set_ylim(range[0], range[1])
+    ax1.minorticks_on()
+
+    #set the same ticks
+    xt = ax1.get_xticks()
+    ax1.set_yticks(xt)
+
+    if objname is not None:
+      ax1.text(0.06, 0.95, r"\bf "+ objname, transform=ax1.transAxes, horizontalalignment='left', verticalalignment='top', bbox=dict(boxstyle="round", facecolor='w', alpha=0.7))
+        
+    ax1.set_xlabel(r"$y$ (lt-day)")
+    ax1.set_ylabel(r"$z$ (lt-day)")
+    
+    if velocity == True:
+      cbar = plt.colorbar(cax, cax=ax2, location='top', label=r"LOS Velocity (km~s$^{-1}$)")
+
+    if format=="jpg":    
+      fig.savefig("fig_clouds_los.jpg", bbox_inches='tight', dpi=500)
+    else:
+      fig.savefig("fig_clouds_los.pdf", bbox_inches='tight')
+
+    plt.show()
+
 
   def postprocess(self, temperature=1):
     """

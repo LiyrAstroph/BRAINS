@@ -36,6 +36,15 @@ if flagdim == 1:
   # plot histograms of BLR model parameters
   pb.plot_blrmodel_para_hist()
 
+  # plot clouds' distribution
+  pb.plot_clouds("../data/clouds.txt")
+  #pb.plot_clouds("../data/clouds.txt", range=[-10, 10], objname="target", format="jpg", velocity=False)
+
+  # plot clouds' distribution viewd from line of sight
+  pb.plot_clouds_los("../data/clouds.txt")
+  #pb.plot_clouds_los("../data/clouds.txt", range=[-10, 10], objname="target", format="jpg", velocity=False)
+
+
 #===============================================
 # RM 2D results, flagdim == 2
 # 
@@ -71,3 +80,12 @@ if flagdim == 2:
   
   # plot histograms of BLR model parameters
   pb.plot_blrmodel_para_hist()
+
+  # plot clouds' distribution
+  pb.plot_clouds("../data/clouds.txt")
+  #pb.plot_clouds("../data/clouds.txt", range=[-10, 10], objname="target", format="jpg", velocity=True)
+  
+  
+  # plot clouds' distribution viewd from line of sight
+  pb.plot_clouds_los("../data/clouds.txt")
+  #pb.plot_clouds_los("../data/clouds.txt", range=[-10, 10], objname="target", format="jpg", velocity=True)
