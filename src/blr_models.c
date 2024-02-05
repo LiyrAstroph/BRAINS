@@ -1968,7 +1968,7 @@ void gen_cloud_sample_model8(const void *pm, int flag_type, int flag_save)
     vxb = Vr * cos(phi) - Vph * sin(phi);
     vyb = Vr * sin(phi) + Vph * cos(phi);
 
-    if(zb < 0.0)
+    if( (rnd_xi < 1.0 - xi) && zb0 < 0.0)
       vzb = -vzb;
 
     vx = vxb * cos_inc_cmp + vzb * sin_inc_cmp;
