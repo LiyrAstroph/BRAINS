@@ -1116,7 +1116,7 @@ void set_par_value_sim(double *pm, int flag_model)
       pm[i++] = 50.0;   //theta_min
       pm[i++] = 20.0;   //dtheta_max
       pm[i++] = log(1.0); // r_min
-      pm[i++] = 4.0;      // fr_max
+      pm[i++] = log(4.0);      // fr_max
       pm[i++] = 1.0;      // gamma
       pm[i++] = 1.0;      // alpha
       pm[i++] = -2.0;      // lambda

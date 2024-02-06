@@ -41,7 +41,7 @@ char *BLRmodel7_name[] = {"ln(Rblr)", "beta", "F", "Inc", "Opn", "Kappa", "gamma
                           "fsh", "ln(Rblr_un)", "beta_un", "F_un", "opn_un", 
                           "ln(Mbh)", "fellip", "fflow", "ln(sigr_circ)", "ln(sigthe_circ)", "ln(sigr_rad)", "ln(sigthe_rad)", 
                           "theta_rot", "fellip_un", "fflow_un", "ln(sig_turb)"};
-char *BLRmodel8_name[] = {"theta_min", "dtheta_max", "ln(r_min)", "fr_max", "gamma", "alpha", "lambda", "k", "xi", "ln(Rv)", 
+char *BLRmodel8_name[] = {"theta_min", "dtheta_max", "ln(r_min)", "ln(fr_max)", "gamma", "alpha", "lambda", "k", "xi", "ln(Rv)", 
                           "ln(Rblr)", "Inc", "ln(Mbh)"};
 char *BLRmodel9_name[] = {"ln(Rblr)", "beta", "F", "Inc", "Opn", "ln(Mbh)"};
 
@@ -1836,7 +1836,7 @@ void gen_cloud_sample_model8(const void *pm, int flag_type, int flag_save)
   int i;
   double theta_min, theta_max, r_min, r_max, Rblr, Rv, mbh, alpha, gamma, xi, lambda, k;
   double rnd, r, r0, theta, phi, xb, yb, zb, x, y, z, l, weight, sin_inc_cmp, cos_inc_cmp, inc;
-  double dis, density, vl, vesc, Vr, Vph, vx, vy, vz, vxb, vyb, vzb, V, rnd_xi, zb0, lmax, R;
+  double dis, density, vl, vesc, Vr, Vph, vx, vy, vz, vxb, vyb, vzb, V, rnd_xi, lmax, R;
   double v0=6.0/VelUnit;
   BLRmodel8 *model=(BLRmodel8 *)pm;
 
@@ -1846,9 +1846,9 @@ void gen_cloud_sample_model8(const void *pm, int flag_type, int flag_save)
   model->dtheta_max = (theta_max-theta_min)/PI*180;
 
   r_min = exp(model->r_min);
-  r_max = model->fr_max * r_min;
+  r_max = exp(model->fr_max) * r_min;
   if(r_max > 0.5*rcloud_max_set) r_max = 0.5*rcloud_max_set;
-  model->fr_max = r_max/r_min;
+  model->fr_max = log(r_max/r_min);
   
   gamma = model->gamma;
   alpha = model->alpha;
@@ -1878,20 +1878,16 @@ void gen_cloud_sample_model8(const void *pm, int flag_type, int flag_save)
     l = gsl_rng_uniform(gsl_blr) * lmax;
 
     r = l * sin(theta) + r0;
-    if(gsl_rng_uniform(gsl_blr) < 0.5)
-      zb = l * cos(theta);
+    rnd_xi = gsl_rng_uniform(gsl_blr);
+    if(rnd_xi < xi) /* below the equatorial plane */
+      zb = -l * cos(theta);
     else
-      zb =-l * cos(theta);
+      zb =  l * cos(theta);
       
     phi = gsl_rng_uniform(gsl_blr) * 2.0*PI;
 
     xb = r * cos(phi);
     yb = r * sin(phi);
-
-    zb0 = zb;
-    rnd_xi = gsl_rng_uniform(gsl_blr);
-    if( (rnd_xi < 1.0 - xi) && zb0 < 0.0)
-      zb = -zb;
 
     vesc = sqrt(2.0*mbh/r0);
     vl = v0 + (vesc - v0) * pow(l/Rv, alpha)/(1.0 + pow(l/Rv, alpha));
@@ -1962,14 +1958,14 @@ void gen_cloud_sample_model8(const void *pm, int flag_type, int flag_save)
 #endif
 
     Vr = vl * sin(theta);
-    vzb = vl * cos(theta);
+    if(rnd_xi < xi)  /* below the equatorial plane */
+      vzb = -vl * cos(theta);
+    else
+      vzb =  vl * cos(theta);
     Vph = sqrt(mbh*r0) / r;
 
     vxb = Vr * cos(phi) - Vph * sin(phi);
     vyb = Vr * sin(phi) + Vph * cos(phi);
-
-    if( (rnd_xi < 1.0 - xi) && zb0 < 0.0)
-      vzb = -vzb;
 
     vx = vxb * cos_inc_cmp + vzb * sin_inc_cmp;
     vy = vyb;
