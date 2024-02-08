@@ -1300,10 +1300,10 @@ class bplotlib(Param, Options, ParaName):
     ax1.minorticks_on()
     ax2.minorticks_on()
 
-    xt = ax1.get_ticks()
-    ax1.set_ticks(xt)
-    xt = ax2.get_ticks()
-    ax2.set_ticks(xt)
+    xt = ax1.get_xticks()
+    ax1.set_yticks(xt)
+    xt = ax2.get_xticks()
+    ax2.set_yticks(xt)
 
     if objname is not None:
       ax1.text(0.06, 0.95, r"\bf "+ objname, transform=ax1.transAxes, horizontalalignment='left', verticalalignment='top', bbox=dict(boxstyle="round", facecolor='w', alpha=0.7))
