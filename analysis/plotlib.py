@@ -479,10 +479,12 @@ class bplotlib(Param, Options, ParaName):
     else:
       raise ValueError("No sa data!")
 
-  def plot_drw_parameters(self):
+  def plot_drw_parameters(self, doshow=False):
     """
     plot drw paramete distributions
     """
+    
+    print("# plotting drw parameter histograms.")
 
     if int(self.param['flagdim']) in [0, 1, 2, 4, 5, 6]:
       idx = self.num_param_blr_rm+self.num_param_sa
@@ -490,8 +492,12 @@ class bplotlib(Param, Options, ParaName):
         fig = corner.corner(self.results['sample'][:, idx+1:idx+3], labels=['ln sigma', 'ln tau'], smooth=True)
       else:
         fig = corner.corner(self.results['sample'][:, idx:idx+3], labels=['syserr', 'ln sigma', 'ln tau'], smooth=True)
-      plt.show()
-      return fig
+      
+      fig.savefig("drw.pdf", bbox_inches='tight')
+      if doshow:
+        plt.show()
+      else:
+        plt.close()
     else:
       print("The running does not have continnum reconstruction.")
   
@@ -552,7 +558,7 @@ class bplotlib(Param, Options, ParaName):
       return prof
 
       
-  def plot_results_con(self):
+  def plot_results_con(self, doshow=False):
     """
     plot continuum results
     """
@@ -561,6 +567,8 @@ class bplotlib(Param, Options, ParaName):
       print("Flagdim =", self.param['flagdim'], "not continuum analysis.")
       return
     
+    print("# plotting results con.")
+
     plt.rc('text', usetex=True)
     plt.rc('font', family='serif', size=15)
 
@@ -591,9 +599,12 @@ class bplotlib(Param, Options, ParaName):
     ax.minorticks_on()
 
     fig.savefig("results_con.pdf", bbox_inches='tight')
-    plt.close()
+    if doshow:
+      plt.show()
+    else:
+      plt.close()
   
-  def plot_results_1d(self):
+  def plot_results_1d(self, doshow=False):
     """
     plot 1d results
     """
@@ -601,6 +612,8 @@ class bplotlib(Param, Options, ParaName):
       print("Flagdim =", self.param['flagdim'], "no 1D RM data.")
       return
     
+    print("# plotting results 1d.")
+
     plt.rc('text', usetex=True)
     plt.rc('font', family='serif', size=15)
 
@@ -658,9 +671,12 @@ class bplotlib(Param, Options, ParaName):
     ax2.set_xlim(xlim[0], xlim[1])
     
     fig.savefig("results_1d.pdf", bbox_inches='tight')
-    plt.close()
+    if doshow:
+      plt.show()
+    else:
+      plt.close()
 
-  def plot_results_2d_style2018(self):
+  def plot_results_2d_style2018(self, doshow=False):
     """
     plot 2d results in the style of 2018 ApJ paper
     """
@@ -669,6 +685,8 @@ class bplotlib(Param, Options, ParaName):
       print("Flagdim =", self.param['flagdim'], "no 2D RM data.")
       return
     
+    print("# plotting results 2d, with the 2018 style.")
+
     cycle = plt.rcParams['axes.prop_cycle'].by_key()['color']
 
     wave0 = float(self.param['linecenter'])
@@ -870,9 +888,12 @@ class bplotlib(Param, Options, ParaName):
     ax6.set_ylabel(r'$\rm Hist$')
     
     fig.savefig("results_2d.pdf", bbox_inches='tight')
-    plt.show()
+    if doshow:
+      plt.show()
+    else:
+      plt.close()
   
-  def plot_results_2d_style2022(self):
+  def plot_results_2d_style2022(self, doshow=False):
     """
     plot 2d results in the style of 2022 ApJ paper
     """
@@ -881,6 +902,8 @@ class bplotlib(Param, Options, ParaName):
       print("Flagdim =", self.param['flagdim'], "no 2D RM data.")
       return
     
+    print("# plotting results 2d, with the 2022 style.")
+
     cycle = plt.rcParams['axes.prop_cycle'].by_key()['color']
 
     wave0 = float(self.param['linecenter'])
@@ -1085,7 +1108,10 @@ class bplotlib(Param, Options, ParaName):
       ax4.legend(fontsize=8, handlelength=1.0, handletextpad=0.2, loc=(0.02, 0.8), frameon=False)
     
     fig.savefig("results_2d.pdf", bbox_inches='tight')
-    plt.show()
+    if doshow:
+      plt.show()
+    else:
+      plt.close()
   
   def find_max_prob(self):
     """
@@ -1139,6 +1165,8 @@ class bplotlib(Param, Options, ParaName):
       print("Flagdim =", self.param["flagdim"], "no limits")
       return 
     
+    print("# plotting limits.")
+
     str_dim = self.postfix[int(self.param['flagdim'])] 
 
     pdf = PdfPages("limits_"+str_dim+".pdf")
@@ -1157,10 +1185,11 @@ class bplotlib(Param, Options, ParaName):
   
     pdf.close()
   
-  def plot_tran2d(self, tau_range=None, vel_range=None):
+  def plot_tran2d(self, tau_range=None, vel_range=None, doshow=False):
     """
     plot transfer function with the maximum prob
     """
+    print("# plotting 2d transfer function.")
 
     if int(self.param['flagdim']) in [2, 5, 6]:
       idx, par = self.find_max_prob()
@@ -1186,16 +1215,22 @@ class bplotlib(Param, Options, ParaName):
       ax.set_title("Transfer function with the maximum prob")
       plt.rcParams['xtick.direction'] = 'in'
       plt.rcParams['ytick.direction'] = 'in'
-      plt.show()
       fig.savefig("tran2d.pdf", bbox_inches='tight')
+      if doshow:
+        plt.show()
+      else:
+        plt.close()
     else:
       print("Flagdim =", self.param["flagdim"], "no trans2d")
       return
   
-  def plot_tran1d(self, tau_range=None):
+  def plot_tran1d(self, tau_range=None, doshow=False):
     """
     plot transfer function 1d
     """
+
+    print("# plotting 1d transfer function.")
+
     if int(self.param['flagdim']) in [1, 4]:
       tran_rec = self.results['tran_rec']
       fig = plt.figure()
@@ -1205,8 +1240,13 @@ class bplotlib(Param, Options, ParaName):
       
       if tau_range is not None:
         ax.set_xlim(tau_range[0], tau_range[1])
+      
+      fig.savefig("tran1d.pdf", bbox_inches='tight')
+      if doshow:
+        plt.show()
+      else:
+        plt.close()
 
-      plt.show()
     elif int(self.param['flagdim']) in [2, 5, 6]:
       tau_rec = self.results['tau_rec']
       tran2d_rec = self.results['tran2d_rec']
@@ -1222,16 +1262,21 @@ class bplotlib(Param, Options, ParaName):
 
       ax.set_xlabel(r"Time Lag")
       ax.set_ylabel(r"Transfer Function")
-      plt.show()
+      fig.savefig("tran1d.pdf", bbox_inches='tight')
+      if doshow:
+        plt.show()
+      else:
+        plt.close()
     else:
       print("Flagdim =", self.param["flagdim"], "no trans1d")
       return
   
-  def plot_blrmodel_para_hist(self, para_indx=None):
+  def plot_blrmodel_para_hist(self, para_indx=None, doshow=False):
     """
     plot histograms of BLR model parameters
     """
-    
+    print("# plotting blrmodel parameter histograms.")
+
     prange = np.zeros((self.results['sample'].shape[1], 2))
     prange[:, 0] = np.min(self.results['sample'], axis=0)
     prange[:, 1] = np.max(self.results['sample'], axis=0)
@@ -1247,13 +1292,18 @@ class bplotlib(Param, Options, ParaName):
       else:
         fig = corner.corner(self.results['sample'][:, para_indx], range = prange[para_indx, :], \
                             smooth=True, smooth1d=True)
+      
+      if doshow:
+        plt.show()
+      else:
+        plt.close()
+  
       fig.savefig("hist.pdf", bbox_inches='tight')
-      plt.show()
     else:
       print("Flagdim =", self.param["flagdim"], "no BLR parameters")
       return
   
-  def plot_clouds(self, fname=None, cmap='bwr', range=[-10, 10], objname=None, velocity=True, format="jpg"):
+  def plot_clouds(self, fname=None, cmap='bwr', range=[-10, 10], objname=None, velocity=True, format="jpg", doshow=False):
     """
     plot clouds' distribution
     """
@@ -1264,6 +1314,8 @@ class bplotlib(Param, Options, ParaName):
     if int(self.param["flagdim"]) == 1:
       velocity = False 
     
+    print("# plotting clouds.")
+
     plt.rc('text', usetex=True)
     plt.rc('font', family='serif')
 
@@ -1321,10 +1373,13 @@ class bplotlib(Param, Options, ParaName):
       fig.savefig("fig_clouds.jpg", bbox_inches='tight', dpi=500)
     else:
       fig.savefig("fig_clouds.pdf", bbox_inches='tight')
-
-    plt.show()
+    
+    if doshow:
+      plt.show()
+    else:
+      plt.close()
   
-  def plot_clouds_los(self, fname=None, cmap='bwr', range=[-10, 10], objname=None, velocity=True, format="jpg"):
+  def plot_clouds_los(self, fname=None, cmap='bwr', range=[-10, 10], objname=None, velocity=True, format="jpg", doshow=False):
     """
     plot clouds' distribution viewed from line of sight
     """
@@ -1333,9 +1388,9 @@ class bplotlib(Param, Options, ParaName):
     
     if int(self.param["flagdim"]) == 1:
       velocity = False
-
-    velocity=True
     
+    print("# plotting clouds los.")
+
     plt.rc('text', usetex=True)
     plt.rc('font', family='serif')
 
@@ -1383,13 +1438,17 @@ class bplotlib(Param, Options, ParaName):
       fig.savefig("fig_clouds_los.jpg", bbox_inches='tight', dpi=500)
     else:
       fig.savefig("fig_clouds_los.pdf", bbox_inches='tight')
+    
+    if doshow:
+      plt.show()
+    else:
+      plt.close()
 
-    plt.show()
 
-
-  def postprocess(self, temperature=1):
+  def postprocess(self, temperature=1, doshow=False):
     """
     do posterior process, output results into "cdnest.pdf"
     """
-    pt(int(self.param["flagdim"]), temp=temperature, fcut=0.0, fdir=self.param["filedir"])
+    print("# doing posterior process, plotting cdnest.pdf.")
+    pt(int(self.param["flagdim"]), temp=temperature, fcut=0.0, fdir=self.param["filedir"], doshow=doshow)
     return

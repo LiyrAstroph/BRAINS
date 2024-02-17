@@ -19,7 +19,7 @@ def logdiffexp(x1, x2):    # log( exp(x1) - exp(x2))
   result = np.log(np.exp(xx1) - np.exp(xx2)) + biggest
   return result
 
-def postprocess(ndim, temp=1.0, fcut=0.0, fdir="../"):
+def postprocess(ndim, temp=1.0, fcut=0.0, fdir="../", doshow=False):
 
   pdf = PdfPages('cdnest.pdf')
 
@@ -208,14 +208,18 @@ def postprocess(ndim, temp=1.0, fcut=0.0, fdir="../"):
     fig.align_ylabels()
 
     pdf.savefig()
-
-    plt.show()
-    ax4.clear()
-    ax4.remove()
-    ax5.clear()
-    ax5.remove()
+    
+    if z < numResampleLogX-1:
+      ax4.clear()
+      ax4.remove()
+      ax5.clear()
+      ax5.remove()
   
-  plt.close()
+  if doshow:
+    plt.show()
+  else:
+    plt.close()
+
   pdf.close()
   P_samples = np.mean(P_samples, 1)
   P_samples = P_samples/np.sum(P_samples)
