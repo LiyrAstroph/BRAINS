@@ -81,9 +81,12 @@ def postprocess(ndim, temp=1.0, fcut=0.0, fdir="../", doshow=False):
   fig = plt.figure(figsize=(12, 8))
   fig.subplots_adjust(wspace=0.2, hspace=0.3)
   ax1 = fig.add_subplot(3, 1, 1)
-  ax1.plot(sample_info[:,0], "k", lw=1)
+  ax1.plot(sample_info[:,0], "k", lw=1, zorder=0)
   ax1.set_xlabel("Iteration")
   ax1.set_ylabel("Level")
+
+  # resterization
+  ax1.set_rasterization_zorder(0)
   
   ax2=fig.add_subplot(3,2,3)
   ax2.plot(np.diff(levels_orig[:,0]), "k")
@@ -175,11 +178,15 @@ def postprocess(ndim, temp=1.0, fcut=0.0, fdir="../", doshow=False):
     H_estimates[z] = -logz_estimates[z] + np.sum(P_samples[:,z]*logl)
   
     ax4=fig.add_subplot(3,2,4)
-    ax4.plot(logx_samples[:,z], sample_info[:,1], 'b.', label='Samples')
+    ax4.plot(logx_samples[:,z], sample_info[:,1], 'b.', label='Samples', zorder=0)
     ax4.plot(levels[1:,0], levels[1:,1], 'r.', label='Levels')
     ax4.legend(numpoints=1, loc='lower left')
     ax4.set_ylabel('log(L)')
     ax4.set_xlabel('log(X)')
+
+    # resterization
+    ax4.set_rasterization_zorder(0)
+
     ax1.set_title(str(z+1) + "/" + str(numResampleLogX) + ", log(Z) = " + str(logz_estimates[z][0]))
     
     # Use all plotted logl values to set ylim
@@ -196,7 +203,7 @@ def postprocess(ndim, temp=1.0, fcut=0.0, fdir="../", doshow=False):
     xlim = ax4.get_xlim()
   
     ax5=fig.add_subplot(3,2,6)
-    ax5.plot(logx_samples[:,z], P_samples[:,z], 'b.')
+    ax5.plot(logx_samples[:,z], P_samples[:,z], 'b.', zorder=0)
     ax5.set_ylabel('Posterior Weights')
     ax5.set_xlabel('log(X)')
     ax5.set_xlim(xlim)
@@ -205,6 +212,9 @@ def postprocess(ndim, temp=1.0, fcut=0.0, fdir="../", doshow=False):
     ylim = ax5.get_ylim()
     ax5.text(xlim[0]+0.1*(xlim[1]-xlim[0]), ylim[1]-0.1*(ylim[1]-ylim[0]), 'T='+str(temperature))
     
+    # resterization
+    ax5.set_rasterization_zorder(0)
+
     fig.align_ylabels()
 
     pdf.savefig()
