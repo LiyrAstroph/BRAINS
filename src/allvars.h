@@ -139,6 +139,8 @@ typedef struct
 
   int flag_help, flag_end;
   int flag_para_name;
+  int flag_load_prior;
+  char prior_file[BRAINS_MAX_STR_LENGTH];
   int flag_theta_sample;
   
   double redshift;

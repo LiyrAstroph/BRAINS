@@ -84,6 +84,9 @@ void print_help()
   printf("\t" PURPLE BOLD "-n or --para_name\n" NONE);
   printf("\t\tprint parameter name.\n");
 
+  printf("\t" PURPLE BOLD "-l or --load_prior\n" NONE);
+  printf("\t\tload parameter prior from an input file.\n");
+
   printf("\n\n");
   return;
 }

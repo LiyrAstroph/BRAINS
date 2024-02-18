@@ -1541,3 +1541,57 @@ void set_blr_model2d()
   }
   return;
 }
+
+/*!
+ *  load prior ranges for parameters from fname 
+ *
+ */
+void load_par_names(char *fname)
+{
+  if(thistask!= roottask)
+    return;
+  
+  int i;
+  FILE *fp;
+  char str[BRAINS_MAX_STR_LENGTH], buf[BRAINS_MAX_STR_LENGTH];
+  int type, fix;
+  double val_min, val_max, val, mean, std;
+
+  fp = fopen(fname, "r");
+  if(fp == NULL)
+  {
+    fprintf(stderr, "# Error: Cannot open file %s.\n", fname);
+    exit(0);
+  }
+  
+  printf("# Loading parameter prior from %s\n", fname);
+
+  while(!feof(fp))
+  {
+    fgets(str, BRAINS_MAX_STR_LENGTH, fp);
+    sscanf(str, "%s", buf);
+    
+    if(buf[0] == '#')
+      continue;
+    
+    /* format: %4d %-28s %10.6f %10.6f %4d %4d %15.6e %15.6e %15.6e*/
+    sscanf(str,"%d %s %lf %lf %d %d %lf", &i, buf, &val_min, &val_max, &type, &fix, &val, &mean, &std);
+    
+    if(i >= num_params)
+    {
+      printf("Error: the number %d exceed the total number %d of parameters.\n", i, num_params);
+      exit(0);
+    }
+
+    par_range_model[i][0] = val_min;
+    par_range_model[i][1] = val_max;
+    par_prior_model[i] = type;
+    par_fix[i] = fix;
+    par_fix_val[i] = val;
+    par_prior_gaussian[i][0] = mean;
+    par_prior_gaussian[i][1] = std;
+    //printf("%d %-28s %f %f\n", i, buf, val_min, val_max);
+  }
+  
+  fclose(fp);
+}

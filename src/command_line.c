@@ -34,6 +34,7 @@ int command_line_options(int argc, char** argv)
       {"temp", required_argument, 0, 't'},
       {"seed", required_argument, 0, 's'},
       {"gravity", no_argument, 0, 'a'},
+      {"load_prior", required_argument, 0, 'l'},
       {0, 0, 0, 0}
     };
 
@@ -51,8 +52,9 @@ int command_line_options(int argc, char** argv)
     parset.flag_para_name = 0;
     parset.flag_force_run = 0;
     parset.flag_gravity = 0;
+    parset.flag_load_prior = 0;
 
-    while( (opt = getopt_long(argc, argv, "pt:rcs:ehvnfa", long_options, &opt_idx)) != -1)
+    while( (opt = getopt_long(argc, argv, "pt:rcs:ehvnfal:", long_options, &opt_idx)) != -1)
     {
       switch(opt)
       {
@@ -115,6 +117,12 @@ int command_line_options(int argc, char** argv)
         case 'n': /* print parameter names */
           printf("# Print parameter name.\n");
           parset.flag_para_name = 1;
+          break;
+        
+        case 'l': /* Load parameter prior */
+          parset.flag_load_prior = 1;
+          strcpy(parset.prior_file, optarg);
+          printf("# Load parameter prior from %s.\n", parset.prior_file);
           break;
 
         case 'a': /* use gravity's baseline */

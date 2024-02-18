@@ -87,7 +87,15 @@ int dnest_con(int argc, char **argv)
     par_fix[0] = 1;
     par_fix_val[0] = log(1.0);
   }
-
+  
+  /* if flag_dim != 0, no need to load priors */
+  if(parset.flag_load_prior == 1 && parset.flag_dim == 0)
+  {
+    load_par_names(parset.prior_file);
+    for(i=0; i<num_params; i++)
+      MPI_Bcast(par_range_model[i], 2, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+  }
+  
   print_par_names_con();
 
   /* if not only print parameter name */
@@ -189,7 +197,7 @@ void print_par_names_con()
     exit(0);
   }
   
-  strcpy(str_fmt, "%4d %-28s %10.6f %10.6f %4d %4d %15.6e\n");
+  strcpy(str_fmt, "%4d %-28s %10.6f %10.6f %4d %4d %15.6e %15.6e %15.6e\n");
 
   printf("# Print parameter name in %s\n", fname);
 
@@ -197,22 +205,23 @@ void print_par_names_con()
   fprint_version(fp);
   fprintf(fp, "#*************************************************\n");
 
-  fprintf(fp, "%4s %-28s %10s %10s %4s %4s %15s\n", "#", "Par", "Min", "Max", "Prior", "Fix", "Val");
+  fprintf(fp, "%4s %-28s %10s %10s %4s %4s %15s %15s %15s\n", "#", "Par", "Min", "Max", "Prior", "Fix", "Val", 
+                                                              "Mean(Gau)", "Std(Gau)");
   i=0;
   fprintf(fp, str_fmt, i, "sys_err_con", par_range_model[i][0], par_range_model[i][1], par_prior_model[i],
-                            par_fix[i], par_fix_val[i]);
+                            par_fix[i], par_fix_val[i], par_prior_gaussian[i][0], par_prior_gaussian[i][1]);
   i++;
   fprintf(fp, str_fmt, i, "sigmad", par_range_model[i][0], par_range_model[i][1], par_prior_model[i],
-                            par_fix[i], par_fix_val[i]);
+                            par_fix[i], par_fix_val[i], par_prior_gaussian[i][0], par_prior_gaussian[i][1]);
   i++;
   fprintf(fp, str_fmt, i, "taud", par_range_model[i][0], par_range_model[i][1], par_prior_model[i],
-                            par_fix[i], par_fix_val[i]);
+                            par_fix[i], par_fix_val[i], par_prior_gaussian[i][0], par_prior_gaussian[i][1]);
   
   for(j=0; j<num_params_trend; j++)
   {
     i++;
     fprintf(fp, str_fmt, i, "trend", par_range_model[i][0], par_range_model[i][1], par_prior_model[i],
-                            par_fix[i], par_fix_val[i]);
+                            par_fix[i], par_fix_val[i], par_prior_gaussian[i][0], par_prior_gaussian[i][1]);
   }
   
   /* in case of 0D, num_params_resp = 0 
@@ -221,21 +230,21 @@ void print_par_names_con()
   {
     i++;
     fprintf(fp, str_fmt, i, "resp", par_range_model[i][0], par_range_model[i][1], par_prior_model[i],
-                            par_fix[i], par_fix_val[i]);
+                            par_fix[i], par_fix_val[i], par_prior_gaussian[i][0], par_prior_gaussian[i][1]);
   }
 
   for(j=0; j<num_params_difftrend; j++)
   {
     i++;
-    fprintf(fp, str_fmt, i, "diff trend", par_range_model[i][0], par_range_model[i][1], par_prior_model[i],
-                            par_fix[i], par_fix_val[i]);
+    fprintf(fp, str_fmt, i, "diff_trend", par_range_model[i][0], par_range_model[i][1], par_prior_model[i],
+                            par_fix[i], par_fix_val[i], par_prior_gaussian[i][0], par_prior_gaussian[i][1]);
   }
 
   for(j=0; j<parset.n_con_recon; j++)
   {
     i++;
-    fprintf(fp, str_fmt, i, "time series", par_range_model[i][0], par_range_model[i][1], par_prior_model[i],
-                            par_fix[i], par_fix_val[i]);
+    fprintf(fp, str_fmt, i, "time_series", par_range_model[i][0], par_range_model[i][1], par_prior_model[i],
+                            par_fix[i], par_fix_val[i], par_prior_gaussian[i][0], par_prior_gaussian[i][1]);
   }
   
   fclose(fp);

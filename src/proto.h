@@ -27,6 +27,7 @@ void scale_con_line();
 void cal_emission_flux();
 void get_num_particles(char *fname);
 void set_par_fix_blrmodel();
+void load_par_names(char *fname);
 
 void print_help();
 void fprint_param();
