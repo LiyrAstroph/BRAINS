@@ -1,5 +1,11 @@
 .. :changelog:
 
+0.1.8 (2024-02-18)
+++++++++++++++++++
+
+- add plotting interface.
+- enable the user to adjust prior ranges.
+
 0.1.7 (2022-10-27)
 ++++++++++++++++++
 
