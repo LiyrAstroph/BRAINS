@@ -27,3 +27,5 @@ BRAINS outputs following files.
 - **tran_rec.txt**: 1D transfer function.
   
 - **tran2d_rec.txt**: 2D tranfer function.
+
+See :ref:`plot_label` for plotting the results.

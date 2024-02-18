@@ -27,6 +27,7 @@ Documentation
    user_model.rst
    transfun.rst
    sa.rst
+   plot.rst
    sim.rst
    mkfile.rst
    todo.rst
