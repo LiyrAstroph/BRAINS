@@ -66,23 +66,25 @@ Command-line Options
 .. code-block:: bash
 
     -h or --help
-        print help information.
-    -p or --post_proc
-        only do posterior processing.
-    -r or --restart
-        restart from the backup. 
-    -t or --temperature or --temp
-        specify tempering temperature in posterior processing, e.g., ``-t 2``, ``--temperature 2``, or ``--temp 2``.
-    -s or --seed 
-        set a seed for the random number generator, e.g., ``-s 100`` or ``--seed 100``
-    -c or --recalc_info
-        only do posterior processing, but recalculate the posterior sample information.
-    -e or --exam_prior
-        examine the priors.
-    -v or --version
-        print version.
-    -n or --para_name
-        print parameter name.
+		print help information.
+	-p or --post_proc
+		only do posterior processing.
+	-r or --restart
+		restart from the backup.
+	-t or --temperature or --temp
+		specify tempering temperature in posterior processing.
+	-s or --seed
+		set a seed for the random number generator.
+	-c or --recalc_info
+		only do posterior processing, but recalculate the posterior sample information.
+	-e or --exam_prior
+		examine the priors.
+	-v or --version
+		print version.
+	-n or --para_name
+		print parameter name.
+	-l or --load_prior
+		load parameter prior from an input file.
 
 For example, if one wants to redo posterior processing with a different temperature, say 10 (the default is 1), one may use the command
 
@@ -98,6 +100,7 @@ MCMC Sampling
 The output Markov chain is stored in ``data/posterior_sample.txt`` for continuum reconstuction, in ``data/posterior_sample1d.txt`` for 1d reverberation mapping analysis, and in ``data/posterior_sample2d.txt`` for 2d reverberation mapping analysis.
 
 The parameter names and prior ranges are stored in ``data/para_names_con.txt`` for continuum reconstuction, in ``data/para_names_model1d.txt`` for 1d reverberation mapping analysis, and in ``data/para_names_model2d.txt`` for 2d reverberation mapping analysis. The last column of those files indicates the prior type of the parameter with ``1`` means Gaussian and ``2`` means uniform.
+see  :ref:`prior_label` to see how to adjust the prior ranges of parameters.
 
 One need to tune the corresponding option files ``OPTIONSCON``, ``OPTIONS1D``, and ``OPTIONS2D`` accordingly, which specify configurations for nested sampling.
 

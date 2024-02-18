@@ -11,7 +11,7 @@
 /* BRAINS version number */
 #define BRAINS_MAJOR_VERSION 0
 #define BRAINS_MINOR_VERSION 1
-#define BRAINS_PATCH_VERSION 7
+#define BRAINS_PATCH_VERSION 8
 
 void print_version();
 void fprint_version(FILE *fp);
