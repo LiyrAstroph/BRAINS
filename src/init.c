@@ -1575,7 +1575,7 @@ void load_par_names(char *fname)
       continue;
     
     /* format: %4d %-28s %10.6f %10.6f %4d %4d %15.6e %15.6e %15.6e*/
-    sscanf(str,"%d %s %lf %lf %d %d %lf", &i, buf, &val_min, &val_max, &type, &fix, &val, &mean, &std);
+    sscanf(str,"%d %s %lf %lf %d %d %lf %lf %lf", &i, buf, &val_min, &val_max, &type, &fix, &val, &mean, &std);
     
     if(i >= num_params)
     {
@@ -1590,7 +1590,7 @@ void load_par_names(char *fname)
     par_fix_val[i] = val;
     par_prior_gaussian[i][0] = mean;
     par_prior_gaussian[i][1] = std;
-    //printf("%d %-28s %f %f\n", i, buf, val_min, val_max);
+    //printf("%d %-28s %f %f %f %f\n", i, buf, val_min, val_max, mean, std);
   }
   
   fclose(fp);

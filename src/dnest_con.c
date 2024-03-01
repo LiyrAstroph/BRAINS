@@ -93,7 +93,13 @@ int dnest_con(int argc, char **argv)
   {
     load_par_names(parset.prior_file);
     for(i=0; i<num_params; i++)
+    {
       MPI_Bcast(par_range_model[i], 2, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+      MPI_Bcast(par_prior_gaussian[i], 2, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+    }
+    MPI_Bcast(par_prior_model, num_params, MPI_INT, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(par_fix, num_params, MPI_INT, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(par_fix_val, num_params, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
   }
   
   print_par_names_con();
