@@ -219,6 +219,26 @@ void sim()
   }
   fclose(fp);
 
+/*==================================line profile============================================*/  
+  gen_cloud_sample(model, 0, 0);
+  cal_line_profile_with_sample(model, TransV, Fline2d, parset.n_vel_recon);
+  sprintf(fname, "%s/%s", parset.file_dir, "/data/sim_lineprofile.txt");
+  printf("%-13s %s\n", "Line Profile:", fname);
+  fp = fopen(fname, "w");
+  if(fp == NULL)
+  {
+    fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+    exit(-1);
+  }
+  
+  fprintf(fp, "# %d\n", parset.n_vel_recon);
+  for(j=0; j<parset.n_vel_recon; j++)
+  {
+    fprintf(fp, "%e %e %e\n", TransW[j],  
+      (Fline2d[j] + gsl_ran_ugaussian(gsl_r)*line_error_mean*0.3)/line_scale, line_error_mean/line_scale);
+  }
+  fclose(fp);
+
 #ifdef SpecAstro
   double *sa_pm;
   sa_pm = (double *)pm + num_params_blr;
@@ -606,6 +626,7 @@ void sim_init()
   
   /* spectral broadening, note this is a deviation from the input value */
   pm[num_params_blr_model + num_params_nlr ] = 0.0; 
+  pm[num_params_blr -1] = 0.0; //line syserr=0 (for flag_dim!=3) or scale=1 (for flag_dim=3)
 
   pm[idx_resp + 0] = log(1.0); //A
   pm[idx_resp + 1] = 0.0;      //Ag

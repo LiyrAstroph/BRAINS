@@ -1,0 +1,114 @@
+% parameter file
+% lines beginning with '%' are regarded as comments and are neglected
+% 
+% this is a full list. 
+% in a run, only some parameters are required to specify, depending on
+% "FlagDim", so no need to set all the parameters.
+%========================================================================
+% generic
+%
+
+Redshift                    0.0                                    % redshift of the object
+
+FileDir                     /home/liyropt/Projects/GIT/BRAINS      % directory for where all the output files are stored
+
+FlagDim                     3                           % -2, generate fully random lc; 
+                                                        % -1, mock lc based on input data; 
+                                                        %  0, only continuum modeling; 
+                                                        %  1, 1d line RM; 
+                                                        %  2, 2d line RM
+                                                        %  3, line profile fitting;
+                                                        %  4, only SA (if -DSpecAstro in Makefile); 
+                                                        %  5, SA+1d line RM (if -DSpecAstro in Makefile); 
+                                                        %  6, SA+2d line RM (if -DSpecAstro in Makefile); 
+                                                        %  7, SARM (if -DSpecAstro in Makefile);
+
+%========================================================================
+% line profile data file
+%
+LineProfileFile             data/sim_lineprofile.txt    % file for line profile 
+
+%=========================================================================
+% reverberation mapping (RM) generic configuration
+%
+
+FlagBLRModel                6                           % 1, 2, 3, 4, 5, 6, 7, 8, 9; BLR model type
+                                                        % 5 is double power-law model; 6 is Pancoast's model; 7 is two-zone model
+                                                        % 8 is a disk-wind model; 9 is GRAVITY's 3C 273 model
+                                                        % 0 is user defined
+                                                        % -1 is user defined, analytical transfer function
+
+LineCenter                  4861.0                      %  rest frame, the unit must be the same as that of the wavelength in RM data 
+FlagLineCenter              0                           % -1, epoch-dependent offset; 0, not included; 1, uniform offset
+LineCenterErr               50.0                        % km/s
+
+NCloudPerCore               5000                        % number of clouds per task
+NVPerCloud                  1                           % number of velocities per cloud
+
+RCloudMax                   -1                          % outer edge of broad-line region in a unit of light-day; -1, set automatically 
+
+FlagCloudsOut               1                           % 1, save clouds at the last run; 0, do not save
+CloudsFileOut               data/clouds.txt             % output filename for clouds 
+
+FlagCloudsForceUpdate       0                           % default 0; 
+                                                        % 0, only update when BLR parameters are updated 
+                                                        % 1, update every MCMC perturb (continuum + BLR)
+
+FlagLineSysErr              0                           % 0, not include systematic error of line; 1, include
+
+FlagThetaSample             1                           % 0, sample over cos theta; 1, over theta
+
+%========================================================================
+% line profile reconstruction 
+%
+NVelRecon                          42                          % number of points for line profile reconstruction along velocity axis
+LineProfileConstructFileOut        data/plineprofile.txt       % output filename for line profile reconstruction
+
+%========================================================================
+% spectral broadening, referring to the standard deviation of Gaussian
+% InstRes means instrument broadening 
+%
+FlagInstRes                 0                           % 0, fixed to InstRes
+                                                        % 1, uniform prior, epoch-independent
+                                                        % 2, uniform prior, but epoch-dependent parameterization
+                                                        % 3, epoch-dependent parameterization, prior stored in "InstResFile"
+
+InstRes                     490                         % instrument broadening (modeled by a Gaussian), in km/s, for FlagInstRes=0, or 1
+                                                        % Gaussian standard deviation
+
+InstResErr                  50.0                        % instrument broadening error, in km/s, for FlagInstRes=0, or 1
+
+%========================================================================
+% narrow-line component
+% use a gaussian to model the narrow-line component
+% width is the standard deviation of the Gaussian
+% 
+FlagNarrowLine              0                           % 0, no narrow line; 
+                                                        % 1, add fixed narrow line; 
+                                                        % 2, add Gaussian priors of the flux for narrow line; 
+                                                        % 3, add logarithmic prior of the flux for narrow line
+
+FluxNarrowLine              1.5                         % flux of narrow line
+FluxNarrowLineErr           0.50                        % flux error of narrow line
+WidthNarrowLine             93.0                        % width km/s
+WidthNarrowLineErr          10.0                         % width error
+ShiftNarrowLine             0.0                        % shift, km/s, with respect to broad line center.  
+ShiftNarrowLineErr          0.0                         % shift error
+
+%========================================================================
+% set fixed BLR parameters and their fixed values
+% do not put space in the strings
+% 1: fixed; 0: not fixed; values are separated by ":"
+%
+
+BLRParFix                   0000000000
+BLRParFixVal                2.0:1.0  
+
+%SABLRParFix                   000000000
+%SABLRParFixVal                2.0:1.0
+
+%=========================================================================
+% bin type of data 
+% 0, center; 1, left edge.
+% the default type is 0.
+FlagBinType                 0
