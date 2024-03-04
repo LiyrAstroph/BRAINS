@@ -86,7 +86,9 @@ typedef struct
        cloud_out_file[BRAINS_MAX_STR_LENGTH],
        tran_out_file[BRAINS_MAX_STR_LENGTH],
        tran2d_out_file[BRAINS_MAX_STR_LENGTH],
-       tran2d_data_out_file[BRAINS_MAX_STR_LENGTH];
+       tran2d_data_out_file[BRAINS_MAX_STR_LENGTH],
+       lineprofile_file[BRAINS_MAX_STR_LENGTH],
+       plineprofile_out_file[BRAINS_MAX_STR_LENGTH];
 
   char file_dir[BRAINS_MAX_STR_LENGTH];
 
@@ -181,7 +183,7 @@ extern double *Tcon_data, *Fcon_data,  *Fcerrs_data;
 extern double *Tline_data, *Fline_data, *Flerrs_data;
 extern double *Vline_data, *Fline2d_data, *Flerrs2d_data, *Wline_data;
 extern double *Vline_data_ext, *Wline_data_ext;
-extern double con_scale, line_scale;
+extern double con_scale, line_scale, profile_scale;
 
 extern double con_error_mean, line_error_mean, line_error_mean_sq;
 
@@ -215,6 +217,9 @@ extern double logz_line;
 extern double *Fline2d_at_data;
 extern double *Fline2d, *Flerrs2d;
 extern double logz_line2d;
+
+/* line profile */
+extern double logz_lp;
 
 extern int BLRmodel_size;
 extern int *par_fix, npar_fix;

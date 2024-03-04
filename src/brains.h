@@ -21,6 +21,7 @@
 #include "dnest_con.h"
 #include "dnest_line1d.h"
 #include "dnest_line2d.h"
+#include "dnest_lp.h"
 #include "command_line.h"
 #include "user_blr_model.h"
 #include "user_transfun.h"

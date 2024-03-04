@@ -40,7 +40,7 @@ double *Tcon_data, *Fcon_data,  *Fcerrs_data;
 double *Tline_data, *Fline_data, *Flerrs_data;
 double *Vline_data, *Fline2d_data, *Flerrs2d_data, *Wline_data;
 double *Vline_data_ext, *Wline_data_ext;
-double con_scale, line_scale;
+double con_scale, line_scale, profile_scale;
 
 double con_error_mean, line_error_mean, line_error_mean_sq;
 
@@ -74,6 +74,9 @@ double logz_line;
 double *Fline2d_at_data;
 double *Fline2d, *Flerrs2d;
 double logz_line2d;
+
+/* line profile */
+double logz_lp;
 
 // BLR
 int BLRmodel_size;

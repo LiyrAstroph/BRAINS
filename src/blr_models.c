@@ -151,27 +151,48 @@ void gen_cloud_sample_model1(const void *pm, int flag_type, int flag_save)
     clouds_weight[i] = weight;
 
 #ifndef SpecAstro
-    dis = r - x;
-    clouds_tau[i] = dis;
-    if(flag_type == 1)
-    {
-      if(flag_save && thistask==roottask)
+  switch(flag_type)
+  {
+    case 0:  /* ine profile */
+      // do nothing
+      break;
+      
+    case 1:  /* 1D RM */
+      dis = r - x;
+      clouds_tau[i] = dis;
+      if(flag_save == 1)
       {
-        if(i%(icr_cloud_save) == 0)
-          fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+        if(thistask==roottask)
+        {
+          if(i%(icr_cloud_save) == 0)
+            fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+        }
       }
       continue;
-    }
+      break;
+    
+    case 2:  /* 2D RM*/
+      dis = r - x;
+      clouds_tau[i] = dis;
+      break;
+  }
 #else
   switch(flag_type) 
   {
+    case 0:   /* line profile */
+      // do nothing
+      break;
+
     case 1:   /* 1D RM */
       dis = r - x;
       clouds_tau[i] = dis;
-      if(flag_save && thistask==roottask)
+      if(flag_save == 1)
       {
-        if(i%(icr_cloud_save) == 0)
-          fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+        if(thistask==roottask)
+        {
+          if(i%(icr_cloud_save) == 0)
+            fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+        }
       }
       continue;
       break;
@@ -261,10 +282,13 @@ void gen_cloud_sample_model1(const void *pm, int flag_type, int flag_save)
       
       clouds_vel[i*parset.n_vel_per_cloud + j] = V;
 
-      if(flag_save && thistask==roottask)
+      if(flag_save == 1) 
       {
-        if(i%(icr_cloud_save) == 0)
-          fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx*VelUnit, vy*VelUnit, vz*VelUnit, weight);
+        if(thistask==roottask)
+        {
+          if(i%(icr_cloud_save) == 0)
+            fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx*VelUnit, vy*VelUnit, vz*VelUnit, weight);
+        }
       }
     }
   }
@@ -371,27 +395,48 @@ void gen_cloud_sample_model2(const void *pm, int flag_type, int flag_save)
     clouds_weight[i] = weight;
 
 #ifndef SpecAstro
-    dis = r - x;
-    clouds_tau[i] = dis;
-    if(flag_type == 1)
-    {
-      if(flag_save && thistask==roottask)
+  switch(flag_type)
+  {
+    case 0:  /* ine profile */
+      // do nothing
+      break;
+      
+    case 1:  /* 1D RM */
+      dis = r - x;
+      clouds_tau[i] = dis;
+      if(flag_save == 1)
       {
-        if(i%(icr_cloud_save) == 0)
-          fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+        if(thistask==roottask)
+        {
+          if(i%(icr_cloud_save) == 0)
+            fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+        }
       }
       continue;
-    }
+      break;
+    
+    case 2:  /* 2D RM*/
+      dis = r - x;
+      clouds_tau[i] = dis;
+      break;
+  }
 #else
   switch(flag_type) 
   {
+    case 0:   /* line profile */
+      // do nothing
+      break;
+
     case 1:   /* 1D RM */
       dis = r - x;
       clouds_tau[i] = dis;
-      if(flag_save && thistask==roottask)
+      if(flag_save == 1)
       {
-        if(i%(icr_cloud_save) == 0)
-          fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+        if(thistask==roottask)
+        {
+          if(i%(icr_cloud_save) == 0)
+            fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+        }
       }
       continue;
       break;
@@ -467,10 +512,13 @@ void gen_cloud_sample_model2(const void *pm, int flag_type, int flag_save)
 
       clouds_vel[i*parset.n_vel_per_cloud + j] = V;
 
-      if(flag_save && thistask==roottask)
+      if(flag_save == 1) 
       {
-        if(i%(icr_cloud_save) == 0)
-          fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx*VelUnit, vy*VelUnit, vz*VelUnit, weight);
+        if(thistask==roottask)
+        {
+          if(i%(icr_cloud_save) == 0)
+            fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx*VelUnit, vy*VelUnit, vz*VelUnit, weight);
+        }
       }
     }
   }
@@ -571,27 +619,48 @@ void gen_cloud_sample_model3(const void *pm, int flag_type, int flag_save)
     clouds_weight[i] = weight;
 
 #ifndef SpecAstro
-    dis = r - x;
-    clouds_tau[i] = dis;
-    if(flag_type == 1)
-    {
-      if(flag_save && thistask==roottask)
+  switch(flag_type)
+  {
+    case 0:  /* ine profile */
+      // do nothing
+      break;
+      
+    case 1:  /* 1D RM */
+      dis = r - x;
+      clouds_tau[i] = dis;
+      if(flag_save == 1)
       {
-        if(i%(icr_cloud_save) == 0)
-          fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+        if(thistask==roottask)
+        {
+          if(i%(icr_cloud_save) == 0)
+            fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+        }
       }
       continue;
-    }
+      break;
+    
+    case 2:  /* 2D RM*/
+      dis = r - x;
+      clouds_tau[i] = dis;
+      break;
+  }
 #else
   switch(flag_type) 
   {
+    case 0:   /* line profile */
+      // do nothing
+      break;
+
     case 1:   /* 1D RM */
       dis = r - x;
       clouds_tau[i] = dis;
-      if(flag_save && thistask==roottask)
+      if(flag_save == 1)
       {
-        if(i%(icr_cloud_save) == 0)
-          fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+        if(thistask==roottask)
+        {
+          if(i%(icr_cloud_save) == 0)
+            fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+        }
       }
       continue;
       break;
@@ -668,10 +737,13 @@ void gen_cloud_sample_model3(const void *pm, int flag_type, int flag_save)
 
       clouds_vel[i*parset.n_vel_per_cloud + j] = V;
 
-      if(flag_save && thistask==roottask)
+      if(flag_save == 1) 
       {
-        if(i%(icr_cloud_save) == 0)
-          fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx*VelUnit, vy*VelUnit, vz*VelUnit, weight);
+        if(thistask==roottask)
+        {
+          if(i%(icr_cloud_save) == 0)
+            fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx*VelUnit, vy*VelUnit, vz*VelUnit, weight);
+        }
       }
     }
   }
@@ -768,27 +840,48 @@ void gen_cloud_sample_model4(const void *pm, int flag_type, int flag_save)
     clouds_weight[i] = weight;
 
 #ifndef SpecAstro
-    dis = r - x;
-    clouds_tau[i] = dis;
-    if(flag_type == 1)
-    {
-      if(flag_save && thistask==roottask)
+  switch(flag_type)
+  {
+    case 0:  /* ine profile */
+      // do nothing
+      break;
+      
+    case 1:  /* 1D RM */
+      dis = r - x;
+      clouds_tau[i] = dis;
+      if(flag_save == 1)
       {
-        if(i%(icr_cloud_save) == 0)
-          fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+        if(thistask==roottask)
+        {
+          if(i%(icr_cloud_save) == 0)
+            fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+        }
       }
       continue;
-    }
+      break;
+    
+    case 2:  /* 2D RM*/
+      dis = r - x;
+      clouds_tau[i] = dis;
+      break;
+  }
 #else
   switch(flag_type) 
   {
+    case 0:   /* line profile */
+      // do nothing
+      break;
+
     case 1:   /* 1D RM */
       dis = r - x;
       clouds_tau[i] = dis;
-      if(flag_save && thistask==roottask)
+      if(flag_save == 1)
       {
-        if(i%(icr_cloud_save) == 0)
-          fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+        if(thistask==roottask)
+        {
+          if(i%(icr_cloud_save) == 0)
+            fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+        }
       }
       continue;
       break;
@@ -865,10 +958,13 @@ void gen_cloud_sample_model4(const void *pm, int flag_type, int flag_save)
 
       clouds_vel[i*parset.n_vel_per_cloud + j] = V;
 
-      if(flag_save && thistask==roottask)
+      if(flag_save == 1) 
       {
-        if(i%(icr_cloud_save) == 0)
-          fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx*VelUnit, vy*VelUnit, vz*VelUnit, weight);
+        if(thistask==roottask)
+        {
+          if(i%(icr_cloud_save) == 0)
+            fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx*VelUnit, vy*VelUnit, vz*VelUnit, weight);
+        }
       }
     }
   }
@@ -1004,27 +1100,48 @@ void gen_cloud_sample_model5(const void *pm, int flag_type, int flag_save)
     clouds_weight[i] = weight;
 
 #ifndef SpecAstro
-    dis = r - x;
-    clouds_tau[i] = dis;
-    if(flag_type == 1)
-    {
-      if(flag_save && thistask==roottask)
+  switch(flag_type)
+  {
+    case 0:  /* ine profile */
+      // do nothing
+      break;
+      
+    case 1:  /* 1D RM */
+      dis = r - x;
+      clouds_tau[i] = dis;
+      if(flag_save == 1)
       {
-        if(i%(icr_cloud_save) == 0)
-          fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+        if(thistask==roottask)
+        {
+          if(i%(icr_cloud_save) == 0)
+            fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+        }
       }
       continue;
-    }
+      break;
+    
+    case 2:  /* 2D RM*/
+      dis = r - x;
+      clouds_tau[i] = dis;
+      break;
+  }
 #else
   switch(flag_type) 
   {
+    case 0:   /* line profile */
+      // do nothing
+      break;
+
     case 1:   /* 1D RM */
       dis = r - x;
       clouds_tau[i] = dis;
-      if(flag_save && thistask==roottask)
+      if(flag_save == 1)
       {
-        if(i%(icr_cloud_save) == 0)
-          fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+        if(thistask==roottask)
+        {
+          if(i%(icr_cloud_save) == 0)
+            fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+        }
       }
       continue;
       break;
@@ -1118,10 +1235,13 @@ void gen_cloud_sample_model5(const void *pm, int flag_type, int flag_save)
 
       clouds_vel[i*parset.n_vel_per_cloud + j] = V;
 
-      if(flag_save && thistask==roottask)
+      if(flag_save == 1) 
       {
-        if(i%(icr_cloud_save) == 0)
-          fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx*VelUnit, vy*VelUnit, vz*VelUnit, weight);
+        if(thistask==roottask)
+        {
+          if(i%(icr_cloud_save) == 0)
+            fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx*VelUnit, vy*VelUnit, vz*VelUnit, weight);
+        }
       }
     }
   }
@@ -1250,27 +1370,48 @@ void gen_cloud_sample_model6(const void *pm, int flag_type, int flag_save)
     clouds_weight[i] = weight;
 
 #ifndef SpecAstro
-    dis = r - x;
-    clouds_tau[i] = dis;
-    if(flag_type == 1)  // 1D RM
-    {
-      if(flag_save && thistask==roottask)
+  switch(flag_type)
+  {
+    case 0:  /* ine profile */
+      // do nothing
+      break;
+      
+    case 1:  /* 1D RM */
+      dis = r - x;
+      clouds_tau[i] = dis;
+      if(flag_save == 1)
       {
-        if(i%(icr_cloud_save) == 0)
-          fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+        if(thistask==roottask)
+        {
+          if(i%(icr_cloud_save) == 0)
+            fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+        }
       }
       continue;
-    }
+      break;
+    
+    case 2:  /* 2D RM*/
+      dis = r - x;
+      clouds_tau[i] = dis;
+      break;
+  }
 #else
   switch(flag_type) 
   {
+    case 0:   /* line profile */
+      // do nothing
+      break;
+
     case 1:   /* 1D RM */
       dis = r - x;
       clouds_tau[i] = dis;
-      if(flag_save && thistask==roottask)
+      if(flag_save == 1)
       {
-        if(i%(icr_cloud_save) == 0)
-          fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+        if(thistask==roottask)
+        {
+          if(i%(icr_cloud_save) == 0)
+            fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+        }
       }
       continue;
       break;
@@ -1369,10 +1510,13 @@ void gen_cloud_sample_model6(const void *pm, int flag_type, int flag_save)
 
       clouds_vel[i*parset.n_vel_per_cloud + j] = V;
 
-      if(flag_save && thistask==roottask)
+      if(flag_save == 1)
       {
-        if(i%(icr_cloud_save) == 0)
-          fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx*VelUnit, vy*VelUnit, vz*VelUnit, weight);
+        if(thistask==roottask)
+        {
+          if(i%(icr_cloud_save) == 0)
+            fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx*VelUnit, vy*VelUnit, vz*VelUnit, weight);
+        }
       }
     }
   }
@@ -1499,27 +1643,48 @@ void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save)
     clouds_weight[i] = weight;
 
 #ifndef SpecAstro
-    dis = r - x;
-    clouds_tau[i] = dis;
-    if(flag_type == 1)
-    {
-      if(flag_save && thistask==roottask)
+  switch(flag_type)
+  {
+    case 0:  /* ine profile */
+      // do nothing
+      break;
+      
+    case 1:  /* 1D RM */
+      dis = r - x;
+      clouds_tau[i] = dis;
+      if(flag_save == 1)
       {
-        if(i%(icr_cloud_save) == 0)
-          fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+        if(thistask==roottask)
+        {
+          if(i%(icr_cloud_save) == 0)
+            fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+        }
       }
       continue;
-    }
+      break;
+    
+    case 2:  /* 2D RM*/
+      dis = r - x;
+      clouds_tau[i] = dis;
+      break;
+  }
 #else
   switch(flag_type) 
   {
+    case 0:
+      // do nothing 
+      break;
+
     case 1:   /* 1D RM */
       dis = r - x;
       clouds_tau[i] = dis;
-      if(flag_save && thistask==roottask)
+      if(flag_save ==1)
       {
-        if(i%(icr_cloud_save) == 0)
-          fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+        if(thistask==roottask)
+        {
+          if(i%(icr_cloud_save) == 0)
+            fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+        }
       }
       continue;
       break;
@@ -1613,10 +1778,13 @@ void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save)
 
       clouds_vel[i*parset.n_vel_per_cloud + j] = V;
 
-      if(flag_save && thistask==roottask)
+      if(flag_save == 1)
       {
-        if(i%(icr_cloud_save) == 0)
-          fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx*VelUnit, vy*VelUnit, vz*VelUnit, weight);
+        if(thistask==roottask)
+        {
+          if(i%(icr_cloud_save) == 0)
+            fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx*VelUnit, vy*VelUnit, vz*VelUnit, weight);
+        }
       }
     }
   }
@@ -1701,27 +1869,48 @@ void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save)
     clouds_weight[i] = weight;
     
 #ifndef SpecAstro
-    dis = r - x;
-    clouds_tau[i] = dis;
-    if(flag_type == 1)
-    {
-      if(flag_save && thistask==roottask)
+  switch(flag_type)
+  {
+    case 0:  /* ine profile */
+      // do nothing
+      break;
+      
+    case 1:  /* 1D RM */
+      dis = r - x;
+      clouds_tau[i] = dis;
+      if(flag_save == 1)
       {
-        if(i%(icr_cloud_save) == 0)
-          fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+        if(thistask==roottask)
+        {
+          if(i%(icr_cloud_save) == 0)
+            fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+        }
       }
       continue;
-    }
+      break;
+    
+    case 2:  /* 2D RM*/
+      dis = r - x;
+      clouds_tau[i] = dis;
+      break;
+  }
 #else
   switch(flag_type) 
   {
+    case 0:   /* line profile */
+      // do nothing
+      break;
+
     case 1:   /* 1D RM */
       dis = r - x;
       clouds_tau[i] = dis;
-      if(flag_save && thistask==roottask)
+      if(flag_save == 1)
       {
-        if(i%(icr_cloud_save) == 0)
-          fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+        if(thistask==roottask)
+        {
+          if(i%(icr_cloud_save) == 0)
+            fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+        }
       }
       continue;
       break;
@@ -1815,10 +2004,13 @@ void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save)
 
       clouds_vel[i*parset.n_vel_per_cloud + j] = V;
 
-      if(flag_save && thistask==roottask)
+      if(flag_save == 1) 
       {
-        if(i%(icr_cloud_save) == 0)
-          fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx*VelUnit, vy*VelUnit, vz*VelUnit, weight);
+        if(thistask==roottask)
+        {
+          if(i%(icr_cloud_save) == 0)
+            fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx*VelUnit, vy*VelUnit, vz*VelUnit, weight);
+        }
       }
     }
   }
@@ -1903,27 +2095,48 @@ void gen_cloud_sample_model8(const void *pm, int flag_type, int flag_save)
     clouds_weight[i] = weight * density;
 
 #ifndef SpecAstro
-    dis = R - x;
-    clouds_tau[i] = dis;
-    if(flag_type == 1)
-    {
-      if(flag_save && thistask==roottask)
+  switch(flag_type)
+  {
+    case 0:  /* ine profile */
+      // do nothing
+      break;
+      
+    case 1:  /* 1D RM */
+      dis = R - x;
+      clouds_tau[i] = dis;
+      if(flag_save == 1)
       {
-        if(i%(icr_cloud_save) == 0)
-          fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+        if(thistask==roottask)
+        {
+          if(i%(icr_cloud_save) == 0)
+            fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+        }
       }
       continue;
-    }
+      break;
+    
+    case 2:  /* 2D RM*/
+      dis = R - x;
+      clouds_tau[i] = dis;
+      break;
+  }
 #else
   switch(flag_type) 
   {
+    case 0:   /* line profile */
+      // do nothing
+      break;
+
     case 1:   /* 1D RM */
       dis = R - x;
       clouds_tau[i] = dis;
-      if(flag_save && thistask==roottask)
+      if(flag_save == 1)
       {
-        if(i%(icr_cloud_save) == 0)
-          fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+        if(thistask==roottask)
+        {
+          if(i%(icr_cloud_save) == 0)
+            fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+        }
       }
       continue;
       break;
@@ -1975,10 +2188,13 @@ void gen_cloud_sample_model8(const void *pm, int flag_type, int flag_save)
                 // velocity relative to the observer.
     clouds_vel[i] = V;
 
-    if(flag_save && thistask==roottask)
+    if(flag_save == 1) 
     {
-      if(i%(icr_cloud_save) == 0)
-        fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx*VelUnit, vy*VelUnit, vz*VelUnit, weight);
+      if(thistask==roottask)
+      {
+        if(i%(icr_cloud_save) == 0)
+          fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx*VelUnit, vy*VelUnit, vz*VelUnit, weight);
+      }
     }
   }
 
@@ -2075,27 +2291,48 @@ void gen_cloud_sample_model9(const void *pm, int flag_type, int flag_save)
     clouds_weight[i] = weight;
 
 #ifndef SpecAstro
-    dis = r - x;
-    clouds_tau[i] = dis;
-    if(flag_type == 1)
-    {
-      if(flag_save && thistask==roottask)
+  switch(flag_type)
+  {
+    case 0:  /* ine profile */
+      // do nothing
+      break;
+      
+    case 1:  /* 1D RM */
+      dis = r - x;
+      clouds_tau[i] = dis;
+      if(flag_save == 1)
       {
-        if(i%(icr_cloud_save) == 0)
-          fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+        if(thistask==roottask)
+        {
+          if(i%(icr_cloud_save) == 0)
+            fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+        }
       }
       continue;
-    }
+      break;
+    
+    case 2:  /* 2D RM*/
+      dis = r - x;
+      clouds_tau[i] = dis;
+      break;
+  }
 #else
   switch(flag_type) 
   {
+    case 0:   /* line profile */
+      // do nothing
+      break;
+
     case 1:   /* 1D RM */
       dis = r - x;
       clouds_tau[i] = dis;
-      if(flag_save && thistask==roottask)
+      if(flag_save == 1)
       {
-        if(i%(icr_cloud_save) == 0)
-          fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+        if(thistask==roottask)
+        {
+          if(i%(icr_cloud_save) == 0)
+            fprintf(fcloud_out, "%f\t%f\t%f\n", x, y, z);
+        }
       }
       continue;
       break;
@@ -2170,10 +2407,13 @@ void gen_cloud_sample_model9(const void *pm, int flag_type, int flag_save)
       
       clouds_vel[i*parset.n_vel_per_cloud + j] = V;
 
-      if(flag_save && thistask==roottask)
+      if(flag_save == 1) 
       {
-        if(i%(icr_cloud_save) == 0)
-          fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx*VelUnit, vy*VelUnit, vz*VelUnit, weight);
+        if(thistask==roottask)
+        {
+          if(i%(icr_cloud_save) == 0)
+            fprintf(fcloud_out, "%f\t%f\t%f\t%f\t%f\t%f\t%f\n", x, y, z, vx*VelUnit, vy*VelUnit, vz*VelUnit, weight);
+        }
       }
     }
   }

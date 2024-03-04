@@ -45,6 +45,7 @@ void set_blr_range_model6();
 void set_blr_range_model7();
 void set_blr_range_model8();
 void set_blr_range_model9();
+void set_nlr_range_model();
 
 /* continuum reconstruction */
 int dnest_con(int argc, char **argv);
@@ -124,6 +125,21 @@ void smooth_end();
 void smooth_test();
 
 int get_idx_mbh_from_blrmodel();
+
+/* line profile fitting */
+void postprocesslp();
+void reconstruct_lp();
+void reconstruct_lp_init();
+void reconstruct_lp_end();
+void postprocesslp();
+
+int dnest_lp(int argc, char **argv);
+double prob_lp(const void *model);
+void set_par_range_lp();
+void print_par_names_lp();
+void line_gaussian_smooth_FFT(const double *transv, double *fl, int nv, const void *pm);
+void cal_line_profile_with_sample(const void *pm, double *vel, double *fv, int nvel);
+
 
 /* sim */
 void sim();

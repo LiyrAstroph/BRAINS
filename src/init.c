@@ -143,7 +143,7 @@ void init()
   }
 
 #ifdef SpecAstro
-  if(parset.flag_dim > 2 || parset.flag_dim < 0)
+  if(parset.flag_dim > 3 || parset.flag_dim < 0)
   {
     num_params_sa_extpar = sizeof(SAExtPar)/sizeof(double);
     switch(parset.flag_sa_blrmodel)
@@ -196,7 +196,7 @@ void init()
   }
 #endif 
   
-  if(parset.flag_dim != 3)
+  if(parset.flag_dim != 3 && parset.flag_dim != 4)
   {
     /* set maximum continuum point */
     n_con_max = parset.n_con_recon;
@@ -246,8 +246,22 @@ void init()
   /* default rcloud_max_set */
   rcloud_max_set = 1.0e6;
   
-  /* not SA */
-  if(parset.flag_dim != 3)
+  /* line profile  */
+  if(parset.flag_dim == 3)
+  {
+    rcloud_min_set = 0.0;
+    rcloud_max_set = 1.0e4;
+    if(thistask == roottask)
+    {
+      printf("Rcloud_min_max_set: %.2f %.2f\n", rcloud_min_set, rcloud_max_set);
+    }
+
+    set_nlr_range_model();
+    set_blr_range_model();
+  }
+  
+  /* not line profile or SA */
+  if(parset.flag_dim != 3 && parset.flag_dim != 4)
   {
     gsl_acc = gsl_interp_accel_alloc();
     gsl_linear = gsl_interp_alloc(gsl_interp_linear, parset.n_con_recon);
@@ -286,7 +300,7 @@ void init()
       }
     }
   
-    if( (parset.flag_dim > 0 && parset.flag_dim < 6) || parset.flag_dim == -1)
+    if( (parset.flag_dim > 0 && parset.flag_dim < 7) || parset.flag_dim == -1)
     {   
       /* set cadence and time span of data */
       Tspan_data_con = (Tcon_data[n_con_data -1] - Tcon_data[0]);
@@ -403,49 +417,21 @@ void init()
   
     var_range_model[4+num_params_difftrend][0] = -10.0; /* light curve values */
     var_range_model[4+num_params_difftrend][1] =  10.0; 
-  
-    
-    if(num_params_nlr > 1)
-    {
-      if(parset.flag_narrowline == 2) /* Gaussian prior */
-      {
-        nlr_range_model[0][0] = -10.0;
-        nlr_range_model[0][1] =  10.0;
-  
-        nlr_prior_model[0] = GAUSSIAN;
-      }
-      else
-      {
-        nlr_range_model[0][0] = log(parset.flux_narrowline_low); /* logrithmic prior */
-        nlr_range_model[0][1] = log(parset.flux_narrowline_upp);
-  
-        nlr_prior_model[0] = UNIFORM;
-      }
-  
-      nlr_range_model[1][0] = -10.0;
-      nlr_range_model[1][1] =  10.0;
-  
-      nlr_prior_model[1] = GAUSSIAN;
-  
-      nlr_range_model[2][0] = -10.0;
-      nlr_range_model[2][1] =  10.0;
-  
-      nlr_prior_model[2] = GAUSSIAN;
-    }
     
     // range for systematic error
     sys_err_line_range[0] = log(1.0);
     sys_err_line_range[1] = log(1.0+10.0);
     
+    set_nlr_range_model();
     set_blr_range_model();
-    
+
   }
   
 #ifdef SpecAstro
   /* SA */
-  if(parset.flag_dim > 2)
+  if(parset.flag_dim > 3)
   {
-    if(parset.flag_dim >= 6) /* SARM, take into account SA line time */
+    if(parset.flag_dim >= 7) /* SARM, take into account SA line time */
     {
       double time_back_sarm_set;
       /* set cadence and time span of data */
@@ -528,52 +514,56 @@ void allocate_memory()
 {
   int i;
 
-  if(parset.flag_dim != 3)
+  if(parset.flag_dim != 4)
   {
-    Tcon = malloc(parset.n_con_recon * sizeof(double));
-    Fcerrs = malloc(parset.n_con_recon * sizeof(double));
-  
-    PSmat = malloc(parset.n_con_recon * parset.n_con_recon * sizeof(double));
-    //PNmat = malloc(parset.n_con_recon * parset.n_con_recon * sizeof(double));
-    USmat = malloc(parset.n_con_recon * n_con_data * sizeof(double));
-    PSmat_data = malloc(n_con_data * n_con_data * sizeof(double));
-    //PNmat_data = malloc(n_con_data * n_con_data * sizeof(double));
-    PCmat_data = malloc(n_con_data * n_con_data * sizeof(double));
-    IPCmat_data = malloc(n_con_data * n_con_data * sizeof(double));
-    PQmat = malloc(parset.n_con_recon * parset.n_con_recon * sizeof(double));
-    PEmat1 = malloc(parset.n_con_recon * n_con_data * sizeof(double));
-    PEmat2 = malloc(parset.n_con_recon * parset.n_con_recon * sizeof(double));
+    if(parset.flag_dim != 3)
+    {
+      Tcon = malloc(parset.n_con_recon * sizeof(double));
+      Fcerrs = malloc(parset.n_con_recon * sizeof(double));
     
+      PSmat = malloc(parset.n_con_recon * parset.n_con_recon * sizeof(double));
+      //PNmat = malloc(parset.n_con_recon * parset.n_con_recon * sizeof(double));
+      USmat = malloc(parset.n_con_recon * n_con_data * sizeof(double));
+      PSmat_data = malloc(n_con_data * n_con_data * sizeof(double));
+      //PNmat_data = malloc(n_con_data * n_con_data * sizeof(double));
+      PCmat_data = malloc(n_con_data * n_con_data * sizeof(double));
+      IPCmat_data = malloc(n_con_data * n_con_data * sizeof(double));
+      PQmat = malloc(parset.n_con_recon * parset.n_con_recon * sizeof(double));
+      PEmat1 = malloc(parset.n_con_recon * n_con_data * sizeof(double));
+      PEmat2 = malloc(parset.n_con_recon * parset.n_con_recon * sizeof(double));
+          
+      workspace = malloc((n_con_data*nq + 7*n_con_max + nq*nq + nq)*sizeof(double));
+      workspace_uv = malloc(2*parset.n_con_recon*sizeof(double));
+      Larr_data = malloc(n_con_data*nq*sizeof(double));
+      Larr_rec = malloc(parset.n_con_recon*nq*sizeof(double));
+      pow_Tcon_data = malloc(num_params_difftrend*sizeof(double));
+      
+      var_param = malloc(num_params_var * sizeof(double));
+      var_param_std = malloc(num_params_var * sizeof(double));
+    
+      for(i=0; i<num_params_var; i++)
+      {
+        var_param[i] = var_param_std[i] = 0.0;
+      }
+    }
+
     blr_range_model = malloc(BLRmodel_size/sizeof(double) * sizeof(double *));
     for(i=0; i<BLRmodel_size/sizeof(double); i++)
     {
       blr_range_model[i] = malloc(2*sizeof(double));
     }
-  
-    workspace = malloc((n_con_data*nq + 7*n_con_max + nq*nq + nq)*sizeof(double));
-    workspace_uv = malloc(2*parset.n_con_recon*sizeof(double));
-    Larr_data = malloc(n_con_data*nq*sizeof(double));
-    Larr_rec = malloc(parset.n_con_recon*nq*sizeof(double));
-    pow_Tcon_data = malloc(num_params_difftrend*sizeof(double));
-    
-    var_param = malloc(num_params_var * sizeof(double));
-    var_param_std = malloc(num_params_var * sizeof(double));
-  
-    for(i=0; i<num_params_var; i++)
-    {
-      var_param[i] = var_param_std[i] = 0.0;
-    }
   }
 
-  if(parset.flag_dim != 0 && parset.flag_dim != 3)
+  if(parset.flag_dim != 0 && parset.flag_dim != 3 && parset.flag_dim != 4)
   {
+    /* used to smooth transfer function along delay axis */
     gauss_p = gsl_filter_gaussian_alloc(ngauss);
     hist_in = gsl_vector_alloc(parset.n_tau);
     hist_out = gsl_vector_alloc(parset.n_tau);
   }
   
 #ifdef SpecAstro
-  if(parset.flag_dim > 2 || parset.flag_dim < 0)
+  if(parset.flag_dim > 3 || parset.flag_dim < 0)
   {
     sa_extpar_range = malloc(num_params_sa_extpar * sizeof(double *));
     for(i=0; i<num_params_sa_extpar; i++)
@@ -605,42 +595,45 @@ void free_memory()
 {
   int i;
   
-  if(parset.flag_dim != 3)
+  if(parset.flag_dim != 4)
   {
-    free(Tcon);
-    free(Fcerrs);
-  
-    free(PSmat);
-    //(PNmat);
-    free(USmat);
-    free(PSmat_data);
-    //free(PNmat_data);
-    free(PCmat_data);
-    free(IPCmat_data);
-    free(PQmat);
-    free(PEmat1);
-    free(PEmat2);
-  
+    if(parset.flag_dim != 3)
+    {
+      free(Tcon);
+      free(Fcerrs);
+    
+      free(PSmat);
+      //(PNmat);
+      free(USmat);
+      free(PSmat_data);
+      //free(PNmat_data);
+      free(PCmat_data);
+      free(IPCmat_data);
+      free(PQmat);
+      free(PEmat1);
+      free(PEmat2);
+    
+      free(workspace);
+      free(workspace_uv);
+      free(Larr_data);
+      free(Larr_rec);
+      free(pow_Tcon_data);
+    
+      free(var_param);
+      free(var_param_std);
+
+      gsl_interp_accel_free(gsl_acc);
+      gsl_interp_free(gsl_linear);
+    }
+
     for(i=0; i<BLRmodel_size/sizeof(double); i++)
     {
       free(blr_range_model[i]);
     }
     free(blr_range_model);
-  
-    free(workspace);
-    free(workspace_uv);
-    free(Larr_data);
-    free(Larr_rec);
-    free(pow_Tcon_data);
-  
-    free(var_param);
-    free(var_param_std);
-
-    gsl_interp_accel_free(gsl_acc);
-    gsl_interp_free(gsl_linear);
   }
 
-  if(parset.flag_dim != 0 && parset.flag_dim != 3)
+  if(parset.flag_dim != 0 && parset.flag_dim != 3 && parset.flag_dim != 4)
   {
     gsl_filter_gaussian_free(gauss_p);
     gsl_vector_free(hist_in);
@@ -648,7 +641,7 @@ void free_memory()
   }
   
 #ifdef SpecAstro
-  if(parset.flag_dim > 2 || parset.flag_dim < 0)
+  if(parset.flag_dim > 3 || parset.flag_dim < 0)
   {
     for(i=0; i<num_params_sa_extpar; i++)
     {
@@ -741,7 +734,7 @@ void scale_con_line()
       Flerrs_data[i] *= line_scale;
     }
 
-    if(parset.flag_dim==2 || parset.flag_dim == -1 || parset.flag_dim == 5)
+    if(parset.flag_dim==2 || parset.flag_dim == -1 || parset.flag_dim == 6)
       for(j=0; j<n_vel_data; j++)
       {
         // note mask with error < 0.0
@@ -755,7 +748,7 @@ void scale_con_line()
   line_error_mean *= line_scale;
   line_error_mean_sq *= (line_scale*line_scale);
 
-  if( (parset.flag_dim==2 || parset.flag_dim == -1 || parset.flag_dim == 5) && parset.flag_narrowline!=0)
+  if( (parset.flag_dim==2 || parset.flag_dim == -1 || parset.flag_dim == 6) && parset.flag_narrowline!=0)
   {
     if(parset.flag_narrowline < 3)  /* fixed or Gaussian prior */
     {
@@ -1538,6 +1531,41 @@ void set_blr_model2d()
       transfun_2d_cal = transfun_2d_cal_cloud;
       BLRmodel_name = BLRmodel1_name;
       break;
+  }
+  return;
+}
+
+/*!
+ * set range of narrow line model parameters
+ */
+void set_nlr_range_model()
+{
+  if(num_params_nlr > 1)
+  {
+    if(parset.flag_narrowline == 2) /* Gaussian prior */
+    {
+      nlr_range_model[0][0] = -10.0;
+      nlr_range_model[0][1] =  10.0;
+
+      nlr_prior_model[0] = GAUSSIAN;
+    }
+    else
+    {
+      nlr_range_model[0][0] = log(parset.flux_narrowline_low); /* logrithmic prior */
+      nlr_range_model[0][1] = log(parset.flux_narrowline_upp);
+
+      nlr_prior_model[0] = UNIFORM;
+    }
+
+    nlr_range_model[1][0] = -10.0;
+    nlr_range_model[1][1] =  10.0;
+
+    nlr_prior_model[1] = GAUSSIAN;
+
+    nlr_range_model[2][0] = -10.0;
+    nlr_range_model[2][1] =  10.0;
+
+    nlr_prior_model[2] = GAUSSIAN;
   }
   return;
 }

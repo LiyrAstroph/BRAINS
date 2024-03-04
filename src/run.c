@@ -55,13 +55,16 @@ void begin_run()
     read_data();
 #ifndef SpecAstro
     /* scale continuum and line to an order of unity */
-    scale_con_line();
+    if(parset.flag_dim != 3)
+    {
+      scale_con_line();
+    }
 #else
-    if(parset.flag_dim == 6)
+    if(parset.flag_dim == 7)
     {
       scale_con_line_sarm();
     }
-    else if(parset.flag_dim != 3)
+    else if(parset.flag_dim != 3 && parset.flag_dim != 4 )
     {
       scale_con_line();
     }
@@ -107,13 +110,18 @@ void begin_run()
     reconstruct_line2d();
   }
 
+  if(parset.flag_dim == 3) /* line profile fitting */
+  {
+    reconstruct_lp();
+  }
+
 #ifdef SpecAstro
-  if(parset.flag_dim == 3) /* SA */
+  if(parset.flag_dim == 4) /* SA */
   {
     reconstruct_sa();
   }
 
-  if(parset.flag_dim == 4) /* SA + RM */
+  if(parset.flag_dim == 5) /* SA + RM */
   {
     if(parset.flag_postprc == 0)
     {
@@ -122,7 +130,7 @@ void begin_run()
     reconstruct_sa1d();
   }
 
-  if(parset.flag_dim == 5) /* SA + 2D RM */
+  if(parset.flag_dim == 6) /* SA + 2D RM */
   {
     if(parset.flag_postprc == 0)
     {
@@ -131,7 +139,7 @@ void begin_run()
     reconstruct_sa2d();
   }
 
-  if(parset.flag_dim == 6) /* SARM */
+  if(parset.flag_dim == 7) /* SARM */
   {
     if(parset.flag_postprc == 0)
     {
