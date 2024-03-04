@@ -1623,3 +1623,55 @@ void load_par_names(char *fname)
   
   fclose(fp);
 }
+
+/* 
+ * get index of mbh from a BLR model.
+ * 
+ */
+int get_idx_mbh_from_blrmodel()
+{
+  int idx = -1;
+  switch(parset.flag_blrmodel)
+  {
+    case 0:
+      idx = offsetof(MyBLRmodel, mbh);
+      break;
+
+    case 1:
+      idx = offsetof(BLRmodel1, mbh);
+      break;
+
+    case 2:
+      idx = offsetof(BLRmodel2, mbh);
+      break;
+    
+    case 3:
+      idx = offsetof(BLRmodel3, mbh);
+      break;
+
+    case 4:
+      idx = offsetof(BLRmodel4, mbh);
+      break;
+    
+    case 5:
+      idx = offsetof(BLRmodel5, mbh);
+      break;
+
+    case 6:
+      idx = offsetof(BLRmodel6, mbh);
+      break;
+    
+    case 7:
+      idx = offsetof(BLRmodel7, mbh);
+      break;
+    
+    case 8:
+      idx = offsetof(BLRmodel8, mbh);
+      break;
+    
+    case 9:
+      idx = offsetof(BLRmodel9, mbh);
+      break;
+  }
+  return idx / sizeof(double);
+}
