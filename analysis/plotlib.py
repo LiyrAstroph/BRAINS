@@ -148,13 +148,13 @@ class ParaName:
     self.num_param_blrmodel_sa = 0
     self.num_param_sa_extra = 0
     for name in self.para_names['name']:
-      if re.match("BLR model", name):
+      if re.match("BLR_model", name):
         self.num_param_blrmodel_rm += 1
       
-      if re.match("SA BLR model", name):
+      if re.match("SA_BLR_model", name):
         self.num_param_blrmodel_sa += 1
       
-      if re.match("SA Extra Par", name):
+      if re.match("SA_Extra_Par", name):
         self.num_param_sa_extra += 1
     
     self.num_param_sa = self.num_param_blrmodel_sa + self.num_param_sa_extra
@@ -162,8 +162,8 @@ class ParaName:
     self.num_param_rm_extra = idx_con[0][0] - self.num_param_blrmodel_rm - self.num_param_sa
     self.num_param_blr_rm = self.num_param_rm_extra + self.num_param_blrmodel_rm
 
-    if 'time series' in self.para_names['name']:
-      idx = np.nonzero(self.para_names['name'] == 'time series')
+    if 'time_series' in self.para_names['name']:
+      idx = np.nonzero(self.para_names['name'] == 'time_series')
       self.num_param_con = idx[0][0] - self.num_param_sa - self.num_param_blr_rm
     else:
       self.num_param_con = 0
@@ -1283,7 +1283,8 @@ class bplotlib(Param, Options, ParaName):
     dprange = prange[:, 1]-prange[:, 0]
     prange[:, 0] -= 0.1*dprange 
     prange[:, 1] += 0.1*dprange
-
+    
+    print(self.num_param_blrmodel_rm)
     if int(self.param['flagdim']) >= 1:
       if para_indx is None:
         fig = corner.corner(self.results['sample'][:, :self.num_param_blrmodel_rm], \

@@ -277,7 +277,7 @@ void print_par_names_sarm()
     strcpy(str_name, "\0");
     if(BLRmodel_sa_name!=NULL && BLRmodel_sa_name[i] != NULL)
     {
-      strcpy(str_name, "SA_BLR_model ");
+      strcpy(str_name, "SA_BLR_model_");
       strcat(str_name, BLRmodel_sa_name[i]);
     }
     else 

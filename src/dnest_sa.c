@@ -178,7 +178,7 @@ void print_par_names_sa()
     strcpy(str_name, "\0");
     if(BLRmodel_sa_name!=NULL && BLRmodel_sa_name[i] != NULL)
     {
-      strcpy(str_name, "SA_BLR_model ");
+      strcpy(str_name, "SA_BLR_model_");
       strcat(str_name, BLRmodel_sa_name[i]);
     }
     else 
@@ -192,7 +192,7 @@ void print_par_names_sa()
   for(j=0; j<num_params_sa_extpar; j++)
   {
     i++;
-    fprintf(fp, str_fmt, i, "SA_ExtPar", par_range_model[i][0], par_range_model[i][1], par_prior_model[i],
+    fprintf(fp, str_fmt, i, "SA_Ext_Par", par_range_model[i][0], par_range_model[i][1], par_prior_model[i],
                             par_fix[i], par_fix_val[i], par_prior_gaussian[i][0], par_prior_gaussian[i][1]);
   }
   fclose(fp);
