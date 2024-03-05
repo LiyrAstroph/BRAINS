@@ -78,12 +78,14 @@ class Options:
     elif flag_dim == '2':
       self.option_file = file_dir + "/param/OPTIONS2D"
     elif flag_dim == '3':
-      self.option_file = file_dir + "/param/OPTIONSSA"
+      self.option_file = file_dir + "/param/OPTIONSLP"
     elif flag_dim == '4':
-      self.option_file = file_dir + "/param/OPTIONSSA1D"
+      self.option_file = file_dir + "/param/OPTIONSSA"
     elif flag_dim == '5':
-      self.option_file = file_dir + "/param/OPTIONSSA2D"
+      self.option_file = file_dir + "/param/OPTIONSSA1D"
     elif flag_dim == '6':
+      self.option_file = file_dir + "/param/OPTIONSSA2D"
+    elif flag_dim == '7':
       self.option_file = file_dir + "/param/OPTIONSSARM"
 
     if self.option_file != "":
@@ -116,12 +118,14 @@ class ParaName:
     elif flag_dim == '2':
       self.para_names_file = file_dir + "/data/para_names_2d.txt"
     elif flag_dim == '3':
-      self.para_names_file = file_dir + "/data/para_names_sa.txt"
+      self.para_names_file = file_dir + "/data/para_names_lp.txt"
     elif flag_dim == '4':
-      self.para_names_file = file_dir + "/data/para_names_sa1d.txt"
+      self.para_names_file = file_dir + "/data/para_names_sa.txt"
     elif flag_dim == '5':
-      self.para_names_file = file_dir + "/data/para_names_sa2d.txt"
+      self.para_names_file = file_dir + "/data/para_names_sa1d.txt"
     elif flag_dim == '6':
+      self.para_names_file = file_dir + "/data/para_names_sa2d.txt"
+    elif flag_dim == '7':
       self.para_names_file = file_dir + "/data/para_names_sarm.txt"
     else:
       raise Exception("Incorrect FlagDim.")
