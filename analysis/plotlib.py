@@ -130,8 +130,11 @@ class ParaName:
     else:
       raise Exception("Incorrect FlagDim.")
 
-    names = np.genfromtxt(self.para_names_file, skip_header=7, \
+    names = np.genfromtxt(self.para_names_file, comments='#', \
       dtype=[int, 'S30', float, float, int, int, float], delimiter=[4, 30, 12, 12, 4, 5, 15])
+    
+    # the first line is header
+    names = np.delete(names, 0)
     
     self.para_names = {}
     self.para_names['name'] = np.array([str(f.strip(), encoding='utf8') for f in names['f1']])
@@ -1288,7 +1291,7 @@ class bplotlib(Param, Options, ParaName):
     prange[:, 0] -= 0.1*dprange 
     prange[:, 1] += 0.1*dprange
     
-    print(self.num_param_blrmodel_rm)
+    print("BLR para num:", self.num_param_blrmodel_rm)
     if int(self.param['flagdim']) >= 1:
       if para_indx is None:
         fig = corner.corner(self.results['sample'][:, :self.num_param_blrmodel_rm], \
