@@ -390,13 +390,14 @@ void calculate_con_from_model_semiseparable(const void *model)
   set_covar_Umat(sigma, tau, alpha);
 
   compute_semiseparable_drw(Tcon_data, n_con_data, sigma2, 1.0/tau, Fcerrs_data, syserr, W, D, phi);
-  // Cq^-1 = L^TxC^-1xL
+  // Cq^-1 = L^TxC^-1xL, Lbuf = C^-1xL
   multiply_mat_semiseparable_drw(Larr_data, W, D, phi, n_con_data, nq, sigma2, Lbuf);
   multiply_mat_MN_transposeA(Larr_data, Lbuf, Cq, nq, nq, n_con_data);
 
   // L^TxC^-1xy
-  multiply_matvec_semiseparable_drw(Fcon_data, W, D, phi, n_con_data, sigma2, ybuf);
-  multiply_mat_MN_transposeA(Larr_data, ybuf, yq, nq, 1, n_con_data);
+  // multiply_matvec_semiseparable_drw(Fcon_data, W, D, phi, n_con_data, sigma2, ybuf);
+  // multiply_mat_MN_transposeA(Larr_data, ybuf, yq, nq, 1, n_con_data);
+  multiply_matvec_MN_transposeA(Lbuf, n_con_data, nq, Fcon_data, yq);
 
   // (hat q) = Cqx(L^TxC^-1xy)
   inverse_pomat(Cq, nq, &info);
@@ -414,13 +415,16 @@ void calculate_con_from_model_semiseparable(const void *model)
   {
     y[i] = Fcon_data[i] - ybuf[i];
   }
+  
+  /* PEmat1 = C^-1 x S^T */
+  multiply_mat_transposeB_semiseparable_drw(USmat, W, D, phi, n_con_data, parset.n_con_recon, sigma2, PEmat1);
 
   // (hat s) = SxC^-1xy
-  multiply_matvec_semiseparable_drw(y, W, D, phi, n_con_data, sigma2, ybuf);
-  multiply_matvec_MN(USmat, parset.n_con_recon, n_con_data, ybuf, Fcon);
+  // multiply_matvec_semiseparable_drw(y, W, D, phi, n_con_data, sigma2, ybuf);
+  // multiply_matvec_MN(USmat, parset.n_con_recon, n_con_data, ybuf, Fcon);
+  multiply_matvec_MN_transposeA(PEmat1, n_con_data, parset.n_con_recon, y, Fcon);
 
   // SxC^-1xS^T
-  multiply_mat_transposeB_semiseparable_drw(USmat, W, D, phi, n_con_data, parset.n_con_recon, sigma2, PEmat1);
   multiply_mat_MN(USmat, PEmat1, PEmat2, parset.n_con_recon, parset.n_con_recon, n_con_data);
 
   // set DRW covariance at reconstructed points
@@ -627,13 +631,14 @@ double prob_con_variability_semiseparable(const void *model)
     for(i=0; i<n_con_data; i++)
       lndet += log(D[i]);
 
-    /* calculate L^T*C^-1*L */
+    /* calculate L^T*C^-1*L, Lbuf = C^-1*L */
     multiply_mat_semiseparable_drw(Larr_data, W, D, phi, n_con_data, nq, sigma2, Lbuf);
     multiply_mat_MN_transposeA(Larr_data, Lbuf, Cq, nq, nq, n_con_data);
 
     /* calculate L^T*C^-1*y */
-    multiply_matvec_semiseparable_drw(Fcon_data, W, D, phi, n_con_data, sigma2, ybuf);
-    multiply_mat_MN_transposeA(Larr_data, ybuf, yq, nq, 1, n_con_data);
+    // multiply_matvec_semiseparable_drw(Fcon_data, W, D, phi, n_con_data, sigma2, ybuf);
+    // multiply_mat_MN_transposeA(Larr_data, ybuf, yq, nq, 1, n_con_data);
+    multiply_matvec_MN_transposeA(Lbuf, n_con_data, nq, Fcon_data, yq);
 
     /* calculate (L^T*C^-1*L)^-1 * L^T*C^-1*y */
     inverse_pomat(Cq, nq, &info);
@@ -753,13 +758,14 @@ double prob_con_variability_initial_semiseparable(const void *model)
   for(i=0; i<n_con_data; i++)
   lndet += log(D[i]);
  
-  /* calculate L^T*C^-1*L */
+  /* calculate L^T*C^-1*L, Lbuf=C^-1*L */
   multiply_mat_semiseparable_drw(Larr_data, W, D, phi, n_con_data, nq, sigma2, Lbuf);
   multiply_mat_MN_transposeA(Larr_data, Lbuf, Cq, nq, nq, n_con_data);
 
   /* calculate L^T*C^-1*y */
-  multiply_matvec_semiseparable_drw(Fcon_data, W, D, phi, n_con_data, sigma2, ybuf);
-  multiply_mat_MN_transposeA(Larr_data, ybuf, yq, nq, 1, n_con_data);
+  // multiply_matvec_semiseparable_drw(Fcon_data, W, D, phi, n_con_data, sigma2, ybuf);
+  // multiply_mat_MN_transposeA(Larr_data, ybuf, yq, nq, 1, n_con_data);
+  multiply_matvec_MN_transposeA(Lbuf, n_con_data, nq, Fcon_data, yq);
 
   inverse_pomat(Cq, nq, &info);
   multiply_mat_MN(Cq, yq, ybuf, nq, 1, nq);
