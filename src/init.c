@@ -1624,6 +1624,88 @@ void load_par_names(char *fname)
   fclose(fp);
 }
 
+/*!
+ * set drw parameter ranges using continuum reconstruction results
+ *
+ */
+void set_drw_par_range()
+{
+  if(thistask != roottask)
+    return;
+
+  int i;
+  /* note omit of the continuum systematic error parameter */
+  for(i=num_params_blr_tot+1; i<num_params_drw + num_params_blr_tot; i++)
+  {
+    if(var_param_std[i-num_params_blr_tot] > 0.0)
+    {
+      par_range_model[i][0] = var_param[i-num_params_blr_tot] - 5.0 * var_param_std[i-num_params_blr_tot];
+      par_range_model[i][1] = var_param[i-num_params_blr_tot] + 5.0 * var_param_std[i-num_params_blr_tot];
+
+      /* make sure that the range lies within the initial range */
+      par_range_model[i][0] = fmax(par_range_model[i][0], var_range_model[i-num_params_blr_tot][0]);
+      par_range_model[i][1] = fmin(par_range_model[i][1], var_range_model[i-num_params_blr_tot][1]);
+
+      par_prior_model[i] = GAUSSIAN;
+      par_prior_gaussian[i][0] = var_param[i-num_params_blr_tot];
+      par_prior_gaussian[i][1] = var_param_std[i-num_params_blr_tot];
+    }
+    else
+    {
+      par_range_model[i][0] = var_range_model[i-num_params_blr_tot][0];
+      par_range_model[i][1] = var_range_model[i-num_params_blr_tot][1];
+
+      par_prior_model[i] = UNIFORM;
+      par_prior_gaussian[i][0] = 0.0;
+      par_prior_gaussian[i][1] = 0.0;
+    }
+  }
+
+  return;
+}
+
+/*!
+ * set drw parameter ranges using continuum reconstruction results
+ * and compare with the loaded priors
+ *
+ */
+void set_drw_par_range_load()
+{
+  if(thistask != roottask)
+    return;
+
+  int i;
+  double upp, low;
+  /* note omit of the continuum systematic error parameter */
+  for(i=num_params_blr_tot+1; i<num_params_drw + num_params_blr_tot; i++)
+  {
+    /* nozero std means the parameter is not fixed */
+    if(var_param_std[i-num_params_blr_tot] > 0.0)
+    {
+      /* range from continuum reconstruction */
+      low = var_param[i-num_params_blr_tot] - 5.0 * var_param_std[i-num_params_blr_tot];
+      upp = var_param[i-num_params_blr_tot] + 5.0 * var_param_std[i-num_params_blr_tot];
+
+      if(par_range_model[i][0] > upp || par_range_model[i][1] < low)
+      {
+        printf("# Error: the input drw parameter priors are inconsistent with those from continuum reconstructions.\n");
+        printf("Input: [%f %f]; ContRecon: [%f %f]\n", par_range_model[i][0], par_range_model[i][1],
+                                                       low, upp);
+        exit(0);
+      }
+
+      /*compare with loaded priors */
+      par_range_model[i][0] = fmax(par_range_model[i][0], low);
+      par_range_model[i][1] = fmin(par_range_model[i][1], upp);
+
+      par_prior_model[i] = GAUSSIAN;
+      par_prior_gaussian[i][0] = var_param[i-num_params_blr_tot];
+      par_prior_gaussian[i][1] = var_param_std[i-num_params_blr_tot];
+    }
+  }
+  return;
+}
+
 /* 
  * get index of mbh from a BLR model.
  * 

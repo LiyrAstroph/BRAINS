@@ -98,6 +98,9 @@ int dnest_sarm(int argc, char **argv)
   if(parset.flag_load_prior == 1)
   {
     load_par_names(parset.prior_file);
+    /* special handeling with drw parameters */
+    set_drw_par_range_load();
+
     for(i=0; i<num_params; i++)
     {
       MPI_Bcast(par_range_model[i], 2, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
@@ -158,31 +161,7 @@ void set_par_range_sarm()
   par_prior_gaussian[i][0] = 0.0;
   par_prior_gaussian[i][1] = 0.0;
 
-  for(i=num_params_blr_tot+1; i<num_params_drw + num_params_blr_tot; i++)
-  {
-    if(var_param_std[i-num_params_blr_tot] > 0.0)
-    {
-      par_range_model[i][0] = var_param[i-num_params_blr_tot] - 5.0 * var_param_std[i-num_params_blr_tot];
-      par_range_model[i][1] = var_param[i-num_params_blr_tot] + 5.0 * var_param_std[i-num_params_blr_tot];
-
-      /* make sure that the range lies within the initial range */
-      par_range_model[i][0] = fmax(par_range_model[i][0], var_range_model[i-num_params_blr_tot][0]);
-      par_range_model[i][1] = fmin(par_range_model[i][1], var_range_model[i-num_params_blr_tot][1]);
-
-      par_prior_model[i] = GAUSSIAN;
-      par_prior_gaussian[i][0] = var_param[i-num_params_blr_tot];
-      par_prior_gaussian[i][1] = var_param_std[i-num_params_blr_tot];
-    }
-    else
-    {
-      par_range_model[i][0] = var_range_model[i-num_params_blr_tot][0];
-      par_range_model[i][1] = var_range_model[i-num_params_blr_tot][1];
-
-      par_prior_model[i] = UNIFORM;
-      par_prior_gaussian[i][0] = 0.0;
-      par_prior_gaussian[i][1] = 0.0;
-    }
-  }
+  set_drw_par_range();
 
   /* long-term trend of continuum */
   for(i=num_params_drw + num_params_blr_tot; i< num_params_drw + num_params_trend + num_params_blr_tot; i++)
