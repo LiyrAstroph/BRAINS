@@ -604,6 +604,7 @@ class bplotlib(Param, Options, ParaName):
     ax.set_xlabel("Time")
     ax.set_ylabel("Flux")
     ax.minorticks_on()
+    ax.set_xlim(con_date[0], con_date[-1])
 
     fig.savefig("results_con.pdf", bbox_inches='tight')
     if doshow:
@@ -625,6 +626,7 @@ class bplotlib(Param, Options, ParaName):
     plt.rc('font', family='serif', size=15)
 
     fig = plt.figure(figsize=(8, 4))
+    fig.subplots_adjust(hspace=0.05)
     ax1 = fig.add_subplot(211)
     ax2 = fig.add_subplot(212)
     
@@ -647,12 +649,14 @@ class bplotlib(Param, Options, ParaName):
     ax1.plot(con_date, con_mean, color='red', zorder=20) 
     ax1.fill_between(con_date, y1=con_mean_low, y2=con_mean_upp, color='grey')
     
-    ax1.set_xlabel("Time")
+    #ax1.set_xlabel("Time")
     ax1.set_ylabel("Flux")
+    ax1.set_xticklabels([])
     ax1.minorticks_on()
     fmax = np.max(conlc[:, 1])
     fmin = np.min(conlc[:, 1])
     ax1.set_ylim(fmin-0.2*(fmax-fmin), fmax+0.2*(fmax-fmin))
+    ax1.set_xlim(con_date[0], con_date[-1])
     xlim = ax1.get_xlim()
 
     linelc = self.data["line_data"]
@@ -677,6 +681,8 @@ class bplotlib(Param, Options, ParaName):
     ax2.minorticks_on()
     ax2.set_xlim(xlim[0], xlim[1])
     
+    fig.align_ylabels()
+
     fig.savefig("results_1d.pdf", bbox_inches='tight')
     if doshow:
       plt.show()
@@ -1352,6 +1358,11 @@ class bplotlib(Param, Options, ParaName):
     else:
       ax1.scatter(clouds_rm[:, 0], clouds_rm[:, 1], alpha=0.7, s=10, linewidths=0.5)
       ax2.scatter(clouds_rm[:, 0], clouds_rm[:, 2], alpha=0.7, s=10, linewidths=0.5)
+    
+    # check the range 
+    clouds_max = np.max(clouds_rm[:, 0:3])
+    if np.max(np.abs(range)) < clouds_max/10.0:
+      print("cloud locations significant exceed input/default range=[%.2f, %.2f], better to set a larger range."%(range[0], range[1]))
 
     ax1.set_xlim(range[0], range[1])
     ax1.set_ylim(range[0], range[1])
@@ -1424,6 +1435,11 @@ class bplotlib(Param, Options, ParaName):
       cax=ax1.scatter(clouds_rm[:, 1], clouds_rm[:, 2], c=clouds_rm[:, 3], cmap=cmap, norm=norm, alpha=0.7, s=10, edgecolors='k', linewidths=0.5)
     else:
       ax1.scatter(clouds_rm[:, 1], clouds_rm[:, 2], alpha=0.7, s=10, linewidths=0.5)
+    
+    # check the range 
+    clouds_max = np.max(clouds_rm[:, 0:3])
+    if np.max(np.abs(range)) < clouds_max/10.0:
+      print("cloud locations significant exceed input/default range=[%.2f, %.2f], better to set a larger range."%(range[0], range[1]))
 
     ax1.set_xlim(range[0], range[1])
     ax1.set_ylim(range[0], range[1])
