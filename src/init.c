@@ -1630,9 +1630,6 @@ void load_par_names(char *fname)
  */
 void set_drw_par_range()
 {
-  if(thistask != roottask)
-    return;
-
   int i;
   /* note omit of the continuum systematic error parameter */
   for(i=num_params_blr_tot+1; i<num_params_drw + num_params_blr_tot; i++)
