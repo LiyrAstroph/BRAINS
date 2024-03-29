@@ -50,7 +50,7 @@ int command_line_options(int argc, char** argv)
     parset.flag_help = 0;
     parset.flag_end = 0;
     parset.flag_para_name = 0;
-    parset.flag_force_run = 0;
+    parset.flag_force_run = 1;
     parset.flag_gravity = 0;
     parset.flag_load_prior = 0;
 

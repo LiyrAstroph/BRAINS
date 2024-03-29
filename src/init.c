@@ -369,13 +369,19 @@ void init()
       {
         if(thistask == roottask)
         {
-          printf("# Too small NConRecon.\n" 
-               "# Better to change it to %d or set RCloudMax/TimeBack to smaller than %f/%f.\n"
-               "# Note that too small RCloudMax/TimeBack might result in biases.\n", 
-               (int)(parset.n_con_recon * med_cad_recon/med_cad), 
-               ((parset.n_con_recon-1) * med_cad - (Tcon_data[n_con_data-1] - Tcon_data[0]))/2.0,
-               ((parset.n_con_recon-1) * med_cad - (Tcon_data[n_con_data-1] - Tcon_data[0])));
-          printf("\e[1;35m" "# Use '-f' option in command line if want to ignore this check.\n" "\e[0m");
+          // printf("# Too small NConRecon.\n" 
+          //      "# Better to change it to %d or set RCloudMax/TimeBack to smaller than %f/%f.\n"
+          //      "# Note that 1) too small RCloudMax/TimeBack might result in biases.\n"
+          //      "            2) but too large NConRecon will seriously slow down the running.\n", 
+          //      (int)(parset.n_con_recon * med_cad_recon/med_cad), 
+          //      ((parset.n_con_recon-1) * med_cad - (Tcon_data[n_con_data-1] - Tcon_data[0]))/2.0,
+          //      ((parset.n_con_recon-1) * med_cad - (Tcon_data[n_con_data-1] - Tcon_data[0])));
+          // printf("\e[1;35m" "# Use '-f' option in command line if want to ignore this check.\n" "\e[0m");
+           printf(
+               "# Continuum sampling: %f; Reconstruction Sampling: %f.\n"
+               "# Note that 1) too small RCloudMax/TimeBack might result in biases.\n"
+               "            2) but too large NConRecon will seriously slow down the running.\n", 
+               med_cad,  med_cad_recon);
         }
         if(parset.flag_force_run != 1)
         {
