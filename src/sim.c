@@ -219,25 +219,28 @@ void sim()
   }
   fclose(fp);
 
-/*==================================line profile============================================*/  
-  gen_cloud_sample(model, 0, 0);
-  cal_line_profile_with_sample(model, TransV, Fline2d, parset.n_vel_recon);
-  sprintf(fname, "%s/%s", parset.file_dir, "/data/sim_lineprofile.txt");
-  printf("%-13s %s\n", "Line Profile:", fname);
-  fp = fopen(fname, "w");
-  if(fp == NULL)
+/*==================================line profile============================================*/
+  if(parset.flag_blrmodel != -1)  
   {
-    fprintf(stderr, "# Error: Cannot open file %s\n", fname);
-    exit(-1);
+    gen_cloud_sample(model, 0, 0);
+    cal_line_profile_with_sample(model, TransV, Fline2d, parset.n_vel_recon);
+    sprintf(fname, "%s/%s", parset.file_dir, "/data/sim_lineprofile.txt");
+    printf("%-13s %s\n", "Line Profile:", fname);
+    fp = fopen(fname, "w");
+    if(fp == NULL)
+    {
+      fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+      exit(-1);
+    }
+    
+    fprintf(fp, "# %d\n", parset.n_vel_recon);
+    for(j=0; j<parset.n_vel_recon; j++)
+    {
+      fprintf(fp, "%e %e %e\n", TransW[j],  
+        (Fline2d[j] + gsl_ran_ugaussian(gsl_r)*line_error_mean*0.3)/line_scale, line_error_mean/line_scale);
+    }
+    fclose(fp);
   }
-  
-  fprintf(fp, "# %d\n", parset.n_vel_recon);
-  for(j=0; j<parset.n_vel_recon; j++)
-  {
-    fprintf(fp, "%e %e %e\n", TransW[j],  
-      (Fline2d[j] + gsl_ran_ugaussian(gsl_r)*line_error_mean*0.3)/line_scale, line_error_mean/line_scale);
-  }
-  fclose(fp);
 
 #ifdef SpecAstro
   double *sa_pm;
@@ -456,6 +459,7 @@ void sim_init()
       num_params_blr_model = num_params_MyTransfun2d;
       transfun_1d_cal = transfun_1d_cal_mytransfun;
       transfun_2d_cal = transfun_2d_cal_mytransfun;
+      BLRmodel_name = MyTFmodel_name;
       break;
 
     case 0:
@@ -1003,6 +1007,10 @@ void set_par_value_sim(double *pm, int flag_model)
   int i;
   switch(flag_model)
   {
+    case -1:
+      set_par_value_mytransfun_sim(pm);
+      break;
+
     case 0:
       set_par_value_mymodel_sim(pm);
       break;
