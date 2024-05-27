@@ -370,7 +370,7 @@ void read_parset()
     parset.flag_bintype = 0;
     parset.flag_theta_sample = 0;
     parset.flux_narrowline_low = 1.0e-1;
-    parset.flux_narrowline_low = 1.0e2;
+    parset.flux_narrowline_upp = 1.0e2;
 
     strcpy(parset.continuum_file, "");
     strcpy(parset.line_file, "");
