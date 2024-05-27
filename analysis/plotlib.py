@@ -410,12 +410,16 @@ class bplotlib(Param, Options, ParaName):
       self.results['line2d_sim'] = np.loadtxt(self.file_dir+"data/sim_hb2d.txt")
     
     elif self.param['flagdim'] == '0':
-      self.results['sample'] = np.loadtxt(self.file_dir + "data/posterior_sample_con.txt")
+      sample = np.loadtxt(self.file_dir + "data/posterior_sample_con.txt")
+      if sample.ndim == 1:
+        self.results['sample'] = np.reshape(sample, (1, sample.shape[0]))
       self.sample_size = self.results['sample'].shape[0]
       self._load_con_rec()
     
     elif self.param['flagdim'] == '1':
-      self.results['sample'] = np.loadtxt(self.file_dir + "data/posterior_sample_1d.txt")      
+      sample = self.results['sample'] = np.loadtxt(self.file_dir + "data/posterior_sample_1d.txt")      
+      if sample.ndim == 1:
+        self.results['sample'] = np.reshape(sample, (1, sample.shape[0]))
       self.sample_size = self.results['sample'].shape[0]
       self._load_con_rec()
       self._load_line_rec()
@@ -423,7 +427,9 @@ class bplotlib(Param, Options, ParaName):
       
     elif self.param['flagdim'] == '2':
       # load posterior samples
-      self.results['sample'] = np.loadtxt(self.file_dir + 'data/posterior_sample_2d.txt')
+      sample = self.results['sample'] = np.loadtxt(self.file_dir + 'data/posterior_sample_2d.txt')
+      if sample.ndim == 1:
+        self.results['sample'] = np.reshape(sample, (1, sample.shape[0]))
       # load likelihoods
       self.results['sample_info'] = np.loadtxt(self.file_dir + 'data/posterior_sample_info_2d.txt')
       self.sample_size = self.results['sample'].shape[0]
@@ -434,22 +440,28 @@ class bplotlib(Param, Options, ParaName):
       self._load_tran2d_rec()
 
 
-    elif self.param['flagdim'] == '3':
-      self.results['sample'] = np.loadtxt(self.file_dir + 'data/posterior_sample_sa.txt')
+    elif self.param['flagdim'] == '4':
+      sample = self.results['sample'] = np.loadtxt(self.file_dir + 'data/posterior_sample_sa.txt')
+      if sample.ndim == 1:
+        self.results['sample'] = np.reshape(sample, (1, sample.shape[0]))
       self.sample_size = self.results['sample'].shape[0]
       self._load_sa_rec()
 
     
-    elif self.param['flagdim'] == '4':
-      self.results['sample'] = np.loadtxt(self.file_dir + 'data/posterior_sample_sa1d.txt')
+    elif self.param['flagdim'] == '5':
+      sample = self.results['sample'] = np.loadtxt(self.file_dir + 'data/posterior_sample_sa1d.txt')
+      if sample.ndim == 1:
+        self.results['sample'] = np.reshape(sample, (1, sample.shape[0]))
       self.sample_size = self.results['sample'].shape[0]
       self._load_con_rec()
       self._load_line_rec()
       self._load_tran_rec()
       self._load_sa_rec()
 
-    elif self.param['flagdim'] == '5':
-      self.results['sample'] = np.loadtxt(self.file_dir + 'data/posterior_sample_sa2d.txt')
+    elif self.param['flagdim'] == '6':
+      sample = self.results['sample'] = np.loadtxt(self.file_dir + 'data/posterior_sample_sa2d.txt')
+      if sample.ndim == 1:
+        self.results['sample'] = np.reshape(sample, (1, sample.shape[0]))
       self.sample_size = self.results['sample'].shape[0]
       self._load_line2d_rec()
       self._load_tran2d_rec()
