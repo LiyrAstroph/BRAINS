@@ -87,6 +87,7 @@ InstResFile                 data/sim_broaden.txt       % file for storing epoch-
 % narrow-line component
 % use a gaussian to model the narrow-line component
 % width refers to the gaussian standard deviation
+% note that here width is the instrinsic width (after correcting for spectral broandening)
 
 FlagNarrowLine              0                           % 0, no narrow line; 
                                                         % 1, add fixed narrow line; 
@@ -97,9 +98,11 @@ FluxNarrowLine              1.5                         % flux of narrow line
 FluxNarrowLineErr           0.50                        % flux error of narrow line
 WidthNarrowLine             93.0                        % width km/s
 WidthNarrowLineErr          10.0                         % width error
-ShiftNarrowLine             0.0                        % shift, km/s, with respect to broad line center.  
+ShiftNarrowLine             0.0                         % shift, km/s, with respect to broad line center.  
 ShiftNarrowLineErr          0.0                         % shift error
 
+FluxNarrowLineLimitLow      0.01                        % when FlagNarrowLine=3
+FluxNarrowLineLimitUpp      1.00                        % when FlagNarrowLine=3
 %========================================================================
 % set fixed BLR parameters and their fixed values
 % do not put sapce in the strings

@@ -138,6 +138,7 @@ InstResFile                 data/sim_broadening.txt       % file for storing epo
 % RM narrow-line component
 % use a gaussian to model the narrow-line component
 % width is the standard deviation of the Gaussian
+% note that here width is the instrinsic width (after correcting for spectral broandening)
 % 
 FlagNarrowLine              0                           % 0, no narrow line; 
                                                         % 1, add fixed narrow line; 
