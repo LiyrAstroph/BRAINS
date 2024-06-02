@@ -744,6 +744,8 @@ class bplotlib(Param, Options, ParaName):
     sample = self.results['sample']
     syserr_con = (np.exp(np.mean(sample[:, idx_con])) - 1.0) * con_mean_err
     syserr_line = (np.exp(np.mean(sample[:, idx_line])) - 1.0) * line_mean_err
+    # systematic error to line fluxes
+    hblc_syserr = np.sqrt(syserr_line**2 * nv) * dV  
 
     plt.rc('text', usetex=True)
     plt.rc('font', family='serif', size=15)
@@ -777,7 +779,7 @@ class bplotlib(Param, Options, ParaName):
     line_rec_max = np.sum(prof_rec_max, axis=1) * dV
 
     plt.errorbar(hblc[:, 0], hblc[:, 1] * wave0*self.VelUnit/3e5, \
-                 yerr=np.sqrt(hblc[:, 2]*hblc[:, 2] + syserr_line * syserr_line * dV*dV)* wave0*self.VelUnit/3e5, \
+                 yerr=np.sqrt(hblc[:, 2]*hblc[:, 2] + hblc_syserr*hblc_syserr)* wave0*self.VelUnit/3e5, \
                  marker='None', markersize=3, ls='none', lw=1.0, capsize=0.7, markeredgewidth=0.5, zorder=32)
     #plt.plot(date_line, line_rec_max* wave0*self.VelUnit/3e5, color='red')
     
@@ -961,6 +963,8 @@ class bplotlib(Param, Options, ParaName):
     sample = self.results['sample']
     syserr_con = (np.exp(np.mean(sample[:, idx_con])) - 1.0) * con_mean_err
     syserr_line = (np.exp(np.mean(sample[:, idx_line])) - 1.0) * line_mean_err
+    # systematic error to line fluxes
+    hblc_syserr = np.sqrt(syserr_line**2 * nv) * dV  
 
     plt.rc('text', usetex=True)
     plt.rc('font', family='serif', size=15)
@@ -993,7 +997,7 @@ class bplotlib(Param, Options, ParaName):
     line_rec_max = np.sum(prof_rec_max, axis=1) * dV
 
     plt.errorbar(hblc[:, 0], hblc[:, 1] * wave0*self.VelUnit/3e5, \
-                 yerr=np.sqrt(hblc[:, 2]*hblc[:, 2] + syserr_line * syserr_line * dV*dV)* wave0*self.VelUnit/3e5, \
+                 yerr=np.sqrt(hblc[:, 2]*hblc[:, 2] + hblc_syserr**2)* wave0*self.VelUnit/3e5, \
                  marker='None', markersize=3, ls='none', lw=1.0, capsize=0.7, markeredgewidth=0.5, zorder=32)
     #plt.plot(date_line, line_rec_max* wave0*self.VelUnit/3e5, color='red')
     
