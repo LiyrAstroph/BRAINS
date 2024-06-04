@@ -317,9 +317,13 @@ class bplotlib(Param, Options, ParaName):
       self.con_scale = self.data['con_data'].shape[0]/np.sum(self.data['con_data'][:, 1])
     
     elif self.param['flagdim'] == '3':
-      self.data["sa_data"] = self._load_sa_data()
+     # load profile data
+     self.data["lp_data"] = np.loadtxt(self.file_dir+self.param['lineprofilefile'])
 
     elif self.param['flagdim'] == '4':
+      self.data["sa_data"] = self._load_sa_data()
+
+    elif self.param['flagdim'] == '5':
       # load continuum data
       self.data['con_data'] = np.loadtxt(self.file_dir+self.param['continuumfile'])
       # load line data
@@ -327,7 +331,7 @@ class bplotlib(Param, Options, ParaName):
       # load sa data
       self.data["sa_data"] = self._load_sa_data()
 
-    elif self.param['flagdim'] == '5':
+    elif self.param['flagdim'] == '6':
       # load continuum data
       self.data['con_data'] = np.loadtxt(self.file_dir+self.param['continuumfile'])
       # load line2d data
@@ -438,6 +442,15 @@ class bplotlib(Param, Options, ParaName):
       self._load_con_rec()
       self._load_line2d_rec()
       self._load_tran2d_rec()
+    
+    elif self.param['flagdim'] == '3':
+      # load posterior samples
+      sample = self.results['sample'] = np.loadtxt(self.file_dir + 'data/posterior_sample_lp.txt')
+      if sample.ndim == 1:
+        self.results['sample'] = np.reshape(sample, (1, sample.shape[0]))
+      # load likelihoods
+      self.results['sample_info'] = np.loadtxt(self.file_dir + 'data/posterior_sample_info_lp.txt')
+      self.sample_size = self.results['sample'].shape[0]
 
 
     elif self.param['flagdim'] == '4':
@@ -628,7 +641,7 @@ class bplotlib(Param, Options, ParaName):
     """
     plot 1d results
     """
-    if not int(self.param['flagdim']) in [1, 4]:
+    if not int(self.param['flagdim']) in [1, 5]:
       print("Flagdim =", self.param['flagdim'], "no 1D RM data.")
       return
     
@@ -1142,6 +1155,95 @@ class bplotlib(Param, Options, ParaName):
     else:
       plt.close()
   
+  def plot_results_sa(self, doshow=False):
+    if not int(self.param['flagdim']) in [4, 5, 6]:
+      print("Flagdim =", self.param['flagdim'], "no  SA data.")
+      return
+
+    plt.rc('text', usetex=True)
+    plt.rc('font', family='serif', size=15)
+
+    #========================================================================
+    ns = self.data["sa_data"]["profile"].shape[0]
+    nv = self.data["sa_data"]["profile"].shape[1]
+    nb = self.data["sa_data"]["phase"].shape[0]
+    nb_per_ns = int(nb/ns)
+
+    print(ns, nv, nb)
+    fig, axs = plt.subplots(int(nb/ns)+1, ns)
+    fig.set_size_inches(4*ns, 8)
+    if ns == 1:
+      axs = np.reshape(axs, (int(nb/ns)+1, ns))
+    
+    fig.subplots_adjust(wspace=0, hspace=0)
+
+    # lien profile
+    ax_spec = axs[0, :]
+    
+    profile_rec = self.results["sa_profile_rec"]
+    flux_rec_mean = np.mean(profile_rec, axis=0)
+    print(flux_rec_mean.shape)
+    for loop_e in range(ns):
+      ax = ax_spec[loop_e]
+      ax.plot(flux_rec_mean[:, 0], flux_rec_mean[:, 1], color="k", lw=2)
+
+    profile = self.data["sa_data"]["profile"]
+    for loop_e in range(ns):
+      ax = ax_spec[loop_e]
+      ax.errorbar(profile[loop_e, :, 0], profile[loop_e, :, 1], yerr=profile[loop_e, :, 2], ls='none', color="k", marker='o', markersize=3)
+
+      if loop_e > 0:
+        ax.set_yticklabels([])
+      else:
+        ax.set_ylabel("Flux")
+    
+    # then phase 
+    ax_vphi = axs[1:, :] 
+    phase_rec = self.results["sa_phase_rec"]
+    phase_rec_mean = np.mean(phase_rec, axis=0)
+    phase_rec_upp = np.quantile(phase_rec, axis=0, q=(1.0-0.683)/2)
+    phase_rec_low = np.quantile(phase_rec, axis=0, q=1.0-(1.0-0.683)/2)
+    for loop_b in range(nb):
+      loop_b_p = loop_b%nb_per_ns
+      for loop_e in range(ns):
+        ax = ax_vphi[loop_b_p, loop_e]
+        phi = phase_rec_mean[loop_b+loop_e*nb_per_ns, :, :]
+        phi_upp = phase_rec_upp[loop_b+loop_e*nb_per_ns, :, 1]  
+        phi_low = phase_rec_low[loop_b+loop_e*nb_per_ns, :, 1]                
+        ax.plot(phi[:, 0], phi[:, 1], color="C{0}".format(loop_b), lw=2)
+        ax.fill_between(phi[:, 0], y1=phi_upp, y2=phi_low, color="C{0}".format(loop_b), alpha=0.5)
+
+    phase = self.data["sa_data"]["phase"]
+    for loop_b in range(nb):
+      loop_b_p = loop_b%nb_per_ns
+      for loop_e in range(ns):
+        ax = ax_vphi[loop_b_p, loop_e]
+        x = phase[loop_b+loop_e*nb_per_ns, :, 0]
+        y = phase[loop_b+loop_e*nb_per_ns, :, 1]
+        e = phase[loop_b+loop_e*nb_per_ns, :, 2]
+
+        ax.errorbar(x, y, yerr=e, ls="none", marker="o", markersize=3, color="C{0}".format(loop_b))
+        
+        if loop_b_p < nb_per_ns-1:
+          ax.set_xticklabels([])
+        else:
+          ax.set_xlabel(r"Wavelength ($\mu$m)")
+
+        if loop_e > 0:
+          ax.set_yticklabels([])
+        else:
+          ax.set_ylabel(r"$\phi\,(^\circ)$")
+    
+    fig.align_labels()
+
+    fig.savefig("results_sa.pdf", bbox_inches='tight')
+
+    if doshow==True:
+      plt.show()
+    else:
+      plt.close()
+
+  
   def find_max_prob(self):
     """
     find the parameter set with the maximum prob
@@ -1260,7 +1362,7 @@ class bplotlib(Param, Options, ParaName):
 
     print("# plotting 1d transfer function.")
 
-    if int(self.param['flagdim']) in [1, 4]:
+    if int(self.param['flagdim']) in [1, 5]:
       tran_rec = self.results['tran_rec']
       fig = plt.figure()
       ax = fig.add_subplot(111)
@@ -1276,7 +1378,7 @@ class bplotlib(Param, Options, ParaName):
       else:
         plt.close()
 
-    elif int(self.param['flagdim']) in [2, 5, 6]:
+    elif int(self.param['flagdim']) in [2, 6, 7]:
       tau_rec = self.results['tau_rec']
       tran2d_rec = self.results['tran2d_rec']
       tran1d_rec = np.sum(tran2d_rec, axis=2)
