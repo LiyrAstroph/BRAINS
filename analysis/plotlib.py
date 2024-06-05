@@ -1182,15 +1182,17 @@ class bplotlib(Param, Options, ParaName):
     
     profile_rec = self.results["sa_profile_rec"]
     flux_rec_mean = np.mean(profile_rec, axis=0)
-    print(flux_rec_mean.shape)
+    flux_rec_upp = np.quantile(profile_rec, axis=0, q=1.0-(1.0-0.683)/2.0)
+    flux_rec_low = np.quantile(profile_rec, axis=0, q=(1.0-0.683)/2.0)
     for loop_e in range(ns):
       ax = ax_spec[loop_e]
       ax.plot(flux_rec_mean[:, 0], flux_rec_mean[:, 1], color="k", lw=2)
+      ax.fill_between(flux_rec_mean[:, 0], y1=flux_rec_upp[:, 1], y2=flux_rec_low[:, 1], color='k', alpha=0.5)
 
     profile = self.data["sa_data"]["profile"]
     for loop_e in range(ns):
       ax = ax_spec[loop_e]
-      ax.errorbar(profile[loop_e, :, 0], profile[loop_e, :, 1], yerr=profile[loop_e, :, 2], ls='none', color="k", marker='o', markersize=3)
+      ax.errorbar(profile[loop_e, :, 0], profile[loop_e, :, 1], yerr=profile[loop_e, :, 2], ls='none', color="C0", marker='o', markersize=3, zorder=0)
 
       if loop_e > 0:
         ax.set_yticklabels([])
@@ -1201,8 +1203,8 @@ class bplotlib(Param, Options, ParaName):
     ax_vphi = axs[1:, :] 
     phase_rec = self.results["sa_phase_rec"]
     phase_rec_mean = np.mean(phase_rec, axis=0)
-    phase_rec_upp = np.quantile(phase_rec, axis=0, q=(1.0-0.683)/2)
-    phase_rec_low = np.quantile(phase_rec, axis=0, q=1.0-(1.0-0.683)/2)
+    phase_rec_low = np.quantile(phase_rec, axis=0, q=(1.0-0.683)/2)
+    phase_rec_upp = np.quantile(phase_rec, axis=0, q=1.0-(1.0-0.683)/2)
     for loop_b in range(nb):
       loop_b_p = loop_b%nb_per_ns
       for loop_e in range(ns):
