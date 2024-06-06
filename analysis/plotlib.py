@@ -564,7 +564,8 @@ class bplotlib(Param, Options, ParaName):
       
       width_br = np.sqrt(width**2 + broad**2)
       flux *= width/width_br
-      prof = flux * np.exp( -0.5 *(grid_vel - shift)**2/width_br**2)
+      # note the velocity unit. in the code, velocity is scaled by the unit.
+      prof = flux/(np.sqrt(2.0*np.pi) * width/self.VelUnit) * np.exp( -0.5 *(grid_vel - shift)**2/width_br**2)
       return prof
     elif int(self.param["flagnarrowline"]) == 2:
       flux_na = float(self.param["fluxnarrowline"])
@@ -575,7 +576,8 @@ class bplotlib(Param, Options, ParaName):
       
       width_br = np.sqrt(width**2 + broad**2)
       flux *= width/width_br
-      prof = flux * np.exp( -0.5 *(grid_vel - shift)**2/width_br**2)
+      # note the velocity unit. in the code, velocity is scaled by the unit.
+      prof = flux/(np.sqrt(2.0*np.pi) * width/self.VelUnit) * np.exp( -0.5 *(grid_vel - shift)**2/width_br**2)
       return prof
     elif int(self.param["flagnarrowline"]) == 3:
       flux = np.exp(self.results['sample'][imax, self.num_param_blrmodel_rm])
@@ -586,7 +588,8 @@ class bplotlib(Param, Options, ParaName):
       flux *= width/width_br
       # note line scale
       flux /= self.line_scale
-      prof = flux * np.exp(-0.5 *(grid_vel - shift)**2/width_br**2)
+      # note the velocity unit. in the code, velocity is scaled by the unit.
+      prof = flux/(np.sqrt(2.0*np.pi) * width/self.VelUnit) * np.exp(-0.5 *(grid_vel - shift)**2/width_br**2)
       return prof
 
       
