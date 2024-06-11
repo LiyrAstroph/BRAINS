@@ -203,7 +203,7 @@ void print_par_names_con()
     exit(0);
   }
   
-  strcpy(str_fmt, "%4d %-28s %10.6f %10.6f %4d %4d %15.6e %15.6e %15.6e\n");
+  strcpy(str_fmt, "%4d %-28s %12.6f %12.6f %4d %4d %15.6e %15.6e %15.6e\n");
 
   printf("# Print parameter name in %s\n", fname);
 
@@ -211,7 +211,7 @@ void print_par_names_con()
   fprint_version(fp);
   fprintf(fp, "#*************************************************\n");
 
-  fprintf(fp, "%4s %-28s %10s %10s %4s %4s %15s %15s %15s\n", "#", "Par", "Min", "Max", "Prior", "Fix", "Val", 
+  fprintf(fp, "%4s %-28s %12s %12s %4s %4s %15s %15s %15s\n", "#", "Par", "Min", "Max", "Prior", "Fix", "Val", 
                                                               "Mean(Gau)", "Std(Gau)");
   i=0;
   fprintf(fp, str_fmt, i, "sys_err_con", par_range_model[i][0], par_range_model[i][1], par_prior_model[i],

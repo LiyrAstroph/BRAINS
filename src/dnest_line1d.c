@@ -270,7 +270,7 @@ void print_par_names_model1d()
     exit(0);
   }
   
-  strcpy(str_fmt, "%4d %-28s %10.6f %10.6f %4d %4d %15.6e %15.6e %15.6e\n");
+  strcpy(str_fmt, "%4d %-28s %12.6f %12.6f %4d %4d %15.6e %15.6e %15.6e\n");
 
   printf("# Print parameter name in %s\n", fname);
 
@@ -278,7 +278,7 @@ void print_par_names_model1d()
   fprint_version(fp);
   fprintf(fp, "#*************************************************\n");
   
-  fprintf(fp, "%4s %-28s %10s %10s %4s %4s %15s %15s %15s\n", "#", "Par", "Min", "Max", "Prior", "Fix", "Val", 
+  fprintf(fp, "%4s %-28s %12s %12s %4s %4s %15s %15s %15s\n", "#", "Par", "Min", "Max", "Prior", "Fix", "Val", 
                                                               "Mean(Gau)", "Std(Gau)");
   i=-1;
   for(j=0; j<num_params_blr_model; j++)
