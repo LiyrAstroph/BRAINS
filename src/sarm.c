@@ -114,7 +114,7 @@ void calculate_sarm_with_sample(const void *pm)
 {
   int i, j, k, m;
   double tau, tl, tc, fcon_rm, dTransTau, ratio, flux_ratio, fcon;
-  double DA, PA, cos_PA, sin_PA, y, z;
+  double DA, PA, cos_PA, sin_PA, y, z, alphac, betac;
   double *pmodel = (double *)pm;
 
   dTransTau = TransTau[1] - TransTau[0];
@@ -123,6 +123,9 @@ void calculate_sarm_with_sample(const void *pm)
   DA = exp(pmodel[num_params_blr + num_params_sa_blr_model]); 
   /* position angle */         
   PA = pmodel[num_params_blr + num_params_sa_blr_model + 1]/180.0 * PI;  
+  /* continuum offset */
+  alphac = pmodel[num_params_blr + num_params_sa_blr_model + 4];
+  betac  = pmodel[num_params_blr + num_params_sa_blr_model + 5];
 
   /* North through East (E of N), 180 deg ambiguity */
   cos_PA = cos(PA);
@@ -175,9 +178,9 @@ void calculate_sarm_with_sample(const void *pm)
       momentum_sarm_beta[j*n_vel_sarm_data_ext + i] = -y * sin_PA + z * cos_PA;
 
       momentum_sarm_alpha[j*n_vel_sarm_data_ext + i] = momentum_sarm_alpha[j*n_vel_sarm_data_ext + i] 
-                                                   / (Fline2d_sarm_at_data[j*n_vel_sarm_data_ext + i] + EPS);
+                                                   / (Fline2d_sarm_at_data[j*n_vel_sarm_data_ext + i] + EPS) - alphac;
       momentum_sarm_beta[j*n_vel_sarm_data_ext + i]  = momentum_sarm_beta[j*n_vel_sarm_data_ext + i] 
-                                                   / (Fline2d_sarm_at_data[j*n_vel_sarm_data_ext + i] + EPS);
+                                                   / (Fline2d_sarm_at_data[j*n_vel_sarm_data_ext + i] + EPS) - betac;
       
       /* note that Fline and Fcon data are scaled */
       flux_ratio = Fline2d_sarm_at_data[j*n_vel_sarm_data_ext + i]/fcon * sarm_scale_ratio;
@@ -212,7 +215,7 @@ void calculate_sarm_sim_with_sample(const void *pm, double *tline, double *vel_s
 {
   int i, j, k, m;
   double tau, tl, tc, fcon_rm, dTransTau, ratio, flux_ratio, fcon;
-  double DA, PA, FA, cos_PA, sin_PA, y, z;
+  double DA, PA, FA, cos_PA, sin_PA, y, z, alphac, betac;
   double *pmodel = (double *)pm;
 
   dTransTau = TransTau[1] - TransTau[0];
@@ -223,6 +226,9 @@ void calculate_sarm_sim_with_sample(const void *pm, double *tline, double *vel_s
   PA = pmodel[num_params_blr + num_params_sa_blr_model + 1]/180.0 * PI;  
   /* line flux scaling factor */
   FA = exp(pmodel[num_params_blr + num_params_sa_blr_model+2]);  
+  /* continuum offset */
+  alphac = pmodel[num_params_blr + num_params_sa_blr_model + 4];
+  betac  = pmodel[num_params_blr + num_params_sa_blr_model + 5];
 
   /* North through East (E of N), 180 deg ambiguity */
   cos_PA = cos(PA);
@@ -271,8 +277,8 @@ void calculate_sarm_sim_with_sample(const void *pm, double *tline, double *vel_s
       momentum_alpha[j*n_vel + i] = y * cos_PA + z * sin_PA;
       momentum_beta[j*n_vel + i] = -y * sin_PA + z * cos_PA;
 
-      photocenter_alpha[j*n_vel + i] = momentum_alpha[j*n_vel + i] / (fline[j*n_vel + i] + EPS);
-      photocenter_beta[j*n_vel + i]  = momentum_beta[j*n_vel + i] / (fline[j*n_vel + i] + EPS);
+      photocenter_alpha[j*n_vel + i] = momentum_alpha[j*n_vel + i] / (fline[j*n_vel + i] + EPS) - alphac;
+      photocenter_beta[j*n_vel + i]  = momentum_beta[j*n_vel + i] / (fline[j*n_vel + i] + EPS)  - betac;
 
       flux_ratio = fline[j*n_vel + i]/fcon;
       ratio = flux_ratio/(1.0+flux_ratio) / DA;

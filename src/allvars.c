@@ -196,4 +196,6 @@ const double sarm_lag_con_under_line = 0.0;
 double *Fline2d_sarm_at_data;
 double *phase_sarm_at_data;
 
+/* SA extra parameter name */
+char *sa_extpar_name[] = {"DA", "PA", "FA", "CO", "AlphaC", "BetaC"};
 #endif

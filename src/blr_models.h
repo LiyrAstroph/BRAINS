@@ -222,6 +222,8 @@ typedef struct
   double PA; /* position angle */
   double FA; /* line flux scaling factor */
   double CO; /* line center offset */
+  double AlphaC; /* offset wrt to continuum */
+  double BetaC;  /* offset wrt to continuum */
 }SAExtPar;
 
 #endif

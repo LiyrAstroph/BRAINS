@@ -656,6 +656,8 @@ void sim_init()
   sa_model[num_params_sa_blr_model + 1] = 0.0;        //PA
   sa_model[num_params_sa_blr_model + 2] = 0.0;        //FA
   sa_model[num_params_sa_blr_model + 3] = 0.0;        //CO
+  sa_model[num_params_sa_blr_model + 4] = 0.0;        //alphac
+  sa_model[num_params_sa_blr_model + 5] = 0.0;        //betac
 #endif
 
   Fcon = malloc(parset.n_con_recon * sizeof(double));

@@ -334,5 +334,8 @@ extern const double sarm_lag_con_under_line;
 /* SARM reconstruction */
 extern double *Fline2d_sarm_at_data;
 extern double *phase_sarm_at_data;
+
+/* SA extra parameter name */
+extern char *sa_extpar_name[];
 #endif
 #endif

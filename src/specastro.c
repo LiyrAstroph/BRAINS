@@ -102,7 +102,7 @@ void calculate_sa_with_sample(const void *pm)
 {
   int i, j, k, idV;
   double V, V_offset, dV, y, z, alpha, beta, flux_norm, phase, *phase_norm, *alpha_cent, *beta_cent;
-  double DA, PA, FA, CO, cos_PA, sin_PA;
+  double DA, PA, FA, CO, cos_PA, sin_PA, alphac, betac;
   double *pmodel = (double *)pm;
 
   phase_norm = workspace_phase;
@@ -120,6 +120,9 @@ void calculate_sa_with_sample(const void *pm)
    * equivalent to redshift offset:  dz = -(1+z) dw0/w0
    */       
   CO = -pmodel[num_params_blr + num_params_sa_blr_model+3]/parset.sa_linecenter * C_Unit;  
+  /* continuum offset */
+  alphac = pmodel[num_params_blr + num_params_sa_blr_model + 4];
+  betac  = pmodel[num_params_blr + num_params_sa_blr_model + 5];
 
   /* North through East (E of N), 180 deg ambiguity */
   cos_PA = cos(PA);
@@ -183,8 +186,8 @@ void calculate_sa_with_sample(const void *pm)
     alpha_cent[j] = y * cos_PA + z * sin_PA;
     beta_cent[j] = -y * sin_PA + z * cos_PA;
 
-    alpha_cent[j] = (alpha_cent[j]/(phase_norm[j]+EPS)) / DA;
-    beta_cent[j] =  (beta_cent[j]/(phase_norm[j]+EPS)) / DA;
+    alpha_cent[j] = (alpha_cent[j]/(phase_norm[j]+EPS) - alphac) / DA;
+    beta_cent[j]  =  (beta_cent[j]/(phase_norm[j]+EPS) - betac) / DA;
   }
   
   /* phi = -2*pi * f_line * B/lambda * X/DA for phase
@@ -215,7 +218,7 @@ void calculate_sa_sim_with_sample(const void *pm, double *vel_sa, int n_vel_sa, 
 {
   int i, j, k, idV;
   double V, V_offset, dV, y, z, alpha, beta, flux_norm, phase, *phase_norm, *alpha_cent, *beta_cent;
-  double DA, PA, FA, CO, cos_PA, sin_PA;
+  double DA, PA, FA, CO, cos_PA, sin_PA, alphac, betac;
   double *pmodel = (double *)pm;
 
   phase_norm = workspace_phase;
@@ -233,6 +236,9 @@ void calculate_sa_sim_with_sample(const void *pm, double *vel_sa, int n_vel_sa, 
    * equivalent to redshift offset:  dz = -(1+z) dw0/w0
    */       
   CO = -pmodel[num_params_blr + num_params_sa_blr_model+3]/parset.sa_linecenter * C_Unit; 
+  /* continuum offset */
+  alphac = pmodel[num_params_blr + num_params_sa_blr_model + 4];
+  betac  = pmodel[num_params_blr + num_params_sa_blr_model + 5];
 
   /* North through East (E of N), 180 deg ambiguity */
   cos_PA = cos(PA);
@@ -295,8 +301,8 @@ void calculate_sa_sim_with_sample(const void *pm, double *vel_sa, int n_vel_sa, 
     alpha_cent[j] = y * cos_PA + z * sin_PA;
     beta_cent[j] = -y * sin_PA + z * cos_PA;
 
-    alpha_cent[j] = (alpha_cent[j]/(phase_norm[j]+EPS)) / DA;
-    beta_cent[j] =  (beta_cent[j]/(phase_norm[j]+EPS)) / DA;
+    alpha_cent[j] = (alpha_cent[j]/(phase_norm[j]+EPS) - alphac) / DA;
+    beta_cent[j]  = (beta_cent[j]/(phase_norm[j]+EPS)  - betac) / DA;
   }
   
   /* phi = -2*pi * f_line * B/lambda * X/DA for phase
