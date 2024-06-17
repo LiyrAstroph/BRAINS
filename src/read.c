@@ -344,6 +344,11 @@ void read_parset()
     pardict[nt].addr= &parset.sa_str_par_fix_val;
     pardict[nt].isset = 0;
     pardict[nt++].id = STRING;
+
+    strcpy(pardict[nt].tag, "DA");
+    pardict[nt].addr= &parset.da;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = DOUBLE;
 #endif
 
     num_pardict = nt;
@@ -395,6 +400,7 @@ void read_parset()
     parset.flag_sa_par_mutual = 0;
     parset.sa_linecenter = 1.875; 
     parset.sa_InstRes = 0.0;
+    parset.da = 100.0; /* angular-size distance, Mpc */
     strcpy(parset.sa_file, "");
     strcpy(parset.sa_str_par_fix,"");
     strcpy(parset.sa_str_par_fix_val,"");
@@ -835,6 +841,12 @@ void read_parset()
           fprintf(stderr, "# Please specify SARM data file in parameter file.\n");
           error_flag = 4;
         }
+      }
+      /* check angular-size distance */
+      if(parset.da < 0.0)
+      {
+        fprintf(stderr, "# Angular-size distance DA should be positive.\n");
+        error_flag = 4;
       }
       
       if(error_flag == 0)
@@ -2219,6 +2231,7 @@ int check_parset_isset()
     strcpy(this_tag[n_this_tag++], "SAFile");
     strcpy(this_tag[n_this_tag++], "NCloudPerCore");
     strcpy(this_tag[n_this_tag++], "NVPerCloud");
+    strcpy(this_tag[n_this_tag++], "DA");
   }
   else if(parset.flag_dim == 5)
   {

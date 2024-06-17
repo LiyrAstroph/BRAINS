@@ -77,7 +77,7 @@ int dnest_sa(int argc, char **argv)
 
   /* fix DA */
   par_fix[num_params_sa_blr_model] = 1;
-  par_fix_val[num_params_sa_blr_model] = log(144.0);
+  par_fix_val[num_params_sa_blr_model] = log(parset.da);
 
   /* fix FA */
   par_fix[num_params_sa_blr_model+2] = 1;
