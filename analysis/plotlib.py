@@ -166,7 +166,11 @@ class ParaName:
     
     self.num_param_sa = self.num_param_blrmodel_sa + self.num_param_sa_extra
     idx_con =  np.nonzero(self.para_names['name'] == 'sys_err_con')
-    self.num_param_rm_extra = idx_con[0][0] - self.num_param_blrmodel_rm - self.num_param_sa
+    if len(idx_con[0]) > 0:
+      self.num_param_rm_extra = idx_con[0][0] - self.num_param_blrmodel_rm - self.num_param_sa
+    else:
+      self.num_param_rm_extra = 0
+
     self.num_param_blr_rm = self.num_param_rm_extra + self.num_param_blrmodel_rm
 
     if 'time_series' in self.para_names['name']:
@@ -556,6 +560,9 @@ class bplotlib(Param, Options, ParaName):
     elif int(self.param["flaginstres"]) == 2:
       broad = float(self.param["instres"]) + float(self.param["instreserr"]) \
             * self.results['sample'][imax, self.num_param_blrmodel_rm + num_param_na + iepoch]
+    elif int(self.param["flaginstres"]) == 3:
+      broad_all = np.loadtxt(os.path.join(self.param["filedir"], self.param["instresfile"]))
+      broad = broad_all[iepoch, 0] + broad_all[iepoch, 1]*self.results['sample'][imax, self.num_param_blrmodel_rm + num_param_na + iepoch]
 
     if int(self.param["flagnarrowline"]) == 1:
       flux = float(self.param["fluxnarrowline"])
@@ -1158,7 +1165,7 @@ class bplotlib(Param, Options, ParaName):
     else:
       plt.close()
   
-  def plot_results_sa(self, doshow=False):
+  def plot_results_sa(self, doshow=False, show_offset=False, subtract_offset=False):
     if not int(self.param['flagdim']) in [4, 5, 6]:
       print("Flagdim =", self.param['flagdim'], "no  SA data.")
       return
@@ -1166,13 +1173,43 @@ class bplotlib(Param, Options, ParaName):
     plt.rc('text', usetex=True)
     plt.rc('font', family='serif', size=15)
 
-    #========================================================================
-    ns = self.data["sa_data"]["profile"].shape[0]
-    nv = self.data["sa_data"]["profile"].shape[1]
-    nb = self.data["sa_data"]["phase"].shape[0]
+    #============================================
+    # figures 
+    fig_avg = plt.figure(figsize=(6, 6))
+    ax_avg = fig_avg.add_axes((0.1, 0.1, 0.8, 0.55))
+    ax2_avg = fig_avg.add_subplot((0.1, 0.65, 0.8, 0.25))
+    #============================================
+    
+    ns = self.data["sa_data"]["profile"].shape[0] # number of spectra
+    nv = self.data["sa_data"]["profile"].shape[1] # number of wavelength
+    nb = self.data["sa_data"]["phase"].shape[0]   # number of baseline
     nb_per_ns = int(nb/ns)
-
     print(ns, nv, nb)
+
+    profile_rec = self.results["sa_profile_rec"]
+    phase_rec = self.results["sa_phase_rec"]
+    baseline = self.data["sa_data"]["baseline"]
+    wave = profile_rec[0, :, 0] # reconstruction and data have the same wavelength bin
+
+    # calculate continuum offset
+    if subtract_offset == True or show_offset == True:
+      Factor = 1.0/360.0 * 3.08567758e+18/(3e10*24*3600.0)
+      phase_offset_rec = np.zeros((phase_rec.shape[0], nb, nv))
+      phase_offset_rec_mean = np.zeros((nb, nv))
+      idx_sa_extpar = np.nonzero(self.para_names['name'] == 'SA_Ext_Par_DA')[0][0]
+      sample = self.results['sample']
+      
+      
+      # offset = fline/(1+fline) * xc/DA
+      # phase_offset = -360 * offset * B/lambda [deg]
+      # note the negative sign. In the code, phase_obs = phase_blr - phase_offset
+      alphac = profile_rec[:, :, 1]/(1.0+profile_rec[:, :, 1])*sample[:, idx_sa_extpar+4, np.newaxis]/np.exp(sample[:, idx_sa_extpar,  np.newaxis])  # ld/Mpc
+      betac  = profile_rec[:, :, 1]/(1.0+profile_rec[:, :, 1])*sample[:, idx_sa_extpar+5, np.newaxis]/np.exp(sample[:, idx_sa_extpar,  np.newaxis])  # ld/Mpc
+      for loop_b in range(nb):
+        phase_offset_rec[:, loop_b, :] = -(alphac*baseline[loop_b, 0] + betac*baseline[loop_b, 1])/wave/Factor
+        phase_offset_rec_mean[loop_b, :] = np.median(phase_offset_rec[:, loop_b, :], axis=0)
+
+    #========================================================================
     fig, axs = plt.subplots(int(nb/ns)+1, ns)
     fig.set_size_inches(4*ns, 8)
     if ns == 1:
@@ -1183,19 +1220,26 @@ class bplotlib(Param, Options, ParaName):
     # lien profile
     ax_spec = axs[0, :]
     
-    profile_rec = self.results["sa_profile_rec"]
     flux_rec_mean = np.mean(profile_rec, axis=0)
     flux_rec_upp = np.quantile(profile_rec, axis=0, q=1.0-(1.0-0.683)/2.0)
     flux_rec_low = np.quantile(profile_rec, axis=0, q=(1.0-0.683)/2.0)
     for loop_e in range(ns):
       ax = ax_spec[loop_e]
-      ax.plot(flux_rec_mean[:, 0], flux_rec_mean[:, 1], color="k", lw=2)
-      ax.fill_between(flux_rec_mean[:, 0], y1=flux_rec_upp[:, 1], y2=flux_rec_low[:, 1], color='k', alpha=0.5)
+      ax.plot(flux_rec_mean[:, 0], flux_rec_mean[:, 1], color="C0", lw=2)
+      ax.fill_between(flux_rec_mean[:, 0], y1=flux_rec_upp[:, 1], y2=flux_rec_low[:, 1], color='C0', alpha=0.5)
+
+      ax2_avg.plot(flux_rec_mean[:, 0], flux_rec_mean[:, 1], color="C1", lw=2)
+      ax2_avg.fill_between(flux_rec_mean[:, 0], y1=flux_rec_upp[:, 1], y2=flux_rec_low[:, 1], color='C1', alpha=0.5)
+
 
     profile = self.data["sa_data"]["profile"]
     for loop_e in range(ns):
       ax = ax_spec[loop_e]
-      ax.errorbar(profile[loop_e, :, 0], profile[loop_e, :, 1], yerr=profile[loop_e, :, 2], ls='none', color="C0", marker='o', markersize=3, zorder=0)
+      ax.errorbar(profile[loop_e, :, 0], profile[loop_e, :, 1], yerr=profile[loop_e, :, 2], ls='none', color="C0", 
+                  marker='o', markersize=2, zorder=0, elinewidth=1)
+      
+      ax2_avg.errorbar(profile[loop_e, :, 0], profile[loop_e, :, 1], yerr=profile[loop_e, :, 2], ls='none', color="C0", 
+                       marker='o', zorder=0, elinewidth=1)
 
       if loop_e > 0:
         ax.set_yticklabels([])
@@ -1204,11 +1248,10 @@ class bplotlib(Param, Options, ParaName):
     
     # then phase 
     ax_vphi = axs[1:, :] 
-    phase_rec = self.results["sa_phase_rec"]
     phase_rec_mean = np.mean(phase_rec, axis=0)
     phase_rec_low = np.quantile(phase_rec, axis=0, q=(1.0-0.683)/2)
     phase_rec_upp = np.quantile(phase_rec, axis=0, q=1.0-(1.0-0.683)/2)
-    for loop_b in range(nb):
+    for loop_b in range(nb_per_ns):
       loop_b_p = loop_b%nb_per_ns
       for loop_e in range(ns):
         ax = ax_vphi[loop_b_p, loop_e]
@@ -1218,8 +1261,15 @@ class bplotlib(Param, Options, ParaName):
         ax.plot(phi[:, 0], phi[:, 1], color="C{0}".format(loop_b), lw=2)
         ax.fill_between(phi[:, 0], y1=phi_upp, y2=phi_low, color="C{0}".format(loop_b), alpha=0.5)
 
+        if show_offset == True:
+          #note: continuum offset already included in reconstruction
+          #      in the code,  phase_obs =  phase_blr - phase_offset
+          phi_offset = phase_offset_rec_mean[loop_b+loop_e*nb_per_ns, :]
+          ax.plot(phi[:, 0], -phi_offset, ls='dotted', color="C{0}".format(loop_b), zorder=5)
+          ax.plot(phi[:, 0], phi[:, 1]+phi_offset, ls='--', color="C{0}".format(loop_b), zorder=5)
+
     phase = self.data["sa_data"]["phase"]
-    for loop_b in range(nb):
+    for loop_b in range(nb_per_ns):
       loop_b_p = loop_b%nb_per_ns
       for loop_e in range(ns):
         ax = ax_vphi[loop_b_p, loop_e]
@@ -1227,21 +1277,67 @@ class bplotlib(Param, Options, ParaName):
         y = phase[loop_b+loop_e*nb_per_ns, :, 1]
         e = phase[loop_b+loop_e*nb_per_ns, :, 2]
 
-        ax.errorbar(x, y, yerr=e, ls="none", marker="o", markersize=3, color="C{0}".format(loop_b))
+        ax.errorbar(x, y, yerr=e, ls="none", marker="o", markersize=2, color="C{0}".format(loop_b), elinewidth=1)
         
         if loop_b_p < nb_per_ns-1:
           ax.set_xticklabels([])
         else:
-          ax.set_xlabel(r"Wavelength ($\mu$m)")
+          ax.set_xlabel(r"Wavelength")
 
         if loop_e > 0:
           ax.set_yticklabels([])
         else:
-          ax.set_ylabel(r"$\phi\,(^\circ)$")
+          ax.set_ylabel(r"$\phi$")
+        
+        ax.minorticks_on()
     
     fig.align_labels()
 
     fig.savefig("results_sa.pdf", bbox_inches='tight')
+    
+    # averaged phase 
+    phase_avg = np.zeros((nv, 3))
+    norm = np.zeros(nv)
+    for loop_b in range(nb_per_ns):
+      for loop_e in range(ns):
+        y = phase[loop_b+loop_e*nb_per_ns, :, 1]
+        e = phase[loop_b+loop_e*nb_per_ns, :, 2]
+
+        if subtract_offset == True:
+          phi_offset = phase_offset_rec_mean[loop_b+loop_e*nb_per_ns, :]
+          y = y + phi_offset 
+
+        weight = 1.0/e**2
+        norm[:] += weight
+        phase_avg[:, 1] += y*weight
+        phase_avg[:, 2] += e**2*weight**2
+    phase_avg[:, 0] = phase[0, :, 0]
+    phase_avg[:, 1] /= norm 
+    phase_avg[:, 2] = np.sqrt(phase_avg[:, 2])/norm
+    
+    ax_avg.errorbar(phase_avg[:, 0], phase_avg[:, 1], yerr=phase_avg[:, 2], ls='--', marker='o', color="C0")
+
+    # averaged phase reconstruction 
+    if subtract_offset == False:
+      phase_rec_avg = np.mean(phase_rec_mean[:, :, 1], axis=0)
+      phase_rec_upp_avg = np.mean(phase_rec_upp[:, :, 1], axis=0)
+      phase_rec_low_avg = np.mean(phase_rec_low[:, :, 1], axis=0)
+    else:
+      phase_rec_avg = np.mean(phase_rec_mean[:, :, 1] + phase_offset_rec_mean, axis=0)
+      phase_rec_upp_avg = np.mean(phase_rec_upp[:, :, 1] + phase_offset_rec_mean, axis=0)
+      phase_rec_low_avg = np.mean(phase_rec_low[:, :, 1] + phase_offset_rec_mean, axis=0)
+
+    ax_avg.plot(wave, phase_rec_avg, color='C1')
+    ax_avg.fill_between(wave, y1=phase_rec_upp_avg, y2=phase_rec_low_avg, alpha=0.5, color="C1")
+    ax_avg.axhline(y=0.0, ls='--', color='grey', lw=1)
+
+    ax_avg.set_xlabel(r"Wavelength")
+    ax_avg.set_ylabel(r"$\phi$")
+    ax_avg.minorticks_on()
+    ax2_avg.set_xticklabels([])
+    ax2_avg.set_ylabel("Flux")
+
+    fig_avg.savefig("results_sa_avg.pdf", bbox_inches='tight')
 
     if doshow==True:
       plt.show()
