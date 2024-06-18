@@ -80,8 +80,8 @@ int dnest_sa(int argc, char **argv)
   par_fix_val[num_params_sa_blr_model] = log(parset.da);
 
   /* fix FA */
-  par_fix[num_params_sa_blr_model+2] = 1;
-  par_fix_val[num_params_sa_blr_model+2] = log(1.0);
+  // par_fix[num_params_sa_blr_model+2] = 1;
+  // par_fix_val[num_params_sa_blr_model+2] = log(1.0);
   
   if(parset.flag_load_prior == 1)
   {

@@ -507,8 +507,8 @@ void init()
     sa_extpar_range[2][0] = log(0.5);    /* FA  */
     sa_extpar_range[2][1] = log(2.0);
 
-    sa_extpar_range[3][0] = -(wave_sa_data[1]-wave_sa_data[0]);    /* CO  */
-    sa_extpar_range[3][1] =  (wave_sa_data[1]-wave_sa_data[0]);
+    sa_extpar_range[3][0] = -5.0*(wave_sa_data[1]-wave_sa_data[0]);    /* CO  */
+    sa_extpar_range[3][1] =  5.0*(wave_sa_data[1]-wave_sa_data[0]);
 
     sa_extpar_range[4][0] = -100.0;    /* offset wrt to continuum  */
     sa_extpar_range[4][1] =  100.0;

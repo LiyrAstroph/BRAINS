@@ -40,16 +40,19 @@ LineProfileFile             data/sim_lineprofile.txt    % file for line profile
 % in Makefile, otherwise, errors raised
 %
 
-% FlagSADataType              1                         % 0: phase; 1: photocenter
-% SALineCenter                1.875                     % rest frame, the unit must be the same as that of the wavelength in SA data           
+% FlagSADataType              0                         % 0: phase; 1: photocenter
+% SALineCenter                2.165                     % rest frame, the unit must be the same as that of the wavelength in SA data           
 % FlagSABLRModel              6                         % same as FlagBLRModel 
 % FlagSAParMutual             1                         % flag for mutual parameters with BLR model
-%                                                       % 0: all 
-%                                                       % 1: only BH mass and inclination
-%                                                       % 2: inclination and all dyamical parameters
+                                                      % 0: all 
+                                                      % 1: only BH mass and inclination
+                                                      % 2: inclination and all dyamical parameters
 % SAInstRes                   235.0                     % km/s, fixed
-% SAFile                      data/sim_sa.txt 
+% SAFile                      data/mrk509_sa.txt 
 % SARMFile                    data/sim_sarm.txt 
+
+% DA                          145.86                       % angular-size distance, in a unit of Mpc
+                                                      % applies only when FlagDim==4
 
 %=========================================================================
 % reverberation mapping generic configuration
@@ -84,7 +87,7 @@ FlagLineSysErr              0                           % 0, not include systema
 
 FlagNonlinear               1                           % 0, linear response; 1, non-linear response
 
-FlagThetaSample             1                           % 0, sample over cos theta; 1, over theta
+FlagThetaSample             0                           % 0, sample over cos theta; 1, over theta
 %========================================================================
 % continuum configuration
 %
@@ -126,10 +129,10 @@ FlagInstRes                 0                           % 0, fixed to InstRes
                                                         % 2, uniform prior, but epoch-dependent parameterization
                                                         % 3, epoch-dependent parameterization, prior stored in "InstResFile"
 
-InstRes                     490                         % instrument broadening (modeled by a Gaussian), in km/s, for FlagInstRes=0, or 1
+InstRes                     490                         % instrument broadening (modeled by a Gaussian), in km/s, for FlagInstRes=0, or 1, or 2
                                                         % Gaussian standard deviation
 
-InstResErr                  50.0                        % instrument broadening error, in km/s, for FlagInstRes=0, or 1
+InstResErr                  50.0                        % instrument broadening error, in km/s, for FlagInstRes=1, or 2
 
 InstResFile                 data/sim_broadening.txt       % file for storing epoch-dependent instrument broadening
                                                           % two columns: broadening width and error (km/s), in the order of time as the 2d line data
