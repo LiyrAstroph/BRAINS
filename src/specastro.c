@@ -330,7 +330,7 @@ void calculate_sa_sim_with_sample(const void *pm, double *vel_sa, int n_vel_sa, 
  */
 void calculate_sa_from_blrmodel(const void *pm, int flag_save)
 {
-  gen_sa_cloud_sample(pm, 3, 0);
+  gen_sa_cloud_sample(pm, 3, flag_save);
   calculate_sa_with_sample(pm);
   return;
 }

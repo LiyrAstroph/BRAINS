@@ -16,6 +16,7 @@
 #include <math.h>
 #include <string.h>
 #include <float.h>
+#include <ctype.h>
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
 #include <gsl/gsl_interp.h>
@@ -1591,7 +1592,7 @@ void load_par_names(char *fname)
   if(thistask!= roottask)
     return;
   
-  int i;
+  int i, begin, end;
   FILE *fp;
   char str[BRAINS_MAX_STR_LENGTH], buf[BRAINS_MAX_STR_LENGTH];
   int type, fix;
@@ -1614,8 +1615,24 @@ void load_par_names(char *fname)
     if(buf[0] == '#')
       continue;
     
+    begin = 0;
+    while (isspace((unsigned char) str[begin]))
+      begin++;
+    end = strlen(str) - 1;
+    while ((end >= begin) && isspace((unsigned char) str[end]))
+      end--;
+    for (i = begin; i <= end; i++)
+        str[i - begin] = str[i];
+    str[i - begin] = '\0';
+    if(strlen(str)==0)
+      continue;
+    
     /* format: %4d %-28s %10.6f %10.6f %4d %4d %15.6e %15.6e %15.6e*/
-    sscanf(str,"%d %s %lf %lf %d %d %lf %lf %lf", &i, buf, &val_min, &val_max, &type, &fix, &val, &mean, &std);
+    if(sscanf(str,"%d %s %lf %lf %d %d %lf %lf %lf", &i, buf, &val_min, &val_max, &type, &fix, &val, &mean, &std)<9)
+    {
+      printf("Error in reading %s.\nThe line %s is problematic.\n", fname, str);
+      exit(0);
+    }
     
     if(i >= num_params)
     {

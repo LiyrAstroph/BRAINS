@@ -25,13 +25,19 @@ This will output the prior ranges to a file named `data/para_names_xx.txt`. The 
 Here, `Min` and `Max` columns represent the lower and upper limits. For `Prior` column, `1` means Gaussian prior 
 and `2` means uniform prior. For `Fix` column, `0` means not fixed and `1` means fixed. When the parameter is fixed,
 the `Val` columns represent the fixed value. When the prior is Gaussian, the `Mean(Gau)` and `Std(Gau)` represent
-the mean and standard deviation of the Gaussian, respectively.
+the mean and standard deviation of the Gaussian, respectively. The lines starting with "#" will be neglected.
 
 **Note that do not change the format the file, otherwise, there will be an error when reading in it.**
 
 If the prior range of some parameters needs to change, just adjust the corresponding `Min` and `Max` columns. 
-Then save the edited file to a new file, e.g., say, `data/new_prior.txt`. Afterwards, pass this new prior file to 
-BRAINS as 
+Then save the edited file to a new file, e.g., say, `data/new_prior.txt`. 
+Note that for the sake of brevity, one can only keep those lines for the parameters to be adjusted. The rest lines can be removed. 
+However, it is still fine to keep all lines. For example, one can edit the 1st and 3rd parameters (counting from 0) as::
+
+   1 BLR_model_beta                 0.001000   2.000000    2    0  -1.797693e+308    0.000000e+00    0.000000e+00
+   3 BLR_model_Inc                  0.000000   1.000000    2    0  -1.797693e+308    0.000000e+00    0.000000e+00
+
+Afterwards, pass this new prior file to BRAINS as 
 
 .. code-block:: bash
 
