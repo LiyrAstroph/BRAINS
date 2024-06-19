@@ -1210,7 +1210,7 @@ class bplotlib(Param, Options, ParaName):
 
     #========================================================================
     ncol = ns
-    nrow = int(ns/nb)+1
+    nrow = int(nb/ns)+1
     if nb > 6:
       ncol = int(np.ceil(nb/6))
       nrow = 6+1
