@@ -160,6 +160,7 @@ typedef struct
   char sa_str_par_fix[BRAINS_MAX_STR_LENGTH], sa_str_par_fix_val[BRAINS_MAX_STR_LENGTH];
   int n_sa_vel_recon, n_sa_base_recon;
   double da;
+  int flag_sa_phaseoffset;
 
   /* sarm */
   int n_sarm_base_recon, n_sarm_line_recon; /* number of baselines in each epoch */

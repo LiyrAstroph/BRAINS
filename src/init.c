@@ -510,11 +510,11 @@ void init()
     sa_extpar_range[3][0] = -5.0*(wave_sa_data[1]-wave_sa_data[0]);    /* CO  */
     sa_extpar_range[3][1] =  5.0*(wave_sa_data[1]-wave_sa_data[0]);
 
-    sa_extpar_range[4][0] = -100.0;    /* offset wrt to continuum  */
-    sa_extpar_range[4][1] =  100.0;
+    sa_extpar_range[4][0] = -200.0;    /* offset wrt to continuum  */
+    sa_extpar_range[4][1] =  200.0;
 
-    sa_extpar_range[5][0] = -100.0;    /* offset wrt to continuum  */
-    sa_extpar_range[5][1] =  100.0;
+    sa_extpar_range[5][0] = -200.0;    /* offset wrt to continuum  */
+    sa_extpar_range[5][1] =  200.0;
   }
 #endif 
 }

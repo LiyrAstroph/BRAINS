@@ -79,6 +79,15 @@ int dnest_sarm(int argc, char **argv)
   par_fix[num_params_blr + num_params_sa_blr_model+2] = 1;
   par_fix_val[num_params_blr + num_params_sa_blr_model+2] = log(1.0);
 
+  if(parset.flag_sa_phaseoffset == 0)
+  {
+    par_fix[num_params_blr + num_params_sa_blr_model + 4] = 1;
+    par_fix_val[num_params_blr + num_params_sa_blr_model + 4] = 0.0;
+
+    par_fix[num_params_blr + num_params_sa_blr_model + 5] = 1;
+    par_fix_val[num_params_blr + num_params_sa_blr_model + 5] = 0.0;
+  }
+
   /* fix systematic error of continuum */
   if(parset.flag_con_sys_err != 1)
   {

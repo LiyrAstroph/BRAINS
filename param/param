@@ -53,7 +53,8 @@ LineProfileFile             data/sim_lineprofile.txt    % file for line profile
 
 % DA                          145.86                       % angular-size distance, in a unit of Mpc
                                                       % applies only when FlagDim==4
-
+% FlagSAPhaseOffset           0                         % whether include phase offset wrt continuum.
+                                                      % 0: not; 1: yes
 %=========================================================================
 % reverberation mapping generic configuration
 %

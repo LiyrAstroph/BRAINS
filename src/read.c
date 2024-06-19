@@ -349,6 +349,12 @@ void read_parset()
     pardict[nt].addr= &parset.da;
     pardict[nt].isset = 0;
     pardict[nt++].id = DOUBLE;
+
+    strcpy(pardict[nt].tag, "FlagSAPhaseOffset");
+    pardict[nt].addr= &parset.flag_sa_phaseoffset;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = INT;
+
 #endif
 
     num_pardict = nt;
@@ -401,6 +407,7 @@ void read_parset()
     parset.sa_linecenter = 1.875; 
     parset.sa_InstRes = 0.0;
     parset.da = 100.0; /* angular-size distance, Mpc */
+    parset.flag_sa_phaseoffset = 0;
     strcpy(parset.sa_file, "");
     strcpy(parset.sa_str_par_fix,"");
     strcpy(parset.sa_str_par_fix_val,"");

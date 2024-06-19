@@ -82,6 +82,15 @@ int dnest_sa(int argc, char **argv)
   /* fix FA */
   // par_fix[num_params_sa_blr_model+2] = 1;
   // par_fix_val[num_params_sa_blr_model+2] = log(1.0);
+
+  if(parset.flag_sa_phaseoffset == 0)
+  {
+    par_fix[num_params_sa_blr_model + 4] = 1;
+    par_fix_val[num_params_sa_blr_model + 4] = 0.0;
+
+    par_fix[num_params_sa_blr_model + 5] = 1;
+    par_fix_val[num_params_sa_blr_model + 5] = 0.0;
+  }
   
   if(parset.flag_load_prior == 1)
   {
