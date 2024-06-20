@@ -126,7 +126,8 @@ void smooth_init(int nv, const double *transv);
 void smooth_end();
 void smooth_test();
 
-int get_idx_mbh_from_blrmodel();
+int get_idx_mbh_from_blrmodel(int blrmodel);
+int get_idx_blrsize_from_blrmodel(int blrmodel);
 
 /* line profile fitting */
 void postprocesslp();

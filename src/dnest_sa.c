@@ -315,7 +315,7 @@ void read_particle_sa(FILE *fp, void *model)
 double perturb_sa(void *model)
 {
   double *pm = (double *)model;
-  double logH = 0.0, limit1, limit2, width;
+  double logH = 0.0, limit1, limit2, width, move;
   int which, which_level, size_levels; 
 
   /* 
@@ -347,7 +347,8 @@ double perturb_sa(void *model)
     width = (par_range_model[which][1] - par_range_model[which][0]);
   }
   width /= (2.35);
-
+  
+  move = pm[which];
   if(par_prior_model[which] == GAUSSIAN)
   {
     logH -= (-0.5*pow((pm[which] - par_prior_gaussian[which][0])/par_prior_gaussian[which][1], 2.0) );
@@ -363,6 +364,23 @@ double perturb_sa(void *model)
     //dnest_wrap(&pm[which], limit1, limit2);
   }
 
+  /* consider the strong correlation between mass and size.
+   * 0th parameter is always BLR size
+   */
+  if(flag_mass_size_corr == 1)
+  {
+    move = pm[which] - move;
+    if(which == idx_sa_blrsize)
+    {
+      pm[which+idx_sa_mbh] += (move + dnest_randh() * 0.1);
+      dnest_wrap(&(pm[idx_sa_mbh]), par_range_model[idx_sa_mbh][0], par_range_model[idx_sa_mbh][1]);
+    }
+    else if(which == idx_sa_mbh)
+    {
+      pm[idx_sa_blrsize] += (move + dnest_randh() * 0.1);
+      dnest_wrap(&(pm[idx_sa_blrsize]), par_range_model[idx_sa_blrsize][0], par_range_model[idx_sa_blrsize][1]);
+    }
+  }
   return logH;
 }
 

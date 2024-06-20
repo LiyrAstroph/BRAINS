@@ -330,6 +330,11 @@ void reconstruct_sa_init()
       exit(-1);
     }
   }
+  
+  /* consider correlation between mass and blr size */
+  flag_mass_size_corr = 1;
+  idx_sa_blrsize = get_idx_blrsize_from_blrmodel(parset.flag_sa_blrmodel);
+  idx_sa_mbh     = get_idx_mbh_from_blrmodel(parset.flag_sa_blrmodel);
   return;
 }
 

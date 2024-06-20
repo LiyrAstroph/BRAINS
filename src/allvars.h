@@ -263,6 +263,8 @@ extern double *clouds_tau, *clouds_weight, *clouds_vel;
 
 extern double bin_offset;
 
+extern unsigned int flag_mass_size_corr;
+
 extern FILE *fcloud_out;
 extern int icr_cloud_save;
 
@@ -302,6 +304,8 @@ extern double **sa_extpar_range, **sa_blr_range_model;
 extern int SABLRmodel_size;
 
 extern int *idx_sa_par_mutual, *idx_rm_par_mutual;
+
+extern int idx_sa_blrsize, idx_sa_mbh;
 
 extern double *prob_sa_particles, *prob_sa_particles_perturb;
 

@@ -1736,10 +1736,10 @@ void set_drw_par_range_load()
  * get index of mbh from a BLR model.
  * 
  */
-int get_idx_mbh_from_blrmodel()
+int get_idx_mbh_from_blrmodel(int blrmodel)
 {
   int idx = -1;
-  switch(parset.flag_blrmodel)
+  switch(blrmodel)
   {
     case 0:
       idx = offsetof(MyBLRmodel, mbh);
@@ -1779,6 +1779,54 @@ int get_idx_mbh_from_blrmodel()
     
     case 9:
       idx = offsetof(BLRmodel9, mbh);
+      break;
+  }
+  return idx / sizeof(double);
+}
+
+int get_idx_blrsize_from_blrmodel(int blrmodel)
+{
+  int idx = -1;
+  switch(blrmodel)
+  {
+    case 0:
+      idx = 0;   /* unknown, set to 0 by default*/
+      break;
+
+    case 1:
+      idx = offsetof(BLRmodel1, mu);
+      break;
+
+    case 2:
+      idx = offsetof(BLRmodel2, mu);
+      break;
+    
+    case 3:
+      idx = offsetof(BLRmodel3, Rin);
+      break;
+
+    case 4:
+      idx = offsetof(BLRmodel4, Rin);
+      break;
+    
+    case 5:
+      idx = offsetof(BLRmodel5, mu);
+      break;
+
+    case 6:
+      idx = offsetof(BLRmodel6, mu);
+      break;
+    
+    case 7:
+      idx = offsetof(BLRmodel7, mu);
+      break;
+    
+    case 8:
+      idx = offsetof(BLRmodel8, Rblr);
+      break;
+    
+    case 9:
+      idx = offsetof(BLRmodel9, mu);
       break;
   }
   return idx / sizeof(double);

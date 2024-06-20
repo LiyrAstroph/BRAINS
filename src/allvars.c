@@ -121,6 +121,8 @@ double *clouds_tau, *clouds_weight, *clouds_vel;
 
 double bin_offset;
 
+unsigned int flag_mass_size_corr;
+
 FILE *fcloud_out = NULL;
 int icr_cloud_save = 1;
 
@@ -160,6 +162,8 @@ double **sa_extpar_range, **sa_blr_range_model;
 int SABLRmodel_size;
 
 int *idx_sa_par_mutual, *idx_rm_par_mutual;
+
+int idx_sa_blrsize, idx_sa_mbh;
 
 double *prob_sa_particles, *prob_sa_particles_perturb;
 

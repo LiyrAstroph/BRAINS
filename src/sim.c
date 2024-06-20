@@ -663,7 +663,7 @@ void sim_init()
   Fcon = malloc(parset.n_con_recon * sizeof(double));
   Fcon_rm = malloc(parset.n_con_recon * sizeof(double));
 
-  idx = get_idx_mbh_from_blrmodel();
+  idx = get_idx_mbh_from_blrmodel(parset.flag_blrmodel);
   mbh = exp(pm[idx]);
 
   if(parset.flag_blrmodel != 8) /* model 8 is particular */

@@ -88,7 +88,7 @@ int dnest_lp(int argc, char **argv)
   }
 
   /* fix mbh */
-  idx = get_idx_mbh_from_blrmodel();
+  idx = get_idx_mbh_from_blrmodel(parset.flag_blrmodel);
   par_fix[idx] = 1;
   par_fix_val[idx] =  log(10.0);
   
