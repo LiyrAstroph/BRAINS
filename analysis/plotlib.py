@@ -647,7 +647,7 @@ class bplotlib(Param, Options, ParaName):
     else:
       plt.close()
   
-  def plot_results_1d(self, doshow=False):
+  def plot_results_1d(self, doshow=False, time_range=None, time_start=None):
     """
     plot 1d results
     """
@@ -665,6 +665,11 @@ class bplotlib(Param, Options, ParaName):
     ax1 = fig.add_subplot(211)
     ax2 = fig.add_subplot(212)
     
+    if time_start is None:
+      t0 = 0
+    else:
+      t0 = time_start
+
     conlc = self.data["con_data"]
 
     con_mean_err = np.mean(conlc[:, 2])
@@ -672,7 +677,7 @@ class bplotlib(Param, Options, ParaName):
     sample = self.results['sample']
     syserr_con = (np.exp(np.mean(sample[:, idx_con])) - 1.0) * con_mean_err
 
-    ax1.errorbar(conlc[:, 0], conlc[:, 1], yerr=np.sqrt(conlc[:, 2]*conlc[:, 2] + syserr_con*syserr_con), \
+    ax1.errorbar(conlc[:, 0]-t0, conlc[:, 1], yerr=np.sqrt(conlc[:, 2]*conlc[:, 2] + syserr_con*syserr_con), \
                 marker='None', markersize=3, ls='none', lw=1.0, capsize=1, markeredgewidth=0.5, zorder=32)
     
     con_rec = self.results['con_rec']
@@ -681,8 +686,8 @@ class bplotlib(Param, Options, ParaName):
     con_mean_upp = np.quantile(con_rec[:, :, 1], axis=0, q=(1.0-0.683)/2.0)
     con_mean_low = np.quantile(con_rec[:, :, 1], axis=0, q=1.0 - (1.0-0.683)/2.0)
     
-    ax1.plot(con_date, con_mean, color='red', zorder=20) 
-    ax1.fill_between(con_date, y1=con_mean_low, y2=con_mean_upp, color='grey')
+    ax1.plot(con_date-t0, con_mean, color='red', zorder=20) 
+    ax1.fill_between(con_date-t0, y1=con_mean_low, y2=con_mean_upp, color='grey')
     
     #ax1.set_xlabel("Time")
     ax1.set_ylabel("Flux")
@@ -699,7 +704,7 @@ class bplotlib(Param, Options, ParaName):
     idx_line =  np.nonzero(self.para_names['name'] == 'sys_err_line')[0][0]
     syserr_line = (np.exp(np.mean(sample[:, idx_line])) - 1.0) * line_mean_err
 
-    ax2.errorbar(linelc[:, 0], linelc[:, 1], yerr=np.sqrt(linelc[:, 2]*linelc[:, 2] + syserr_line*syserr_line), \
+    ax2.errorbar(linelc[:, 0]-t0, linelc[:, 1], yerr=np.sqrt(linelc[:, 2]*linelc[:, 2] + syserr_line*syserr_line), \
                 marker='None', markersize=3, ls='none', lw=1.0, capsize=1, markeredgewidth=0.5, zorder=32)
     
     line_rec = self.results['line_rec']
@@ -708,15 +713,23 @@ class bplotlib(Param, Options, ParaName):
     line_mean_upp = np.quantile(line_rec[:, :, 1], axis=0, q=(1.0-0.683)/2.0)
     line_mean_low = np.quantile(line_rec[:, :, 1], axis=0, q=1.0 - (1.0-0.683)/2.0)
     
-    ax2.plot(line_date, line_mean, color='red', zorder=20) 
-    ax2.fill_between(line_date, y1=line_mean_low, y2=line_mean_upp, color='grey')
+    ax2.plot(line_date-t0, line_mean, color='red', zorder=20) 
+    ax2.fill_between(line_date-t0, y1=line_mean_low, y2=line_mean_upp, color='grey')
     
-    ax2.set_xlabel("Time")
+    if time_start is None:
+      ax2.set_xlabel("Time")
+    else:
+      ax2.set_xlabel("Time - %d"%t0)
+      
     ax2.set_ylabel("Flux")
     ax2.minorticks_on()
     ax2.set_xlim(xlim[0], xlim[1])
     
     fig.align_ylabels()
+
+    if time_range is not None:
+      ax1.set_xlim(time_range[0], time_range[1])
+      ax2.set_xlim(time_range[0], time_range[1])
 
     fig.savefig("results_1d.pdf", bbox_inches='tight')
     if doshow:
@@ -724,7 +737,7 @@ class bplotlib(Param, Options, ParaName):
     else:
       plt.close()
 
-  def plot_results_2d_style2018(self, doshow=False):
+  def plot_results_2d_style2018(self, doshow=False, time_range=None):
     """
     plot 2d results in the style of 2018 ApJ paper
     """
@@ -854,6 +867,10 @@ class bplotlib(Param, Options, ParaName):
     ax5.set_xlim(xmin, xmax)
     ax4.minorticks_on()
     ax5.minorticks_on()
+
+    if time_range is not None:
+      ax4.set_xlim(time_range[0], time_range[1])
+      ax5.set_xlim(time_range[0], time_range[1])
     
     plt.rcParams['xtick.direction'] = 'out'
     plt.rcParams['ytick.direction'] = 'out'
@@ -943,7 +960,7 @@ class bplotlib(Param, Options, ParaName):
     else:
       plt.close()
   
-  def plot_results_2d_style2022(self, doshow=False):
+  def plot_results_2d_style2022(self, doshow=False, time_range=None):
     """
     plot 2d results in the style of 2022 ApJ paper
     """
@@ -1077,6 +1094,10 @@ class bplotlib(Param, Options, ParaName):
     ax6.set_xlim(xlim[0], xlim[1])
     ax5.minorticks_on()
     ax6.minorticks_on()
+
+    if time_range is not None:
+      ax5.set_xlim(time_range[0], time_range[1])
+      ax6.set_xlim(time_range[0], time_range[1])
 
     plt.rcParams['xtick.direction'] = 'out'
     plt.rcParams['ytick.direction'] = 'out'
@@ -1543,12 +1564,20 @@ class bplotlib(Param, Options, ParaName):
     print("BLR para num:", self.num_param_blrmodel_rm)
     if int(self.param['flagdim']) >= 1:
       if para_indx is None:
+        label = []
+        for i in range(self.num_param_blrmodel_rm):
+          label += [self.para_names['name'][i][10:]]
+
         fig = corner.corner(self.results['sample'][:, :self.num_param_blrmodel_rm], \
                             range = prange[:self.num_param_blrmodel_rm, :], \
-                            smooth=True, smooth1d=True)
+                            smooth=True, smooth1d=True, labels=label)
       else:
+        label = []
+        for i in para_indx:
+          label += [self.para_names['name'][i][10:]]
+
         fig = corner.corner(self.results['sample'][:, para_indx], range = prange[para_indx, :], \
-                            smooth=True, smooth1d=True)
+                            smooth=True, smooth1d=True, labels=label)
       
       if doshow:
         plt.show()
