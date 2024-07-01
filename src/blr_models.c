@@ -26,24 +26,24 @@ char **BLRmodel_name;
 char **BLRmodel_sa_name;
 
 char *BLRmodel1_name[] = {"ln(Rblr)", "beta", "F", "cos(Inc)", "Opn", "Kappa", 
-                          "ln(Mbh)", "Lambda", "fq"};
+                          "ln(Mbh/1e6)", "Lambda", "fq"};
 char *BLRmodel2_name[] = {"ln(Rblr)", "beta", "F", "cos(Inc)", "Opn", "Kappa", 
-                          "ln(Mbh)", "sig_r", "sig_theta"};
+                          "ln(Mbh/1e6)", "sig_r", "sig_theta"};
 char *BLRmodel3_name[] = {"ln(Rin)", "F", "alpha", "cos(Inc)", "Opn", "Kappa", 
-                          "ln(Mbh)", "xi", "fq"};
+                          "ln(Mbh/1e6)", "xi", "fq"};
 char *BLRmodel4_name[] = {"ln(Rin)", "F", "alpha", "cos(Inc)", "Opn", "Kappa", 
-                          "ln(Mbh)", "xi", "fq"};
+                          "ln(Mbh/1e6)", "xi", "fq"};
 char *BLRmodel5_name[] = {"ln(Rblr)", "Fin", "log(Fout)", "alpha", "cos(Inc)", "Opn", "Kappa", "gamma", "xi", 
-                         "ln(Mbh)", "fellip", "fflow", "ln(sigr_circ)", "ln(sigthe_circ)", "ln(sigr_rad)", "ln(sigthe_rad)", "theta_rot", "ln(sig_turb)"};
+                         "ln(Mbh/1e6)", "fellip", "fflow", "ln(sigr_circ)", "ln(sigthe_circ)", "ln(sigr_rad)", "ln(sigthe_rad)", "theta_rot", "ln(sig_turb)"};
 char *BLRmodel6_name[] = {"ln(Rblr)", "beta", "F", "cos(Inc)", "Opn", "Kappa", "gamma", "xi", 
-                         "ln(Mbh)", "fellip", "fflow", "ln(sigr_circ)", "ln(sigthe_circ)", "ln(sigr_rad)", "ln(sigthe_rad)", "theta_rot", "ln(sig_turb)"};
+                         "ln(Mbh/1e6)", "fellip", "fflow", "ln(sigr_circ)", "ln(sigthe_circ)", "ln(sigr_rad)", "ln(sigthe_rad)", "theta_rot", "ln(sig_turb)"};
 char *BLRmodel7_name[] = {"ln(Rblr)", "beta", "F", "cos(Inc)", "Opn", "Kappa", "gamma", "xi",
                           "fsh", "ln(Rblr_un)", "beta_un", "F_un", "opn_un", 
-                          "ln(Mbh)", "fellip", "fflow", "ln(sigr_circ)", "ln(sigthe_circ)", "ln(sigr_rad)", "ln(sigthe_rad)", 
+                          "ln(Mbh/1e6)", "fellip", "fflow", "ln(sigr_circ)", "ln(sigthe_circ)", "ln(sigr_rad)", "ln(sigthe_rad)", 
                           "theta_rot", "fellip_un", "fflow_un", "ln(sig_turb)"};
 char *BLRmodel8_name[] = {"theta_min", "dtheta_max", "ln(r_min)", "ln(fr_max)", "gamma", "alpha", "lambda", "k", "xi", "ln(Rv)", 
-                          "ln(Rblr)", "cos(Inc)", "ln(Mbh)"};
-char *BLRmodel9_name[] = {"ln(Rblr)", "beta", "F", "cos(Inc)", "Opn", "ln(Mbh)"};
+                          "ln(Rblr)", "cos(Inc)", "ln(Mbh/1e6)"};
+char *BLRmodel9_name[] = {"ln(Rblr)", "beta", "F", "cos(Inc)", "Opn", "ln(Mbh/1e6)"};
 
 /* cluster around outer disk face, Lopn_cos1 < Lopn_cos2 */
 inline double theta_sample_outer(double gam, double Lopn_cos1, double Lopn_cos2)
