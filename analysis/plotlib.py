@@ -688,7 +688,31 @@ class bplotlib(Param, Options, ParaName):
     
     ax1.plot(con_date-t0, con_mean, color='red', zorder=20) 
     ax1.fill_between(con_date-t0, y1=con_mean_low, y2=con_mean_upp, color='grey')
-    
+
+    # plot different detrend
+    idx_diff_trend_all =  np.nonzero(self.para_names['name'] == 'diff_trend')[0]
+    num_param_diff_trend = len(idx_diff_trend_all)
+    if num_param_diff_trend > 0:
+      idx_diff_trend = idx_diff_trend_all[0]
+      t1 = conlc[0, 0]
+      t2 = conlc[-1, 0]
+      tmed = (t1+t2)/2.0
+      tspan = t2-t1
+
+      trend = np.linspace(t1, t2, 200)
+      ftrend = np.zeros((sample.shape[0], 200))
+
+      a0 = np.zeros(sample.shape[0])
+      for i in range(1, num_param_diff_trend+1):
+        a0[:] += -sample[:, idx_diff_trend+i-1]/tspan * ((t2-tmed)**(i+1) - (t1-tmed)**(i+1))/(i+1)
+      
+      ftrend += a0[:, np.newaxis]
+      for i in range(1, num_param_diff_trend+1):
+        ftrend +=  sample[:, idx_diff_trend+i-1, np.newaxis] * (trend[np.newaxis, :] - tmed)**(i)
+      
+      fcon_mean = np.median(conlc[:, 1])
+      ax1.plot(trend, np.median(ftrend, axis=0)/self.con_scale + fcon_mean, ls='--', color='grey', lw=1)
+
     #ax1.set_xlabel("Time")
     ax1.set_ylabel("Flux")
     ax1.set_xticklabels([])
