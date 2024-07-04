@@ -11,6 +11,7 @@
 import os
 import re
 import sys
+import copy
 import corner
 import numpy as np 
 import configparser as cp
@@ -1332,8 +1333,15 @@ class bplotlib(Param, Options, ParaName):
       x = phase[loop_b, :, 0]
       y = phase[loop_b, :, 1]
       e = phase[loop_b, :, 2]
-
-      ax.errorbar(x, y, yerr=e, ls="none", marker="o", markersize=2, color="C{0}".format(loop_b_p), elinewidth=1)
+      ecopy = copy.copy(e)
+      
+      # cope with masked points 
+      idx_mask = np.where(e<=0.0)[0]
+      ecopy[idx_mask] = 0.0
+      ax.errorbar(x, y, yerr=ecopy, ls="none", marker="o", markersize=2, color="C{0}".format(loop_b_p), elinewidth=1)
+      
+      # plot masked points with black color
+      ax.errorbar(x[idx_mask], y[idx_mask], yerr=ecopy(idx_mask), ls="none", marker="o", markersize=2, color="k", elinewidth=1, zorder=10)
       
       if loop_b_p < nrow-2:
         ax.set_xticklabels([])

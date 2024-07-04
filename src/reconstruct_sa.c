@@ -395,6 +395,7 @@ double prob_sa(const void *model)
   {
     for(i=0; i<n_vel_sa_data; i++)
     {
+      //note mask with error < 0.0
       if(Flerrs_sa_data[i+j*n_vel_sa_data] > 0.0)
       {
         dy = Fline_sa[i] - Fline_sa_data[i + j*n_vel_sa_data];
@@ -408,6 +409,7 @@ double prob_sa(const void *model)
   {
     for(i=0; i<n_vel_sa_data; i++)
     {
+      //note mask with error < 0.0
       if(pherrs_sa_data[j*n_vel_sa_data + i] > 0.0)
       {
         dy = phase_sa[j*n_vel_sa_data + i] - phase_sa_data[j*n_vel_sa_data + i];

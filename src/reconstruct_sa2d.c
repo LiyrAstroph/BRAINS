@@ -837,9 +837,13 @@ double prob_sa2d(const void *model)
     {
       for(i=0; i<n_vel_sa_data; i++)
       {
-        dy = Fline_sa[i] - Fline_sa_data[i + j*n_vel_sa_data];
-        var2 = Flerrs_sa_data[i+j*n_vel_sa_data]*Flerrs_sa_data[i+j*n_vel_sa_data];
-        prob_sa += -0.5 * (dy*dy)/var2 - 0.5*log(var2 * 2.0*PI);
+        //note mask with error < 0.0
+        if(Flerrs_sa_data[i+j*n_vel_sa_data] > 0.0)
+        {
+          dy = Fline_sa[i] - Fline_sa_data[i + j*n_vel_sa_data];
+          var2 = Flerrs_sa_data[i+j*n_vel_sa_data]*Flerrs_sa_data[i+j*n_vel_sa_data];
+          prob_sa += -0.5 * (dy*dy)/var2 - 0.5*log(var2 * 2.0*PI);
+        }
       }
     }
 
@@ -847,9 +851,13 @@ double prob_sa2d(const void *model)
     {
       for(i=0; i<n_vel_sa_data; i++)
       {
-        dy = phase_sa[j*n_vel_sa_data + i] - phase_sa_data[j*n_vel_sa_data + i];
-        var2 = pherrs_sa_data[j*n_vel_sa_data + i] * pherrs_sa_data[j*n_vel_sa_data + i];
-        prob_sa += -0.5 * (dy*dy)/var2 - 0.5*log(var2 * 2.0*PI);
+        //note mask with error < 0.0
+        if(pherrs_sa_data[j*n_vel_sa_data + i] > 0.0)
+        {
+          dy = phase_sa[j*n_vel_sa_data + i] - phase_sa_data[j*n_vel_sa_data + i];
+          var2 = pherrs_sa_data[j*n_vel_sa_data + i] * pherrs_sa_data[j*n_vel_sa_data + i];
+          prob_sa += -0.5 * (dy*dy)/var2 - 0.5*log(var2 * 2.0*PI);
+        }
       }
     }
     prob_sa_particles_perturb[which_particle_update] = prob_sa;
@@ -942,18 +950,26 @@ double prob_initial_sa2d(const void *model)
   {
     for(i=0; i<n_vel_sa_data; i++)
     {
-      dy = Fline_sa[i] - Fline_sa_data[i + j*n_vel_sa_data];
-      var2 = Flerrs_sa_data[i+j*n_vel_sa_data]*Flerrs_sa_data[i+j*n_vel_sa_data];
-      prob_sa += -0.5 * (dy*dy)/var2 - 0.5*log(var2 * 2.0*PI);
+      //note mask with error < 0.0
+      if(Flerrs_sa_data[i+j*n_vel_sa_data] > 0.0)
+      {
+        dy = Fline_sa[i] - Fline_sa_data[i + j*n_vel_sa_data];
+        var2 = Flerrs_sa_data[i+j*n_vel_sa_data]*Flerrs_sa_data[i+j*n_vel_sa_data];
+        prob_sa += -0.5 * (dy*dy)/var2 - 0.5*log(var2 * 2.0*PI);
+      }
     }
   }
   for(j=0; j<n_base_sa_data; j++)
   {
     for(i=0; i<n_vel_sa_data; i++)
     {
-      dy = phase_sa[j*n_vel_sa_data + i] - phase_sa_data[j*n_vel_sa_data + i];
-      var2 = pherrs_sa_data[j*n_vel_sa_data + i] * pherrs_sa_data[j*n_vel_sa_data + i];
-      prob_sa += -0.5 * (dy*dy)/var2 - 0.5*log(var2 * 2.0*PI);
+      //note mask with error < 0.0
+      if(pherrs_sa_data[j*n_vel_sa_data + i] > 0.0)
+      {
+        dy = phase_sa[j*n_vel_sa_data + i] - phase_sa_data[j*n_vel_sa_data + i];
+        var2 = pherrs_sa_data[j*n_vel_sa_data + i] * pherrs_sa_data[j*n_vel_sa_data + i];
+        prob_sa += -0.5 * (dy*dy)/var2 - 0.5*log(var2 * 2.0*PI);
+      }
     }
   }
   prob_sa_particles[which_particle_update] = prob_sa;

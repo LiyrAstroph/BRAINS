@@ -747,6 +747,7 @@ double prob_sarm(const void *model)
     {
       for(j=0; j<n_vel_sarm_data; j++)
       {
+        //note mask with error < 0.0
         if(pherrs_sarm_data[i*n_vel_sarm_data*n_base_sarm_data + k*n_vel_sarm_data + j] > 0.0)
         {
           dy = phase_sarm_data[i*n_vel_sarm_data*n_base_sarm_data + k*n_vel_sarm_data + j] 
@@ -812,6 +813,7 @@ double prob_initial_sarm(const void *model)
     {
       for(j=0; j<n_vel_sarm_data; j++)
       {
+        //note mask with error < 0.0
         if(pherrs_sarm_data[i*n_vel_sarm_data*n_base_sarm_data + k*n_vel_sarm_data + j] > 0.0)
         {
           /* note the vel extension */
