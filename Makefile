@@ -12,7 +12,7 @@ OPTIMIZE = -O3 -Wall -finline-functions -fcommon -ffast-math
 #OPTIMIZE += -DDebug
 
 # include spectro-astrometry analysis
-#OPTIMIZE += -DSpecAstro
+OPTIMIZE += -DSpecAstro
 
 # get GIT description
 GITCHECK := $(shell git 2>/dev/null)
@@ -78,6 +78,7 @@ endif
 
 
 EXEC     = brains
+ANAL     = ./analysis
 SRC      = ./src
 OBJS     = $(SRC)/main.o $(SRC)/allvars.o $(SRC)/read.o $(SRC)/run.o     \
            $(SRC)/dnest_con.o $(SRC)/reconstruct_con.o $(SRC)/init.o     \
@@ -108,8 +109,10 @@ CFLAGS   = $(OPTIONS) $(GSL_INCL) $(LAPACK_INCL) $(MPICHINCL) $(DNEST_INCL) $(FF
 LIBS     = $(GSL_LIBS) $(LAPACK_LIBS) $(MPICHLIB) $(DNEST_LIBS) $(FFTW_LIBS)
 
 $(EXEC):$(OBJS)
-	cd $(SRC)
 	$(CC) $(OBJS) $(LIBS) -o $@
+	
+	# install plotting interface
+	cd $(ANAL) && python setup.py install --user
 
 $(OBJS): $(INCL)
 
