@@ -22,14 +22,14 @@ BLR model 1
 This model is from Brewer et al. (2011).
 Clouds' distribution has a disk-like shape (see the figure) and is axis-symetric.
 
-* Radial distribution: :math:`\Gamma`-distribution
+* **Radial distribution**: :math:`\Gamma`-distribution
 
   .. math::
   
     \Gamma(r|\alpha, \theta) = 
     \frac{1}{\Gamma(\alpha)\theta^{\alpha-1}}r^{\alpha-1}\exp\left(-\frac{r}{\theta}\right)
 
-* Dynamics: clouds' orbital angular momentum and energy are randomly assigned following distributions
+* **Dynamics**: clouds' orbital angular momentum and energy are randomly assigned following distributions
 
   .. math::
 
@@ -38,7 +38,7 @@ Clouds' distribution has a disk-like shape (see the figure) and is axis-symetric
     p(L)\sim \exp\left(-\frac{|L|}{\lambda L_{\rm max}}\right),~~~
     |L| < L_{\rm max} = \sqrt{2r^2\left(E+\frac{GM_\bullet}{r}\right)}
 
-* Emissivity: anisotropic prescription
+* **Emissivity**: anisotropic prescription
 
   .. math::
   
@@ -49,7 +49,7 @@ Clouds' distribution has a disk-like shape (see the figure) and is axis-symetric
 
 BLR model 2
 ===========
-The radial distribution and emissivity are the same as model 1. The dyanmics of clouds are 
+The radial distribution and emissivity are the same as model 1. The **dyanmics** of clouds are 
 modeled in the orbital plane as 
 
 .. math::
@@ -62,13 +62,13 @@ where :math:`V_{\rm circ}=\sqrt{GM_\bullet/r}` is the circular velocity.
 
 BLR model 3
 ===========
-* Radial distribution: power-law distribution
+* **Radial distribution**: power-law distribution
 
   .. math::
   
     \rho(r|\alpha) = \rho_0 \left(\frac{r}{r_0}\right)^{-\alpha},~~~~r_{\rm in} < r < r_{\rm out}
 
-* Dynamics: Keplerian motion and inflow/outflow.
+* **Dynamics**: Keplerian motion and inflow/outflow.
 
   .. math::
 
@@ -76,7 +76,7 @@ BLR model 3
 
 BLR model 4
 ===========
-This model is the same as model 3, except for the dynamics 
+This model is the same as model 3, except for the **dynamics** 
 
 .. math::
   
@@ -84,7 +84,7 @@ This model is the same as model 3, except for the dynamics
 
 BLR model 5
 ===========
-* Radial distribution: double power-law distribution.
+* **Radial distribution**: double power-law distribution.
 
 .. math::
 
@@ -93,11 +93,41 @@ BLR model 5
   r^{-\alpha},& {\rm for}~1\leqslant r/R_0 \leqslant F_{\rm out},
   \end{array}\right.
 
-* The dyanmics and emissivity are the same as Pancoast et al. (2014)'s model.
+* The **dyanmics** and **emissivity** are the same as model 6.
 
 BLR model 6
 ===========
 This is compatible with Pancoast et al. (2014)'s model.
+
+* **Radial distribution**: :math:`\Gamma`-distribution
+
+  .. math::
+  
+    \Gamma(r|\alpha, \theta) = 
+    \frac{1}{\Gamma(\alpha)\theta^{\alpha-1}}r^{\alpha-1}\exp\left(-\frac{r}{\theta}\right)
+
+* **Dynamics**: A fraction :math:`f_{\rm ellip}` of clouds have bound elliptical Keplerian orbits and the remaining 
+  fraction :math:`(1-f_{\rm ellip})` is either inflowing :math:`(0 < f_{\rm flow} < 0.5)` or outflowing 
+  :math:`(0.5 < f_{\rm flow} < 1)`. 
+  
+  For elliptical orbits, the radial and tangential velocities are drawn 
+  from Gaussian distributions centered around a point :math:`(v_r, v_\phi) = (0, v_{\rm circ})` 
+  with standard deviations :math:`\sigma_{\rho,\rm circ}` and :math:`\sigma_{\Theta,\rm circ}`, respectively.
+  Here, :math:`v_{\rm circ}=\sqrt{GM_\bullet/r}` is the local Keplerian velocity.
+
+  For inflowing/outflowing clouds, velocities are drawn similarly from Gaussian distributions centered 
+  around points :math:`(v_r, v_\phi) = (\pm \sqrt{2} v_{\rm circ}, 0)`` with standard deviations :math:`\sigma_{\rho,\rm rad}` 
+  and :math:`\sigma_{\Theta,\rm rad}`, where “+” corresponds to outflows and “−” corresponds to inflows.
+
+* **Emissivity**: anisotropic prescription
+
+  .. math::
+  
+    w(\phi) = \frac{1}{2} + \kappa \cos\phi
+
+  where :math:`\phi` is the angle between the observer's line of sight to the central ionizing 
+  source and the cloud's line of sight to the central source.
+
 
 BLR model 7
 ===========
@@ -159,20 +189,20 @@ BLR model 9
 ===========
 This is the model adopted in the spectroastrometric modeling on 3C 273 by GRAVITY Collaboration (2018).
 
-* Radial distribution: :math:`\Gamma`-distribution
+* **Radial distribution**: :math:`\Gamma`-distribution
 
   .. math::
   
     \Gamma(r|\alpha, \theta) = 
     \frac{1}{\Gamma(\alpha)\theta^{\alpha-1}}r^{\alpha-1}\exp\left(-\frac{r}{\theta}\right)
 
-* Dynamics: circular Keplerian motion,
+* **Dynamics**: circular Keplerian motion,
 
   .. math::
 
-    V_{Kep} = \frac{GM}{r}.
+    V_{\rm Kep} = \sqrt{\frac{GM}{r}}.
 
-* Emissivity: isotropic prescription.
+* **Emissivity**: isotropic prescription.
 
 References
 ==========
