@@ -2359,8 +2359,8 @@ int check_time_sorted(double *time_series, int n)
  */
 int check_equal_bin(double *x, int n)
 {
-  int i, flag;
-  double dx, dx_mean;
+  int i;
+  double dx, dx_mean, dx_min, dx_max;
 
   if(n <= 2)
   {
@@ -2368,34 +2368,30 @@ int check_equal_bin(double *x, int n)
     exit(-1);
   }
 
-  dx = x[1] - x[0];
-  dx_mean = dx;
+  dx = dx_min = dx_max = dx_mean = x[1] - x[0];
   for(i=2; i<n; i++)
   {
-    dx_mean += dx;
-    if(dx != x[i]-x[i-1])
-    {
-      flag = 1;
-    }
+    dx = x[i]-x[i-1];
+    if(dx_min > dx) dx_min = dx;
+    if(dx_max < dx) dx_max = dx;
   }
-  dx_mean /= (n-1);
-  dx = (x[n-1] - x[0])/(n-1);
+  dx_mean = (x[n-1] - x[0])/(n-1);
   
-  if(abs((dx-dx_mean)/dx) > 0.1)
+  if(abs((dx_max-dx_min)/dx_mean) > 0.1)
   {
     printf("Error: wavelength bins are not evenly spaced.\n");
     exit(-1);
   }
 
-  if(flag == 1)
+  if(dx_min != dx_max)
   {
     for(i=1; i<n; i++)
     {
-      x[i] = x[0] + i*dx;
+      x[i] = x[0] + i*dx_mean;
     }
     printf("Warning: wavelength bins are not evenly spaced (mostly due to round error).\n"
            "         rebin them using a bin width of %f\n"
-           "         as a comparison, the mean width of data is %f\n", dx, dx_mean);
+           "         as a comparison, the bin width of data are (%f-%f)\n", dx_mean, dx_min, dx_max);
   }
 
   return 0;
