@@ -65,6 +65,8 @@ inline double theta_sample_inner(double gam, double Lopn_cos1, double Lopn_cos2)
  *
  * geometry: radial Gamma distribution
  * dynamics: elliptical orbits
+ * 
+ * clouds below the equatorial plane are fully obscurated
  *================================================================
  */
 void gen_cloud_sample_model1(const void *pm, int flag_type, int flag_save)
@@ -137,7 +139,8 @@ void gen_cloud_sample_model1(const void *pm, int flag_type, int flag_save)
     xb =  cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y;
     yb = -cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y;
     zb =  sin(Lthe) * x;
-
+    
+    /* clouds below the equatorial plane are fully obscurated */
     zb0 = zb;
     if(zb0 < 0.0)
       zb = -zb;
@@ -303,6 +306,8 @@ void gen_cloud_sample_model1(const void *pm, int flag_type, int flag_save)
  * 
  * geometry: radial Gamma distribution
  * dynamics: elliptical orbits (Gaussian around circular orbits)
+ * 
+ * clouds below the equatorial plane are fully obscurated
  *================================================================
  */
 void gen_cloud_sample_model2(const void *pm, int flag_type, int flag_save)
@@ -382,6 +387,7 @@ void gen_cloud_sample_model2(const void *pm, int flag_type, int flag_save)
     yb = -cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y;
     zb =  sin(Lthe) * x;
 
+    /* clouds below the equatorial plane are fully obscurated */
     zb0 = zb;
     if(zb0 < 0.0)
       zb = -zb;
@@ -532,6 +538,8 @@ void gen_cloud_sample_model2(const void *pm, int flag_type, int flag_save)
  *
  * geometry: radial power law
  * dynamics: 
+ * 
+ * clouds below the equatorial plane are fully obscurated
  *====================================================================
  */
 void gen_cloud_sample_model3(const void *pm, int flag_type, int flag_save)
@@ -751,9 +759,12 @@ void gen_cloud_sample_model3(const void *pm, int flag_type, int flag_save)
   return;
 }
 
-/*! 
+/*====================================================================
  * model 4.
  * generate cloud sample.
+ * 
+ * clouds below the equatorial plane are full obscurated
+ *====================================================================
  */
 void gen_cloud_sample_model4(const void *pm, int flag_type, int flag_save)
 {

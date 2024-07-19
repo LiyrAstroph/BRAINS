@@ -1244,6 +1244,8 @@ void read_data()
           }
         }
         fscanf(fp, "\n");
+
+        check_equal_bin(Wline_data, n_vel_data);
       }
       fclose(fp);
       
@@ -1403,6 +1405,8 @@ void read_data()
       }
 
       fclose(fp);
+
+      check_equal_bin(Wline_data, n_vel_data);
 
       if(error_flag == 0)
       {
@@ -2347,5 +2351,52 @@ int check_time_sorted(double *time_series, int n)
       return 1;
     }
   }
+  return 0;
+}
+
+/* in most cases, due to the round error, wavelength bins are not strictly evenly spaced
+ * so rebin them here.
+ */
+int check_equal_bin(double *x, int n)
+{
+  int i, flag;
+  double dx, dx_mean;
+
+  if(n <= 2)
+  {
+    printf("Error: wavelength bins are too few.\n");
+    exit(-1);
+  }
+
+  dx = x[1] - x[0];
+  dx_mean = dx;
+  for(i=2; i<n; i++)
+  {
+    dx_mean += dx;
+    if(dx != x[i]-x[i-1])
+    {
+      flag = 1;
+    }
+  }
+  dx_mean /= (n-1);
+  dx = (x[n-1] - x[0])/(n-1);
+  
+  if(abs((dx-dx_mean)/dx) > 0.1)
+  {
+    printf("Error: wavelength bins are not evenly spaced.\n");
+    exit(-1);
+  }
+
+  if(flag == 1)
+  {
+    for(i=1; i<n; i++)
+    {
+      x[i] = x[0] + i*dx;
+    }
+    printf("Warning: wavelength bins are not evenly spaced (mostly due to round error).\n"
+           "         rebin them using a bin width of %f\n"
+           "         as a comparison, the mean width of data is %f\n", dx, dx_mean);
+  }
+
   return 0;
 }
