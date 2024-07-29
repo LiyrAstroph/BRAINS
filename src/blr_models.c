@@ -65,7 +65,7 @@ inline double eta_func(double eta0, double eta1, double alpha, double r)
   
   eta = eta0 + eta1*pow(r, alpha);
   if(eta< -0.5)eta = -0.5;
-  else if(eta > 1.5)eta = 1.5;
+  else if(eta > 2.0)eta = 2.0;
   return eta;
 }
 

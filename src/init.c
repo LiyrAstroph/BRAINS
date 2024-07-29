@@ -1692,7 +1692,7 @@ void set_eta_range_model()
   eta_range_model[1][1] =  1.5;
 
   eta_range_model[2][0] =  0.0;
-  eta_range_model[2][1] =  3.0;
+  eta_range_model[2][1] =  5.0;
 }
 
 /*!
