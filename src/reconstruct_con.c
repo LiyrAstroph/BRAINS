@@ -954,7 +954,7 @@ void create_con_from_random(double sigma_hat, double tau, double alpha, double s
   int i, info;
   double *Prandvec;
   double sigma = sigma_hat * sqrt(tau);
-  double mean, max, min;
+  double mean, max, min, fcon_mean;
 
   Prandvec = malloc(parset.n_con_recon*sizeof(double));
 
@@ -991,8 +991,10 @@ void create_con_from_random(double sigma_hat, double tau, double alpha, double s
     Fcon[i] /= mean;
   }
   
+  fcon_mean = 1.0;
   for(i=0; i<parset.n_con_recon; i++)
   {
+    Fcon[i] = Fcon[i] - 1.5*(max-min)/mean  +  fcon_mean;
     //Fcon[i] +=  gsl_ran_ugaussian(gsl_r) * con_error_mean;
     Fcerrs[i] = con_error_mean;
   }

@@ -312,6 +312,7 @@ void reconstruct_lp_init()
   }
 
   clouds_weight = malloc(parset.n_cloud_per_task * sizeof(double));
+  clouds_weight_mean = malloc(parset.n_cloud_per_task * sizeof(double));
   clouds_vel = malloc(parset.n_cloud_per_task * parset.n_vel_per_cloud * sizeof(double));
 
   if(parset.flag_save_clouds && thistask == roottask)
@@ -360,6 +361,7 @@ void reconstruct_lp_end()
   free(par_prior_model);
   
   free(clouds_weight);
+  free(clouds_weight_mean);
   free(clouds_vel);
 
   if(parset.flag_save_clouds && thistask==roottask)
@@ -418,7 +420,7 @@ void cal_line_profile_with_sample(const void *pm, double *vel, double *fv, int n
       if(V_offset < vel[0] || V_offset >= vel[nvel-1] + dV )
         continue;
       idV = (V_offset - vel[0])/dV; 
-      fv[idV] += clouds_weight[i];
+      fv[idV] += clouds_weight_mean[i];  /* note that here use weight_mean */
     }
   }
   norm *= dV;

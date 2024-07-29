@@ -25,25 +25,25 @@
 char **BLRmodel_name;
 char **BLRmodel_sa_name;
 
-char *BLRmodel1_name[] = {"ln(Rblr)", "beta", "F", "cos(Inc)", "Opn", "Kappa", 
+char *BLRmodel1_name[] = {"ln(Rblr)", "beta", "F", "cos(Inc)", "Opn", "Kappa", "eta0", "eta1", "eta_alpha", 
                           "ln(Mbh/1e6)", "Lambda", "fq"};
-char *BLRmodel2_name[] = {"ln(Rblr)", "beta", "F", "cos(Inc)", "Opn", "Kappa", 
+char *BLRmodel2_name[] = {"ln(Rblr)", "beta", "F", "cos(Inc)", "Opn", "Kappa", "eta0", "eta1", "eta_alpha", 
                           "ln(Mbh/1e6)", "sig_r", "sig_theta"};
-char *BLRmodel3_name[] = {"ln(Rin)", "F", "alpha", "cos(Inc)", "Opn", "Kappa", 
+char *BLRmodel3_name[] = {"ln(Rin)", "F", "alpha", "cos(Inc)", "Opn", "Kappa", "eta0", "eta1", "eta_alpha", 
                           "ln(Mbh/1e6)", "xi", "fq"};
-char *BLRmodel4_name[] = {"ln(Rin)", "F", "alpha", "cos(Inc)", "Opn", "Kappa", 
+char *BLRmodel4_name[] = {"ln(Rin)", "F", "alpha", "cos(Inc)", "Opn", "Kappa", "eta0", "eta1", "eta_alpha", 
                           "ln(Mbh/1e6)", "xi", "fq"};
-char *BLRmodel5_name[] = {"ln(Rblr)", "Fin", "log(Fout)", "alpha", "cos(Inc)", "Opn", "Kappa", "gamma", "xi", 
+char *BLRmodel5_name[] = {"ln(Rblr)", "Fin", "log(Fout)", "alpha", "cos(Inc)", "Opn", "Kappa", "gamma", "xi", "eta0", "eta1", "eta_alpha", 
                          "ln(Mbh/1e6)", "fellip", "fflow", "ln(sigr_circ)", "ln(sigthe_circ)", "ln(sigr_rad)", "ln(sigthe_rad)", "theta_rot", "ln(sig_turb)"};
-char *BLRmodel6_name[] = {"ln(Rblr)", "beta", "F", "cos(Inc)", "Opn", "Kappa", "gamma", "xi", 
+char *BLRmodel6_name[] = {"ln(Rblr)", "beta", "F", "cos(Inc)", "Opn", "Kappa", "gamma", "xi", "eta0", "eta1", "eta_alpha", 
                          "ln(Mbh/1e6)", "fellip", "fflow", "ln(sigr_circ)", "ln(sigthe_circ)", "ln(sigr_rad)", "ln(sigthe_rad)", "theta_rot", "ln(sig_turb)"};
 char *BLRmodel7_name[] = {"ln(Rblr)", "beta", "F", "cos(Inc)", "Opn", "Kappa", "gamma", "xi",
-                          "fsh", "ln(Rblr_un)", "beta_un", "F_un", "opn_un", 
+                          "fsh", "ln(Rblr_un)", "beta_un", "F_un", "opn_un", "eta0", "eta1", "eta_alpha", 
                           "ln(Mbh/1e6)", "fellip", "fflow", "ln(sigr_circ)", "ln(sigthe_circ)", "ln(sigr_rad)", "ln(sigthe_rad)", 
                           "theta_rot", "fellip_un", "fflow_un", "ln(sig_turb)"};
 char *BLRmodel8_name[] = {"theta_min", "dtheta_max", "ln(r_min)", "ln(fr_max)", "gamma", "alpha", "lambda", "k", "xi", "ln(Rv)", 
-                          "ln(Rblr)", "cos(Inc)", "ln(Mbh/1e6)"};
-char *BLRmodel9_name[] = {"ln(Rblr)", "beta", "F", "cos(Inc)", "Opn", "ln(Mbh/1e6)"};
+                          "ln(Rblr)", "cos(Inc)", "eta0", "eta1", "eta_alpha", "ln(Mbh/1e6)"};
+char *BLRmodel9_name[] = {"ln(Rblr)", "beta", "F", "cos(Inc)", "Opn", "eta0", "eta1", "eta_alpha", "ln(Mbh/1e6)"};
 
 /* cluster around outer disk face, Lopn_cos1 < Lopn_cos2 */
 inline double theta_sample_outer(double gam, double Lopn_cos1, double Lopn_cos2)
@@ -57,6 +57,16 @@ inline double theta_sample_inner(double gam, double Lopn_cos1, double Lopn_cos2)
   /* note that cosine is a decreaing function */
   double opn1 = acos(Lopn_cos1), opn2 = acos(Lopn_cos2);
   return opn2 + (opn1-opn2)  * (1.0 - pow(gsl_rng_uniform(gsl_blr), 1.0/gam));
+}
+
+inline double eta_func(double eta0, double eta1, double alpha, double r)
+{
+  double eta;
+  
+  eta = eta0 + eta1*pow(r, alpha);
+  if(eta< -0.5)eta = -0.5;
+  else if(eta > 1.5)eta = 1.5;
+  return eta;
 }
 
 /*================================================================
@@ -79,7 +89,7 @@ void gen_cloud_sample_model1(const void *pm, int flag_type, int flag_save)
   double V, weight, rnd;
   BLRmodel1 *model = (BLRmodel1 *)pm;
   double Emin, Lmax, Vr, Vr2, Vph, mbh, chi, lambda, q;
-  
+  double eta, eta0, eta1, eta_alpha;  
 
   Lopn_cos = cos(model->opn*PI/180.0);
   inc = acos(model->inc);
@@ -87,6 +97,10 @@ void gen_cloud_sample_model1(const void *pm, int flag_type, int flag_save)
   F = model->F;
   mu = exp(model->mu);
   k = model->k;
+
+  eta0 = model->eta0;
+  eta1 = model->eta1;
+  eta_alpha = model->eta_alpha;
   
   if(flag_type == 1) // 1D RM, no dynamical parameters
   {
@@ -151,7 +165,9 @@ void gen_cloud_sample_model1(const void *pm, int flag_type, int flag_save)
     z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
 
     weight = 0.5 + k*(x/r);
-    clouds_weight[i] = weight;
+    eta = eta_func(eta0, eta1, eta_alpha, r/mu);
+    clouds_weight_mean[i] = weight;
+    clouds_weight[i] = eta * clouds_weight_mean[i];
 
 #ifndef SpecAstro
   switch(flag_type)
@@ -320,7 +336,7 @@ void gen_cloud_sample_model2(const void *pm, int flag_type, int flag_save)
   double V, weight, rnd;
   BLRmodel2 *model = (BLRmodel2 *)pm;
   double Emin, Ecirc, Lcirc, Vcirc, Vr, Vph, mbh, sigr, sigtheta, rhor, rhotheta;
-  
+  double eta, eta0, eta1, eta_alpha;  
 
   Lopn_cos = cos(model->opn*PI/180.0);
   inc = acos(model->inc);
@@ -333,6 +349,10 @@ void gen_cloud_sample_model2(const void *pm, int flag_type, int flag_save)
   s = mu/a;
   rin=mu*F;
   sig=(1.0-F)*s;
+
+  eta0 = model->eta0;
+  eta1 = model->eta1;
+  eta_alpha = model->eta_alpha;
   
   if(flag_type == 1)  //1D RM no dynamical parameters
   {
@@ -398,7 +418,9 @@ void gen_cloud_sample_model2(const void *pm, int flag_type, int flag_save)
     z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
 
     weight = 0.5 + k*(x/r);
-    clouds_weight[i] = weight;
+    eta = eta_func(eta0, eta1, eta_alpha, r/mu);
+    clouds_weight_mean[i] = weight;
+    clouds_weight[i] = eta * clouds_weight_mean[i];
 
 #ifndef SpecAstro
   switch(flag_type)
@@ -552,7 +574,7 @@ void gen_cloud_sample_model3(const void *pm, int flag_type, int flag_save)
   double V, weight, rnd;
   BLRmodel3 *model = (BLRmodel3 *)pm;
   double Emin, Lmax, Vr, Vph, mbh, xi, q;
-  
+  double eta, eta0, eta1, eta_alpha;  
 
   Lopn_cos = cos(model->opn*PI/180.0);
   inc = acos(model->inc);
@@ -560,6 +582,10 @@ void gen_cloud_sample_model3(const void *pm, int flag_type, int flag_save)
   F = model->F;
   Rin = exp(model->Rin);
   k = model->k;
+
+  eta0 = model->eta0;
+  eta1 = model->eta1;
+  eta_alpha = model->eta_alpha;
   
   if(flag_type == 1)
   {
@@ -624,7 +650,9 @@ void gen_cloud_sample_model3(const void *pm, int flag_type, int flag_save)
     z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
 
     weight = 0.5 + k*(x/r);
-    clouds_weight[i] = weight;
+    eta = eta_func(eta0, eta1, eta_alpha, r/Rin);
+    clouds_weight_mean[i] = weight;
+    clouds_weight[i] = eta * clouds_weight_mean[i];
 
 #ifndef SpecAstro
   switch(flag_type)
@@ -776,7 +804,7 @@ void gen_cloud_sample_model4(const void *pm, int flag_type, int flag_save)
   double V, weight, rnd;
   BLRmodel4 *model = (BLRmodel4 *)pm;
   double Emin, Lmax, Vr, Vph, mbh, xi, q;
-  
+  double eta, eta0, eta1, eta_alpha;  
 
   Lopn_cos = cos(model->opn*PI/180.0);
   inc = acos(model->inc);
@@ -784,6 +812,10 @@ void gen_cloud_sample_model4(const void *pm, int flag_type, int flag_save)
   F = model->F;
   Rin = exp(model->Rin);
   k = model->k;
+
+  eta0 = model->eta0;
+  eta1 = model->eta1;
+  eta_alpha = model->eta_alpha;
   
   if(flag_type == 1)  // 1D RM, no dynamical parameters
   {
@@ -848,7 +880,9 @@ void gen_cloud_sample_model4(const void *pm, int flag_type, int flag_save)
     z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
 
     weight = 0.5 + k*(x/r);
-    clouds_weight[i] = weight;
+    eta = eta_func(eta0, eta1, eta_alpha, r/Rin);
+    clouds_weight_mean[i] = weight;
+    clouds_weight[i] = eta * clouds_weight_mean[i];
 
 #ifndef SpecAstro
   switch(flag_type)
@@ -1002,6 +1036,7 @@ void gen_cloud_sample_model5(const void *pm, int flag_type, int flag_save)
   double weight, rndr, rnd, rnd_frac, rnd_xi, frac1, frac2, ratio, Rs, g;
   double vx, vy, vz, vxb, vyb, vzb;
   BLRmodel5 *model = (BLRmodel5 *)pm;
+  double eta, eta0, eta1, eta_alpha;
 
   Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
   inc = acos(model->inc);         /* inclination angle in rad */
@@ -1012,6 +1047,10 @@ void gen_cloud_sample_model5(const void *pm, int flag_type, int flag_save)
   k = model->k;  
   gam = model->gam;
   xi = model->xi;
+
+  eta0 = model->eta0;
+  eta1 = model->eta1;
+  eta_alpha = model->eta_alpha;
   
   if(flag_type == 1) // 1D RM, no dynamical parameters
   {
@@ -1108,7 +1147,9 @@ void gen_cloud_sample_model5(const void *pm, int flag_type, int flag_save)
     z =-xb * sin_inc_cmp + zb * cos_inc_cmp;
 
     weight = 0.5 + k*(x/r);
-    clouds_weight[i] = weight;
+    eta = eta_func(eta0, eta1, eta_alpha, r/mu);
+    clouds_weight_mean[i] = weight;
+    clouds_weight[i] = eta * clouds_weight_mean[i];
 
 #ifndef SpecAstro
   switch(flag_type)
@@ -1280,6 +1321,7 @@ void gen_cloud_sample_model6(const void *pm, int flag_type, int flag_save)
   double Lphi, Lthe, sin_Lphi, cos_Lphi, sin_Lthe, cos_Lthe, sin_inc_cmp, cos_inc_cmp;
   double weight, rnd, rnd_xi;
   BLRmodel6 *model = (BLRmodel6 *)pm;
+  double eta, eta0, eta1, eta_alpha;
 
   Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
   inc = acos(model->inc);         /* inclination angle in rad */
@@ -1289,6 +1331,10 @@ void gen_cloud_sample_model6(const void *pm, int flag_type, int flag_save)
   k = model->k;  
   gam = model-> gam;
   xi = model->xi;
+
+  eta0 = model->eta0;
+  eta1 = model->eta1;
+  eta_alpha = model->eta_alpha;
 
   if(flag_type == 1) // 1D RM, no mbh parameters
   {
@@ -1378,7 +1424,9 @@ void gen_cloud_sample_model6(const void *pm, int flag_type, int flag_save)
     z =-xb * sin_inc_cmp + zb * cos_inc_cmp;
 
     weight = 0.5 + k*(x/r);
-    clouds_weight[i] = weight;
+    eta = eta_func(eta0, eta1, eta_alpha, r/mu);
+    clouds_weight_mean[i] = weight;
+    clouds_weight[i] = eta * clouds_weight_mean[i];
 
 #ifndef SpecAstro
   switch(flag_type)
@@ -1554,6 +1602,7 @@ void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save)
   double Lphi, Lthe, sin_Lphi, cos_Lphi, sin_Lthe, cos_Lthe, sin_inc_cmp, cos_inc_cmp;
   double weight, rnd, rnd_xi;
   BLRmodel7 *model = (BLRmodel7 *)pm;
+  double eta, eta0, eta1, eta_alpha;
 
   Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
   inc = acos(model->inc);         /* inclination angle in rad */
@@ -1563,6 +1612,10 @@ void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save)
   k = model->k;  
   gam = model-> gam;
   xi = model->xi;
+
+  eta0 = model->eta0;
+  eta1 = model->eta1;
+  eta_alpha = model->eta_alpha;
   
   if(flag_type == 1) // 1D RM, no dyamical parameters
   {
@@ -1651,7 +1704,9 @@ void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save)
     z =-xb * sin_inc_cmp + zb * cos_inc_cmp;
 
     weight = 0.5 + k*(x/r);
-    clouds_weight[i] = weight;
+    eta = eta_func(eta0, eta1, eta_alpha, r/mu);
+    clouds_weight_mean[i] = weight;
+    clouds_weight[i] = eta * clouds_weight_mean[i];
 
 #ifndef SpecAstro
   switch(flag_type)
@@ -1877,7 +1932,9 @@ void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save)
     z =-xb * sin_inc_cmp + zb * cos_inc_cmp;
 
     weight = 0.5 + k*(x/r);
-    clouds_weight[i] = weight;
+    eta = eta_func(eta0, eta1, eta_alpha, r/mu);
+    clouds_weight_mean[i] = weight;
+    clouds_weight[i] = eta * clouds_weight_mean[i];
     
 #ifndef SpecAstro
   switch(flag_type)
@@ -2042,6 +2099,7 @@ void gen_cloud_sample_model8(const void *pm, int flag_type, int flag_save)
   double dis, density, vl, vesc, Vr, Vph, vx, vy, vz, vxb, vyb, vzb, V, rnd_xi, lmax, R;
   double v0=6.0/VelUnit;
   BLRmodel8 *model=(BLRmodel8 *)pm;
+  double eta, eta0, eta1, eta_alpha;
 
   theta_min = model->theta_min/180.0 * PI;
   theta_max = model->dtheta_max/180.0*PI + theta_min;
@@ -2065,6 +2123,10 @@ void gen_cloud_sample_model8(const void *pm, int flag_type, int flag_save)
   if(Rblr < r_max) Rblr = r_max;
   model->Rblr = log(Rblr);
   inc = acos(model->inc);
+
+  eta0 = model->eta0;
+  eta1 = model->eta1;
+  eta_alpha = model->eta_alpha;
   
   mbh = exp(model->mbh);
 
@@ -2103,7 +2165,9 @@ void gen_cloud_sample_model8(const void *pm, int flag_type, int flag_save)
 
     R = sqrt(r*r + zb*zb);
     weight = 0.5 + k*(x/R);
-    clouds_weight[i] = weight * density;
+    eta = eta_func(eta0, eta1, eta_alpha, r/r_min);
+    clouds_weight_mean[i] = weight * density;
+    clouds_weight[i] = eta * clouds_weight_mean[i];
 
 #ifndef SpecAstro
   switch(flag_type)
@@ -2228,6 +2292,7 @@ void gen_cloud_sample_model9(const void *pm, int flag_type, int flag_save)
   double V, weight, rnd, sin_inc_cmp, cos_inc_cmp;
   BLRmodel9 *model = (BLRmodel9 *)pm;
   double Vr, Vph, mbh;
+  double eta, eta0, eta1, eta_alpha;
   
   Lopn_cos = cos(model->opn*PI/180.0);
   //Lopn = model->opn*PI/180.0;
@@ -2235,6 +2300,10 @@ void gen_cloud_sample_model9(const void *pm, int flag_type, int flag_save)
   beta = model->beta;
   F = model->F;
   mu = exp(model->mu);
+
+  eta0 = model->eta0;
+  eta1 = model->eta1;
+  eta_alpha = model->eta_alpha;
   
   if(flag_type == 1)  // 1D RM, no dynmaical parameters
   {
@@ -2299,7 +2368,9 @@ void gen_cloud_sample_model9(const void *pm, int flag_type, int flag_save)
     z =-xb * sin_inc_cmp + zb * cos_inc_cmp;
 
     weight = 1.0;
-    clouds_weight[i] = weight;
+    eta = eta_func(eta0, eta1, eta_alpha, r/mu);
+    clouds_weight_mean[i] = weight;
+    clouds_weight[i] = eta * clouds_weight_mean[i];
 
 #ifndef SpecAstro
   switch(flag_type)

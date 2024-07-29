@@ -490,6 +490,7 @@ void reconstruct_line1d_init()
 
   clouds_tau = malloc(parset.n_cloud_per_task * sizeof(double));
   clouds_weight = malloc(parset.n_cloud_per_task * sizeof(double));
+  clouds_weight_mean = malloc(parset.n_cloud_per_task * sizeof(double));
 
   if(parset.flag_save_clouds && thistask == roottask)
   {
@@ -566,6 +567,7 @@ void reconstruct_line1d_end()
 
   free(clouds_tau);
   free(clouds_weight);
+  free(clouds_weight_mean);
 
   if(parset.flag_save_clouds && thistask==roottask)
   {

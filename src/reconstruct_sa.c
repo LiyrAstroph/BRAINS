@@ -308,6 +308,7 @@ void reconstruct_sa_init()
 
   /* cloud sample related */
   clouds_weight = malloc(parset.n_cloud_per_task * sizeof(double));
+  clouds_weight_mean = malloc(parset.n_cloud_per_task * sizeof(double));
   clouds_alpha = malloc(parset.n_cloud_per_task * sizeof(double));
   clouds_beta = malloc(parset.n_cloud_per_task * sizeof(double));
   clouds_vel = malloc(parset.n_cloud_per_task * parset.n_vel_per_cloud * sizeof(double));
@@ -361,6 +362,7 @@ void reconstruct_sa_end()
   
   /* clouds sample related */
   free(clouds_weight);
+  free(clouds_weight_mean);
   free(clouds_alpha);
   free(clouds_beta);
   free(clouds_vel);

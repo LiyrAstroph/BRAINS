@@ -617,6 +617,8 @@ void reconstruct_sa2d_init()
   Trans2D = malloc(parset.n_tau * parset.n_vel_recon * sizeof(double));
   Tline = malloc(parset.n_line_recon * sizeof(double));
   Fline2d = malloc(parset.n_line_recon * parset.n_vel_recon * sizeof(double));
+
+  Fline2d_mean = (double *)malloc(n_vel_max * sizeof(double));
   
   Tline_min = Tline_data[0] - fmin(0.1*(Tline_data[n_line_data - 1] - Tline_data[0]), 10.0);
   if(parset.time_back <= 0.0)
@@ -685,6 +687,7 @@ void reconstruct_sa2d_init()
 
   /* cloud sample related */
   clouds_weight = malloc(parset.n_cloud_per_task * sizeof(double));
+  clouds_weight_mean = malloc(parset.n_cloud_per_task * sizeof(double));
   clouds_alpha = malloc(parset.n_cloud_per_task * sizeof(double));
   clouds_beta = malloc(parset.n_cloud_per_task * sizeof(double));
   clouds_vel = malloc(parset.n_cloud_per_task * parset.n_vel_per_cloud * sizeof(double));
@@ -717,6 +720,7 @@ void reconstruct_sa2d_end()
   /* RM setup */
   free(Tline);
   free(Fline2d);
+  free(Fline2d_mean);
   free(TransV);
   free(Trans2D);
 
@@ -769,6 +773,7 @@ void reconstruct_sa2d_end()
   free(best_model_std_sa2d);
 
   free(clouds_weight);
+  free(clouds_weight_mean);
   free(clouds_alpha);
   free(clouds_beta);
   free(clouds_tau);

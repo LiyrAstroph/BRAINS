@@ -606,8 +606,8 @@ void reconstruct_line2d_init()
 
   Tline = malloc(parset.n_line_recon * sizeof(double));
   Fline2d = malloc(parset.n_line_recon * parset.n_vel_recon * sizeof(double));
+  Fline2d_mean = (double *)malloc(n_vel_max * sizeof(double));
 
-  
   Tline_min = Tline_data[0] - fmin(0.1*(Tline_data[n_line_data - 1] - Tline_data[0]), 10.0);
   if(parset.time_back <= 0.0)
     Tline_min = fmax(Tline_min, Tcon_min + time_back_set);
@@ -676,6 +676,7 @@ void reconstruct_line2d_init()
 
   clouds_tau = malloc(parset.n_cloud_per_task * sizeof(double));
   clouds_weight = malloc(parset.n_cloud_per_task * sizeof(double));
+  clouds_weight_mean = malloc(parset.n_cloud_per_task * sizeof(double));
   clouds_vel = malloc(parset.n_cloud_per_task * parset.n_vel_per_cloud * sizeof(double));
 
   if(parset.flag_save_clouds && thistask == roottask)
@@ -705,6 +706,7 @@ void reconstruct_line2d_end()
   free(Tline);
   //free(Fline2d_at_data);
   free(Fline2d);
+  free(Fline2d_mean);
 
   //free(TransTau);
   free(TransV);
@@ -755,6 +757,7 @@ void reconstruct_line2d_end()
   
   free(clouds_tau);
   free(clouds_weight);
+  free(clouds_weight_mean);
   free(clouds_vel);
   
   if(parset.flag_save_clouds && thistask==roottask)

@@ -35,6 +35,7 @@ int n_con_data;    /*!< number of continuum data points */
 int n_line_data;   /*!< number of emission data points along time axis */
 int n_vel_data;    /*!< number of emission data points along velocity axis */
 int n_vel_data_incr=5, n_vel_data_ext;
+int n_vel_max;
 int n_con_max;
 double *Tcon_data, *Fcon_data,  *Fcerrs_data;
 double *Tline_data, *Fline_data, *Flerrs_data;
@@ -91,6 +92,7 @@ double mass_range[2];
 double sys_err_line_range[2];
 double resp_range[2][2];
 int idx_resp, idx_difftrend, idx_linecenter;
+double eta_range_model[3][2];
 
 int num_params_blr_tot;
 int num_params, num_params_blr, num_params_blr_model, num_params_var, num_params_difftrend, num_params_nlr, num_params_res;
@@ -108,6 +110,8 @@ double *instres_epoch, *instres_err_epoch;
 double *TransTau, *TransV, *TransW, *Trans1D, *Trans2D_at_veldata, *Trans2D;
 double rcloud_min_set, rcloud_max_set, time_back_set;
 
+double Fline_mean, *Fline2d_mean;
+
 double **Fcon_rm_particles, **Fcon_rm_particles_perturb;
 double *prob_con_particles, *prob_con_particles_perturb;
 
@@ -117,7 +121,7 @@ double **Trans1D_particles, **Trans1D_particles_perturb;
 double **Trans2D_at_veldata_particles, **Trans2D_at_veldata_particles_perturb;
 double **Fline_at_data_particles, **Fline_at_data_particles_perturb;
 
-double *clouds_tau, *clouds_weight, *clouds_vel;
+double *clouds_tau, *clouds_weight, *clouds_weight_mean, *clouds_vel;
 
 double bin_offset;
 

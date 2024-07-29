@@ -195,7 +195,7 @@ int dnest_line2d(int argc, char **argv)
  *   V.   systematic error......()                          \n
  *   VI.  variability...........()                          \n
  *   VII. long-term trend.......()                          \n
- *   VIII.response A and Ag.....()                          \n
+ *   VIII.response A and Fcon_mean.....()                   \n
  *   IX.  different trend.......(if flag_difftend is ture)  \n
  *   X.   continuum light curve.()                          \n
  */
@@ -277,7 +277,7 @@ void set_par_range_model2d()
     par_prior_gaussian[i][1] = 1.0;
   }
 
-  /* response A and Ag */
+  /* response A and Fcon_mean */
   j = 0;
   i1 = idx_resp;
   i2 = idx_resp + num_params_resp;
@@ -418,7 +418,7 @@ void print_par_names_model2d()
                             par_fix[i], par_fix_val[i], par_prior_gaussian[i][0], par_prior_gaussian[i][1]);
 
   i++;
-  fprintf(fp, str_fmt, i, "Ag", par_range_model[i][0], par_range_model[i][1], par_prior_model[i],
+  fprintf(fp, str_fmt, i, "Fcon_mean", par_range_model[i][0], par_range_model[i][1], par_prior_model[i],
                             par_fix[i], par_fix_val[i], par_prior_gaussian[i][0], par_prior_gaussian[i][1]);
 
   for(j=0; j<num_params_difftrend; j++)

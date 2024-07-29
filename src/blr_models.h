@@ -16,6 +16,7 @@
 double (*theta_sample)(double gam, double Lopn_cos1, double Lopn_cos2);
 double theta_sample_outer(double gam, double Lopn_cos1, double Lopn_cos2);
 double theta_sample_inner(double gam, double Lopn_cos1, double Lopn_cos2);
+double eta_func(double eta0, double eta1, double alpha, double r);
 
 extern char **BLRmodel_name;
 extern char **BLRmodel_sa_name;
@@ -41,9 +42,12 @@ typedef struct
   double inc;      /*!< \brief 4.  inclination, in degree, 0-90 */
   double opn;      /*!< \brief 5.  openning angle, in degere, 0-90 */
   double k;        /*!< \brief 6.  anisotropic emission */
-  double mbh;      /*!< \brief 7.  black hole mass,  in 10e6 solar mass */
-  double lambda;   /*!< \brief 8.  orbit parameter */
-  double q;        /*!< \brief 9.  inflow/outflow */
+  double eta0;     /*!< \brief 7. */
+  double eta1;     /*!< \brief 8. */
+  double eta_alpha;/*!< \brief 9. */
+  double mbh;      /*!< \brief 10.  black hole mass,  in 10e6 solar mass */
+  double lambda;   /*!< \brief 11.  orbit parameter */
+  double q;        /*!< \brief 12.  inflow/outflow */
 }BLRmodel1;
 
 /*!
@@ -58,9 +62,12 @@ typedef struct
   double inc;      /*!< \brief 4.  inclination, in degree, 0-90 */
   double opn;      /*!< \brief 5.  openning angle, in degere, 0-90 */
   double k;        /*!< \brief 6.  anisotropic emission */
-  double mbh;      /*!< \brief 7.  black hole mass,  in 10e6 solar mass */
-  double sigr;     /*!< \brief 8.  orbit parameter */
-  double sigtheta; /*!< \brief 9.  inflow/outflow */
+  double eta0;     /*!< \brief 7. */
+  double eta1;     /*!< \brief 8. */
+  double eta_alpha;/*!< \brief 9. */
+  double mbh;      /*!< \brief 10.  black hole mass,  in 10e6 solar mass */
+  double sigr;     /*!< \brief 11.  orbit parameter */
+  double sigtheta; /*!< \brief 12.  inflow/outflow */
 }BLRmodel2;
 
 /*!
@@ -75,9 +82,12 @@ typedef struct
   double inc;      /*!< \brief 4.  inclination, in degree, 0-90 */
   double opn;      /*!< \brief 5.  openning angle, in degere, 0-90 */
   double k;        /*!< \brief 6.  anisotropic emission */
-  double mbh;      /*!< \brief 7.  black hole mass,  in 10e6 solar mass */
-  double xi;       /*!< \brief 8.  orbit parameter */
-  double q;        /*!< \brief 9.  inflow/outflow */
+  double eta0;     /*!< \brief 7. */
+  double eta1;     /*!< \brief 8. */
+  double eta_alpha;/*!< \brief 9. */
+  double mbh;      /*!< \brief 10.  black hole mass,  in 10e6 solar mass */
+  double xi;       /*!< \brief 11.  orbit parameter */
+  double q;        /*!< \brief 12.  inflow/outflow */
 }BLRmodel3;
 
 /*!
@@ -101,15 +111,18 @@ typedef struct
   double k;             /*!< \brief 7. kappa */
   double gam;           /*!< \brief 8. gamma */
   double xi;            /*!< \brief 9. obscuration */
-  double mbh;           /*!< \brief 10.black hole mass */
-  double fellip;        /*!< \brief 11.elliptic orbits */
-  double fflow;         /*!< \brief 12.inflow/outflow */
-  double sigr_circ;     /*!< \brief 13. */
-  double sigthe_circ;   /*!< \brief 14. */
-  double sigr_rad;      /*!< \brief 15. */
-  double sigthe_rad;    /*!< \brief 16. */
-  double theta_rot;     /*!< \brief 17. */
-  double sig_turb;      /*!< \brief 18.turbulence velocity */
+  double eta0;          /*!< \brief 10. */
+  double eta1;          /*!< \brief 11. */
+  double eta_alpha;     /*!< \brief 12. */
+  double mbh;           /*!< \brief 13.black hole mass */
+  double fellip;        /*!< \brief 14.elliptic orbits */
+  double fflow;         /*!< \brief 15.inflow/outflow */
+  double sigr_circ;     /*!< \brief 16. */
+  double sigthe_circ;   /*!< \brief 17. */
+  double sigr_rad;      /*!< \brief 18. */
+  double sigthe_rad;    /*!< \brief 19. */
+  double theta_rot;     /*!< \brief 20. */
+  double sig_turb;      /*!< \brief 21.turbulence velocity */
 }BLRmodel5;
 
 /*!
@@ -126,15 +139,18 @@ typedef struct
   double k;             /*!< \brief 6. kappa */
   double gam;           /*!< \brief 7. gamma */
   double xi;            /*!< \brief 8. obscuration */
-  double mbh;           /*!< \brief 9. black hole mass */
-  double fellip;        /*!< \brief 10.elliptic orbits */
-  double fflow;         /*!< \brief 11.inflow/outflow */
-  double sigr_circ;     /*!< \brief 12. */
-  double sigthe_circ;   /*!< \brief 13. */
-  double sigr_rad;      /*!< \brief 14. */
-  double sigthe_rad;    /*!< \brief 15. */
-  double theta_rot;     /*!< \brief 16. */
-  double sig_turb;      /*!< \brief 17. turbulence velocity */
+  double eta0;          /*!< \brief 9. */
+  double eta1;          /*!< \brief 10. */
+  double eta_alpha;     /*!< \brief 11. */
+  double mbh;           /*!< \brief 12. black hole mass */
+  double fellip;        /*!< \brief 13.elliptic orbits */
+  double fflow;         /*!< \brief 14.inflow/outflow */
+  double sigr_circ;     /*!< \brief 15. */
+  double sigthe_circ;   /*!< \brief 16. */
+  double sigr_rad;      /*!< \brief 17. */
+  double sigthe_rad;    /*!< \brief 18. */
+  double theta_rot;     /*!< \brief 19. */
+  double sig_turb;      /*!< \brief 20. turbulence velocity */
 }BLRmodel6;
 
 
@@ -159,17 +175,21 @@ typedef struct
   double F_un;          /*!< \brief 12.fraction of outer radius*/
   double opn_un;        /*!< \brief 13.opening angle */
 
-  double mbh;           /*!< \brief 14.black hole mass */
-  double fellip;        /*!< \brief 15.elliptic orbits */
-  double fflow;         /*!< \brief 16.inflow/outflow */
-  double sigr_circ;     /*!< \brief 17. */
-  double sigthe_circ;   /*!< \brief 18. */
-  double sigr_rad;      /*!< \brief 19. */
-  double sigthe_rad;    /*!< \brief 20. */
-  double theta_rot;     /*!< \brief 21. */
-  double fellip_un;     /*!< \brief 22.elliptic orbits */
-  double fflow_un;      /*!< \brief 23.inflow/outflow */
-  double sig_turb;      /*!< \brief 24. */
+  double eta0;          /*!< \brief 14. */
+  double eta1;          /*!< \brief 15. */
+  double eta_alpha;     /*!< \brief 16. */
+
+  double mbh;           /*!< \brief 17.black hole mass */
+  double fellip;        /*!< \brief 18.elliptic orbits */
+  double fflow;         /*!< \brief 19.inflow/outflow */
+  double sigr_circ;     /*!< \brief 20. */
+  double sigthe_circ;   /*!< \brief 21. */
+  double sigr_rad;      /*!< \brief 22. */
+  double sigthe_rad;    /*!< \brief 23. */
+  double theta_rot;     /*!< \brief 24. */
+  double fellip_un;     /*!< \brief 25.elliptic orbits */
+  double fflow_un;      /*!< \brief 26.inflow/outflow */
+  double sig_turb;      /*!< \brief 27. */
 }BLRmodel7;
 
 
@@ -191,7 +211,10 @@ typedef struct
   double Rv;            /*!< \brief 10 */ 
   double Rblr;          /*!< \brief 11 */
   double inc;           /*!< \brief 12 */
-  double mbh;           /*!< \brief 13 */
+  double eta0;          /*!< \brief 13. */
+  double eta1;          /*!< \brief 14. */
+  double eta_alpha;     /*!< \brief 15. */
+  double mbh;           /*!< \brief 16 */
 }BLRmodel8;
 
 typedef struct
@@ -201,7 +224,10 @@ typedef struct
   double F;        /*!< \brief 3.  inner edge */
   double inc;      /*!< \brief 4.  inclination, in degree, 0-90 */
   double opn;      /*!< \brief 5.  openning angle, in degere, 0-90 */
-  double mbh;      /*!< \brief 6.  black hole mass,  in 10e6 solar mass */ 
+  double eta0;     /*!< \brief 6. */
+  double eta1;     /*!< \brief 7. */
+  double eta_alpha;/*!< \brief 8. */
+  double mbh;      /*!< \brief 9.  black hole mass,  in 10e6 solar mass */ 
 }BLRmodel9;
 
 #ifdef SpecAstro

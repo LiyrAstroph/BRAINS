@@ -48,11 +48,11 @@ inline double interp_con_rm(double tp)
 void calculate_con_rm(const void *pm)
 {
   int i, m;
-  double fcon, A, Ag, ftrend, a0=0.0, tmp;
+  double fcon, A, fcon_mean, ftrend, a0=0.0, tmp;
   double *pmodel = (double *)pm;
 
   A=exp(pmodel[idx_resp]);
-  Ag=pmodel[idx_resp + 1];
+  fcon_mean=pmodel[idx_resp + 1];
 
   /* add different trend in continuum and emission */
   if(parset.flag_trend_diff > 0)
@@ -75,14 +75,7 @@ void calculate_con_rm(const void *pm)
       }
       
       fcon = Fcon[i] + ftrend;
-      if(fcon > 0.0)
-      {
-        Fcon_rm[i] = A * pow(fcon, 1.0 + Ag);
-      }
-      else 
-      {
-        Fcon_rm[i] = 0.0;
-      }
+      Fcon_rm[i] = A * (fcon - fcon_mean);
     }
   }
   else 
@@ -90,14 +83,7 @@ void calculate_con_rm(const void *pm)
     for(i=0; i<parset.n_con_recon; i++)
     {
       /* if fcon is negative, its pow raises an error */
-      if(Fcon[i] >= 0.0)
-      {
-        Fcon_rm[i] = A * pow(Fcon[i], 1.0+Ag);
-      }
-      else 
-      {
-        Fcon_rm[i] = 0.0;
-      }
+      Fcon_rm[i] = A * (Fcon[i] - fcon_mean);
     }
   }
 
@@ -120,7 +106,11 @@ void calculate_con_rm(const void *pm)
 void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl)
 {
   int i, j;
-  double fline, fcon_rm, tl, tc, tau, dTransTau;
+  double A, fline, fcon_rm, tl, tc, tau, dTransTau;
+  double *pmodel = (double *)pm;
+
+  A=exp(pmodel[idx_resp]);
+  Fline_mean *= A;
 
   dTransTau = TransTau[1] - TransTau[0];
 
@@ -137,7 +127,7 @@ void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl
     
       fline += Trans1D[j] * fcon_rm;     /*  line response */
     }
-    Fl[i] = fline * dTransTau;
+    Fl[i] = fline * dTransTau + Fline_mean;
   }
 
   return;
@@ -150,8 +140,15 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
                                               double *fl2d, int nl, int nv)
 {
   int i, j, k;
-  double tau, tl, tc, fcon_rm, fnarrow, dTransTau;
+  double A, tau, tl, tc, fcon_rm, fnarrow, dTransTau, sigV_mean, linecenter_mean;
   double *pmodel = (double *)pm;
+  A=exp(pmodel[idx_resp]);
+
+  /* multiply response coefficient */
+  for(i=0; i<nv; i++)
+  {
+    Fline2d_mean[i] *= A;
+  }
 
   dTransTau = TransTau[1] - TransTau[0];
 
@@ -176,6 +173,8 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
     for(i=0; i<nv; i++)
     {
       fl2d[j*nv + i] *= dTransTau;
+
+      fl2d[j*nv + i] += Fline2d_mean[i];
     }
   }
 
@@ -214,8 +213,10 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
     } 
   }
 
-  /* smooth the line profile */
-  line_gaussian_smooth_2D_FFT(transv, fl2d, nl, nv, pm);
+  /* smooth the line profile, get the mean sigV and linecenter */
+  line_gaussian_smooth_2D_FFT(transv, fl2d, nl, nv, pm, &sigV_mean, &linecenter_mean);
+  /* smooth the mean line profile */
+  line_gaussian_smooth_FFT_width_linecenter(transv, Fline2d_mean, nv, sigV_mean, linecenter_mean);
 }
 
 /*!
@@ -236,7 +237,7 @@ void transfun_1d_cal_with_sample()
 {
   int i, idt;
   double tau_min, tau_max, dTransTau;
-  double Anorm, dis;
+  double Anorm, dis, fline_mean;
 
   tau_min = clouds_tau[0];
   tau_max = clouds_tau[0];
@@ -254,29 +255,27 @@ void transfun_1d_cal_with_sample()
     TransTau[i] = tau_min + dTransTau * i;
     Trans1D[i] = 0.0;
   }
-
+  
+  fline_mean = 0.0;
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
     dis = clouds_tau[i];
     idt = (dis - tau_min)/dTransTau;
     //Trans1D[idt] += pow(1.0/r, 2.0*(1 + gam)) * weight;
     Trans1D[idt] += clouds_weight[i];
+
+    fline_mean += clouds_weight_mean[i];
   }
 
   /* normalize transfer function */
-  Anorm = 0.0;
-  for(i=0;i<parset.n_tau;i++)
-  {
-    Anorm += Trans1D[i];
-  }
-  Anorm *= dTransTau;
-
-  Anorm += EPS;
+  Anorm = fline_mean * dTransTau + EPS;
 
   for(i=0; i<parset.n_tau; i++)
   {
     Trans1D[i] /= Anorm;
   }
+  
+  Fline_mean = 1.0; 
 
   smooth_transfer_function_tau(Trans1D);
   
@@ -324,6 +323,11 @@ void transfun_2d_cal_with_sample(double *transv, double *trans2d, int n_vel)
   for(i=0; i<parset.n_tau; i++)
     for(j=0;j<n_vel;j++)
       trans2d[i*n_vel+j]=0.0;   /* cleanup of transfer function */
+  
+  for(j=0; j<n_vel; j++)
+  {
+    Fline2d_mean[j] = 0.0;
+  }
 
   for(i=0; i<parset.n_cloud_per_task; i++)
   {
@@ -339,19 +343,25 @@ void transfun_2d_cal_with_sample(double *transv, double *trans2d, int n_vel)
       idV = (V_offset - transv[0])/dV; 
       //trans2d[idt*n_vel + idV] += pow(1.0/r, 2.0*(1 + gam)) * weight;
       trans2d[idt*n_vel + idV] += clouds_weight[i];
+
+      Fline2d_mean[idV] += clouds_weight_mean[i];
     }
   }
 
   /* normalize transfer function */
-  Anorm = 0.0;
-  for(i=0; i<parset.n_tau; i++)
-    for(j=0; j<n_vel; j++)
-    {
-      Anorm += trans2d[i*n_vel+j];
-    }
-  Anorm *= (dV * dTransTau);
+  Anorm = EPS;
+  for(j=0; j<n_vel; j++)
+  {
+    Anorm += Fline2d_mean[j];
+  }
+  Anorm *= dV;
+
+  for(j=0; j<n_vel; j++)
+  {
+    Fline2d_mean[j] /= Anorm;
+  }
   
-  Anorm += EPS;
+  Anorm *=  dTransTau;
   for(i=0; i<parset.n_tau; i++)
   {
     for(j=0; j<n_vel; j++)

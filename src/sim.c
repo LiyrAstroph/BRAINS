@@ -596,7 +596,7 @@ void sim_init()
 #endif
   num_params = num_params_blr_tot + num_params_var + parset.n_con_recon;
 
-  /* index of A and Ag */
+  /* index of A and Fcon_mean */
   idx_resp = num_params_blr_tot + num_params_drw + num_params_trend;
   /* index of different trend */
   idx_difftrend = idx_resp + num_params_resp;
@@ -633,7 +633,7 @@ void sim_init()
   pm[num_params_blr -1] = 0.0; //line syserr=0 (for flag_dim!=3) or scale=1 (for flag_dim=3)
 
   pm[idx_resp + 0] = log(1.0); //A
-  pm[idx_resp + 1] = 0.0;      //Ag
+  pm[idx_resp + 1] = 1.0;      //Fcon_mean
 
 #ifdef SpecAstro
   double *sa_model = pm + num_params_blr;
@@ -734,6 +734,7 @@ void sim_init()
   Tline = malloc(parset.n_line_recon * sizeof(double));
   Fline = malloc(parset.n_line_recon * sizeof(double));
   Fline2d = malloc(parset.n_line_recon * parset.n_vel_recon * sizeof(double));
+  Fline2d_mean = (double *)malloc(parset.n_vel_recon * sizeof(double));
 
   if(parset.flag_dim == -1)
   {
@@ -767,6 +768,7 @@ void sim_init()
   
   clouds_tau = malloc(parset.n_cloud_per_task * sizeof(double));
   clouds_weight = malloc(parset.n_cloud_per_task * sizeof(double));
+  clouds_weight_mean = malloc(parset.n_cloud_per_task * sizeof(double));
   clouds_vel = malloc(parset.n_cloud_per_task * parset.n_vel_per_cloud * sizeof(double));
 
 
@@ -959,11 +961,13 @@ void sim_end()
   free(Tline);
   free(Fline);
   free(Fline2d);
+  free(Fline2d_mean);
   free(Trans2D);
   free(Trans1D);
 
   free(clouds_tau);
   free(clouds_weight);
+  free(clouds_weight_mean);
   free(clouds_vel);
 
   if(parset.flag_save_clouds && thistask == roottask)
@@ -1025,6 +1029,9 @@ void set_par_value_sim(double *pm, int flag_model)
       pm[i++] = cos(20.0/180.0*PI);
       pm[i++] = 40.0;
       pm[i++] = 0.0;
+      pm[i++] =  0.5;       //eta0
+      pm[i++] =  0.1;       //eta1
+      pm[i++] =  2.0;       //eta_alpha
       pm[i++] = log(3.0);
       pm[i++] = 0.1;
       pm[i++] = 0.5;
@@ -1038,6 +1045,9 @@ void set_par_value_sim(double *pm, int flag_model)
       pm[i++] = cos(20.0/180.0*PI);
       pm[i++] = 40.0;
       pm[i++] = 0.0;
+      pm[i++] =  0.5;       //eta0
+      pm[i++] =  0.1;       //eta1
+      pm[i++] =  2.0;       //eta_alpha
       pm[i++] = log(3.0);
       pm[i++] = log(0.01);
       pm[i++] = log(0.1);
@@ -1051,6 +1061,9 @@ void set_par_value_sim(double *pm, int flag_model)
       pm[i++] = cos(20.0/180.0*PI);
       pm[i++] = 40.0;
       pm[i++] = 0.0;
+      pm[i++] =  0.5;       //eta0
+      pm[i++] =  0.1;       //eta1
+      pm[i++] =  2.0;       //eta_alpha
       pm[i++] = log(3.0);
       pm[i++] = 0.5;
       pm[i++] = 0.5;
@@ -1064,6 +1077,9 @@ void set_par_value_sim(double *pm, int flag_model)
       pm[i++] = cos(20.0/180.0*PI);
       pm[i++] = 40.0;
       pm[i++] = 0.0;
+      pm[i++] =  0.5;       //eta0
+      pm[i++] =  0.1;       //eta1
+      pm[i++] =  2.0;       //eta_alpha
       pm[i++] = log(3.0);
       pm[i++] = 0.5;
       pm[i++] = 0.5;
@@ -1080,6 +1096,9 @@ void set_par_value_sim(double *pm, int flag_model)
       pm[i++] = 0.5;       //k
       pm[i++] = 2.0;       //gam
       pm[i++] = 0.5;      //xi
+      pm[i++] =  0.5;       //eta0
+      pm[i++] =  0.1;       //eta1
+      pm[i++] =  2.0;       //eta_alpha
       pm[i++] = log(2.0); //mbh
       pm[i++] = 0.5;      //fellip
       pm[i++] = 0.5;      //fflow
@@ -1101,6 +1120,9 @@ void set_par_value_sim(double *pm, int flag_model)
       pm[i++] = 0.0;        // kappa
       pm[i++] = 1.0;        // gamma
       pm[i++] = 1.0;        // obscuration
+      pm[i++] =  0.5;       //eta0
+      pm[i++] =  0.1;       //eta1
+      pm[i++] =  2.0;       //eta_alpha
       pm[i++] = log(2.0);  //mbh
       pm[i++] = 0.5;       //fellip
       pm[i++] = 0.4;       //fflow
@@ -1129,6 +1151,10 @@ void set_par_value_sim(double *pm, int flag_model)
       pm[i++] = 0.1;      //F_un
       pm[i++] = 20.0;     //opn_un
 
+      pm[i++] =  0.5;       //eta0
+      pm[i++] =  0.1;       //eta1
+      pm[i++] =  2.0;       //eta_alpha
+
       pm[i++] = log(2.0); //mbh
       pm[i++] = 0.5;      //fellip
       pm[i++] = 0.4;      //fflow
@@ -1156,6 +1182,9 @@ void set_par_value_sim(double *pm, int flag_model)
       pm[i++] = log(30.0);     // Rv
       pm[i++] = log(20.0);     // Rblr, should larger than r_max=r_max * fr_max
       pm[i++] = cos(30.0/180.0*PI);     // inc
+      pm[i++] =  0.5;       //eta0
+      pm[i++] =  0.1;       //eta1
+      pm[i++] =  2.0;       //eta_alpha
       pm[i++] = log(4.0); // mbh
       break;
     
@@ -1166,6 +1195,9 @@ void set_par_value_sim(double *pm, int flag_model)
       pm[i++] = 0.2;        //F
       pm[i++] = cos(30.0/180.0*PI);     // inc
       pm[i++] = 30.0;       //opn
+      pm[i++] =  0.5;       //eta0
+      pm[i++] =  0.1;       //eta1
+      pm[i++] =  2.0;       //eta_alpha
       pm[i++] = log(4.0);   // mbh
       break;
   }

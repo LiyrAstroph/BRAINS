@@ -36,11 +36,11 @@ void init()
   num_params_drw = 3; /* include systematic error */
   if(parset.flag_dim == 0)
   {
-    num_params_resp = 0; /* no A and Ag for 0D */
+    num_params_resp = 0; /* no A and Fcon_mean for 0D */
   }
   else
   {
-    num_params_resp = 2; /* response A and Ag */
+    num_params_resp = 2; /* response A and Fcon_mean */
   }
 
   if(parset.flag_trend_diff > 0)
@@ -207,6 +207,17 @@ void init()
         n_con_max = n_con_data;
     }
   }
+  
+  /* determine the largest number of velocity points */
+  if(parset.flag_dim != 0 && parset.flag_dim != 1)
+  {
+    n_vel_max = parset.n_vel_recon;
+    if(parset.flag_dim >= -1)
+    {
+      if(n_vel_data_ext > n_vel_max)
+        n_vel_max = n_vel_data_ext;
+    }
+  }
 
   allocate_memory();
 
@@ -258,6 +269,7 @@ void init()
     }
 
     set_nlr_range_model();
+    set_eta_range_model();
     set_blr_range_model();
   }
   
@@ -396,12 +408,12 @@ void init()
       printf("RM rcloud_min_max_set: %f %f\n", rcloud_min_set, rcloud_max_set);
     }
     
-    // response range A and Ag
+    // response range A and Fcon_mean
     resp_range[0][0] = log(0.1);
     resp_range[0][1] = log(10.0);
   
-    resp_range[1][0] = -1.0;
-    resp_range[1][1] =  3.0;
+    resp_range[1][0] =  0.0;
+    resp_range[1][1] =  2.0;
 
     /* set the range of continuum variation  */
     var_range_model[0][0] = log(1.0); /* systematic error in continuum */
@@ -430,6 +442,7 @@ void init()
     sys_err_line_range[1] = log(1.0+10.0);
     
     set_nlr_range_model();
+    set_eta_range_model();
     set_blr_range_model();
 
   }
@@ -941,6 +954,16 @@ void set_blr_range_model1()
   //k
   blr_range_model[i][0] = -0.5;
   blr_range_model[i++][1] = 0.5;
+  //eta0
+  blr_range_model[i][0]   = eta_range_model[0][0];  // 
+  blr_range_model[i++][1] = eta_range_model[0][1];
+  //eta1
+  blr_range_model[i][0]   = eta_range_model[1][0];  // 
+  blr_range_model[i++][1] = eta_range_model[1][1];
+  //eta_alpha
+  blr_range_model[i][0]   = eta_range_model[2][0];  // 
+  blr_range_model[i++][1] = eta_range_model[2][1];
+
   //mbh
   blr_range_model[i][0] = log(mass_range[0]);
   blr_range_model[i++][1] = log(mass_range[1]);
@@ -979,6 +1002,15 @@ void set_blr_range_model2()
   //k
   blr_range_model[i][0] = -0.5;
   blr_range_model[i++][1] = 0.5;
+  //eta0
+  blr_range_model[i][0]   = eta_range_model[0][0];  // 
+  blr_range_model[i++][1] = eta_range_model[0][1];
+  //eta1
+  blr_range_model[i][0]   = eta_range_model[1][0];  // 
+  blr_range_model[i++][1] = eta_range_model[1][1];
+  //eta_alpha
+  blr_range_model[i][0]   = eta_range_model[2][0];  // 
+  blr_range_model[i++][1] = eta_range_model[2][1];
   //mbh
   blr_range_model[i][0] = log(mass_range[0]);
   blr_range_model[i++][1] = log(mass_range[1]);
@@ -1016,6 +1048,15 @@ void set_blr_range_model3()
   //k
   blr_range_model[i][0] = -0.5;
   blr_range_model[i++][1] = 0.5;
+  //eta0
+  blr_range_model[i][0]   = eta_range_model[0][0];  // 
+  blr_range_model[i++][1] = eta_range_model[0][1];
+  //eta1
+  blr_range_model[i][0]   = eta_range_model[1][0];  // 
+  blr_range_model[i++][1] = eta_range_model[1][1];
+  //eta_alpha
+  blr_range_model[i][0]   = eta_range_model[2][0];  // 
+  blr_range_model[i++][1] = eta_range_model[2][1];
   //mbh
   blr_range_model[i][0] = log(mass_range[0]);
   blr_range_model[i++][1] = log(mass_range[1]);
@@ -1054,6 +1095,15 @@ void set_blr_range_model4()
   //k
   blr_range_model[i][0] = -0.5;
   blr_range_model[i++][1] = 0.5;
+  //eta0
+  blr_range_model[i][0]   = eta_range_model[0][0];  // 
+  blr_range_model[i++][1] = eta_range_model[0][1];
+  //eta1
+  blr_range_model[i][0]   = eta_range_model[1][0];  // 
+  blr_range_model[i++][1] = eta_range_model[1][1];
+  //eta_alpha
+  blr_range_model[i][0]   = eta_range_model[2][0];  // 
+  blr_range_model[i++][1] = eta_range_model[2][1];
   //mbh
   blr_range_model[i][0] = log(mass_range[0]);
   blr_range_model[i++][1] = log(mass_range[1]);
@@ -1101,6 +1151,15 @@ void set_blr_range_model5()
   //xi
   blr_range_model[i][0] = 0.0;
   blr_range_model[i++][1] = 1.0;
+  //eta0
+  blr_range_model[i][0]   = eta_range_model[0][0];  // 
+  blr_range_model[i++][1] = eta_range_model[0][1];
+  //eta1
+  blr_range_model[i][0]   = eta_range_model[1][0];  // 
+  blr_range_model[i++][1] = eta_range_model[1][1];
+  //eta_alpha
+  blr_range_model[i][0]   = eta_range_model[2][0];  // 
+  blr_range_model[i++][1] = eta_range_model[2][1];
   //mbh
   blr_range_model[i][0] = log(mass_range[0]);
   blr_range_model[i++][1] = log(mass_range[1]);
@@ -1165,6 +1224,15 @@ void set_blr_range_model6()
   //xi
   blr_range_model[i][0] = 0.0;
   blr_range_model[i++][1] = 1.0;
+  //eta0
+  blr_range_model[i][0]   = eta_range_model[0][0];  // 
+  blr_range_model[i++][1] = eta_range_model[0][1];
+  //eta1
+  blr_range_model[i][0]   = eta_range_model[1][0];  // 
+  blr_range_model[i++][1] = eta_range_model[1][1];
+  //eta_alpha
+  blr_range_model[i][0]   = eta_range_model[2][0];  // 
+  blr_range_model[i++][1] = eta_range_model[2][1];
   //mbh
   blr_range_model[i][0] = log(mass_range[0]);
   blr_range_model[i++][1] = log(mass_range[1]);
@@ -1245,6 +1313,16 @@ void set_blr_range_model7()
   //opn_un
   blr_range_model[i][0] = 0.0;
   blr_range_model[i++][1] = 90.0;
+
+  //eta0
+  blr_range_model[i][0]   = eta_range_model[0][0];  // 
+  blr_range_model[i++][1] = eta_range_model[0][1];
+  //eta1
+  blr_range_model[i][0]   = eta_range_model[1][0];  // 
+  blr_range_model[i++][1] = eta_range_model[1][1];
+  //eta_alpha
+  blr_range_model[i][0]   = eta_range_model[2][0];  // 
+  blr_range_model[i++][1] = eta_range_model[2][1];
 
   //mbh
   blr_range_model[i][0] = log(mass_range[0]);
@@ -1327,6 +1405,15 @@ void set_blr_range_model8()
   //inc
   blr_range_model[i][0] = 0.0;   // cos(inc)
   blr_range_model[i++][1] = 1.0;
+  //eta0
+  blr_range_model[i][0]   = eta_range_model[0][0];  // 
+  blr_range_model[i++][1] = eta_range_model[0][1];
+  //eta1
+  blr_range_model[i][0]   = eta_range_model[1][0];  // 
+  blr_range_model[i++][1] = eta_range_model[1][1];
+  //eta_alpha
+  blr_range_model[i][0]   = eta_range_model[2][0];  // 
+  blr_range_model[i++][1] = eta_range_model[2][1];
   //mbh
   blr_range_model[i][0] = log(mass_range[0]);
   blr_range_model[i++][1] = log(mass_range[1]);
@@ -1355,6 +1442,15 @@ void set_blr_range_model9()
   //opn
   blr_range_model[i][0] = 0.0;  // in rad
   blr_range_model[i++][1] = 90.0;
+  //eta0
+  blr_range_model[i][0]   = eta_range_model[0][0];  // 
+  blr_range_model[i++][1] = eta_range_model[0][1];
+  //eta1
+  blr_range_model[i][0]   = eta_range_model[1][0];  // 
+  blr_range_model[i++][1] = eta_range_model[1][1];
+  //eta_alpha
+  blr_range_model[i][0]   = eta_range_model[2][0];  // 
+  blr_range_model[i++][1] = eta_range_model[2][1];
   //mbh
   blr_range_model[i][0] = log(mass_range[0]);
   blr_range_model[i++][1] = log(mass_range[1]);
@@ -1383,70 +1479,70 @@ void set_blr_model1d()
       break;
 
     case 1:
-      num_params_blr_model = 6;
+      num_params_blr_model = 9;
       gen_cloud_sample = gen_cloud_sample_model1;
       transfun_1d_cal = transfun_1d_cal_cloud;
       BLRmodel_name = BLRmodel1_name;
       break;
 
     case 2:
-      num_params_blr_model = 6;
+      num_params_blr_model = 9;
       gen_cloud_sample = gen_cloud_sample_model1;
       transfun_1d_cal = transfun_1d_cal_cloud;
       BLRmodel_name = BLRmodel2_name;
       break;
 
     case 3:
-      num_params_blr_model = 6;
+      num_params_blr_model = 9;
       gen_cloud_sample = gen_cloud_sample_model3;
       transfun_1d_cal = transfun_1d_cal_cloud;
       BLRmodel_name = BLRmodel3_name;
       break;
 
     case 4:
-      num_params_blr_model = 6;
+      num_params_blr_model = 9;
       gen_cloud_sample = gen_cloud_sample_model3;
       transfun_1d_cal = transfun_1d_cal_cloud;
       BLRmodel_name = BLRmodel4_name;
       break;
 
     case 5:
-      num_params_blr_model = 9;
+      num_params_blr_model = 12;
       gen_cloud_sample = gen_cloud_sample_model5;
       transfun_1d_cal = transfun_1d_cal_cloud;
       BLRmodel_name = BLRmodel5_name;
       break;
 
     case 6:
-      num_params_blr_model = 8;
+      num_params_blr_model = 11;
       gen_cloud_sample = gen_cloud_sample_model6;
       transfun_1d_cal = transfun_1d_cal_cloud;
       BLRmodel_name = BLRmodel6_name;
       break;
 
     case 7:
-      num_params_blr_model = 13;
+      num_params_blr_model = 16;
       gen_cloud_sample = gen_cloud_sample_model7;
       transfun_1d_cal = transfun_1d_cal_cloud;
       BLRmodel_name = BLRmodel7_name;
       break;
 
     case 8:
-      num_params_blr_model = 13;
+      num_params_blr_model = 16;
       gen_cloud_sample = gen_cloud_sample_model8;
       transfun_1d_cal = transfun_1d_cal_cloud;
       BLRmodel_name = BLRmodel8_name;
       break;
     
     case 9:
-      num_params_blr_model = 5;
+      num_params_blr_model = 8;
       gen_cloud_sample = gen_cloud_sample_model9;
       transfun_1d_cal = transfun_1d_cal_cloud;
       BLRmodel_name = BLRmodel9_name;
       break;
 
     default:
-      num_params_blr_model = 6;
+      num_params_blr_model = 9;
       gen_cloud_sample = gen_cloud_sample_model1;
       transfun_1d_cal = transfun_1d_cal_cloud;
       BLRmodel_name = BLRmodel1_name;
@@ -1581,6 +1677,22 @@ void set_nlr_range_model()
     nlr_prior_model[2] = GAUSSIAN;
   }
   return;
+}
+
+/*
+ * the range of parameters for eta
+ * eta = eta0 + eta1 * r**alpha
+ */
+void set_eta_range_model()
+{
+  eta_range_model[0][0] = -1.5;
+  eta_range_model[0][1] =  1.5;
+
+  eta_range_model[1][0] = -1.5;
+  eta_range_model[1][1] =  1.5;
+
+  eta_range_model[2][0] =  0.0;
+  eta_range_model[2][1] =  3.0;
 }
 
 /*!

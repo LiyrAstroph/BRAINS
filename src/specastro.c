@@ -160,9 +160,9 @@ void calculate_sa_with_sample(const void *pm)
         continue;
       idV = (V_offset - vel_sa_data[0])/dV;
       
-      phase_norm[idV] += clouds_weight[i];
-      alpha_cent[idV] += alpha * clouds_weight[i];
-      beta_cent[idV] += beta * clouds_weight[i];
+      phase_norm[idV] += clouds_weight_mean[i];
+      alpha_cent[idV] += alpha * clouds_weight_mean[i];
+      beta_cent[idV] += beta * clouds_weight_mean[i];
     }
   }
   
@@ -275,9 +275,9 @@ void calculate_sa_sim_with_sample(const void *pm, double *vel_sa, int n_vel_sa, 
         continue;
       idV = (V_offset - vel_sa[0])/dV;
       
-      phase_norm[idV] += clouds_weight[i];
-      alpha_cent[idV] += alpha * clouds_weight[i];
-      beta_cent[idV] += beta * clouds_weight[i];
+      phase_norm[idV] += clouds_weight_mean[i];
+      alpha_cent[idV] += alpha * clouds_weight_mean[i];
+      beta_cent[idV] += beta * clouds_weight_mean[i];
     }
   }
 

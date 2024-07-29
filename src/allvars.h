@@ -180,7 +180,7 @@ extern int num_pardict;
 
 extern double VelUnit, C_Unit;
 
-extern int n_con_data, n_line_data, n_vel_data, n_vel_data_incr, n_vel_data_ext, n_con_max;
+extern int n_con_data, n_line_data, n_vel_data, n_vel_data_incr, n_vel_data_ext, n_con_max, n_vel_max;
 extern double *Tcon_data, *Fcon_data,  *Fcerrs_data;
 extern double *Tline_data, *Fline_data, *Flerrs_data;
 extern double *Vline_data, *Fline2d_data, *Flerrs2d_data, *Wline_data;
@@ -243,12 +243,15 @@ extern double mass_range[2];
 extern double sys_err_line_range[2]; /* range for systematic error of line */
 extern double resp_range[2][2];
 extern int idx_resp, idx_difftrend, idx_linecenter;
+extern double eta_range_model[3][2];
 
 extern double *instres_epoch, *instres_err_epoch;
 
 /* transfer function / velocity-delay map */
 extern double *TransTau, *TransV, *TransW, *Trans1D, *Trans2D_at_veldata, *Trans2D;
 extern double rcloud_min_set, rcloud_max_set, time_back_set;
+
+extern double Fline_mean, *Fline2d_mean;
 
 extern double **Fcon_rm_particles, **Fcon_rm_particles_perturb;
 extern double *prob_con_particles, *prob_con_particles_perturb;
@@ -259,7 +262,7 @@ extern double **Trans1D_particles, **Trans1D_particles_perturb;
 extern double **Trans2D_at_veldata_particles, **Trans2D_at_veldata_particles_perturb;
 extern double **Fline_at_data_particles, **Fline_at_data_particles_perturb;
 
-extern double *clouds_tau, *clouds_weight, *clouds_vel;
+extern double *clouds_tau, *clouds_weight, *clouds_weight_mean, *clouds_vel;
 
 extern double bin_offset;
 
