@@ -134,7 +134,7 @@ gsl_interp_accel *gsl_acc;
 gsl_interp  *gsl_linear;
 
 const size_t ngauss = 30;
-const double alpha  = (ngauss-1)/2.0/2.0;
+const double alpha  = (30-1)/2.0/2.0; /* correspond to a guassian sigma of 2*binwidth */
 gsl_filter_gaussian_workspace *gauss_p;
 gsl_vector *hist_in;
 gsl_vector *hist_out;
