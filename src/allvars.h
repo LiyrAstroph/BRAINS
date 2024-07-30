@@ -130,7 +130,7 @@ typedef struct
   int flag_exam_prior;
   int flag_rng_seed, rng_seed;
   int flag_fixvar;
-  int flag_nonlinear;
+  int flag_fixresp;
 
   int flag_force_update;
   int flag_force_run;
@@ -242,7 +242,7 @@ extern int nlr_prior_model[3];
 extern double mass_range[2];
 extern double sys_err_line_range[2]; /* range for systematic error of line */
 extern double resp_range[2][2];
-extern int idx_resp, idx_difftrend, idx_linecenter;
+extern int idx_resp, idx_difftrend, idx_linecenter, idx_eta;
 extern double eta_range_model[3][2];
 
 extern double *instres_epoch, *instres_err_epoch;

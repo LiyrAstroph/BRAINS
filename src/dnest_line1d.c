@@ -110,11 +110,16 @@ int dnest_line1d(int argc, char **argv)
     par_fix_val[num_params_blr] = log(1.0);
   }
 
-  /* fix non-linear response */
-  if(parset.flag_nonlinear !=1)
+  /* fix constant responsivity, note that when flag_blrmodel=0,  flag_fixresp=0, this will not be implemented */
+  if(parset.flag_fixresp == 1)
   {
-    par_fix[idx_resp + 1] = 1;
-    par_fix_val[idx_resp + 1] = 0.0;
+    idx_eta = get_idx_eta_from_blrmodel(parset.flag_blrmodel);
+
+    par_fix[idx_eta + 1] = 1;
+    par_fix_val[idx_eta + 1] = 0.0;
+
+    par_fix[idx_eta + 2] = 1;
+    par_fix_val[idx_eta + 2] = 0.0;
   }
   
   if(parset.flag_load_prior == 1)

@@ -116,11 +116,29 @@ int dnest_sa2d(int argc, char **argv)
     par_fix_val[num_params_blr_model+num_params_nlr] = 0.0;
   }
 
-  /* fix non-linear response */
-  if(parset.flag_nonlinear !=1)
+  //* fix constant responsivity, note that when flag_blrmodel=0,  flag_fixresp=0, this will not be implemented */
+  if(parset.flag_fixresp == 1)
   {
-    par_fix[idx_resp + 1] = 1;
-    par_fix_val[idx_resp + 1] = 0.0;
+    /* first RM BLR */
+    idx_eta = get_idx_eta_from_blrmodel(parset.flag_blrmodel);
+
+    par_fix[idx_eta + 1] = 1;
+    par_fix_val[idx_eta + 1] = 0.0;
+
+    par_fix[idx_eta + 2] = 1;
+    par_fix_val[idx_eta + 2] = 0.0;
+
+    /* second SA BLR, if not use mutual BLR */
+    if(parset.flag_sa_par_mutual == 1)
+    {
+      idx_eta = get_idx_eta_from_blrmodel(parset.flag_sa_blrmodel);
+
+      par_fix[num_params_blr + idx_eta + 1] = 1;
+      par_fix_val[num_params_blr + idx_eta + 1] = 0.0;
+
+      par_fix[num_params_blr + idx_eta + 2] = 1;
+      par_fix_val[num_params_blr + idx_eta + 2] = 0.0;
+    }
   }
 
   /* fix systematic error of line */

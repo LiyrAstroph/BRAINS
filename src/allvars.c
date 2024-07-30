@@ -91,7 +91,7 @@ int nlr_prior_model[3];
 double mass_range[2];
 double sys_err_line_range[2];
 double resp_range[2][2];
-int idx_resp, idx_difftrend, idx_linecenter;
+int idx_resp, idx_difftrend, idx_linecenter, idx_eta;
 double eta_range_model[3][2];
 
 int num_params_blr_tot;

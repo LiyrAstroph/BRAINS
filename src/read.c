@@ -274,8 +274,8 @@ void read_parset()
     pardict[nt].isset = 0;
     pardict[nt++].id = DOUBLE;
 
-    strcpy(pardict[nt].tag, "FlagNonlinear");
-    pardict[nt].addr= &parset.flag_nonlinear;
+    strcpy(pardict[nt].tag, "FlagFixResponsivity");
+    pardict[nt].addr= &parset.flag_fixresp;
     pardict[nt].isset = 0;
     pardict[nt++].id = INT;
 
@@ -370,7 +370,7 @@ void read_parset()
     parset.flag_force_update= 0;
     parset.flag_con_sys_err = 0;
     parset.flag_line_sys_err = 0;
-    parset.flag_nonlinear = 1;
+    parset.flag_fixresp = 0;
     parset.flag_InstRes = 0;
     parset.InstRes = 0.0;
     parset.InstRes_err = 0.0;
@@ -727,7 +727,13 @@ void read_parset()
       if(parset.flag_dim < 1)
       {
         parset.flag_trend_diff = 0;
-        parset.flag_nonlinear = 0;
+        parset.flag_fixresp = 0;
+      }
+      
+      /* user defined BLR model, no need to fix responsivity, since user's model might not include it. */
+      if(parset.flag_blrmodel == 0)
+      {
+        parset.flag_fixresp = 0;
       }
   
       if(parset.flag_dim < 0) // create mock data

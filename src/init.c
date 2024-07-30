@@ -1943,3 +1943,51 @@ int get_idx_blrsize_from_blrmodel(int blrmodel)
   }
   return idx / sizeof(double);
 }
+
+int get_idx_eta_from_blrmodel(int blrmodel)
+{
+  int idx = -1;
+  switch(blrmodel)
+  {
+    case 0:
+      idx = 0;   /* unknown, set to 0 by default*/
+      break;
+
+    case 1:
+      idx = offsetof(BLRmodel1, eta0);
+      break;
+
+    case 2:
+      idx = offsetof(BLRmodel2, eta0);
+      break;
+    
+    case 3:
+      idx = offsetof(BLRmodel3, eta0);
+      break;
+
+    case 4:
+      idx = offsetof(BLRmodel4, eta0);
+      break;
+    
+    case 5:
+      idx = offsetof(BLRmodel5, eta0);
+      break;
+
+    case 6:
+      idx = offsetof(BLRmodel6, eta0);
+      break;
+    
+    case 7:
+      idx = offsetof(BLRmodel7, eta0);
+      break;
+    
+    case 8:
+      idx = offsetof(BLRmodel8, eta0);
+      break;
+    
+    case 9:
+      idx = offsetof(BLRmodel9, eta0);
+      break;
+  }
+  return idx / sizeof(double);
+}
