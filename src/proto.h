@@ -102,7 +102,9 @@ double prob_restart_line2d(const void *model);
 void reconstruct_line2d();
 void reconstruct_line2d_init();
 void reconstruct_line2d_end();
-void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int nv, const void *pm, double *sigV_mean, double *linecenter_mean);
+void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int nv, const void *pm);
+void line_gaussian_smooth_2D_FFT_width_linecenter(const double *transv, double *fl2d, int nl, int nv, 
+                                                  const void *pm, double *sigV_mean, double *linecenter_mean);
 void line_gaussian_smooth_FFT_width_linecenter(const double *transv, double *fl, int nv, double sigV, double linecenter);
 void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const double *transv, const double *trans2d, 
                                               double *fl2d, int nl, int nv);

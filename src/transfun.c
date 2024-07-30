@@ -106,11 +106,11 @@ void calculate_con_rm(const void *pm)
 void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl)
 {
   int i, j;
-  double A, fline, fcon_rm, tl, tc, tau, dTransTau;
+  double A, fline, fline_mean, fcon_rm, tl, tc, tau, dTransTau;
   double *pmodel = (double *)pm;
-
   A=exp(pmodel[idx_resp]);
-  Fline_mean *= A;
+  
+  fline_mean = Fline_mean * A; /* scale with the response coefficient */
 
   dTransTau = TransTau[1] - TransTau[0];
 
@@ -127,7 +127,7 @@ void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl
     
       fline += Trans1D[j] * fcon_rm;     /*  line response */
     }
-    Fl[i] = fline * dTransTau + Fline_mean;
+    Fl[i] = fline * dTransTau + fline_mean;  /* add back mean spectrum */
   }
 
   return;
@@ -147,7 +147,7 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
   /* multiply response coefficient */
   for(i=0; i<nv; i++)
   {
-    Fline2d_mean[i] *= A;
+    Fline2d_mean_buf[i] = Fline2d_mean[i] * A; /* scale with the response coefficient */
   }
 
   dTransTau = TransTau[1] - TransTau[0];
@@ -173,8 +173,7 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
     for(i=0; i<nv; i++)
     {
       fl2d[j*nv + i] *= dTransTau;
-
-      fl2d[j*nv + i] += Fline2d_mean[i];
+      fl2d[j*nv + i] += Fline2d_mean_buf[i]; /* add back mean spectrum */
     }
   }
 
@@ -214,9 +213,9 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
   }
 
   /* smooth the line profile, get the mean sigV and linecenter */
-  line_gaussian_smooth_2D_FFT(transv, fl2d, nl, nv, pm, &sigV_mean, &linecenter_mean);
+  line_gaussian_smooth_2D_FFT(transv, fl2d, nl, nv, pm);
   /* smooth the mean line profile */
-  line_gaussian_smooth_FFT_width_linecenter(transv, Fline2d_mean, nv, sigV_mean, linecenter_mean);
+  // line_gaussian_smooth_FFT_width_linecenter(transv, Fline2d_mean_buf, nv, sigV_mean, linecenter_mean);
 }
 
 /*!

@@ -90,7 +90,137 @@ void smooth_end()
 /*!
  * This function performs FFT-smoothing to 2d line.
  */
-void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int nv, 
+void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int nv, const void *pm)
+{
+  int i, j;
+  // initialize response and its fft.
+  double sigV, dV, linecenter=0.0;
+  double *pmodel = (double *)pm;
+
+  dV = transv[1] - transv[0];
+
+  if(parset.flag_InstRes <= 1) /* fixed InstRes or uniform prior for InstRes */
+  {
+    sigV = parset.InstRes + pmodel[num_params_blr_model+num_params_nlr]*parset.InstRes_err;
+    sigV = fmax(0.0, sigV);
+
+    /* setup response 
+       note the factor nd_fft. 
+       FFTW does not include the factor 1/nd_fft when transforming backforward.
+       So include here. Thereby, need not to mannually multiply 1/nd_fft in the final output.
+     */
+
+    for(i=0; i<nd_fft_cal; i++)
+    {
+      resp_fft0[i][0] = exp(-2.0 * PI*PI * sigV/dV*sigV/dV * i*i*1.0/nd_fft/nd_fft)/nd_fft;
+      resp_fft0[i][1] = 0.0;
+    }
+    
+    for(j=0; j<nl; j++)
+    {
+      /* line center, not include for flag_linecenter = 0 */
+      if(parset.flag_linecenter > 0) /* uniform */
+      {
+        linecenter = pmodel[idx_linecenter] * parset.linecenter_err; 
+      }
+      else if(parset.flag_linecenter < 0) /* epoch dependent */
+      {
+        linecenter = pmodel[idx_linecenter + j] * parset.linecenter_err;
+      }
+
+      for(i=0; i<nd_fft_cal; i++)
+      {  
+        /* line center */
+        resp_fft[i][0] =  resp_fft0[i][0] * cos(2.0*PI*linecenter/dV * i*1.0/nd_fft);
+        resp_fft[i][1] = -resp_fft0[i][0] * sin(2.0*PI*linecenter/dV * i*1.0/nd_fft);
+      }
+
+      memcpy(real_data+npad, &fl2d[j*nv], nv*sizeof(double));
+      for(i=0; i<npad; i++)
+        real_data[i] = real_data[nd_fft-1-i] = 0.0;
+
+      /* FFT of line */
+      fftw_execute(pdata);
+    
+      /* complex multiply and inverse FFT 
+       * note that for FFT of real data, FFTW outputs n/2+1 complex numbers.
+       * similarly, for complex to real transform, FFTW needs input of n/2+1 complex numbers.
+       */
+      for(i=0; i<nd_fft_cal; i++)
+      {
+        conv_fft[i][0] = data_fft[i][0]*resp_fft[i][0] - data_fft[i][1]*resp_fft[i][1];
+        conv_fft[i][1] = data_fft[i][0]*resp_fft[i][1] + data_fft[i][1]*resp_fft[i][0];
+      }
+      fftw_execute(pback);
+
+      //for(i=0; i<nv; i++)
+      //{
+      //fl2d[j*nv + i] = real_conv[i] * dV / nd_fft;
+      //}
+      memcpy(&fl2d[j*nv], real_conv+npad, nv*sizeof(double));
+    }
+  }
+  else
+  {
+    for(j=0; j<nl; j++)
+    {
+      sigV = instres_epoch[j] + pmodel[num_params_blr_model + num_params_nlr + j]*instres_err_epoch[j];
+      sigV = fmax(0.0, sigV);
+
+      /* line center */
+      if(parset.flag_linecenter > 0) /* uniform  */
+      {
+        linecenter = pmodel[idx_linecenter] * parset.linecenter_err; 
+      }
+      else if(parset.flag_linecenter < 0) /* epoch dependent */
+      {
+        linecenter = pmodel[idx_linecenter + j] * parset.linecenter_err;
+      }
+
+      /* setup response */
+      for(i=0; i<nd_fft_cal; i++)
+      {
+        resp_fft0[i][0] = exp(-2.0 * PI*PI * sigV/dV*sigV/dV * i*i*1.0/nd_fft/nd_fft)/nd_fft;
+        resp_fft0[i][1] = 0.0;
+
+        /* line center */
+        resp_fft[i][0] =  resp_fft0[i][0] * cos(2.0*PI*linecenter/dV * i*1.0/nd_fft);
+        resp_fft[i][1] = -resp_fft0[i][0] * sin(2.0*PI*linecenter/dV * i*1.0/nd_fft);
+      }
+    
+      memcpy(real_data+npad, &fl2d[j*nv], nv*sizeof(double));
+      for(i=0; i<npad; i++)
+        real_data[i] = real_data[nd_fft-1-i] = 0.0;
+
+      /* FFT of line */
+      fftw_execute(pdata);
+    
+      /* complex multiply and inverse FFT 
+       * note that for FFT of real data, FFTW outputs n/2+1 complex numbers.
+       * similarly, for complex to real transform, FFTW needs input of n/2+1 complex numbers.
+       */
+      for(i=0; i<nd_fft_cal; i++)
+      {
+        conv_fft[i][0] = data_fft[i][0]*resp_fft[i][0] - data_fft[i][1]*resp_fft[i][1];
+        conv_fft[i][1] = data_fft[i][0]*resp_fft[i][1] + data_fft[i][1]*resp_fft[i][0];
+      }
+      fftw_execute(pback);
+
+      //for(i=0; i<nv; i++)
+      //{
+        //fl2d[j*nv + i] = real_conv[i] * dV / nd_fft;
+      //}
+      memcpy(&fl2d[j*nv], real_conv+npad, nv*sizeof(double));
+    }
+  }
+  return;
+}
+
+/*!
+ * This function performs FFT-smoothing to 2d line.
+ * same to line_gaussian_smooth_2D_FFT, except for getting mean broadening width and linecenter
+ */
+void line_gaussian_smooth_2D_FFT_width_linecenter(const double *transv, double *fl2d, int nl, int nv, 
                                  const void *pm, double *sigV_mean, double *linecenter_mean)
 {
   int i, j;

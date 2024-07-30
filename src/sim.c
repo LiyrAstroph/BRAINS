@@ -735,6 +735,7 @@ void sim_init()
   Fline = malloc(parset.n_line_recon * sizeof(double));
   Fline2d = malloc(parset.n_line_recon * parset.n_vel_recon * sizeof(double));
   Fline2d_mean = (double *)malloc(parset.n_vel_recon * sizeof(double));
+  Fline2d_mean_buf = (double *)malloc(parset.n_vel_recon * sizeof(double));
 
   if(parset.flag_dim == -1)
   {
@@ -962,6 +963,7 @@ void sim_end()
   free(Fline);
   free(Fline2d);
   free(Fline2d_mean);
+  free(Fline2d_mean_buf);
   free(Trans2D);
   free(Trans1D);
 

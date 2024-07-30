@@ -607,6 +607,7 @@ void reconstruct_line2d_init()
   Tline = malloc(parset.n_line_recon * sizeof(double));
   Fline2d = malloc(parset.n_line_recon * parset.n_vel_recon * sizeof(double));
   Fline2d_mean = (double *)malloc(n_vel_max * sizeof(double));
+  Fline2d_mean_buf = (double *)malloc(n_vel_max * sizeof(double));
 
   Tline_min = Tline_data[0] - fmin(0.1*(Tline_data[n_line_data - 1] - Tline_data[0]), 10.0);
   if(parset.time_back <= 0.0)
@@ -707,6 +708,7 @@ void reconstruct_line2d_end()
   //free(Fline2d_at_data);
   free(Fline2d);
   free(Fline2d_mean);
+  free(Fline2d_mean_buf);
 
   //free(TransTau);
   free(TransV);
