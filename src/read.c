@@ -1244,10 +1244,10 @@ void read_data()
           }
         }
         fscanf(fp, "\n");
-
-        check_equal_bin(Wline_data, n_vel_data);
       }
       fclose(fp);
+
+      check_equal_bin(Wline_data, n_vel_data);
       
       if(error_flag == 0)
       {
