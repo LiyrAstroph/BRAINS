@@ -660,6 +660,14 @@ void read_parset()
           error_flag = 1;
         }
       }
+
+      if(parset.flag_fixresp < 0 || parset.flag_fixresp > 2)
+      {
+        fprintf(stderr, "# Error in FlagFixResponsivity: %d is not allowed.\n"
+                        "# Please specify it in [0, 1, 2].\n", parset.flag_fixresp);
+        error_flag = 1;
+      }
+
     }
     
     if( error_flag == 0 )

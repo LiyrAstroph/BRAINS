@@ -147,10 +147,23 @@ int dnest_line2d(int argc, char **argv)
     par_fix_val[num_params_blr] = log(1.0);
   }
 
-  /* fix constant responsivity, note that when flag_blrmodel=0,  flag_fixresp=0, this will not be implemented */
+  /* fix constant responsivity, note that when flag_blrmodel=0,  flag_fixresp=0, the following will not be implemented */
   if(parset.flag_fixresp == 1)
   {
     idx_eta = get_idx_eta_from_blrmodel(parset.flag_blrmodel);
+
+    par_fix[idx_eta + 1] = 1;
+    par_fix_val[idx_eta + 1] = 0.0;
+
+    par_fix[idx_eta + 2] = 1;
+    par_fix_val[idx_eta + 2] = 0.0;
+  }
+  else if(parset.flag_fixresp == 2) /* eta = 1 */
+  {
+    idx_eta = get_idx_eta_from_blrmodel(parset.flag_blrmodel);
+    
+    par_fix[idx_eta] = 1;
+    par_fix_val[idx_eta] = 1.0;
 
     par_fix[idx_eta + 1] = 1;
     par_fix_val[idx_eta + 1] = 0.0;
