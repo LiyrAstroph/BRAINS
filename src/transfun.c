@@ -106,11 +106,12 @@ void calculate_con_rm(const void *pm)
 void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl)
 {
   int i, j;
-  double A, fline, fline_mean, fcon_rm, tl, tc, tau, dTransTau;
+  double A, fcon_mean, fline, fline_mean, fcon_rm, tl, tc, tau, dTransTau;
   double *pmodel = (double *)pm;
   A=exp(pmodel[idx_resp]);
+  fcon_mean=pmodel[idx_resp + 1];
   
-  fline_mean = Fline_mean * A; /* scale with the response coefficient */
+  fline_mean = Fline_mean * A * fcon_mean; /* scale with the response coefficient */
 
   dTransTau = TransTau[1] - TransTau[0];
 
@@ -140,14 +141,15 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
                                               double *fl2d, int nl, int nv)
 {
   int i, j, k;
-  double A, tau, tl, tc, fcon_rm, fnarrow, dTransTau, sigV_mean, linecenter_mean;
+  double A, fcon_mean, tau, tl, tc, fcon_rm, fnarrow, dTransTau, sigV_mean, linecenter_mean;
   double *pmodel = (double *)pm;
   A=exp(pmodel[idx_resp]);
+  fcon_mean=pmodel[idx_resp + 1];
 
   /* multiply response coefficient */
   for(i=0; i<nv; i++)
   {
-    Fline2d_mean_buf[i] = Fline2d_mean[i] * A; /* scale with the response coefficient */
+    Fline2d_mean_buf[i] = Fline2d_mean[i] * A * fcon_mean; /* scale with the response coefficient */
   }
 
   dTransTau = TransTau[1] - TransTau[0];
