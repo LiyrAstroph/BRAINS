@@ -33,6 +33,7 @@ void sim()
   FILE *fp;
   char fname[200];
   int i, j, k, incr;
+  double r_rw, r_ew;
 
   sim_init();
   
@@ -40,6 +41,9 @@ void sim()
   double sigma, taud;
   
   smooth_init(parset.n_vel_recon, TransV);
+  
+  /*first calculate emissivity and responsivity weighted size */
+  calculate_size(model, &r_rw, &r_ew);
 
 /*==================================continuum============================================*/  
   if(parset.flag_dim == -1)
@@ -47,7 +51,7 @@ void sim()
     /* note that here use sigma_hat = sigma/sqrt(tau) */
     sigma = var_param[1];
     taud = var_param[2];
-    printf("Sim with ln(sigma) = %f and  ln(taud) = %f.\n", sigma, taud);
+    printf("Sim with ln(sigma) = %f and ln(taud) = %f.\n", sigma, taud);
     reconstruct_con_from_varmodel(exp(var_param[1]), exp(var_param[2]), 1.0, 0.0); 
   }
   else
@@ -59,7 +63,7 @@ void sim()
      * note the light curve is shifted and scaled, so that sigma_hat maybe changed. */
     sigma = 0.03;
     taud = (Tcon[parset.n_con_recon-1] - Tcon[0])/10.0;
-    printf("Sim with sigma = %f and  taud = %f.\n", sigma, taud);
+    printf("Sim with sigma = %f and taud = %f.\n", sigma, taud);
     create_con_from_random(sigma, taud, 1.0, 0.0); 
   }
   calculate_con_rm(model);
@@ -476,6 +480,7 @@ void sim_init()
       transfun_1d_cal = transfun_1d_cal_cloud;
       transfun_2d_cal = transfun_2d_cal_cloud;
       BLRmodel_name = BLRmodel1_name;
+      calculate_size = calculate_size_model1;
       break;
     case 2:
       num_params_blr_model = sizeof(BLRmodel2)/sizeof(double);
@@ -528,6 +533,7 @@ void sim_init()
       transfun_1d_cal = transfun_1d_cal_cloud;
       transfun_2d_cal = transfun_2d_cal_cloud;
       BLRmodel_name = BLRmodel8_name;
+      calculate_size = calculate_size_model8;
       break;
     
     case 9:
@@ -536,6 +542,7 @@ void sim_init()
       transfun_1d_cal = transfun_1d_cal_cloud;
       transfun_2d_cal = transfun_2d_cal_cloud;
       BLRmodel_name = BLRmodel9_name;
+      calculate_size = calculate_size_model9;
       break;
 
     default:
