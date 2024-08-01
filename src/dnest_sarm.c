@@ -91,6 +91,10 @@ int dnest_sarm(int argc, char **argv)
 
     par_fix[idx_eta + 2] = 1;
     par_fix_val[idx_eta + 2] = 0.0;
+
+    /* for linear response, no need to include Fcon_mean */
+    par_fix[idx_resp + 1] = 1.0;
+    par_fix_val[idx_resp + 1] = 0.0;
   }
   
 
