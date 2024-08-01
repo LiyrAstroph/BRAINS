@@ -86,7 +86,10 @@ FlagCloudsForceUpdate       0                           % default 0;
 FlagConSysErr               0                           % 0, not include systematic error of continuum; 1, include
 FlagLineSysErr              0                           % 0, not include systematic error of line; 1, include
 
-FlagFixResponsivity         0                           % 0, radial-dependent responsivity; 1, constant responsivity
+FlagFixResponsivity         0                           % 0, radial-dependent responsivity; 
+                                                        % 1, constant responsivity
+                                                        % 2, fix responsivity to unity (eta==1)
+                                                        % default: 0
 
 FlagThetaSample             0                           % 0, sample over cos theta; 1, over theta
 %========================================================================
