@@ -735,7 +735,6 @@ void read_parset()
       if(parset.flag_dim < 1)
       {
         parset.flag_trend_diff = 0;
-        parset.flag_fixresp = 0;
       }
       
       /* user defined BLR model, no need to fix responsivity, since user's model might not include it. */
