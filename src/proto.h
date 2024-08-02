@@ -123,6 +123,17 @@ void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save);
 void gen_cloud_sample_model8(const void *pm, int flag_type, int flag_save);
 void gen_cloud_sample_model9(const void *pm, int flag_type, int flag_save);
 
+void (*calculate_size)(const void *pm, double *r_rw, double *r_ew);
+void calculate_size_model1(const void *pm, double *r_rw, double *r_ew);
+void calculate_size_model2(const void *pm, double *r_rw, double *r_ew);
+void calculate_size_model3(const void *pm, double *r_rw, double *r_ew);
+void calculate_size_model4(const void *pm, double *r_rw, double *r_ew);
+void calculate_size_model5(const void *pm, double *r_rw, double *r_ew);
+void calculate_size_model6(const void *pm, double *r_rw, double *r_ew);
+void calculate_size_model7(const void *pm, double *r_rw, double *r_ew);
+void calculate_size_model8(const void *pm, double *r_rw, double *r_ew);
+void calculate_size_model9(const void *pm, double *r_rw, double *r_ew);
+
 void (*transfun_2d_cal)(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save);
 void transfun_2d_cal_cloud(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save);
 void transfun_2d_cal_with_sample(double *transv, double *trans2d, int n_vel);

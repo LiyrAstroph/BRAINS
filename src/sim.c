@@ -488,6 +488,7 @@ void sim_init()
       transfun_1d_cal = transfun_1d_cal_cloud;
       transfun_2d_cal = transfun_2d_cal_cloud;
       BLRmodel_name = BLRmodel2_name;
+      calculate_size = calculate_size_model2;
       break;
     case 3:
       num_params_blr_model = sizeof(BLRmodel3)/sizeof(double);
@@ -495,6 +496,7 @@ void sim_init()
       transfun_1d_cal = transfun_1d_cal_cloud;
       transfun_2d_cal = transfun_2d_cal_cloud;
       BLRmodel_name = BLRmodel3_name;
+      calculate_size = calculate_size_model3;
       break;
     case 4:
       num_params_blr_model = sizeof(BLRmodel4)/sizeof(double);
@@ -502,6 +504,7 @@ void sim_init()
       transfun_1d_cal = transfun_1d_cal_cloud;
       transfun_2d_cal = transfun_2d_cal_cloud;
       BLRmodel_name = BLRmodel4_name;
+      calculate_size = calculate_size_model4;
       break;
     case 5:
       num_params_blr_model = sizeof(BLRmodel5)/sizeof(double);
@@ -509,6 +512,7 @@ void sim_init()
       transfun_1d_cal = transfun_1d_cal_cloud;
       transfun_2d_cal = transfun_2d_cal_cloud;
       BLRmodel_name = BLRmodel5_name;
+      calculate_size = calculate_size_model5;
       break;
 
     case 6:
@@ -517,6 +521,7 @@ void sim_init()
       transfun_1d_cal = transfun_1d_cal_cloud;
       transfun_2d_cal = transfun_2d_cal_cloud;
       BLRmodel_name = BLRmodel6_name;
+      calculate_size = calculate_size_model6;
       break;
 
     case 7:
@@ -525,6 +530,7 @@ void sim_init()
       transfun_1d_cal = transfun_1d_cal_cloud;
       transfun_2d_cal = transfun_2d_cal_cloud;
       BLRmodel_name = BLRmodel7_name;
+      calculate_size = calculate_size_model7;
       break;
 
     case 8:
@@ -551,6 +557,7 @@ void sim_init()
       transfun_1d_cal = transfun_1d_cal_cloud;
       transfun_2d_cal = transfun_2d_cal_cloud;
       BLRmodel_name = BLRmodel1_name;
+      calculate_size = calculate_size_model1;
       break;
   }
 

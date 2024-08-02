@@ -656,6 +656,117 @@ void gen_cloud_sample_model2(const void *pm, int flag_type, int flag_save)
   return;
 }
 
+/* 
+ * calculate emissivity and responsivity weighted size for model 2
+ */
+void calculate_size_model2(const void *pm, double *r_rw, double *r_ew)
+{
+  int i, nc;
+  double r, phi, Lopn_cos;
+  double x, y, z, xb, yb, zb, zb0;
+  double inc, F, beta, mu, k, a, s, rin, sig, Rs;
+  double Lphi, Lthe, weight, rnd;
+  BLRmodel2 *model = (BLRmodel2 *)pm;
+  double mbh, sigr, sigtheta;
+  double eta, eta0, eta1, eta_alpha;  
+  double norm_rw, norm_ew;
+
+  Lopn_cos = cos(model->opn*PI/180.0);
+  inc = acos(model->inc);
+  beta = model->beta;
+  F = model->F;
+  mu = exp(model->mu);
+  k = model->k;
+
+  a = 1.0/beta/beta;
+  s = mu/a;
+  rin=mu*F;
+  sig=(1.0-F)*s;
+
+  eta0 = model->eta0;
+  eta1 = model->eta1;
+  eta_alpha = model->eta_alpha;
+  
+  mbh = exp(model->mbh);
+  sigr = model->sigr;
+  sigtheta = model->sigtheta * PI;
+
+  Rs = 3.0e11*mbh/CM_PER_LD; // Schwarzchild radius in a unit of light-days
+
+  a = 1.0/beta/beta;
+  s = mu/a;
+  rin = mu*F + Rs;
+  sig = (1.0-F)*s;
+
+  *r_rw = 0.0;
+  norm_rw = 0.0;
+  *r_ew = 0.0;
+  norm_ew = 0.0;
+
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    /* generate a direction of the angular momentum */    
+    Lphi = 2.0*PI * gsl_rng_uniform(gsl_blr);
+    //Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_blr));
+    Lthe = theta_sample(1.0, Lopn_cos, 1.0);
+
+    nc = 0;
+    r = rcloud_max_set+1.0;
+    while(r>rcloud_max_set || r<rcloud_min_set)
+    {
+      if(nc > 1000)
+      {
+        printf("# Error, too many tries in generating ridial location of clouds.\n");
+        exit(0);
+      }
+      rnd = gsl_ran_gamma(gsl_blr, a, 1.0);
+//    r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_blr, 1.0/beta/beta, beta*beta*mu);
+      r = rin + sig * rnd;
+      nc++;
+    }
+    phi = 2.0*PI * gsl_rng_uniform(gsl_blr);
+
+    x = r * cos(phi); 
+    y = r * sin(phi);
+    z = 0.0;
+
+
+  /*xb =  cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
+    yb = -cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
+    zb =  sin(Lthe) * x + cos(Lthe) * z;*/
+
+    xb =  cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y;
+    yb = -cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y;
+    zb =  sin(Lthe) * x;
+
+    /* clouds below the equatorial plane are fully obscurated */
+    zb0 = zb;
+    if(zb0 < 0.0)
+      zb = -zb;
+
+    /* counter-rotate around y */
+    x = xb * cos(PI/2.0-inc) + zb * sin(PI/2.0-inc);
+    y = yb;
+    z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
+
+    weight = 0.5 + k*(x/r);
+    eta = eta_func(eta0, eta1, eta_alpha, r/mu);
+    clouds_weight_mean[i] = weight;
+    clouds_weight[i] = eta * clouds_weight_mean[i];
+
+    *r_rw += r * clouds_weight[i];
+    *r_ew += r * clouds_weight_mean[i];
+    norm_rw += clouds_weight[i];
+    norm_ew += clouds_weight_mean[i];
+  }
+
+  *r_rw /= norm_rw;
+  *r_ew /= norm_ew;
+  printf("RW size: %f\n", *r_rw);
+  printf("EW szie: %f\n", *r_ew);
+
+  return;
+}
 
 /*====================================================================
  * model 3
@@ -889,6 +1000,112 @@ void gen_cloud_sample_model3(const void *pm, int flag_type, int flag_save)
   return;
 }
 
+/* 
+ * calculate emissivity and responsivity weighted size for model 3
+ */
+void calculate_size_model3(const void *pm, double *r_rw, double *r_ew)
+{
+  int i, nc;
+  double r, phi, dis, Lopn_cos;
+  double x, y, z, xb, yb, zb, zb0;
+  double inc, F, alpha, Rin, k, Rs;
+  double Lphi, Lthe, weight, rnd;
+  BLRmodel3 *model = (BLRmodel3 *)pm;
+  double mbh, xi, q;
+  double eta, eta0, eta1, eta_alpha;  
+  double norm_rw, norm_ew;
+
+  Lopn_cos = cos(model->opn*PI/180.0);
+  inc = acos(model->inc);
+  alpha = model->alpha;
+  F = model->F;
+  Rin = exp(model->Rin);
+  k = model->k;
+
+  eta0 = model->eta0;
+  eta1 = model->eta1;
+  eta_alpha = model->eta_alpha;
+  
+  mbh = exp(model->mbh);
+  xi = model->xi;
+  q = model->q;
+
+  Rs = 3.0e11*mbh/CM_PER_LD; // Schwarzchild radius in a unit of light-days
+  
+  if(F*Rin > rcloud_max_set)
+    F = rcloud_max_set/Rin;
+  
+  *r_rw = 0.0;
+  norm_rw = 0.0;
+  *r_ew = 0.0;
+  norm_ew = 0.0;
+
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+// generate a direction of the angular momentum     
+    Lphi = 2.0*PI * gsl_rng_uniform(gsl_blr);
+    //Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_blr));
+    Lthe = theta_sample(1.0, Lopn_cos, 1.0);
+
+    nc = 0;
+    r = rcloud_max_set+1.0;
+    while(r>rcloud_max_set || r<rcloud_min_set)
+    {
+      if(nc > 1000)
+      {
+        printf("# Error, too many tries in generating ridial location of clouds.\n");
+        exit(0);
+      }
+      if(fabs(1.0-alpha) > 1.0e-4)
+        rnd = pow( gsl_rng_uniform(gsl_blr) * ( pow(F, 1.0-alpha) - 1.0) + 1.0,  1.0/(1.0-alpha) );
+      else
+        rnd = exp( gsl_rng_uniform(gsl_blr) * log(F) );
+      r = Rin * rnd + Rs;
+      nc++;
+    }
+    phi = 2.0*PI * gsl_rng_uniform(gsl_blr);
+
+    x = r * cos(phi); 
+    y = r * sin(phi);
+    z = 0.0;
+
+
+  /*xb =  cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
+    yb = -cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
+    zb =  sin(Lthe) * x + cos(Lthe) * z;*/
+
+    xb =  cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y;
+    yb = -cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y;
+    zb =  sin(Lthe) * x;
+
+    zb0 = zb;
+    if(zb0 < 0.0)
+      zb = -zb;
+
+// counter-rotate around y
+    x = xb * cos(PI/2.0-inc) + zb * sin(PI/2.0-inc);
+    y = yb;
+    z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
+
+    weight = 0.5 + k*(x/r);
+    eta = eta_func(eta0, eta1, eta_alpha, r/Rin);
+    clouds_weight_mean[i] = weight;
+    clouds_weight[i] = eta * clouds_weight_mean[i];
+
+    *r_rw += r * clouds_weight[i];
+    *r_ew += r * clouds_weight_mean[i];
+    norm_rw += clouds_weight[i];
+    norm_ew += clouds_weight_mean[i];
+  }
+
+  *r_rw /= norm_rw;
+  *r_ew /= norm_ew;
+  printf("RW size: %f\n", *r_rw);
+  printf("EW szie: %f\n", *r_ew);
+
+  return;
+}
+
 /*====================================================================
  * model 4.
  * generate cloud sample.
@@ -1115,6 +1332,112 @@ void gen_cloud_sample_model4(const void *pm, int flag_type, int flag_save)
       }
     }
   }
+
+  return;
+}
+
+/* 
+ * calculate emissivity and responsivity weighted size for model 4
+ */
+void calculate_size_model4(const void *pm, double *r_rw, double *r_ew)
+{
+  int i, nc;
+  double r, phi, dis, Lopn_cos;
+  double x, y, z, xb, yb, zb, zb0;
+  double inc, F, alpha, Rin, k, Rs;
+  double Lphi, Lthe, weight, rnd;
+  BLRmodel4 *model = (BLRmodel4 *)pm;
+  double mbh, xi, q;
+  double eta, eta0, eta1, eta_alpha;  
+  double norm_rw, norm_ew;
+
+  Lopn_cos = cos(model->opn*PI/180.0);
+  inc = acos(model->inc);
+  alpha = model->alpha;
+  F = model->F;
+  Rin = exp(model->Rin);
+  k = model->k;
+
+  eta0 = model->eta0;
+  eta1 = model->eta1;
+  eta_alpha = model->eta_alpha;
+  
+  mbh = exp(model->mbh);
+  xi = model->xi;
+  q = model->q;
+  
+  Rs = 3.0e11*mbh/CM_PER_LD; // Schwarzchild radius in a unit of light-days
+
+  if(Rin*F > rcloud_max_set)
+    F = rcloud_max_set/Rin;
+  
+  *r_rw = 0.0;
+  norm_rw = 0.0;
+  *r_ew = 0.0;
+  norm_ew = 0.0;
+
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    /* generate a direction of the angular momentum   */ 
+    Lphi = 2.0*PI * gsl_rng_uniform(gsl_blr);
+    //Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_blr));
+    Lthe = theta_sample(1.0, Lopn_cos, 1.0);
+
+    nc = 0;
+    r = rcloud_max_set+1.0;
+    while(r>rcloud_max_set || r<rcloud_min_set)
+    {
+      if(nc > 1000)
+      {
+        printf("# Error, too many tries in generating ridial location of clouds.\n");
+        exit(0);
+      }
+      if(fabs(1.0-alpha) > 1.0e-4)
+        rnd = pow( gsl_rng_uniform(gsl_blr) * ( pow(F, 1.0-alpha) - 1.0) + 1.0,  1.0/(1.0-alpha) );
+      else
+        rnd = exp( gsl_rng_uniform(gsl_blr) * log(F) );
+      r = Rin * rnd + Rs;
+      nc++;
+    }
+    phi = 2.0*PI * gsl_rng_uniform(gsl_blr);
+
+    x = r * cos(phi); 
+    y = r * sin(phi);
+    z = 0.0;
+
+
+  /*xb =  cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
+    yb = -cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
+    zb =  sin(Lthe) * x + cos(Lthe) * z; */
+    
+    xb =  cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y;
+    yb = -cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y;
+    zb =  sin(Lthe) * x;
+
+    zb0 = zb;
+    if(zb0 < 0.0)
+      zb = -zb;
+
+    /* counter-rotate around y */
+    x = xb * cos(PI/2.0-inc) + zb * sin(PI/2.0-inc);
+    y = yb;
+    z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc);
+
+    weight = 0.5 + k*(x/r);
+    eta = eta_func(eta0, eta1, eta_alpha, r/Rin);
+    clouds_weight_mean[i] = weight;
+    clouds_weight[i] = eta * clouds_weight_mean[i];
+
+    *r_rw += r * clouds_weight[i];
+    *r_ew += r * clouds_weight_mean[i];
+    norm_rw += clouds_weight[i];
+    norm_ew += clouds_weight_mean[i];
+  }
+
+  *r_rw /= norm_rw;
+  *r_ew /= norm_ew;
+  printf("RW size: %f\n", *r_rw);
+  printf("EW szie: %f\n", *r_ew);
 
   return;
 }
@@ -1403,6 +1726,148 @@ void gen_cloud_sample_model5(const void *pm, int flag_type, int flag_save)
   return;
 }
 
+/* 
+ * calculate emissivity and responsivity weighted size for model 5
+ */
+void calculate_size_model5(const void *pm, double *r_rw, double *r_ew)
+{
+  int i, nc;
+  double r, phi, cos_phi, sin_phi, dis, Lopn_cos;
+  double x, y, z, xb, yb, zb, zb0;
+  double inc, Fin, Fout, alpha, k, gam, mu, xi;
+  double mbh, fellip, fflow, sigr_circ, sigthe_circ, sigr_rad, sigthe_rad, theta_rot, sig_turb;
+  double Lphi, Lthe;
+  double cos_Lphi, sin_Lphi, cos_Lthe, sin_Lthe, cos_inc_cmp, sin_inc_cmp;
+  double weight, rndr, rnd, rnd_frac, rnd_xi, frac1, frac2, ratio, Rs, g;
+  BLRmodel5 *model = (BLRmodel5 *)pm;
+  double eta, eta0, eta1, eta_alpha;
+  double norm_rw, norm_ew;
+
+  Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
+  inc = acos(model->inc);         /* inclination angle in rad */
+  alpha = model->alpha;         
+  Fin = model->Fin;
+  Fout = exp(model->Fout);                 
+  mu = exp(model->mu);            /* mean radius */
+  k = model->k;  
+  gam = model->gam;
+  xi = model->xi;
+
+  eta0 = model->eta0;
+  eta1 = model->eta1;
+  eta_alpha = model->eta_alpha;
+  
+  mbh = exp(model->mbh);
+  fellip = model->fellip;
+  fflow = model->fflow;
+  sigr_circ = exp(model->sigr_circ);
+  sigthe_circ = exp(model->sigthe_circ);
+  sigr_rad = exp(model->sigr_rad);
+  sigthe_rad = exp(model->sigthe_rad);
+  theta_rot = model->theta_rot*PI/180.0;
+  sig_turb = exp(model->sig_turb);
+
+  Rs = 3.0e11*mbh/CM_PER_LD; // Schwarzchild radius in a unit of light-days
+
+  if(mu*Fout > rcloud_max_set)
+    Fout = rcloud_max_set/mu;
+  
+  frac1 = 1.0/(alpha+1.0) * (1.0 - pow(Fin,   alpha+1.0));
+  frac2 = 1.0/(alpha-1.0) * (1.0 - pow(Fout, -alpha+1.0));
+  ratio = frac1/(frac1 + frac2);
+
+  sin_inc_cmp = cos(inc);//sin(PI/2.0 - inc);
+  cos_inc_cmp = sin(inc);//cos(PI/2.0 - inc);
+  
+  *r_rw = 0.0;
+  norm_rw = 0.0;
+  *r_ew = 0.0;
+  norm_ew = 0.0;
+
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    /* generate a direction of the angular momentum of the orbit  */ 
+    Lphi = 2.0*PI * gsl_rng_uniform(gsl_blr);
+    //Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_blr), gam));
+    Lthe = theta_sample(gam, Lopn_cos, 1.0);
+
+    cos_Lphi = cos(Lphi);
+    sin_Lphi = sin(Lphi);
+    cos_Lthe = cos(Lthe);
+    sin_Lthe = sin(Lthe);
+    
+    nc = 0;
+    r = rcloud_max_set+1.0;
+    while(r>rcloud_max_set || r<rcloud_min_set)
+    {
+      if(nc > 1000)
+      {
+        printf("# Error, too many tries in generating ridial location of clouds.\n");
+        exit(0);
+      }
+      
+      rnd_frac = gsl_rng_uniform(gsl_blr);
+      rnd = gsl_rng_uniform(gsl_blr);
+      if(rnd_frac < ratio)
+      {
+        rndr = pow( 1.0 - rnd * (1.0 - pow(Fin, alpha+1.0)), 1.0/(1.0+alpha));
+      }
+      else
+      {
+        rndr = pow( 1.0 - rnd * (1.0 - pow(Fout, -alpha+1.0)), 1.0/(1.0-alpha));
+      }
+      r = rndr*mu + Rs;
+      nc++;
+    }
+    phi = 2.0*PI * gsl_rng_uniform(gsl_blr);
+    cos_phi = cos(phi);
+    sin_phi = sin(phi);
+
+    /* Polar coordinates to Cartesian coordinate */
+    x = r * cos_phi; 
+    y = r * sin_phi;
+    z = 0.0;
+
+/* right-handed framework
+ * first rotate around y axis by an angle of Lthe, then rotate around z axis 
+ * by an angle of Lphi
+ */
+  /*xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
+    yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
+    zb = sin(Lthe) * x + cos(Lthe) * z;*/
+
+    xb = cos_Lthe*cos_Lphi * x + sin_Lphi * y;
+    yb =-cos_Lthe*sin_Lphi * x + cos_Lphi * y;
+    zb = sin_Lthe * x;
+    
+    zb0 = zb;
+    rnd_xi = gsl_rng_uniform(gsl_blr);
+    if( (rnd_xi < 1.0 - xi) && zb0 < 0.0)
+      zb = -zb;
+
+// counter-rotate around y, LOS is x-axis 
+    x = xb * cos_inc_cmp + zb * sin_inc_cmp;
+    y = yb;
+    z =-xb * sin_inc_cmp + zb * cos_inc_cmp;
+
+    weight = 0.5 + k*(x/r);
+    eta = eta_func(eta0, eta1, eta_alpha, r/mu);
+    clouds_weight_mean[i] = weight;
+    clouds_weight[i] = eta * clouds_weight_mean[i];
+
+    *r_rw += r * clouds_weight[i];
+    *r_ew += r * clouds_weight_mean[i];
+    norm_rw += clouds_weight[i];
+    norm_ew += clouds_weight_mean[i];
+  }
+
+  *r_rw /= norm_rw;
+  *r_ew /= norm_ew;
+  printf("RW size: %f\n", *r_rw);
+  printf("EW szie: %f\n", *r_ew);
+
+  return;
+}
 
 /*================================================================
  * model 6
@@ -1681,6 +2146,140 @@ void gen_cloud_sample_model6(const void *pm, int flag_type, int flag_save)
       }
     }
   }
+
+  return;
+}
+
+/* 
+ * calculate emissivity and responsivity weighted size for model 6
+ */
+void calculate_size_model6(const void *pm, double *r_rw, double *r_ew)
+{
+  int i, j, nc;
+  double r, phi, cos_phi, sin_phi, dis, Lopn_cos;
+  double x, y, z, xb, yb, zb, zb0, Rs, g;
+  double inc, F, beta, mu, k, gam, xi, a, s, sig, rin;
+  double mbh, fellip, fflow, sigr_circ, sigthe_circ, sigr_rad, sigthe_rad, theta_rot, sig_turb;
+  double Lphi, Lthe, sin_Lphi, cos_Lphi, sin_Lthe, cos_Lthe, sin_inc_cmp, cos_inc_cmp;
+  double weight, rnd, rnd_xi;
+  BLRmodel6 *model = (BLRmodel6 *)pm;
+  double eta, eta0, eta1, eta_alpha;
+  double norm_rw, norm_ew;
+
+  Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
+  inc = acos(model->inc);         /* inclination angle in rad */
+  beta = model->beta;         
+  F = model->F;
+  mu = exp(model->mu);                 /* mean radius */
+  k = model->k;  
+  gam = model-> gam;
+  xi = model->xi;
+
+  eta0 = model->eta0;
+  eta1 = model->eta1;
+  eta_alpha = model->eta_alpha;
+
+  mbh = exp(model->mbh);
+  fellip = model->fellip;
+  fflow = model->fflow;
+  sigr_circ = exp(model->sigr_circ);
+  sigthe_circ = exp(model->sigthe_circ);
+  sigr_rad = exp(model->sigr_rad);
+  sigthe_rad = exp(model->sigthe_rad);
+  theta_rot = model->theta_rot*PI/180.0;
+  sig_turb = exp(model->sig_turb);
+
+  Rs = 3.0e11*mbh/CM_PER_LD; // Schwarzchild radius in a unit of light-days
+
+  a = 1.0/beta/beta;
+  s = mu/a;
+  rin=mu*F + Rs;  // include Scharzschild radius
+  sig=(1.0-F)*s;
+  
+  sin_inc_cmp = cos(inc); //sin(PI/2.0 - inc);
+  cos_inc_cmp = sin(inc); //cos(PI/2.0 - inc);
+  
+  *r_rw = 0.0;
+  norm_rw = 0.0;
+  *r_ew = 0.0;
+  norm_ew = 0.0;
+
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+// generate a direction of the angular momentum of the orbit   
+    Lphi = 2.0*PI * gsl_rng_uniform(gsl_blr);
+    //Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_blr), gam));
+    Lthe = theta_sample(gam, Lopn_cos, 1.0);
+
+    sin_Lphi = sin(Lphi);
+    cos_Lphi = cos(Lphi);
+    sin_Lthe = sin(Lthe);
+    cos_Lthe = cos(Lthe);
+
+    nc = 0;
+    r = rcloud_max_set+1.0;
+    while(r>rcloud_max_set || r<rcloud_min_set)
+    {
+      if(nc > 1000)
+      {
+        printf("# Error, too many tries in generating ridial location of clouds.\n");
+        exit(0);
+      }
+      rnd = gsl_ran_gamma(gsl_blr, a, 1.0);
+//    r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_blr, 1.0/beta/beta, beta*beta*mu);
+      r = rin + sig * rnd;
+      nc++;
+    }
+    phi = 2.0*PI * gsl_rng_uniform(gsl_blr);
+    cos_phi = cos(phi);
+    sin_phi = sin(phi);
+
+    /* Polar coordinates to Cartesian coordinate */
+    x = r * cos_phi; 
+    y = r * sin_phi;
+    z = 0.0;
+
+/* right-handed framework
+ * first rotate around y axis by an angle of Lthe, then rotate around z axis 
+ * by an angle of Lphi
+ */
+  /*xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
+    yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
+    zb = sin(Lthe) * x + cos(Lthe) * z; */
+    
+    xb = cos_Lthe*cos_Lphi * x + sin_Lphi * y;
+    yb =-cos_Lthe*sin_Lphi * x + cos_Lphi * y;
+    zb = sin_Lthe * x;
+
+    zb0 = zb;
+    rnd_xi = gsl_rng_uniform(gsl_blr);
+    if( (rnd_xi < 1.0 - xi) && zb0 < 0.0)
+      zb = -zb;
+
+// counter-rotate around y, LOS is x-axis 
+    /* x = xb * cos(PI/2.0-inc) + zb * sin(PI/2.0-inc);
+       y = yb;
+       z =-xb * sin(PI/2.0-inc) + zb * cos(PI/2.0-inc); */
+    
+    x = xb * cos_inc_cmp + zb * sin_inc_cmp;
+    y = yb;
+    z =-xb * sin_inc_cmp + zb * cos_inc_cmp;
+
+    weight = 0.5 + k*(x/r);
+    eta = eta_func(eta0, eta1, eta_alpha, r/mu);
+    clouds_weight_mean[i] = weight;
+    clouds_weight[i] = eta * clouds_weight_mean[i];
+
+    *r_rw += r * clouds_weight[i];
+    *r_ew += r * clouds_weight_mean[i];
+    norm_rw += clouds_weight[i];
+    norm_ew += clouds_weight_mean[i];
+  }
+
+  *r_rw /= norm_rw;
+  *r_ew /= norm_ew;
+  printf("RW size: %f\n", *r_rw);
+  printf("EW szie: %f\n", *r_ew);
 
   return;
 }
@@ -2188,6 +2787,218 @@ void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save)
   return;
 }
 
+/* 
+ * calculate emissivity and responsivity weighted size for model 7
+ */
+void calculate_size_model7(const void *pm, double *r_rw, double *r_ew)
+{
+  int i, j, nc, num_sh;
+  double r, phi, dis, Lopn_cos, cos_phi, sin_phi;
+  double x, y, z, xb, yb, zb, zb0, Rs, g, sig_turb;
+  double inc, F, beta, mu, k, gam, xi, a, s, sig, rin;
+  double mbh, fellip, fflow, sigr_circ, sigthe_circ, sigr_rad, sigthe_rad, theta_rot;
+  double Lphi, Lthe, sin_Lphi, cos_Lphi, sin_Lthe, cos_Lthe, sin_inc_cmp, cos_inc_cmp;
+  double weight, rnd, rnd_xi;
+  BLRmodel7 *model = (BLRmodel7 *)pm;
+  double eta, eta0, eta1, eta_alpha;
+  double norm_rw, norm_ew;
+
+  Lopn_cos = cos(model->opn*PI/180.0); /* cosine of openning angle */
+  inc = acos(model->inc);         /* inclination angle in rad */
+  beta = model->beta;         
+  F = model->F;
+  mu = exp(model->mu);                 /* mean radius */
+  k = model->k;  
+  gam = model-> gam;
+  xi = model->xi;
+
+  eta0 = model->eta0;
+  eta1 = model->eta1;
+  eta_alpha = model->eta_alpha;
+  
+  mbh = exp(model->mbh);
+  fellip = model->fellip;
+  fflow = model->fflow;
+  sigr_circ = exp(model->sigr_circ);
+  sigthe_circ = exp(model->sigthe_circ);
+  sigr_rad = exp(model->sigr_rad);
+  sigthe_rad = exp(model->sigthe_rad);
+  theta_rot = model->theta_rot*PI/180.0;
+  sig_turb = exp(model->sig_turb);
+
+  Rs = 3.0e11*mbh/CM_PER_LD; // Schwarzchild radius in a unit of light-days
+
+  a = 1.0/beta/beta;
+  s = mu/a;
+  rin=Rs + mu*F;
+  sig=(1.0-F)*s;
+  
+  sin_inc_cmp = cos(inc); //sin(PI/2.0 - inc);
+  cos_inc_cmp = sin(inc); //cos(PI/2.0 - inc);
+
+  num_sh = (int)(parset.n_cloud_per_task * model->fsh);
+
+  *r_rw = 0.0;
+  norm_rw = 0.0;
+  *r_ew = 0.0;
+  norm_ew = 0.0;
+
+  for(i=0; i<num_sh; i++)
+  {
+// generate a direction of the angular momentum of the orbit   
+    Lphi = 2.0*PI * gsl_rng_uniform(gsl_blr);
+    //Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_blr), gam));
+    Lthe = theta_sample(gam, Lopn_cos, 1.0);
+
+    sin_Lphi = sin(Lphi);
+    cos_Lphi = cos(Lphi);
+    sin_Lthe = sin(Lthe);
+    cos_Lthe = cos(Lthe);
+
+    nc = 0;
+    r = rcloud_max_set+1.0;
+    while(r>rcloud_max_set || r<rcloud_min_set)
+    {
+      if(nc > 1000)
+      {
+        printf("# Error, too many tries in generating ridial location of clouds.\n");
+        exit(0);
+      }
+      rnd = gsl_ran_gamma(gsl_blr, a, 1.0);
+//    r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_blr, 1.0/beta/beta, beta*beta*mu);
+      r = rin + sig * rnd;
+      nc++;
+    }
+    phi = 2.0*PI * gsl_rng_uniform(gsl_blr);
+    cos_phi = cos(phi);
+    sin_phi = sin(phi);
+
+    /* Polar coordinates to Cartesian coordinate */
+    x = r * cos_phi; 
+    y = r * sin_phi;
+    z = 0.0;
+
+/* right-handed framework
+ * first rotate around y axis by an angle of Lthe, then rotate around z axis 
+ * by an angle of Lphi
+ */
+  /*xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
+    yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
+    zb = sin(Lthe) * x + cos(Lthe) * z; */
+    
+    xb = cos_Lthe*cos_Lphi * x + sin_Lphi * y;
+    yb =-cos_Lthe*sin_Lphi * x + cos_Lphi * y;
+    zb = sin_Lthe * x;
+
+    zb0 = zb;
+    rnd_xi = gsl_rng_uniform(gsl_blr);
+    if( (rnd_xi < 1.0 - xi) && zb0 < 0.0)
+      zb = -zb;
+
+// counter-rotate around y, LOS is x-axis 
+    x = xb * cos_inc_cmp + zb * sin_inc_cmp;
+    y = yb;
+    z =-xb * sin_inc_cmp + zb * cos_inc_cmp;
+
+    weight = 0.5 + k*(x/r);
+    eta = eta_func(eta0, eta1, eta_alpha, r/mu);
+    clouds_weight_mean[i] = weight;
+    clouds_weight[i] = eta * clouds_weight_mean[i];
+
+    *r_rw += r * clouds_weight[i];
+    *r_ew += r * clouds_weight_mean[i];
+    norm_rw += clouds_weight[i];
+    norm_ew += clouds_weight_mean[i];
+  }
+
+  //second BLR region
+  rin = exp(model->mu_un) * model->F_un + Rs;
+  a = 1.0/(model->beta_un * model->beta_un);
+  sig = exp(model->mu_un) * (1.0-model->F_un)/a;
+  double Lopn_cos_un1, Lopn_cos_un2;
+  Lopn_cos_un1 = Lopn_cos;
+  if(model->opn + model->opn_un < 90.0)
+    Lopn_cos_un2 = cos((model->opn + model->opn_un)/180.0*PI);
+  else
+    Lopn_cos_un2 = 0.0;
+    
+  fellip = model->fellip_un;
+  fflow = model->fflow_un;
+
+  for(i=num_sh; i<parset.n_cloud_per_task; i++)
+  {
+// generate a direction of the angular momentum of the orbit   
+    Lphi = 2.0*PI * gsl_rng_uniform(gsl_blr);
+    //Lthe = acos(Lopn_cos_un2 + (Lopn_cos_un1-Lopn_cos_un2) * pow(gsl_rng_uniform(gsl_blr), gam));
+    //Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * pow(gsl_rng_uniform(gsl_blr), gam));
+    Lthe = theta_sample(gam, Lopn_cos_un2, Lopn_cos_un1);
+
+    sin_Lphi = sin(Lphi);
+    cos_Lphi = cos(Lphi);
+    sin_Lthe = sin(Lthe);
+    cos_Lthe = cos(Lthe);
+
+    nc = 0;
+    r = rcloud_max_set+1.0;
+    while(r>rcloud_max_set || r<rcloud_min_set)
+    {
+      if(nc > 1000)
+      {
+        printf("# Error, too many tries in generating ridial location of clouds.\n");
+        exit(0);
+      }
+      rnd = gsl_ran_gamma(gsl_blr, a, 1.0);
+//    r = mu * F + (1.0-F) * gsl_ran_gamma(gsl_blr, 1.0/beta/beta, beta*beta*mu);
+      r = rin + sig * rnd;
+      nc++;
+    }
+    phi = 2.0*PI * gsl_rng_uniform(gsl_blr);
+    cos_phi = cos(phi);
+    sin_phi = sin(phi);
+
+    /* Polar coordinates to Cartesian coordinate */
+    x = r * cos_phi; 
+    y = r * sin_phi;
+    z = 0.0;
+
+/* right-handed framework
+ * first rotate around y axis by an angle of Lthe, then rotate around z axis 
+ * by an angle of Lphi
+ */
+  /*xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
+    yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
+    zb = sin(Lthe) * x + cos(Lthe) * z; */
+    
+    xb = cos_Lthe*cos_Lphi * x + sin_Lphi * y;
+    yb =-cos_Lthe*sin_Lphi * x + cos_Lphi * y;
+    zb = sin_Lthe * x;
+
+    zb0 = zb;
+    rnd_xi = gsl_rng_uniform(gsl_blr);
+    if( (rnd_xi < 1.0 - xi) && zb0 < 0.0)
+      zb = -zb;
+
+// counter-rotate around y, LOS is x-axis 
+    x = xb * cos_inc_cmp + zb * sin_inc_cmp;
+    y = yb;
+    z =-xb * sin_inc_cmp + zb * cos_inc_cmp;
+
+    weight = 0.5 + k*(x/r);
+    eta = eta_func(eta0, eta1, eta_alpha, r/mu);
+    clouds_weight_mean[i] = weight;
+    clouds_weight[i] = eta * clouds_weight_mean[i];
+
+    *r_rw += r * clouds_weight[i];
+    *r_ew += r * clouds_weight_mean[i];
+    norm_rw += clouds_weight[i];
+    norm_ew += clouds_weight_mean[i];
+  }
+
+  *r_rw /= norm_rw;
+  *r_ew /= norm_ew;
+  printf("RW size: %f\n", *r_rw);
+  printf("EW szie: %f\n", *r_ew);
+}
 
 /* 
  * model 8, generate cloud sample.

@@ -1491,6 +1491,7 @@ void set_blr_model1d()
       gen_cloud_sample = gen_cloud_sample_model1;
       transfun_1d_cal = transfun_1d_cal_cloud;
       BLRmodel_name = BLRmodel2_name;
+      calculate_size = calculate_size_model2;
       break;
 
     case 3:
@@ -1498,6 +1499,7 @@ void set_blr_model1d()
       gen_cloud_sample = gen_cloud_sample_model3;
       transfun_1d_cal = transfun_1d_cal_cloud;
       BLRmodel_name = BLRmodel3_name;
+      calculate_size = calculate_size_model3;
       break;
 
     case 4:
@@ -1505,6 +1507,7 @@ void set_blr_model1d()
       gen_cloud_sample = gen_cloud_sample_model3;
       transfun_1d_cal = transfun_1d_cal_cloud;
       BLRmodel_name = BLRmodel4_name;
+      calculate_size = calculate_size_model4;
       break;
 
     case 5:
@@ -1512,6 +1515,7 @@ void set_blr_model1d()
       gen_cloud_sample = gen_cloud_sample_model5;
       transfun_1d_cal = transfun_1d_cal_cloud;
       BLRmodel_name = BLRmodel5_name;
+      calculate_size = calculate_size_model5;
       break;
 
     case 6:
@@ -1519,6 +1523,7 @@ void set_blr_model1d()
       gen_cloud_sample = gen_cloud_sample_model6;
       transfun_1d_cal = transfun_1d_cal_cloud;
       BLRmodel_name = BLRmodel6_name;
+      calculate_size = calculate_size_model6;
       break;
 
     case 7:
@@ -1526,6 +1531,7 @@ void set_blr_model1d()
       gen_cloud_sample = gen_cloud_sample_model7;
       transfun_1d_cal = transfun_1d_cal_cloud;
       BLRmodel_name = BLRmodel7_name;
+      calculate_size = calculate_size_model7;
       break;
 
     case 8:
@@ -1549,6 +1555,7 @@ void set_blr_model1d()
       gen_cloud_sample = gen_cloud_sample_model1;
       transfun_1d_cal = transfun_1d_cal_cloud;
       BLRmodel_name = BLRmodel1_name;
+      calculate_size = calculate_size_model1;
       break;
   }
   return;
