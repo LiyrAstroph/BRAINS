@@ -42,7 +42,7 @@ inline double interp_con_rm(double tp)
 }
 
 /* 
- * calculate (Fcon + ftrend)^Ag 
+ * calculate A*(Fcon + ftrend)
  * 
  */
 void calculate_con_rm(const void *pm)
@@ -403,5 +403,83 @@ void smooth_transfer_function2d_tau(double *trans2d, int n_vel)
       trans2d[i*n_vel + j] = hist_out->data[i];
     }
   }
+  return;
+}
+
+/*!
+ * This function calculates emissivity-weighted 2d transfer function.
+ */
+void transfun_2d_ew_cal_cloud(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save)
+{
+  /* generate cloud sample and calculate the corresponding time lags, LOS velocity, and weights */
+  gen_cloud_sample(pm, 2, flag_save);
+  transfun_2d_ew_cal_with_sample(transv, trans2d, n_vel);
+  return;
+}
+/*!
+ * This function calculates emissivity-weighted transfer function.
+ *
+ */
+void transfun_2d_ew_cal_with_sample(double *transv, double *trans2d, int n_vel)
+{
+  int i, j, idt, idV;
+  double tau_min, tau_max, dTransTau;
+  double Anorm, dis, V, V_offset, dV;
+
+  tau_min = clouds_tau[0];
+  tau_max = clouds_tau[0];
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    if(tau_min > clouds_tau[i])
+      tau_min = clouds_tau[i];
+    if(tau_max < clouds_tau[i])
+      tau_max = clouds_tau[i];
+  }
+
+  dTransTau = (tau_max - tau_min)/(parset.n_tau - 1);
+  for(i=0; i<parset.n_tau; i++)
+  {
+    TransTau[i] = tau_min + dTransTau * i;
+  }
+
+  dV =(transv[1] - transv[0]); /* velocity grid width */
+  for(i=0; i<parset.n_tau; i++)
+    for(j=0;j<n_vel;j++)
+      trans2d[i*n_vel+j]=0.0;   /* cleanup of transfer function */
+
+  for(i=0; i<parset.n_cloud_per_task; i++)
+  {
+    dis = clouds_tau[i];
+    idt = (dis - tau_min)/dTransTau;
+
+    for(j=0; j<parset.n_vel_per_cloud; j++)
+    {
+      V = clouds_vel[i*parset.n_vel_per_cloud + j];
+      V_offset = V + bin_offset * dV; /* bin type: center or left edge */
+      if(V_offset < transv[0] || V_offset >= transv[n_vel-1] + dV )
+        continue;
+      idV = (V_offset - transv[0])/dV; 
+      //trans2d[idt*n_vel + idV] += pow(1.0/r, 2.0*(1 + gam)) * weight;
+      trans2d[idt*n_vel + idV] += clouds_weight_mean[i];
+    }
+  }
+
+  /* normalize transfer function */
+  Anorm = EPS;
+  for(i=0; i<parset.n_tau; i++)
+    for(j=0; j<n_vel; j++)
+      Anorm += trans2d[i*n_vel + j];
+    
+  Anorm *=  dTransTau * dV;
+  for(i=0; i<parset.n_tau; i++)
+  {
+    for(j=0; j<n_vel; j++)
+    {
+      trans2d[i*n_vel+j] /= Anorm;
+    }
+  }
+
+  smooth_transfer_function2d_tau(trans2d, n_vel);
+
   return;
 }

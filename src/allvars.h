@@ -248,7 +248,7 @@ extern double eta_range_model[3][2];
 extern double *instres_epoch, *instres_err_epoch;
 
 /* transfer function / velocity-delay map */
-extern double *TransTau, *TransV, *TransW, *Trans1D, *Trans2D_at_veldata, *Trans2D;
+extern double *TransTau, *TransV, *TransW, *Trans1D, *Trans2D_at_veldata, *Trans2D, *Trans2DEW;
 extern double rcloud_min_set, rcloud_max_set, time_back_set;
 
 extern double Fline_mean, *Fline2d_mean, *Fline2d_mean_buf;

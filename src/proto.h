@@ -137,6 +137,8 @@ void calculate_size_model9(const void *pm, double *r_rw, double *r_ew);
 void (*transfun_2d_cal)(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save);
 void transfun_2d_cal_cloud(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save);
 void transfun_2d_cal_with_sample(double *transv, double *trans2d, int n_vel);
+void transfun_2d_ew_cal_cloud(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save);
+void transfun_2d_ew_cal_with_sample(double *transv, double *trans2d, int n_vel);
 
 void smooth_init(int nv, const double *transv);
 void smooth_end();

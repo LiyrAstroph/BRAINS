@@ -163,6 +163,9 @@ void sim()
   transfun_2d_cal(model, TransV, Trans2D, parset.n_vel_recon, 0);
   calculate_line2d_from_blrmodel(model, Tline, TransV, 
           Trans2D, Fline2d, parset.n_line_recon, parset.n_vel_recon);
+  
+  /* emissivity-weighted transfer function */
+  transfun_2d_ew_cal_cloud(model, TransV, Trans2DEW, parset.n_vel_recon, 0);
 
   
   sprintf(fname, "%s/%s", parset.file_dir, "/data/sim_line2d.txt");
@@ -217,6 +220,26 @@ void sim()
     for(j=0; j<parset.n_vel_recon; j++)
     {
       fprintf(fp, "%e %e %e\n", TransV[j]*VelUnit, TransTau[i], Trans2D[i*parset.n_vel_recon + j]);
+    }
+
+    fprintf(fp, "\n");
+  }
+  fclose(fp);
+
+  // output emissivity-weighted 2d transfer function
+  sprintf(fname, "%s/%s_ew", parset.file_dir, parset.tran2d_out_file);
+  fp = fopen(fname, "w");
+  if(fp == NULL)
+  {
+    fprintf(stderr, "# Error: Cannot open file %s\n", fname);
+    exit(-1);
+  }
+  fprintf(fp, "# %d %d\n", parset.n_tau, parset.n_vel_recon);
+  for(i=0; i<parset.n_tau; i++)
+  {
+    for(j=0; j<parset.n_vel_recon; j++)
+    {
+      fprintf(fp, "%e %e %e\n", TransV[j]*VelUnit, TransTau[i], Trans2DEW[i*parset.n_vel_recon + j]);
     }
 
     fprintf(fp, "\n");
@@ -745,6 +768,7 @@ void sim_init()
   TransW = malloc(parset.n_vel_recon * sizeof(double));
   Trans1D = malloc(parset.n_tau * sizeof(double));
   Trans2D = malloc(parset.n_tau * parset.n_vel_recon * sizeof(double));
+  Trans2DEW = malloc(parset.n_tau * parset.n_vel_recon * sizeof(double));
   Tline = malloc(parset.n_line_recon * sizeof(double));
   Fline = malloc(parset.n_line_recon * sizeof(double));
   Fline2d = malloc(parset.n_line_recon * parset.n_vel_recon * sizeof(double));
@@ -979,6 +1003,7 @@ void sim_end()
   free(Fline2d_mean);
   free(Fline2d_mean_buf);
   free(Trans2D);
+  free(Trans2DEW);
   free(Trans1D);
 
   free(clouds_tau);
