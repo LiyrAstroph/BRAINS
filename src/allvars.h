@@ -151,6 +151,9 @@ typedef struct
   int flag_bintype;
   int flag_gravity;
   
+  int flag_para_value;
+  char para_value_file[BRAINS_MAX_STR_LENGTH];
+  
 #ifdef SpecAstro
   char sa_file[BRAINS_MAX_STR_LENGTH];
   char sarm_file[BRAINS_MAX_STR_LENGTH];

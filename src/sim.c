@@ -165,7 +165,8 @@ void sim()
           Trans2D, Fline2d, parset.n_line_recon, parset.n_vel_recon);
   
   /* emissivity-weighted transfer function */
-  transfun_2d_ew_cal_cloud(model, TransV, Trans2DEW, parset.n_vel_recon, 0);
+  //transfun_2d_ew_cal_cloud(model, TransV, Trans2DEW, parset.n_vel_recon, 0);
+  transfun_2d_ew_cal_with_sample(TransV, Trans2DEW, parset.n_vel_recon);
 
   
   sprintf(fname, "%s/%s", parset.file_dir, "/data/sim_line2d.txt");
@@ -650,7 +651,14 @@ void sim_init()
   }
   else 
   {
-    set_par_value_sim(pm, parset.flag_blrmodel);
+    if(parset.flag_para_value == 0)
+    {
+      set_par_value_sim(pm, parset.flag_blrmodel);
+    }
+    else 
+    {
+      read_param_value(pm, parset.para_value_file);
+    }
     set_par_fix_blrmodel();
     for(i=0; i<num_params_blr_model; i++)
     {
@@ -675,7 +683,14 @@ void sim_init()
 #ifdef SpecAstro
   double *sa_model = pm + num_params_blr;
   set_idx_par_mutual();
-  set_par_value_sim(sa_model, parset.flag_sa_blrmodel);
+  if(parset.flag_para_value == 0)
+  {
+    set_par_value_sim(sa_model, parset.flag_sa_blrmodel);
+  }
+  else 
+  {
+    read_param_value(sa_model, parset.para_value_file);
+  }
   set_par_fix_sa_blrmodel(); 
   for(i=0; i<num_params_sa_blr_model; i++)
   {
@@ -1277,5 +1292,36 @@ void print_par_value_sim(double *pm, int np)
   {
     printf("%02d %15s = %f\n", i, BLRmodel_name[i], pm[i]);
   }
+  return;
+}
+
+/*!
+ * read in parameter values from a file fname
+ */
+void read_param_value(double *pm, char *fname)
+{
+  FILE *fp;
+  int i;
+
+  fp = fopen(fname, "r");
+  if(fp == NULL)
+  {
+    printf("Error: cannot open file %s!\n", fname);
+    exit(-1);
+  }
+  
+  printf("%d\n", num_params_blr_model);
+
+  for(i=0; i<num_params_blr_model; i++)
+  {
+    if(fscanf(fp, "%lf\n", &pm[i])<1)
+    {
+      printf("Error: unable to read in %d-th value in %s!\n", i, fname);
+      exit(-1);
+    }
+    printf("%f\n", pm[i]);
+  }
+
+  fclose(fp);
   return;
 }

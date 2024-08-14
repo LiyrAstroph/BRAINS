@@ -143,6 +143,8 @@ void init()
     theta_sample = theta_sample_inner;
   }
 
+  eta_func = eta_func_powerlaw;
+
 #ifdef SpecAstro
   if(parset.flag_dim > 3 || parset.flag_dim < 0)
   {

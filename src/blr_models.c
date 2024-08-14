@@ -59,13 +59,21 @@ inline double theta_sample_inner(double gam, double Lopn_cos1, double Lopn_cos2)
   return opn2 + (opn1-opn2)  * (1.0 - pow(gsl_rng_uniform(gsl_blr), 1.0/gam));
 }
 
-inline double eta_func(double eta0, double eta1, double alpha, double r)
+inline double eta_func_powerlaw(double eta0, double eta1, double alpha, double r)
 {
   double eta;
   
   eta = eta0 + eta1*pow(r, alpha);
   if(eta< -0.5)eta = -0.5;
-  else if(eta > 2.0)eta = 2.0;
+  else if(eta > 1.5)eta = 1.5;
+  return eta;
+}
+
+inline double eta_func_step(double eta0, double eta1, double alpha, double r)
+{
+  double eta;
+  if(r>=alpha)eta = eta1;
+  else eta=eta0;
   return eta;
 }
 

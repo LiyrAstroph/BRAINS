@@ -16,7 +16,9 @@
 double (*theta_sample)(double gam, double Lopn_cos1, double Lopn_cos2);
 double theta_sample_outer(double gam, double Lopn_cos1, double Lopn_cos2);
 double theta_sample_inner(double gam, double Lopn_cos1, double Lopn_cos2);
-double eta_func(double eta0, double eta1, double alpha, double r);
+double eta_func_powerlaw(double eta0, double eta1, double alpha, double r);
+double eta_func_step(double eta0, double eta1, double alpha, double r);
+double (*eta_func)(double eta0, double eta1, double alpha, double r);
 
 extern char **BLRmodel_name;
 extern char **BLRmodel_sa_name;
