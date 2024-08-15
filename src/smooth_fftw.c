@@ -219,7 +219,7 @@ void line_gaussian_smooth_2D_FFT(const double *transv, double *fl2d, int nl, int
 void line_gaussian_smooth_FFT(const double *transv, double *fl, int nv, const void *pm)
 {
   int i;
-  double sigV, dV, linecenter;
+  double sigV, dV, linecenter=0.0;
   double *pmodel = (double *)pm;
   
   dV = transv[1] - transv[0];

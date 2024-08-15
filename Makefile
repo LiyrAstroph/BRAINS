@@ -12,7 +12,7 @@ OPTIMIZE = -O3 -Wall -finline-functions -fcommon -ffast-math
 #OPTIMIZE += -DDebug
 
 # include spectro-astrometry analysis
-OPTIMIZE += -DSpecAstro
+# OPTIMIZE += -DSpecAstro
 
 # get GIT description
 GITCHECK := $(shell git 2>/dev/null)

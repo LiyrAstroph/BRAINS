@@ -414,7 +414,7 @@ void cal_line_profile_with_sample(const void *pm, double *vel, double *fv, int n
     {
       V = clouds_vel[i];
             
-      V_offset = V + 0.5 * dV; /* bin type: center or left edge */
+      V_offset = V + bin_offset * dV; /* bin type: center or left edge */
       if(V_offset < vel[0] || V_offset >= vel[nvel-1] + dV )
         continue;
       idV = (V_offset - vel[0])/dV; 
