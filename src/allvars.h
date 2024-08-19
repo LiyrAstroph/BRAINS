@@ -150,6 +150,8 @@ typedef struct
 
   int flag_bintype;
   int flag_gravity;
+
+  double resp_minval, resp_maxval;
   
   int flag_para_value;
   char para_value_file[BRAINS_MAX_STR_LENGTH];

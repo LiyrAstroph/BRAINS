@@ -299,6 +299,16 @@ void read_parset()
     pardict[nt].isset = 0;
     pardict[nt++].id = INT;
 
+    strcpy(pardict[nt].tag, "ResponsivityMaxVal");
+    pardict[nt].addr= &parset.resp_maxval;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = DOUBLE;
+
+    strcpy(pardict[nt].tag, "ResponsivityMinVal");
+    pardict[nt].addr= &parset.resp_minval;
+    pardict[nt].isset = 0;
+    pardict[nt++].id = DOUBLE;
+
 #ifdef SpecAstro
     strcpy(pardict[nt].tag, "FlagSADataType");
     pardict[nt].addr= &parset.flag_sa_datatype;
@@ -382,6 +392,8 @@ void read_parset()
     parset.flag_theta_sample = 0;
     parset.flux_narrowline_low = 1.0e-1;
     parset.flux_narrowline_upp = 1.0e2;
+    parset.resp_minval = -0.5;
+    parset.resp_maxval = 1.5;
 
     strcpy(parset.continuum_file, "");
     strcpy(parset.line_file, "");

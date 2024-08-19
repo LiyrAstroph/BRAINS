@@ -1211,6 +1211,105 @@ class bplotlib(Param, Options, ParaName):
     else:
       plt.close()
   
+  def plot_mean_rms(self, doshow=False, ci=0.683):
+    """
+    plot mean and rms spectra.
+    
+    ci: confidence interval
+    """
+    if not int(self.param['flagdim']) in [2, 5, 6]:
+      print("Flagdim =", self.param['flagdim'], "no 2D RM data.")
+      return
+    
+    print("# plotting mean and rms spectra.")
+    
+    wave0 = float(self.param['linecenter'])
+    idx_line =  np.nonzero(self.para_names['name'] == 'sys_err_line')[0][0]
+    
+    prof = self.data['line2d_data']['profile'][:,:, 1]
+    prof_err = self.data['line2d_data']['profile'][:, :, 2]
+
+    nt, nv = prof.shape
+    grid_wav = np.zeros(nv)
+    grid_wav[:] = self.data['line2d_data']['profile'][0, :, 0]
+    grid_vel = (grid_wav[:]/(1.0+float(self.param['redshift'])) - wave0)/wave0 *3.0e5
+    dV = (grid_vel[1]-grid_vel[0]) / self.VelUnit
+    
+    hblc=np.zeros((nt, 3))
+    hblc[:, 1]=np.sum(prof, axis=1) * dV
+    hblc[:, 2]=np.sqrt(np.sum(prof_err**2, axis=1)) * dV
+    
+    line_mean_err = np.mean(prof_err)
+    sample = self.results['sample']
+    syserr_line = (np.exp(np.mean(sample[:, idx_line])) - 1.0) * line_mean_err
+    # systematic error to line fluxes
+    hblc_syserr = np.sqrt(syserr_line**2 * nv) * dV  
+    
+    # find out the best reconstruction
+    prof_rec = np.zeros((nt, nv))
+    prof_rec_max = np.zeros((nt, nv))
+    line_rec = np.zeros(nt)
+    
+    chi = np.zeros(sample.shape[0])
+    for i in range(self.results['line2d_rec'].shape[0]):
+      prof_rec = self.results['line2d_rec'][i, :, :]
+      line_rec = np.sum(prof_rec, axis=1) * dV
+      #chi[i] = np.sum( (line_rec - hblc[:, 1]) * (line_rec - hblc[:, 1]))
+      chi[i] = np.sum( ((prof_rec - prof)/prof_err)**2 )
+    
+    imax = np.argmin(chi)
+    prof_rec_max = self.results['line2d_rec'][imax]
+
+    # cal uncertainties of mean and rms reconstructions
+    mean_rec_sample = np.mean(self.results['line2d_rec'], axis=1)
+    rms_rec_sample = np.std(self.results['line2d_rec'], axis=1)
+    mean_rec_med, mean_rec_low, mean_rec_upp = np.quantile(mean_rec_sample, axis=0, q=(0.5, (1.0-ci)/2, 1.0-(1.0-ci)/2))
+    rms_rec_med, rms_rec_low, rms_rec_upp = np.quantile(rms_rec_sample, axis=0, q=(0.5, (1.0-ci)/2, 1.0-(1.0-ci)/2))
+
+    plt.rc('text', usetex=True)
+    plt.rc('font', family='serif', size=15)
+
+    fig = plt.figure(figsize=(6, 8))
+    fig.subplots_adjust(hspace=0.05)
+    
+    # first mean spectrum
+    ax = fig.add_subplot(211)
+    mean = np.mean(prof, axis=0)
+    mean_rec = np.mean(prof_rec_max, axis=0)
+    ax.plot(grid_wav, mean, label='Data Mean')
+    ax.plot(grid_wav, mean_rec, label='Model Best')
+    ax.plot(grid_wav, mean_rec_med, label='Model Median')
+    ax.fill_between(grid_wav, y1 = mean_rec_low, y2 = mean_rec_upp, color='grey', alpha=0.5, 
+                    label=r"Uncertainties %.1f"%(ci*100)+"$\%$")
+    ax.legend(fontsize=12)
+
+    #ax.set_xlabel("Wavelength")
+    ax.set_ylabel("Flux")
+    ax.minorticks_on()
+    ax.set_xticklabels([])
+
+    ax = fig.add_subplot(212)
+    rms = np.std(prof, axis=0)
+    rms_rec = np.std(prof_rec_max, axis=0)
+    ax.plot(grid_wav, rms, label='Data RMS')
+    ax.plot(grid_wav, rms_rec, label='Model Best')
+    ax.plot(grid_wav, rms_rec_med, label='Model Median')
+    ax.fill_between(grid_wav, y1 = rms_rec_low, y2 = rms_rec_upp, color='grey', alpha=0.5, 
+                    label=r"Uncertainties %.1f"%(ci*100)+"$\%$")
+    ax.legend(fontsize=12)
+
+    ax.set_xlabel("Wavelength")
+    ax.set_ylabel("Flux")
+    ax.minorticks_on()
+   
+    fig.savefig("mean_rms.pdf", bbox_inches='tight')
+    if doshow:
+      plt.show()
+    else:
+      plt.close()
+
+
+  
   def plot_results_sa(self, doshow=False, show_offset=False, subtract_offset=False, phase_limit=None):
     if not int(self.param['flagdim']) in [4, 5, 6]:
       print("Flagdim =", self.param['flagdim'], "no  SA data.")

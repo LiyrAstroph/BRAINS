@@ -73,6 +73,10 @@ if flagdim == 2:
   # pb.plot_tran2d(vel_range=[a, b])
   # pb.plot_tran2d(tau_range=[a, b], vel_range=[c, d], doshow=False)
   pb.plot_tran2d(doshow=False)
+
+  # plot mean and rms spectra and their reconstruction
+  # ci: confidence interval
+  pb.plot_mean_rms(doshow=False, ci=0.95)
   
   # plot 1d transfer function
   # pb.plot_tran1d(tau_range=[a, b], doshow=False)

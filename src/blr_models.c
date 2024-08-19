@@ -64,8 +64,8 @@ inline double eta_func_powerlaw(double eta0, double eta1, double alpha, double r
   double eta;
   
   eta = eta0 + eta1*pow(r, alpha);
-  if(eta< -0.5)eta = -0.5;
-  else if(eta > 1.5)eta = 1.5;
+  if(eta< parset.resp_minval)eta = parset.resp_minval;
+  else if(eta > parset.resp_maxval)eta = parset.resp_maxval;
   return eta;
 }
 

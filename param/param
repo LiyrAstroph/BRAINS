@@ -91,6 +91,10 @@ FlagFixResponsivity         0                           % 0, radial-dependent re
                                                         % 2, fix responsivity to unity (eta==1)
                                                         % default: 0
 
+ResponsivityMaxVal          1.5                         % codes uses a power law to model responsivity, this is the maximum allowed maximum value
+                                                        % default: 1.5
+                                                        % 
+
 FlagThetaSample             0                           % 0, sample over cos theta; 1, over theta
 %========================================================================
 % continuum configuration

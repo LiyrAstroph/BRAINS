@@ -6,5 +6,5 @@ setup(
     author="Yan-Rong Li",
     packages=["bbackend",],
     package_dir={'bbackend':''},
-    install_requires=["numpy","matplotlib","scipy"],
+    install_requires=["numpy","matplotlib","scipy","configparser", "corner"],
 )
