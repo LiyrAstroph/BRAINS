@@ -215,6 +215,7 @@ class bplotlib(Param, Options, ParaName):
     ParaName.__init__(self, self.param['filedir'], self.param['flagdim'])
     
     self.VelUnit = np.sqrt( 6.672e-8 * 1.0e6 * 1.989e33 / (2.9979e10*8.64e4)) / 1.0e5
+    self.C_Unit = 3.0e5/self.VelUnit
     self.con_scale = 1.0
     self.line_scale = 1.0
 
@@ -543,6 +544,7 @@ class bplotlib(Param, Options, ParaName):
     get narrow line component
     """
     
+    linecenter = float(self.param["linecenter"])
     width_na = float(self.param["widthnarrowline"])
     width_na_err = float(self.param["widthnarrowlineerr"])
     shift_na = float(self.param["shiftnarrowline"])
@@ -572,7 +574,10 @@ class bplotlib(Param, Options, ParaName):
       
       width_br = np.sqrt(width**2 + broad**2)
       flux *= width/width_br
-      # note the velocity unit. in the code, velocity is scaled by the unit.
+      # note 1) flux scale. in the code, wavelength is converted into velocity, flux is not.
+      # the narrow line flux needs to account for this points. 
+      # note 2) the velocity unit. in the code, velocity is scaled by the unit.
+      flux /= (linecenter/self.C_Unit)
       prof = flux/(np.sqrt(2.0*np.pi) * width/self.VelUnit) * np.exp( -0.5 *(grid_vel - shift)**2/width_br**2)
       return prof
     elif int(self.param["flagnarrowline"]) == 2:
@@ -584,7 +589,10 @@ class bplotlib(Param, Options, ParaName):
       
       width_br = np.sqrt(width**2 + broad**2)
       flux *= width/width_br
-      # note the velocity unit. in the code, velocity is scaled by the unit.
+      # note 1) flux scale. in the code, wavelength is converted into velocity, flux is not.
+      # the narrow line flux needs to account for this points. 
+      # note 2) the velocity unit. in the code, velocity is scaled by the unit.
+      flux /= (linecenter/self.C_Unit)
       prof = flux/(np.sqrt(2.0*np.pi) * width/self.VelUnit) * np.exp( -0.5 *(grid_vel - shift)**2/width_br**2)
       return prof
     elif int(self.param["flagnarrowline"]) == 3:
@@ -596,7 +604,10 @@ class bplotlib(Param, Options, ParaName):
       flux *= width/width_br
       # note line scale
       flux /= self.line_scale
-      # note the velocity unit. in the code, velocity is scaled by the unit.
+      # note 1) flux scale. in the code, wavelength is converted into velocity, flux is not.
+      # the narrow line flux needs to account for this points. 
+      # note 2) for flagnarrowline==3, the flux parameter is already include this point.
+      # note 3) the velocity unit. in the code, velocity is scaled by the unit.
       prof = flux/(np.sqrt(2.0*np.pi) * width/self.VelUnit) * np.exp(-0.5 *(grid_vel - shift)**2/width_br**2)
       return prof
 

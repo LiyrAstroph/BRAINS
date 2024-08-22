@@ -671,6 +671,11 @@ void read_parset()
         parset.flag_linecenter = 0;
         parset.flag_InstRes = 0;
       }
+
+      /* note that wavelength is converted into velocity, but line fluxes are not.
+       * the narrow line flux needs to account for this point.
+       * this effectively reduces the narrow line flux by a factor of lambda0/C.
+       */
       if(parset.flag_dim ==2 || parset.flag_dim == 3 || parset.flag_dim == 6)
       {
         if(parset.flag_narrowline == 0)
@@ -683,16 +688,24 @@ void read_parset()
         {
           printf("# add fixed narrow-line: flux=%e, width=%fkm/s, shift=%fkm/s.\n", parset.flux_narrowline, 
              parset.width_narrowline, parset.shift_narrowline);
+          
+          parset.flux_narrowline     /= (parset.linecenter/C_Unit);
         }
         else if(parset.flag_narrowline == 2 )
         {
           printf("# add narrow-line with Gaussian priors: flux=%e, width=%fkm/s, shift=%fkm/s.\n", parset.flux_narrowline, 
              parset.width_narrowline, parset.shift_narrowline);
+          
+          parset.flux_narrowline     /= (parset.linecenter/C_Unit);
+          parset.flux_narrowline_err /= (parset.linecenter/C_Unit);
         }
         else
         {
           printf("# add narrow-line with logrithmic prior of flux and Gaussian priors of width and shift: width=%fkm/s, shift=%fkm/s.\n",
              parset.width_narrowline, parset.shift_narrowline);
+          
+          parset.flux_narrowline_low /= (parset.linecenter/C_Unit);
+          parset.flux_narrowline_upp /= (parset.linecenter/C_Unit);
         }
   
         if(parset.width_narrowline<=0.0 && parset.flag_narrowline > 0)
@@ -701,10 +714,10 @@ void read_parset()
           error_flag = 1;
         }
   
-        parset.width_narrowline /= VelUnit;
+        parset.width_narrowline     /= VelUnit;
         parset.width_narrowline_err /= VelUnit;
   
-        parset.shift_narrowline /= VelUnit;
+        parset.shift_narrowline     /= VelUnit;
         parset.shift_narrowline_err /= VelUnit;
   
         if(parset.flag_InstRes > 2) /* epoch-dependent spectral broadening */
@@ -718,7 +731,7 @@ void read_parset()
         }
         else
         {
-          parset.InstRes /= VelUnit;
+          parset.InstRes     /= VelUnit;
           parset.InstRes_err /= VelUnit;
   
         }
@@ -1163,7 +1176,10 @@ void read_data()
       
       if(error_flag == 0)
       {
-        /* convert time to rest frame */
+        /* convert time to rest frame 
+         * note: only time is conerted, flux is not. 
+         *       this does not affect modeling, because the continuum and line fluxes are normalized before modeling 
+         */
         for(i=0; i<n_line_data; i++)
         {
           Tline_data[i] /= (1.0+parset.redshift);
@@ -1265,7 +1281,11 @@ void read_data()
           error_flag = 4;
         }
 
-        /* convert wavelength to velocity */
+        /* convert wavelength to velocity 
+         * note: the unit of flux is not converted accordingly.
+         *       the narrow-line flux needs to account for this point, otherwise, the input flux prior will be 
+         *       incorrect.
+         */
         for(j=0; j<n_vel_data; j++)
         {
           Vline_data[j] = (Wline_data[j]/(1.0+parset.redshift) - parset.linecenter)/parset.linecenter * C_Unit;
