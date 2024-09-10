@@ -285,7 +285,7 @@ void set_par_range_sa1d()
     par_prior_gaussian[i][1] = 1.0;
   }
   
-  /* response A and Ag */
+  /* response A and Fcon_mean */
   j = 0;
   i1 = idx_resp;
   i2 = idx_resp + num_params_resp;
@@ -432,7 +432,7 @@ void print_par_names_sa1d()
                             par_fix[i], par_fix_val[i], par_prior_gaussian[i][0], par_prior_gaussian[i][1]);
 
   i++;
-  fprintf(fp, str_fmt, i, "Ag", par_range_model[i][0], par_range_model[i][1], par_prior_model[i],
+  fprintf(fp, str_fmt, i, "Fcon_mean", par_range_model[i][0], par_range_model[i][1], par_prior_model[i],
                             par_fix[i], par_fix_val[i], par_prior_gaussian[i][0], par_prior_gaussian[i][1]);
 
   for(j=0; j<num_params_difftrend; j++)
