@@ -577,6 +577,15 @@ void set_sa_blr_range_model1()
   //k
   sa_blr_range_model[i][0] = -0.5;
   sa_blr_range_model[i++][1] = 0.5;
+  //eta0
+  sa_blr_range_model[i][0]   = eta_range_model[0][0];  // 
+  sa_blr_range_model[i++][1] = eta_range_model[0][1];
+  //eta1
+  sa_blr_range_model[i][0]   = eta_range_model[1][0];  // 
+  sa_blr_range_model[i++][1] = eta_range_model[1][1];
+  //eta_alpha
+  sa_blr_range_model[i][0]   = eta_range_model[2][0];  // 
+  sa_blr_range_model[i++][1] = eta_range_model[2][1];
   //mbh
   sa_blr_range_model[i][0] = log(mass_range[0]);
   sa_blr_range_model[i++][1] = log(mass_range[1]);
@@ -615,6 +624,15 @@ void set_sa_blr_range_model2()
   //k
   sa_blr_range_model[i][0] = -0.5;
   sa_blr_range_model[i++][1] = 0.5;
+  //eta0
+  sa_blr_range_model[i][0]   = eta_range_model[0][0];  // 
+  sa_blr_range_model[i++][1] = eta_range_model[0][1];
+  //eta1
+  sa_blr_range_model[i][0]   = eta_range_model[1][0];  // 
+  sa_blr_range_model[i++][1] = eta_range_model[1][1];
+  //eta_alpha
+  sa_blr_range_model[i][0]   = eta_range_model[2][0];  // 
+  sa_blr_range_model[i++][1] = eta_range_model[2][1];
   //mbh
   sa_blr_range_model[i][0] = log(mass_range[0]);
   sa_blr_range_model[i++][1] = log(mass_range[1]);
@@ -652,6 +670,15 @@ void set_sa_blr_range_model3()
   //k
   sa_blr_range_model[i][0] = -0.5;
   sa_blr_range_model[i++][1] = 0.5;
+  //eta0
+  sa_blr_range_model[i][0]   = eta_range_model[0][0];  // 
+  sa_blr_range_model[i++][1] = eta_range_model[0][1];
+  //eta1
+  sa_blr_range_model[i][0]   = eta_range_model[1][0];  // 
+  sa_blr_range_model[i++][1] = eta_range_model[1][1];
+  //eta_alpha
+  sa_blr_range_model[i][0]   = eta_range_model[2][0];  // 
+  sa_blr_range_model[i++][1] = eta_range_model[2][1];
   //mbh
   sa_blr_range_model[i][0] = log(mass_range[0]);
   sa_blr_range_model[i++][1] = log(mass_range[1]);
@@ -690,6 +717,15 @@ void set_sa_blr_range_model4()
   //k
   sa_blr_range_model[i][0] = -0.5;
   sa_blr_range_model[i++][1] = 0.5;
+  //eta0
+  sa_blr_range_model[i][0]   = eta_range_model[0][0];  // 
+  sa_blr_range_model[i++][1] = eta_range_model[0][1];
+  //eta1
+  sa_blr_range_model[i][0]   = eta_range_model[1][0];  // 
+  sa_blr_range_model[i++][1] = eta_range_model[1][1];
+  //eta_alpha
+  sa_blr_range_model[i][0]   = eta_range_model[2][0];  // 
+  sa_blr_range_model[i++][1] = eta_range_model[2][1];
   //mbh
   sa_blr_range_model[i][0] = log(mass_range[0]);
   sa_blr_range_model[i++][1] = log(mass_range[1]);
@@ -737,6 +773,15 @@ void set_sa_blr_range_model5()
   //xi
   sa_blr_range_model[i][0] = 0.0;
   sa_blr_range_model[i++][1] = 1.0;
+  //eta0
+  sa_blr_range_model[i][0]   = eta_range_model[0][0];  // 
+  sa_blr_range_model[i++][1] = eta_range_model[0][1];
+  //eta1
+  sa_blr_range_model[i][0]   = eta_range_model[1][0];  // 
+  sa_blr_range_model[i++][1] = eta_range_model[1][1];
+  //eta_alpha
+  sa_blr_range_model[i][0]   = eta_range_model[2][0];  // 
+  sa_blr_range_model[i++][1] = eta_range_model[2][1];
   //mbh
   sa_blr_range_model[i][0] = log(mass_range[0]);
   sa_blr_range_model[i++][1] = log(mass_range[1]);
@@ -801,6 +846,15 @@ void set_sa_blr_range_model6()
   //xi
   sa_blr_range_model[i][0] = 0.0;
   sa_blr_range_model[i++][1] = 1.0;
+  //eta0
+  sa_blr_range_model[i][0]   = eta_range_model[0][0];  // 
+  sa_blr_range_model[i++][1] = eta_range_model[0][1];
+  //eta1
+  sa_blr_range_model[i][0]   = eta_range_model[1][0];  // 
+  sa_blr_range_model[i++][1] = eta_range_model[1][1];
+  //eta_alpha
+  sa_blr_range_model[i][0]   = eta_range_model[2][0];  // 
+  sa_blr_range_model[i++][1] = eta_range_model[2][1];
   //mbh
   sa_blr_range_model[i][0] = log(mass_range[0]);
   sa_blr_range_model[i++][1] = log(mass_range[1]);
@@ -881,6 +935,16 @@ void set_sa_blr_range_model7()
   //opn_un
   sa_blr_range_model[i][0] = 0.0;
   sa_blr_range_model[i++][1] = 90.0;
+
+  //eta0
+  sa_blr_range_model[i][0]   = eta_range_model[0][0];  // 
+  sa_blr_range_model[i++][1] = eta_range_model[0][1];
+  //eta1
+  sa_blr_range_model[i][0]   = eta_range_model[1][0];  // 
+  sa_blr_range_model[i++][1] = eta_range_model[1][1];
+  //eta_alpha
+  sa_blr_range_model[i][0]   = eta_range_model[2][0];  // 
+  sa_blr_range_model[i++][1] = eta_range_model[2][1];
 
   //mbh
   sa_blr_range_model[i][0] = log(mass_range[0]);
@@ -963,6 +1027,15 @@ void set_sa_blr_range_model8()
   //inc
   sa_blr_range_model[i][0] = 0.0;   // cos(inc)
   sa_blr_range_model[i++][1] = 1.0;
+  //eta0
+  sa_blr_range_model[i][0]   = eta_range_model[0][0];  // 
+  sa_blr_range_model[i++][1] = eta_range_model[0][1];
+  //eta1
+  sa_blr_range_model[i][0]   = eta_range_model[1][0];  // 
+  sa_blr_range_model[i++][1] = eta_range_model[1][1];
+  //eta_alpha
+  sa_blr_range_model[i][0]   = eta_range_model[2][0];  // 
+  sa_blr_range_model[i++][1] = eta_range_model[2][1];
   //mbh
   sa_blr_range_model[i][0] = log(mass_range[0]);
   sa_blr_range_model[i++][1] = log(mass_range[1]);
@@ -991,6 +1064,15 @@ void set_sa_blr_range_model9()
   //opn
   sa_blr_range_model[i][0] = 0.0;  // in degree
   sa_blr_range_model[i++][1] = 90.0;
+  //eta0
+  sa_blr_range_model[i][0]   = eta_range_model[0][0];  // 
+  sa_blr_range_model[i++][1] = eta_range_model[0][1];
+  //eta1
+  sa_blr_range_model[i][0]   = eta_range_model[1][0];  // 
+  sa_blr_range_model[i++][1] = eta_range_model[1][1];
+  //eta_alpha
+  sa_blr_range_model[i][0]   = eta_range_model[2][0];  // 
+  sa_blr_range_model[i++][1] = eta_range_model[2][1];
   //mbh
   sa_blr_range_model[i][0] = log(mass_range[0]);
   sa_blr_range_model[i++][1] = log(mass_range[1]);
