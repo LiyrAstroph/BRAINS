@@ -225,6 +225,8 @@ class bplotlib(Param, Options, ParaName):
 
     self.postfix=["con", "1d","2d", "sa", "sa1d", "sa2d", "sarm"]
 
+    self.redshift = self.param['redshift']
+
   def _load_line2d_data(self):
     """
     load 2d line data
@@ -319,7 +321,7 @@ class bplotlib(Param, Options, ParaName):
       # load line2d data
       self.data['line2d_data'] = self._load_line2d_data()
 
-      # calculate con_scale and line_scale
+      # calculate con_scale
       self.con_scale = self.data['con_data'].shape[0]/np.sum(self.data['con_data'][:, 1])
     
     elif self.param['flagdim'] == '3':
@@ -337,6 +339,9 @@ class bplotlib(Param, Options, ParaName):
       # load sa data
       self.data["sa_data"] = self._load_sa_data()
 
+      # calculate con_scale
+      self.con_scale = self.data['con_data'].shape[0]/np.sum(self.data['con_data'][:, 1])
+
     elif self.param['flagdim'] == '6':
       # load continuum data
       self.data['con_data'] = np.loadtxt(self.file_dir+self.param['continuumfile'])
@@ -344,6 +349,9 @@ class bplotlib(Param, Options, ParaName):
       self.data['line2d_data'] = self._load_line2d_data()
       # load sa data
       self.data["sa_data"] = self._load_sa_data()
+
+      # calculate con_scale
+      self.con_scale = self.data['con_data'].shape[0]/np.sum(self.data['con_data'][:, 1])
     
     else:
       raise Exception("Incorrect FlagDim.")
@@ -706,8 +714,9 @@ class bplotlib(Param, Options, ParaName):
     num_param_diff_trend = len(idx_diff_trend_all)
     if num_param_diff_trend > 0:
       idx_diff_trend = idx_diff_trend_all[0]
-      t1 = conlc[0, 0]
-      t2 = conlc[-1, 0]
+      #note in BRAINS, light curves are converted into rest frame
+      t1 = conlc[0, 0]/(1.0+self.redshift)
+      t2 = conlc[-1, 0]/(1.0+self.redshift)
       tmed = (t1+t2)/2.0
       tspan = t2-t1
 
@@ -723,7 +732,7 @@ class bplotlib(Param, Options, ParaName):
         ftrend +=  sample[:, idx_diff_trend+i-1, np.newaxis] * (trend[np.newaxis, :] - tmed)**(i)
       
       fcon_mean = np.median(conlc[:, 1])
-      ax1.plot(trend - t0, np.median(ftrend, axis=0)/self.con_scale + fcon_mean, ls='--', color='grey', lw=1)
+      ax1.plot(trend*(1.0+self.redshift) - t0, np.median(ftrend, axis=0)/self.con_scale + fcon_mean, ls='--', color='grey', lw=1)
 
     #ax1.set_xlabel("Time")
     ax1.set_ylabel("Flux")
