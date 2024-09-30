@@ -159,6 +159,8 @@ void calculate_sa_with_sample(const void *pm)
       if(V_offset<vel_sa_data[0] || V_offset >= vel_sa_data[n_vel_sa_data-1]+dV)
         continue;
       idV = (V_offset - vel_sa_data[0])/dV;
+      /* due to the round error, idV might be exceed the array limit */
+      if(idV>=n_vel_sa_data-1)idV=n_vel_sa_data-1;
       
       phase_norm[idV] += clouds_weight_mean[i];
       alpha_cent[idV] += alpha * clouds_weight_mean[i];
@@ -274,6 +276,8 @@ void calculate_sa_sim_with_sample(const void *pm, double *vel_sa, int n_vel_sa, 
       if(V_offset<vel_sa[0] || V_offset >= vel_sa[n_vel_sa-1]+dV)
         continue;
       idV = (V_offset - vel_sa[0])/dV;
+      /* due to the round error, idV might be exceed the array limit */
+      if(idV>=n_vel_sa-1)idV=n_vel_sa-1;
       
       phase_norm[idV] += clouds_weight_mean[i];
       alpha_cent[idV] += alpha * clouds_weight_mean[i];
