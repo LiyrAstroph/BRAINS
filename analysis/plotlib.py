@@ -225,7 +225,7 @@ class bplotlib(Param, Options, ParaName):
 
     self.postfix=["con", "1d","2d", "sa", "sa1d", "sa2d", "sarm"]
 
-    self.redshift = self.param['redshift']
+    self.redshift = float(self.param['redshift'])
 
   def _load_line2d_data(self):
     """
