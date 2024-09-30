@@ -1554,6 +1554,8 @@ void read_data()
       }
       fclose(fp);
 
+      check_equal_bin(wave_sa_data, n_vel_sa_data);
+
       if(error_flag == 0)
       {
         sa_phase_error_mean = 0.0;
@@ -1744,6 +1746,8 @@ void read_data()
         }
         sarm_phase_error_mean /= (n_base_sarm_data * n_vel_sarm_data * n_epoch_sarm_data);
       }
+
+      check_equal_bin(wave_sa_data, n_vel_sarm_data);
     }
 
     MPI_Bcast(&error_flag, 1, MPI_INT, roottask, MPI_COMM_WORLD);
