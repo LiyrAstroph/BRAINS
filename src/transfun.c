@@ -75,6 +75,8 @@ void calculate_con_rm(const void *pm)
       }
       
       fcon = Fcon[i] + ftrend;
+      /* make sure fcon is always positive */
+      if(fcon < 0.0)fcon = 0.0;
       Fcon_rm[i] = A * (fcon - fcon_mean);
     }
   }

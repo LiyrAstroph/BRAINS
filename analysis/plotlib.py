@@ -719,20 +719,21 @@ class bplotlib(Param, Options, ParaName):
       t2 = conlc[-1, 0]/(1.0+self.redshift)
       tmed = (t1+t2)/2.0
       tspan = t2-t1
-
-      trend = np.linspace(t1, t2, 200)
-      ftrend = np.zeros((sample.shape[0], 200))
+      fcon_mean = np.median(conlc[:, 1])
 
       a0 = np.zeros(sample.shape[0])
       for i in range(1, num_param_diff_trend+1):
         a0[:] += -sample[:, idx_diff_trend+i-1]/tspan * ((t2-tmed)**(i+1) - (t1-tmed)**(i+1))/(i+1)
       
+      trend = np.linspace(con_date[0]/(1.0+self.redshift), con_date[-1]/(1.0+self.redshift), 200)
+      ftrend = np.zeros((sample.shape[0], 200))
       ftrend += a0[:, np.newaxis]
       for i in range(1, num_param_diff_trend+1):
         ftrend +=  sample[:, idx_diff_trend+i-1, np.newaxis] * (trend[np.newaxis, :] - tmed)**(i)
       
-      fcon_mean = np.median(conlc[:, 1])
-      ax1.plot(trend*(1.0+self.redshift) - t0, np.median(ftrend, axis=0)/self.con_scale + fcon_mean, ls='--', color='grey', lw=1)
+      ftrend_med, ftrend_low, ftrend_upp = np.quantile(ftrend, axis=0, q=(0.5, (1.0-0.683)/2, 1.0-(1.0-0.683)/2))/self.con_scale + fcon_mean
+      ax1.plot(trend*(1.0+self.redshift) - t0, ftrend_med, ls='--', color='grey', lw=1)
+      ax1.fill_between(trend*(1.0+self.redshift) - t0, y1=ftrend_low, y2=ftrend_upp, color='grey', alpha=0.5)
 
     #ax1.set_xlabel("Time")
     ax1.set_ylabel("Flux")
