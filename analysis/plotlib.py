@@ -1316,7 +1316,7 @@ class bplotlib(Param, Options, ParaName):
       plt.close()
 
   
-  def plot_results_sa(self, doshow=False, show_offset=False, subtract_offset=False, phase_limit=None):
+  def plot_results_sa(self, doshow=False, show_offset=False, subtract_offset=False, phase_limit=None, column_first=True):
     if not int(self.param['flagdim']) in [4, 5, 6]:
       print("Flagdim =", self.param['flagdim'], "no  SA data.")
       return
@@ -1412,8 +1412,12 @@ class bplotlib(Param, Options, ParaName):
     phase_rec_low = np.quantile(phase_rec, axis=0, q=(1.0-0.683)/2)
     phase_rec_upp = np.quantile(phase_rec, axis=0, q=1.0-(1.0-0.683)/2)
     for loop_b in range(nb):
-      loop_b_p = loop_b%(nrow-1)
-      loop_e = loop_b//(nrow-1)
+      if column_first == True:
+        loop_e = loop_b%(ncol)
+        loop_b_p = loop_b//(ncol)
+      else:
+        loop_b_p = loop_b%(nrow-1)
+        loop_e = loop_b//(nrow-1)
       ax = ax_vphi[loop_b_p, loop_e]
       phi = phase_rec_mean[loop_b, :, :]
       phi_upp = phase_rec_upp[loop_b, :, 1]  
@@ -1432,8 +1436,12 @@ class bplotlib(Param, Options, ParaName):
     ymin=np.finfo(np.float64).max
     ymax=np.finfo(np.float64).min
     for loop_b in range(nb):
-      loop_b_p = loop_b%(nrow-1)
-      loop_e = loop_b//(nrow-1)
+      if column_first == True:
+        loop_e = loop_b%(ncol)
+        loop_b_p = loop_b//(ncol)
+      else:
+        loop_b_p = loop_b%(nrow-1)
+        loop_e = loop_b//(nrow-1)
       ax = ax_vphi[loop_b_p, loop_e]
       x = phase[loop_b, :, 0]
       y = phase[loop_b, :, 1]
@@ -1465,8 +1473,13 @@ class bplotlib(Param, Options, ParaName):
       ymax = np.max((ylim[1], ymax))
     
     for loop_b in range(nb):
-      loop_b_p = loop_b%(nrow-1)
-      loop_e = loop_b//(nrow-1)
+      if column_first == True:
+        loop_e = loop_b%(ncol)
+        loop_b_p = loop_b//(ncol)
+      else:
+        loop_b_p = loop_b%(nrow-1)
+        loop_e = loop_b//(nrow-1)
+        
       ax = ax_vphi[loop_b_p, loop_e]
 
       if phase_limit is not None:
