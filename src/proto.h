@@ -38,16 +38,16 @@ int check_parset_isset();
 int check_time_sorted(double *time_series, int n);
 int check_equal_bin(double *x, int n);
 
-void (*set_blr_range_model)();
-void set_blr_range_model1();
-void set_blr_range_model2();
-void set_blr_range_model3();
-void set_blr_range_model4();
-void set_blr_range_model5();
-void set_blr_range_model6();
-void set_blr_range_model7();
-void set_blr_range_model8();
-void set_blr_range_model9();
+void (*set_blr_range_model)(double **blr_range);
+void set_blr_range_model1(double **blr_range);
+void set_blr_range_model2(double **blr_range);
+void set_blr_range_model3(double **blr_range);
+void set_blr_range_model4(double **blr_range);
+void set_blr_range_model5(double **blr_range);
+void set_blr_range_model6(double **blr_range);
+void set_blr_range_model7(double **blr_range);
+void set_blr_range_model8(double **blr_range);
+void set_blr_range_model9(double **blr_range);
 void set_nlr_range_model();
 void set_eta_range_model();
 
@@ -242,16 +242,16 @@ void calculate_sa_transfun2d_from_blrmodel(const void *pm, double *transv, doubl
 /* SA general */
 void (*gen_sa_cloud_sample)(const void *pm, int flag_type, int flag_save);
 
-void (*set_sa_blr_range_model)();
-void set_sa_blr_range_model1();
-void set_sa_blr_range_model2();
-void set_sa_blr_range_model3();
-void set_sa_blr_range_model4();
-void set_sa_blr_range_model5();
-void set_sa_blr_range_model6();
-void set_sa_blr_range_model7();
-void set_sa_blr_range_model8();
-void set_sa_blr_range_model9();
+void (*set_sa_blr_range_model)(double **blr_range);
+// void set_sa_blr_range_model1();
+// void set_sa_blr_range_model2();
+// void set_sa_blr_range_model3();
+// void set_sa_blr_range_model4();
+// void set_sa_blr_range_model5();
+// void set_sa_blr_range_model6();
+// void set_sa_blr_range_model7();
+// void set_sa_blr_range_model8();
+// void set_sa_blr_range_model9();
 
 /* SA smooth */
 void sa_smooth_init(int n_v_sa, const double *v_sa, double sigV);
