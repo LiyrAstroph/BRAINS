@@ -164,7 +164,7 @@ int dnest_sa2d(int argc, char **argv)
       idx_eta = get_idx_eta_from_blrmodel(parset.flag_sa_blrmodel);
 
       par_fix[num_params_blr + idx_eta] = 1;
-      par_fix_val[num_params_blr + idx_eta] = 0.0;
+      par_fix_val[num_params_blr + idx_eta] = 1.0;
 
       par_fix[num_params_blr + idx_eta + 1] = 1;
       par_fix_val[num_params_blr + idx_eta + 1] = 0.0;

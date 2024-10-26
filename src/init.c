@@ -521,7 +521,8 @@ void init()
     }
     if(thistask == roottask)
       printf("SA rcloud_min_max set: %f %f\n", rcloud_min_set, rcloud_max_set);
-
+    
+    set_eta_range_model();
     set_sa_blr_range_model(sa_blr_range_model);
 
     sa_extpar_range[0][0] = log(1.0);  /* DA */

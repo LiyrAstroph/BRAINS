@@ -767,6 +767,11 @@ void read_parset()
       {
         parset.flag_fixresp = 0;
       }
+      /* for SA, responsivity is not usefulless, fix all responsivity parameters */
+      if(parset.flag_blrmodel >0 && parset.flag_dim == 4)
+      {
+        parset.flag_fixresp = 2;
+      }
   
       if(parset.flag_dim < 0) // create mock data
       {
