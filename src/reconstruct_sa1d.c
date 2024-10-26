@@ -35,7 +35,8 @@ void postprocess_sa1d()
   {
     // initialize smoothing workspace
     char fname[200];
-    FILE *fp, *fline, *fsa, *fsaline, *ftran, *fcon, *fcon_rm;
+    FILE *fp, *fline, *fsa, *fsaline, *ftran, *fcon, *fcon_rm, *fsize;
+    double r_rw, r_ew, r_tau, norm;
 
     sa_smooth_init(n_vel_sa_data, vel_sa_data, parset.sa_InstRes);
 
@@ -104,6 +105,16 @@ void postprocess_sa1d()
       exit(0);
     }
 
+    //file for BLR size
+    sprintf(fname, "%s/%s", parset.file_dir, "data/blr_size.txt");
+    fsize = fopen(fname, "w");
+    if(fsize == NULL)
+    {
+      fprintf(stderr, "# Error: Cannot open file %s.\n", fname);
+      exit(0);
+    }
+    fprintf(fsize, "# r_rw   r_ew    r_tau\n");
+
     // read number of lines
     if(fscanf(fp, "# %d", &num_ps) < 1)
     {
@@ -139,6 +150,15 @@ void postprocess_sa1d()
       //store model
       memcpy(posterior_sample+i*size_of_modeltype, post_model, size_of_modeltype);
       
+      if(calculate_size != NULL)
+      {
+        calculate_size(post_model, &r_rw, &r_ew);
+      }
+      else
+      {
+        r_rw = r_ew = 0.0;
+      }
+      
       calculate_con_from_model_semiseparable(post_model + num_params_blr_tot *sizeof(double));
       calculate_con_rm(post_model);
       gsl_interp_init(gsl_linear, Tcon, Fcon_rm, parset.n_con_recon);
@@ -146,6 +166,8 @@ void postprocess_sa1d()
       calculate_sa_transfun_from_blrmodel(post_model, 0);
       calculate_line_from_blrmodel(post_model, Tline, Fline, parset.n_line_recon);
       
+      r_tau = calculate_cent_transfun_1d(TransTau, Trans1D, parset.n_tau);
+
       //if( i % (num_ps/10+1) == 0)  
       {
         for(j=0; j<parset.n_con_recon; j++)
@@ -192,6 +214,8 @@ void postprocess_sa1d()
         }
         fprintf(fsa, "\n");
       }
+
+      fprintf(fsize, "%f %f %f\n", r_rw, r_ew, r_tau);
     }
 
     fclose(fp);
@@ -202,6 +226,7 @@ void postprocess_sa1d()
       fclose(fcon_rm);
     fclose(ftran);
     fclose(fline);
+    fclose(fsize);
     sa_smooth_end();
 
     pm = (double *)best_model_sa1d;

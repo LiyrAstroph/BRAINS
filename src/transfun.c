@@ -485,3 +485,24 @@ void transfun_2d_ew_cal_with_sample(double *transv, double *trans2d, int n_vel)
 
   return;
 }
+
+/*
+ * calculate centroid time lag of 1d transfer function
+ *
+ */
+double calculate_cent_transfun_1d(double *transtau, double *trans1d, int ntau)
+{
+  int j;
+  double norm, r_tau;
+  // calculate centroid time lag
+  norm = 0.0;
+  r_tau = 0.0;
+  for(j=0; j<ntau; j++)
+  {
+    norm += trans1d[j];
+    r_tau += trans1d[j] * transtau[j];
+  }
+  r_tau = r_tau/norm;
+
+  return r_tau;
+}

@@ -84,42 +84,52 @@ void init()
     case 1:
       BLRmodel_size = sizeof(BLRmodel1);
       set_blr_range_model = set_blr_range_model1;
+      calculate_size = calculate_size_model1;
       break;
     case 2:
       BLRmodel_size = sizeof(BLRmodel2);
       set_blr_range_model = set_blr_range_model2;
+      calculate_size = calculate_size_model2;
       break;
     case 3:
       BLRmodel_size = sizeof(BLRmodel3);
       set_blr_range_model = set_blr_range_model3;
+      calculate_size = calculate_size_model3;
       break;
     case 4:
       BLRmodel_size = sizeof(BLRmodel4);
       set_blr_range_model = set_blr_range_model4;
+      calculate_size = calculate_size_model4;
       break;
     case 5:
       BLRmodel_size = sizeof(BLRmodel5);
       set_blr_range_model = set_blr_range_model5;
+      calculate_size = calculate_size_model5;
       break;
     case 6:
       BLRmodel_size = sizeof(BLRmodel6);
       set_blr_range_model = set_blr_range_model6;
+      calculate_size = calculate_size_model6;
       break;
     case 7:
       BLRmodel_size = sizeof(BLRmodel7);
       set_blr_range_model = set_blr_range_model7;
+      calculate_size = calculate_size_model7;
       break;
     case 8:
       BLRmodel_size = sizeof(BLRmodel8);
       set_blr_range_model = set_blr_range_model8;
+      calculate_size = calculate_size_model8;
       break;
     case 9:
       BLRmodel_size = sizeof(BLRmodel9);
       set_blr_range_model = set_blr_range_model9;
+      calculate_size = calculate_size_model9;
       break;
     default:
       BLRmodel_size = sizeof(BLRmodel1);
       set_blr_range_model = set_blr_range_model1;
+      calculate_size = calculate_size_model1;
       break;
   }
 

@@ -139,6 +139,7 @@ void transfun_2d_cal_cloud(const void *pm, double *transv, double *trans2d, int 
 void transfun_2d_cal_with_sample(double *transv, double *trans2d, int n_vel);
 void transfun_2d_ew_cal_cloud(const void *pm, double *transv, double *trans2d, int n_vel, int flag_save);
 void transfun_2d_ew_cal_with_sample(double *transv, double *trans2d, int n_vel);
+double calculate_cent_transfun_1d(double *transtau, double *trans1d, int ntau);
 
 void smooth_init(int nv, const double *transv);
 void smooth_end();

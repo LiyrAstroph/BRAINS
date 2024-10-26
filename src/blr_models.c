@@ -421,8 +421,8 @@ void calculate_size_model1(const void *pm, double *r_rw, double *r_ew)
   }
   *r_rw /= norm_rw;
   *r_ew /= norm_ew;
-  printf("RW size: %f\n", *r_rw);
-  printf("EW szie: %f\n", *r_ew);
+  // printf("RW size: %f\n", *r_rw);
+  // printf("EW szie: %f\n", *r_ew);
 
   return;
 }
@@ -770,8 +770,8 @@ void calculate_size_model2(const void *pm, double *r_rw, double *r_ew)
 
   *r_rw /= norm_rw;
   *r_ew /= norm_ew;
-  printf("RW size: %f\n", *r_rw);
-  printf("EW szie: %f\n", *r_ew);
+  // printf("RW size: %f\n", *r_rw);
+  // printf("EW szie: %f\n", *r_ew);
 
   return;
 }
@@ -1108,8 +1108,8 @@ void calculate_size_model3(const void *pm, double *r_rw, double *r_ew)
 
   *r_rw /= norm_rw;
   *r_ew /= norm_ew;
-  printf("RW size: %f\n", *r_rw);
-  printf("EW szie: %f\n", *r_ew);
+  // printf("RW size: %f\n", *r_rw);
+  // printf("EW szie: %f\n", *r_ew);
 
   return;
 }
@@ -1444,8 +1444,8 @@ void calculate_size_model4(const void *pm, double *r_rw, double *r_ew)
 
   *r_rw /= norm_rw;
   *r_ew /= norm_ew;
-  printf("RW size: %f\n", *r_rw);
-  printf("EW szie: %f\n", *r_ew);
+  // printf("RW size: %f\n", *r_rw);
+  // printf("EW szie: %f\n", *r_ew);
 
   return;
 }
@@ -1871,8 +1871,8 @@ void calculate_size_model5(const void *pm, double *r_rw, double *r_ew)
 
   *r_rw /= norm_rw;
   *r_ew /= norm_ew;
-  printf("RW size: %f\n", *r_rw);
-  printf("EW szie: %f\n", *r_ew);
+  // printf("RW size: %f\n", *r_rw);
+  // printf("EW szie: %f\n", *r_ew);
 
   return;
 }
@@ -2286,8 +2286,8 @@ void calculate_size_model6(const void *pm, double *r_rw, double *r_ew)
 
   *r_rw /= norm_rw;
   *r_ew /= norm_ew;
-  printf("RW size: %f\n", *r_rw);
-  printf("EW szie: %f\n", *r_ew);
+  //printf("RW size: %f\n", *r_rw);
+  //printf("EW szie: %f\n", *r_ew);
 
   return;
 }
@@ -3004,8 +3004,8 @@ void calculate_size_model7(const void *pm, double *r_rw, double *r_ew)
 
   *r_rw /= norm_rw;
   *r_ew /= norm_ew;
-  printf("RW size: %f\n", *r_rw);
-  printf("EW szie: %f\n", *r_ew);
+  // printf("RW size: %f\n", *r_rw);
+  // printf("EW szie: %f\n", *r_ew);
 }
 
 /* 
@@ -3291,8 +3291,8 @@ void calculate_size_model8(const void *pm, double *r_rw, double *r_ew)
   }
   *r_rw /= norm_rw;
   *r_ew /= norm_ew;
-  printf("RW size: %f\n", *r_rw);
-  printf("EW szie: %f\n", *r_ew);
+  // printf("RW size: %f\n", *r_rw);
+  // printf("EW szie: %f\n", *r_ew);
 
   return;
 }
@@ -3586,8 +3586,8 @@ void calculate_size_model9(const void *pm, double *r_rw, double *r_ew)
   }
   *r_rw /= norm_rw;
   *r_ew /= norm_ew;
-  printf("RW size: %f\n", *r_rw);
-  printf("EW szie: %f\n", *r_ew);
+  // printf("RW size: %f\n", *r_rw);
+  // printf("EW szie: %f\n", *r_ew);
 
   return;
 }
