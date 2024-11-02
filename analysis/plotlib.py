@@ -1316,7 +1316,8 @@ class bplotlib(Param, Options, ParaName):
       plt.close()
 
   
-  def plot_results_sa(self, doshow=False, show_offset=False, subtract_offset=False, phase_limit=None, column_first=True):
+  def plot_results_sa(self, doshow=False, show_offset=False, subtract_offset=False, phase_limit=None, column_first=True,
+                      average_baseline=None):
     if not int(self.param['flagdim']) in [4, 5, 6]:
       print("Flagdim =", self.param['flagdim'], "no  SA data.")
       return
@@ -1491,10 +1492,24 @@ class bplotlib(Param, Options, ParaName):
 
     fig.savefig("results_sa.pdf", bbox_inches='tight')
     
-    # averaged phase 
+    # averaged phase
+    # do averaging on selected baselines
+    if average_baseline is not None:
+      phase_rec_mean_max = np.max(phase_rec_mean[:, :, 1], axis=1)
+      # note in ascending order 
+      tmp = np.sort(phase_rec_mean_max)
+      if average_baseline <= nb:
+        tmp_sel = tmp[nb-average_baseline]
+      else:
+        tmp_sel = tmp[0]
+      idx_baseline= np.where(phase_rec_mean_max>=tmp_sel)[0]
+      print("averaging baselines:", idx_baseline)
+    else:
+      idx_baseline = np.array(np.arange(nb))
+
     phase_avg = np.zeros((nv, 3))
     norm = np.zeros(nv)
-    for loop_b in range(nb):
+    for loop_b in idx_baseline:
       y = phase[loop_b, :, 1]
       e = phase[loop_b, :, 2]
 
@@ -1515,13 +1530,13 @@ class bplotlib(Param, Options, ParaName):
 
     # averaged phase reconstruction 
     if subtract_offset == False:
-      phase_rec_avg = np.mean(phase_rec_mean[:, :, 1], axis=0)
-      phase_rec_upp_avg = np.mean(phase_rec_upp[:, :, 1], axis=0)
-      phase_rec_low_avg = np.mean(phase_rec_low[:, :, 1], axis=0)
+      phase_rec_avg = np.mean(phase_rec_mean[idx_baseline, :, 1], axis=0)
+      phase_rec_upp_avg = np.mean(phase_rec_upp[idx_baseline, :, 1], axis=0)
+      phase_rec_low_avg = np.mean(phase_rec_low[idx_baseline, :, 1], axis=0)
     else:
-      phase_rec_avg = np.mean(phase_rec_mean[:, :, 1] + phase_offset_rec_mean, axis=0)
-      phase_rec_upp_avg = np.mean(phase_rec_upp[:, :, 1] + phase_offset_rec_mean, axis=0)
-      phase_rec_low_avg = np.mean(phase_rec_low[:, :, 1] + phase_offset_rec_mean, axis=0)
+      phase_rec_avg = np.mean(phase_rec_mean[idx_baseline, :, 1]    + phase_offset_rec_mean[idx_baseline, :], axis=0)
+      phase_rec_upp_avg = np.mean(phase_rec_upp[idx_baseline, :, 1] + phase_offset_rec_mean[idx_baseline, :], axis=0)
+      phase_rec_low_avg = np.mean(phase_rec_low[idx_baseline, :, 1] + phase_offset_rec_mean[idx_baseline, :], axis=0)
 
     ax_avg.plot(wave, phase_rec_avg, color='C1')
     ax_avg.fill_between(wave, y1=phase_rec_upp_avg, y2=phase_rec_low_avg, alpha=0.5, color="C1")
