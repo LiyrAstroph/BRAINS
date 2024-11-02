@@ -93,3 +93,20 @@ if flagdim == 2:
   # plot clouds' distribution viewd from line of sight
   pb.plot_clouds_los("../data/clouds.txt", doshow=False)
   #pb.plot_clouds_los("../data/clouds.txt", range=[-10, 10], objname="target", format="jpg", velocity=True, doshow=False)
+
+
+#===============================================
+# RM SA results, flagdim == 4
+# 
+if flagdim == 4:
+
+  # plot CDNest diagnoistics
+  temperature = 1
+  pb.postprocess(temperature, doshow=False)
+  
+  # plot SA results
+  pb.plot_results_sa(show_offset=True, subtract_offset=True, phase_limit=[-0.9, 0.9])
+  # full arguments are:
+  # pb.plot_results_sa(show_offset=True, subtract_offset=True, phase_limit=[-0.9, 0.9], column_first=False, average_baseline=3)
+  # column_first: when plotting multiple columns (baselines>6), the baselines are arranged by column
+  # average_baseline: the number of baselines to average, counting from the baseline with the largest blr signal.
