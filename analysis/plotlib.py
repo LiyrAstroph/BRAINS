@@ -1510,17 +1510,23 @@ class bplotlib(Param, Options, ParaName):
     # averaged phase
     # do averaging on selected baselines
     if average_baseline is not None:
-      phase_rec_mean_max = np.max(phase_rec_mean[:, :, 1], axis=1)
-      # note in ascending order 
-      tmp = np.sort(phase_rec_mean_max)
-      if average_baseline <= nb:
-        tmp_sel = tmp[nb-average_baseline]
-      else:
-        tmp_sel = tmp[0]
-      idx_baseline= np.where(phase_rec_mean_max>=tmp_sel)[0]
-      print("averaging baselines:", idx_baseline)
+      if isinstance(average_baseline, int):
+        phase_rec_mean_max = np.max(np.abs(phase_rec_mean[:, :, 1]+phase_offset_rec_mean), axis=1)
+        # note in ascending order 
+        tmp = np.sort(phase_rec_mean_max)
+        if average_baseline <= nb:
+          tmp_sel = tmp[nb-average_baseline]
+        else:
+          tmp_sel = tmp[0]
+        idx_baseline= np.where(phase_rec_mean_max>=tmp_sel)[0]
+
+      elif isinstance(average_baseline, list):
+        idx_baseline = average_baseline
+        
     else:
       idx_baseline = np.array(np.arange(nb))
+    
+    print("averaging baselines:", idx_baseline)
 
     phase_avg = np.zeros((nv, 3))
     norm = np.zeros(nv)
