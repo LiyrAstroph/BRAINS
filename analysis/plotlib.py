@@ -1427,11 +1427,17 @@ class bplotlib(Param, Options, ParaName):
     phase_rec_mean = np.mean(phase_rec, axis=0)
     phase_rec_low = np.quantile(phase_rec, axis=0, q=(1.0-0.683)/2)
     phase_rec_upp = np.quantile(phase_rec, axis=0, q=1.0-(1.0-0.683)/2)
+
+    if column_first == True:
+      print("Column first changes in baselines!")
+    else:
+      print("Row first changes in baselines!")
+
     for loop_b in range(nb):
-      if column_first == True:
+      if column_first == True:  # column first changes
         loop_e = loop_b%(ncol)
         loop_b_p = loop_b//(ncol)
-      else:
+      else:  # row first changes 
         loop_b_p = loop_b%(nrow-1)
         loop_e = loop_b//(nrow-1)
       ax = ax_vphi[loop_b_p, loop_e]
