@@ -887,6 +887,14 @@ class bplotlib(Param, Options, ParaName):
     #========================================================================
      # subfig 4
     ax4=fig.add_axes([0.1, 0.35, 0.52, 0.15])
+
+    # set a proper range
+    xmin = min(conlc[0, 0], date_line[0])
+    xmax = max(conlc[-1, 0], date_line[-1])
+    dx = xmax-xmin
+    xmin -= 0.05*dx 
+    xmax += 0.05*dx 
+
     plt.errorbar(conlc[:, 0], conlc[:, 1], yerr=np.sqrt(conlc[:, 2]*conlc[:, 2] + syserr_con*syserr_con), \
                  marker='None', markersize=3, ls='none', lw=1.0, capsize=1, markeredgewidth=0.5, zorder=32)
     
@@ -896,19 +904,15 @@ class bplotlib(Param, Options, ParaName):
     con_mean_upp = np.quantile(con_rec[:, :, 1], axis=0, q=(1.0-0.683)/2.0)
     con_mean_low = np.quantile(con_rec[:, :, 1], axis=0, q=1.0 - (1.0-0.683)/2.0)
     
-    ax4.plot(con_date-date0, con_mean, color='red', zorder=20) 
-    ax4.fill_between(con_date-date0, y1=con_mean_low, y2=con_mean_upp, color='grey')
+    idx = np.where((con_date-date0>=xmin)&(con_date-date0<=xmax))[0]
+    ax4.plot(con_date[idx]-date0, con_mean[idx], color='red', zorder=20) 
+    ax4.fill_between(con_date[idx]-date0, y1=con_mean_low[idx], y2=con_mean_upp[idx], color='grey')
 
     ax4.set_ylabel(r'$F_{\rm 5100}$')
 
     [i.set_visible(False) for i in ax4.get_xticklabels()]
 
-    # set a proper range
-    xmin = min(conlc[0, 0], date_line[0])
-    xmax = max(conlc[-1, 0], date_line[-1])
-    dx = xmax-xmin
-    xmin -= 0.05*dx 
-    xmax += 0.05*dx 
+    
     ax4.set_xlim(xmin, xmax)
     ax5.set_xlim(xmin, xmax)
     ax4.minorticks_on()
@@ -1110,6 +1114,14 @@ class bplotlib(Param, Options, ParaName):
     #========================================================================
      # subfig 5
     ax5=fig.add_axes([0.37, 0.35, 0.55, 0.15])
+
+    # set a proper range
+    xmin = min(conlc[0, 0], date_line[0])
+    xmax = max(conlc[-1, 0], date_line[-1])
+    dx = xmax-xmin
+    xmin -= 0.05*dx 
+    xmax += 0.05*dx 
+
     plt.errorbar(conlc[:, 0], conlc[:, 1], yerr=np.sqrt(conlc[:, 2]*conlc[:, 2] + syserr_con*syserr_con), \
                  marker='None', markersize=3, ls='none', lw=1.0, capsize=1, markeredgewidth=0.5, zorder=32)
     
@@ -1119,19 +1131,15 @@ class bplotlib(Param, Options, ParaName):
     con_mean_upp = np.quantile(con_rec[:, :, 1], axis=0, q=(1.0-0.683)/2.0)
     con_mean_low = np.quantile(con_rec[:, :, 1], axis=0, q=1.0 - (1.0-0.683)/2.0)
     
-    ax5.plot(con_date-date0, con_mean, color='red', zorder=20) 
-    ax5.fill_between(con_date-date0, y1=con_mean_low, y2=con_mean_upp, color='grey')
+    idx = np.where((con_date-date0>=xmin)&(con_date-date0<=xmax))[0]
+    ax5.plot(con_date[idx]-date0, con_mean[idx], color='red', zorder=20) 
+    ax5.fill_between(con_date[idx]-date0, y1=con_mean_low[idx], y2=con_mean_upp[idx], color='grey')
 
     ax5.set_ylabel(r'$F_{\rm 5100}$')
 
     [i.set_visible(False) for i in ax5.get_xticklabels()]
 
-    # set a proper range
-    xmin = min(conlc[0, 0], date_line[0])
-    xmax = max(conlc[-1, 0], date_line[-1])
-    dx = xmax-xmin
-    xmin -= 0.05*dx 
-    xmax += 0.05*dx 
+    
     ax5.set_xlim(xmin, xmax)
     ax5.tick_params(labelright=True, labelleft=False)
     ax5.yaxis.set_label_position('right')
