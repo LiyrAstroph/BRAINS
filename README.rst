@@ -16,7 +16,7 @@ If using intensity reverberation mapping analysis, please cite our papers
 
 If using spectro-astrometric analysis, please cite our papers 
   
-  * `Li, Y.-R., Wang, J.-M., Songsheng, Y.-Y. 2020, ApJ, 927, 58 <https://ui.adsabs.harvard.edu/abs/2022ApJ...927...58L/abstract>`_.
+  * `Li, Y.-R., Wang, J.-M., Songsheng, Y.-Y. 2022, ApJ, 927, 58 <https://ui.adsabs.harvard.edu/abs/2022ApJ...927...58L/abstract>`_.
 
   * `Li, Y.-R., Wang, J.-M., Ho, L. C. et al. 2013, ApJ, 779, 110 <http://adsabs.harvard.edu/abs/2013ApJ...779..110L>`_.
 
