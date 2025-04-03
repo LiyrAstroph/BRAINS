@@ -195,7 +195,7 @@ class ParaName:
     """
     idx = -1
     for i in range(self.num_param_blrmodel_rm):
-      if re.match("BLR_model_ln\(Mbh\)", self.para_names['name'][i]):
+      if re.match("BLR_model_ln\(Mbh/1e6\)", self.para_names['name'][i]):
         idx = i 
         break
     
@@ -829,6 +829,8 @@ class bplotlib(Param, Options, ParaName):
     
     plt.rcParams['xtick.direction'] = 'in'
     plt.rcParams['ytick.direction'] = 'in'
+    plt.rcParams['xtick.top'] = True
+    plt.rcParams['ytick.right'] = True
     #========================================================================
     # subfig 5
     ax5=fig.add_axes([0.1, 0.2, 0.52, 0.15])
@@ -910,6 +912,8 @@ class bplotlib(Param, Options, ParaName):
     
     plt.rcParams['xtick.direction'] = 'out'
     plt.rcParams['ytick.direction'] = 'out'
+    plt.rcParams['xtick.top'] = False 
+    plt.rcParams['ytick.right'] = False
     #========================================================================
     # subfig 1
     ax1 = fig.add_axes([0.1, 0.6, 0.25, 0.3])
@@ -931,8 +935,10 @@ class bplotlib(Param, Options, ParaName):
     
     [i.set_visible(False) for i in ax2.get_yticklabels()]
 
-    plt.rcParams['xtick.direction'] = 'in'
+    plt.rcParams['xtick.direction'] = 'out'
     plt.rcParams['ytick.direction'] = 'in'
+    plt.rcParams['xtick.top'] = False 
+    plt.rcParams['ytick.right'] = True
     #========================================================================
     # subfig 3, plot the best two epochs
     ax3=fig.add_axes([0.7, 0.6, 0.25, 0.3])
@@ -947,7 +953,7 @@ class bplotlib(Param, Options, ParaName):
     i = idx[0][0]
     j = 0
     plt.errorbar(grid_vel/1.0e3, prof[i, :]+j*offset, yerr=np.sqrt(prof_err[i, :]*prof_err[i, :] + syserr_line*syserr_line), \
-                 ls='none', ecolor='k', capsize=1, markeredgewidth=1, zorder=10)
+                 ls='none', ecolor='grey', capsize=1, markeredgewidth=1, zorder=0)
     plt.plot(grid_vel/1.0e3, prof_rec_max[i, :]+j*offset, color=cycle[0], lw=2, zorder=1)
 
     if int(self.param["flagnarrowline"]) > 0:
@@ -959,7 +965,7 @@ class bplotlib(Param, Options, ParaName):
     i = idx[0][0]
     j = 1
     plt.errorbar(grid_vel/1.0e3, prof[i, :]+j*offset, yerr=np.sqrt(prof_err[i, :]*prof_err[i, :] + syserr_line*syserr_line), \
-                 ls='none', ecolor='k', capsize=1, markeredgewidth=1, zorder=10)
+                 ls='none', ecolor='grey', capsize=1, markeredgewidth=1, zorder=0)
     plt.plot(grid_vel/1.0e3, prof_rec_max[i, :]+j*offset, color=cycle[1], lw=2, zorder=1)
     
     if int(self.param["flagnarrowline"]) > 0:
@@ -975,6 +981,10 @@ class bplotlib(Param, Options, ParaName):
     if int(self.param["flagnarrowline"]) > 0:
       ax3.legend(fontsize=8, handlelength=1.0, handletextpad=0.2, loc=(0.02, 0.8), frameon=False)
     
+
+    plt.rcParams['xtick.direction'] = 'in'
+    plt.rcParams['ytick.direction'] = 'in'
+    plt.rcParams['xtick.top'] = True
     #========================================================================
     # subfig 6
     ax6=fig.add_axes([0.7, 0.2, 0.25, 0.3])
@@ -995,6 +1005,12 @@ class bplotlib(Param, Options, ParaName):
       plt.show()
     else:
       plt.close()
+    
+    # back to default
+    plt.rcParams['xtick.direction'] = 'in'
+    plt.rcParams['ytick.direction'] = 'in'
+    plt.rcParams['xtick.top'] = True
+    plt.rcParams['ytick.right'] = True
   
   def plot_results_2d_style2022(self, doshow=False, time_range=None):
     """
@@ -1137,6 +1153,8 @@ class bplotlib(Param, Options, ParaName):
 
     plt.rcParams['xtick.direction'] = 'out'
     plt.rcParams['ytick.direction'] = 'out'
+    plt.rcParams['xtick.top'] = False
+    plt.rcParams['ytick.right'] = False
     #========================================================================
     # subfig 1
     ax1 = fig.add_axes([0.1, 0.6, 0.25, 0.3])
@@ -1163,8 +1181,10 @@ class bplotlib(Param, Options, ParaName):
     prof_diff = prof - prof_rec_max
     ax3=fig.add_axes([0.64, 0.6, 0.31, 0.3])
     img = prof_diff/np.sqrt(prof_err**2 + syserr_line**2)
+    vmax = np.max((abs(np.max(img)), abs(np.min(img)), 5.5))
+    vmin = -vmax
     cmap=ax3.imshow(img,  aspect='auto', origin='lower', cmap='jet',
-                    extent=[grid_vel[0]/1.0e3, grid_vel[nv-1]/1.0e3, 1, prof.shape[0]], vmax=7.0, vmin = -7.0)
+                    extent=[grid_vel[0]/1.0e3, grid_vel[nv-1]/1.0e3, 1, prof.shape[0]], vmax = vmax, vmin = vmin)
     
     plt.colorbar(cmap, ticks=[-5, -2.5, 0.0, 2.5, 5.0])
     ax3.text(0.08, 0.9, r'\bf Residuals', color='white', transform=ax3.transAxes)
@@ -1173,7 +1193,8 @@ class bplotlib(Param, Options, ParaName):
 
     plt.rcParams['xtick.direction'] = 'in'
     plt.rcParams['ytick.direction'] = 'in'
-
+    plt.rcParams['xtick.top'] = True
+    plt.rcParams['ytick.right'] = True
     #========================================================================
     # subfig 4, plot the best two epochs
     ax4=fig.add_axes([0.1, 0.2, 0.25, 0.3])
@@ -1188,7 +1209,7 @@ class bplotlib(Param, Options, ParaName):
     i = idx[0][0]
     j = 0
     plt.errorbar(grid_vel/1.0e3, prof[i, :]+j*offset, yerr=np.sqrt(prof_err[i, :]*prof_err[i, :] + syserr_line*syserr_line), \
-                 ls='none', ecolor='k', capsize=1, markeredgewidth=1)
+                 ls='none', ecolor='grey', capsize=1, markeredgewidth=1)
     plt.plot(grid_vel/1.0e3, prof_rec_max[i, :]+j*offset, color=cycle[0], lw=2)
     
     if int(self.param["flagnarrowline"]) > 0:
@@ -1200,7 +1221,7 @@ class bplotlib(Param, Options, ParaName):
     i = idx[0][0]
     j = 1
     plt.errorbar(grid_vel/1.0e3, prof[i, :]+j*offset, yerr=np.sqrt(prof_err[i, :]*prof_err[i, :] + syserr_line*syserr_line), \
-                 ls='none', ecolor='k', capsize=1, markeredgewidth=1)
+                 ls='none', ecolor='grey', capsize=1, markeredgewidth=1)
     plt.plot(grid_vel/1.0e3, prof_rec_max[i, :]+j*offset, color=cycle[1], lw=2)
     
     if int(self.param["flagnarrowline"]) > 0:
@@ -1221,6 +1242,12 @@ class bplotlib(Param, Options, ParaName):
       plt.show()
     else:
       plt.close()
+    
+    # back to default
+    plt.rcParams['xtick.direction'] = 'in'
+    plt.rcParams['ytick.direction'] = 'in'
+    plt.rcParams['xtick.top'] = True
+    plt.rcParams['ytick.right'] = True
   
   def plot_results_sa(self, doshow=False, show_offset=False, subtract_offset=False, phase_limit=None):
     if not int(self.param['flagdim']) in [4, 5, 6]:
