@@ -8,6 +8,13 @@
 /*!
  *  \file blr_models.c
  *  \brief BLR models
+ * 
+ * Note: for all BLR models, left-handed coordinate is used. The x-axis is set to be along 
+ *       the line of sight and the positive x-axis points to the observer. That is to say,
+ *       a positive velocity in the BLR's coordinate corresponds to a blus-shift velocity
+ *       in observer's coordinate.
+ *       The projection of the BLR's left-handed coordinate on the sky is consistent with 
+ *       the convention sky coordinate where east (postive) is on the left.
  */
 
 #include <stdio.h>
@@ -75,7 +82,7 @@ void gen_cloud_sample_model1(const void *pm, int flag_type, int flag_save)
   double r, phi, dis, Lopn_cos, u;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
   double inc, F, beta, mu, k, a, s, rin, sig, Rs;
-  double Lphi, Lthe, L, E;
+  double Lphi, Lthe, sin_Lphi, cos_Lphi, sin_Lthe, cos_Lthe, L, E;
   double V, weight, rnd;
   BLRmodel1 *model = (BLRmodel1 *)pm;
   double Emin, Lmax, Vr, Vr2, Vph, mbh, chi, lambda, q;
@@ -112,6 +119,11 @@ void gen_cloud_sample_model1(const void *pm, int flag_type, int flag_save)
     //Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_blr));
     Lthe = theta_sample(1.0, Lopn_cos, 1.0);
 
+    sin_Lphi = sin(Lphi);
+    cos_Lphi = cos(Lphi);
+    sin_Lthe = sin(Lthe);
+    cos_Lthe = cos(Lthe);
+
     nc = 0;
     r = rcloud_max_set+1.0;
     while(r>rcloud_max_set || r<rcloud_min_set)
@@ -132,13 +144,12 @@ void gen_cloud_sample_model1(const void *pm, int flag_type, int flag_save)
     y = r * sin(phi);
     z = 0.0;
 
-  /*xb =  cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
-    yb = -cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
-    zb =  sin(Lthe) * x + cos(Lthe) * z;*/
-
-    xb =  cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y;
-    yb = -cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y;
-    zb =  sin(Lthe) * x;
+  /*xb =  cos_Lthe*cos_Lphi * x - sin_Lphi * y + sin_Lthe*cos_Lphi * z;
+    yb =  cos_Lthe*sin_Lphi * x + cos_Lphi * y + sin_Lthe*sin_Lphi * z;
+    zb = -sin_Lthe * x + cos_Lthe * z;*/
+    xb =  cos_Lthe*cos_Lphi * x - sin_Lphi * y;
+    yb =  cos_Lthe*sin_Lphi * x + cos_Lphi * y;
+    zb = -sin_Lthe * x;
     
     /* clouds below the equatorial plane are fully obscurated */
     zb0 = zb;
@@ -265,13 +276,12 @@ void gen_cloud_sample_model1(const void *pm, int flag_type, int flag_save)
       vy = Vr * sin(phi) + Vph * cos(phi);
       vz = 0.0;     
 
-    /*vxb = cos(Lthe)*cos(Lphi) * vx + sin(Lphi) * vy - sin(Lthe)*cos(Lphi) * vz;
-      vyb =-cos(Lthe)*sin(Lphi) * vx + cos(Lphi) * vy + sin(Lthe)*sin(Lphi) * vz;
-      vzb = sin(Lthe) * vx + cos(Lthe) * vz;*/
-
-      vxb = cos(Lthe)*cos(Lphi) * vx + sin(Lphi) * vy;
-      vyb =-cos(Lthe)*sin(Lphi) * vx + cos(Lphi) * vy;
-      vzb = sin(Lthe) * vx;
+    /*vxb = cos_Lthe*cos_Lphi * vx - sin_Lphi * vy + sin_Lthe*cos_Lphi * vz;
+      vyb = cos_Lthe*sin_Lphi * vx + cos_Lphi * vy + sin_Lthe*sin_Lphi * vz;
+      vzb =-sin_Lthe * vx + cos_Lthe * vz;*/
+      vxb = cos_Lthe*cos_Lphi * vx - sin_Lphi * vy;
+      vyb = cos_Lthe*sin_Lphi * vx + cos_Lphi * vy;
+      vzb =-sin_Lthe * vx;
 
       if(zb0 < 0.0)
         vzb = -vzb;
@@ -316,7 +326,7 @@ void gen_cloud_sample_model2(const void *pm, int flag_type, int flag_save)
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
   double inc, F, beta, mu, k, a, s, rin, sig, Rs;
-  double Lphi, Lthe;
+  double Lphi, Lthe, sin_Lphi, cos_Lphi, sin_Lthe, cos_Lthe;
   double V, weight, rnd;
   BLRmodel2 *model = (BLRmodel2 *)pm;
   double Emin, Ecirc, Lcirc, Vcirc, Vr, Vph, mbh, sigr, sigtheta, rhor, rhotheta;
@@ -358,6 +368,11 @@ void gen_cloud_sample_model2(const void *pm, int flag_type, int flag_save)
     //Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_blr));
     Lthe = theta_sample(1.0, Lopn_cos, 1.0);
 
+    sin_Lphi = sin(Lphi);
+    cos_Lphi = cos(Lphi);
+    sin_Lthe = sin(Lthe);
+    cos_Lthe = cos(Lthe);
+
     nc = 0;
     r = rcloud_max_set+1.0;
     while(r>rcloud_max_set || r<rcloud_min_set)
@@ -379,13 +394,12 @@ void gen_cloud_sample_model2(const void *pm, int flag_type, int flag_save)
     z = 0.0;
 
 
-  /*xb =  cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
-    yb = -cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
-    zb =  sin(Lthe) * x + cos(Lthe) * z;*/
-
-    xb =  cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y;
-    yb = -cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y;
-    zb =  sin(Lthe) * x;
+  /*xb =  cos_Lthe*cos_Lphi * x - sin_Lphi * y + sin_Lthe*cos_Lphi * z;
+    yb =  cos_Lthe*sin_Lphi * x + cos_Lphi * y + sin_Lthe*sin_Lphi * z;
+    zb = -sin_Lthe * x + cos_Lthe * z;*/
+    xb =  cos_Lthe*cos_Lphi * x - sin_Lphi * y;
+    yb =  cos_Lthe*sin_Lphi * x + cos_Lphi * y;
+    zb = -sin_Lthe * x;
 
     /* clouds below the equatorial plane are fully obscurated */
     zb0 = zb;
@@ -497,13 +511,12 @@ void gen_cloud_sample_model2(const void *pm, int flag_type, int flag_save)
       vy = Vr * sin(phi) + Vph * cos(phi);
       vz = 0.0;     
 
-    /*vxb = cos(Lthe)*cos(Lphi) * vx + sin(Lphi) * vy - sin(Lthe)*cos(Lphi) * vz;
-      vyb =-cos(Lthe)*sin(Lphi) * vx + cos(Lphi) * vy + sin(Lthe)*sin(Lphi) * vz;
-      vzb = sin(Lthe) * vx + cos(Lthe) * vz;*/
-
-      vxb = cos(Lthe)*cos(Lphi) * vx + sin(Lphi) * vy;
-      vyb =-cos(Lthe)*sin(Lphi) * vx + cos(Lphi) * vy;
-      vzb = sin(Lthe) * vx;
+    /*vxb = cos_Lthe*cos_Lphi * vx - sin_Lphi * vy + sin_Lthe*cos_Lphi * vz;
+      vyb = cos_Lthe*sin_Lphi * vx + cos_Lphi * vy + sin_Lthe*sin_Lphi * vz;
+      vzb =-sin_Lthe * vx + cos_Lthe * vz;*/
+      vxb = cos_Lthe*cos_Lphi * vx - sin_Lphi * vy;
+      vyb = cos_Lthe*sin_Lphi * vx + cos_Lphi * vy;
+      vzb =-sin_Lthe * vx;
 
       if(zb0 < 0.0)
         vzb = -vzb;
@@ -548,7 +561,7 @@ void gen_cloud_sample_model3(const void *pm, int flag_type, int flag_save)
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
   double inc, F, alpha, Rin, k, Rs;
-  double Lphi, Lthe, L, E;
+  double Lphi, Lthe, sin_Lphi, cos_Lphi, sin_Lthe, cos_Lthe, L, E;
   double V, weight, rnd;
   BLRmodel3 *model = (BLRmodel3 *)pm;
   double Emin, Lmax, Vr, Vph, mbh, xi, q;
@@ -583,6 +596,11 @@ void gen_cloud_sample_model3(const void *pm, int flag_type, int flag_save)
     //Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_blr));
     Lthe = theta_sample(1.0, Lopn_cos, 1.0);
 
+    sin_Lphi = sin(Lphi);
+    cos_Lphi = cos(Lphi);
+    sin_Lthe = sin(Lthe);
+    cos_Lthe = cos(Lthe);
+
     nc = 0;
     r = rcloud_max_set+1.0;
     while(r>rcloud_max_set || r<rcloud_min_set)
@@ -606,13 +624,12 @@ void gen_cloud_sample_model3(const void *pm, int flag_type, int flag_save)
     z = 0.0;
 
 
-  /*xb =  cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
-    yb = -cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
-    zb =  sin(Lthe) * x + cos(Lthe) * z;*/
-
-    xb =  cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y;
-    yb = -cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y;
-    zb =  sin(Lthe) * x;
+  /*xb =  cos_Lthe*cos_Lphi * x - sin_Lphi * y + sin_Lthe*cos_Lphi * z;
+    yb =  cos_Lthe*sin_Lphi * x + cos_Lphi * y + sin_Lthe*sin_Lphi * z;
+    zb = -sin_Lthe * x + cos_Lthe * z;*/
+    xb =  cos_Lthe*cos_Lphi * x - sin_Lphi * y;
+    yb =  cos_Lthe*sin_Lphi * x + cos_Lphi * y;
+    zb = -sin_Lthe * x;
 
     zb0 = zb;
     if(zb0 < 0.0)
@@ -725,13 +742,12 @@ void gen_cloud_sample_model3(const void *pm, int flag_type, int flag_save)
       vy = Vr * sin(phi) + Vph * cos(phi);
       vz = 0.0;     
 
-    /*vxb = cos(Lthe)*cos(Lphi) * vx + sin(Lphi) * vy - sin(Lthe)*cos(Lphi) * vz;
-      vyb =-cos(Lthe)*sin(Lphi) * vx + cos(Lphi) * vy + sin(Lthe)*sin(Lphi) * vz;
-      vzb = sin(Lthe) * vx + cos(Lthe) * vz;*/
-
-      vxb = cos(Lthe)*cos(Lphi) * vx + sin(Lphi) * vy;
-      vyb =-cos(Lthe)*sin(Lphi) * vx + cos(Lphi) * vy;
-      vzb = sin(Lthe) * vx;
+    /*vxb = cos_Lthe*cos_Lphi * vx - sin_Lphi * vy + sin_Lthe*cos_Lphi * vz;
+      vyb = cos_Lthe*sin_Lphi * vx + cos_Lphi * vy + sin_Lthe*sin_Lphi * vz;
+      vzb =-sin_Lthe * vx + cos_Lthe * vz;*/
+      vxb = cos_Lthe*cos_Lphi * vx - sin_Lphi * vy;
+      vyb = cos_Lthe*sin_Lphi * vx + cos_Lphi * vy;
+      vzb =-sin_Lthe * vx;
 
       if(zb0 < 0.0)
         vzb = -vzb;
@@ -772,7 +788,7 @@ void gen_cloud_sample_model4(const void *pm, int flag_type, int flag_save)
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, zb0, vx, vy, vz, vxb, vyb, vzb;
   double inc, F, alpha, Rin, k, Rs;
-  double Lphi, Lthe, L, E;
+  double Lphi, Lthe, sin_Lphi, cos_Lphi, sin_Lthe, cos_Lthe, L, E;
   double V, weight, rnd;
   BLRmodel4 *model = (BLRmodel4 *)pm;
   double Emin, Lmax, Vr, Vph, mbh, xi, q;
@@ -807,6 +823,11 @@ void gen_cloud_sample_model4(const void *pm, int flag_type, int flag_save)
     //Lthe = acos(Lopn_cos + (1.0-Lopn_cos) * gsl_rng_uniform(gsl_blr));
     Lthe = theta_sample(1.0, Lopn_cos, 1.0);
 
+    sin_Lphi = sin(Lphi);
+    cos_Lphi = cos(Lphi);
+    sin_Lthe = sin(Lthe);
+    cos_Lthe = cos(Lthe);
+
     nc = 0;
     r = rcloud_max_set+1.0;
     while(r>rcloud_max_set || r<rcloud_min_set)
@@ -830,13 +851,12 @@ void gen_cloud_sample_model4(const void *pm, int flag_type, int flag_save)
     z = 0.0;
 
 
-  /*xb =  cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
-    yb = -cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
-    zb =  sin(Lthe) * x + cos(Lthe) * z; */
-    
-    xb =  cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y;
-    yb = -cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y;
-    zb =  sin(Lthe) * x;
+  /*xb =  cos_Lthe*cos_Lphi * x - sin_Lphi * y + sin_Lthe*cos_Lphi * z;
+    yb =  cos_Lthe*sin_Lphi * x + cos_Lphi * y + sin_Lthe*sin_Lphi * z;
+    zb = -sin_Lthe * x + cos_Lthe * z;*/
+    xb =  cos_Lthe*cos_Lphi * x - sin_Lphi * y;
+    yb =  cos_Lthe*sin_Lphi * x + cos_Lphi * y;
+    zb = -sin_Lthe * x;
 
     zb0 = zb;
     if(zb0 < 0.0)
@@ -949,13 +969,12 @@ void gen_cloud_sample_model4(const void *pm, int flag_type, int flag_save)
       vy = Vr * sin(phi) + Vph * cos(phi);
       vz = 0.0;     
 
-    /*vxb = cos(Lthe)*cos(Lphi) * vx + sin(Lphi) * vy - sin(Lthe)*cos(Lphi) * vz;
-      vyb =-cos(Lthe)*sin(Lphi) * vx + cos(Lphi) * vy + sin(Lthe)*sin(Lphi) * vz;
-      vzb = sin(Lthe) * vx + cos(Lthe) * vz;*/
-
-      vxb = cos(Lthe)*cos(Lphi) * vx + sin(Lphi) * vy;
-      vyb =-cos(Lthe)*sin(Lphi) * vx + cos(Lphi) * vy;
-      vzb = sin(Lthe) * vx;
+    /*vxb = cos_Lthe*cos_Lphi * vx - sin_Lphi * vy + sin_Lthe*cos_Lphi * vz;
+      vyb = cos_Lthe*sin_Lphi * vx + cos_Lphi * vy + sin_Lthe*sin_Lphi * vz;
+      vzb =-sin_Lthe * vx + cos_Lthe * vz;*/
+      vxb = cos_Lthe*cos_Lphi * vx - sin_Lphi * vy;
+      vyb = cos_Lthe*sin_Lphi * vx + cos_Lphi * vy;
+      vzb =-sin_Lthe * vx;
 
       if(zb0 < 0.0)
         vzb = -vzb;
@@ -1085,17 +1104,16 @@ void gen_cloud_sample_model5(const void *pm, int flag_type, int flag_save)
     y = r * sin_phi;
     z = 0.0;
 
-/* right-handed framework
+/* left-handed framework
  * first rotate around y axis by an angle of Lthe, then rotate around z axis 
  * by an angle of Lphi
  */
-  /*xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
-    yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
-    zb = sin(Lthe) * x + cos(Lthe) * z;*/
-
-    xb = cos_Lthe*cos_Lphi * x + sin_Lphi * y;
-    yb =-cos_Lthe*sin_Lphi * x + cos_Lphi * y;
-    zb = sin_Lthe * x;
+  /*xb =  cos_Lthe*cos_Lphi * x - sin_Lphi * y + sin_Lthe*cos_Lphi * z;
+    yb =  cos_Lthe*sin_Lphi * x + cos_Lphi * y + sin_Lthe*sin_Lphi * z;
+    zb = -sin_Lthe * x + cos_Lthe * z;*/
+    xb =  cos_Lthe*cos_Lphi * x - sin_Lphi * y;
+    yb =  cos_Lthe*sin_Lphi * x + cos_Lphi * y;
+    zb = -sin_Lthe * x;
     
     zb0 = zb;
     rnd_xi = gsl_rng_uniform(gsl_blr);
@@ -1218,13 +1236,12 @@ void gen_cloud_sample_model5(const void *pm, int flag_type, int flag_save)
       vy = Vr * sin_phi + Vph * cos_phi;
       vz = 0.0;     
 
-    /*vxb = cos(Lthe)*cos(Lphi) * vx + sin(Lphi) * vy - sin(Lthe)*cos(Lphi) * vz;
-      vyb =-cos(Lthe)*sin(Lphi) * vx + cos(Lphi) * vy + sin(Lthe)*sin(Lphi) * vz;
-      vzb = sin(Lthe) * vx + cos(Lthe) * vz;*/
-
-      vxb = cos_Lthe*cos_Lphi * vx + sin_Lphi * vy;
-      vyb =-cos_Lthe*sin_Lphi * vx + cos_Lphi * vy;
-      vzb = sin_Lthe * vx;
+    /*vxb = cos_Lthe*cos_Lphi * vx - sin_Lphi * vy + sin_Lthe*cos_Lphi * vz;
+      vyb = cos_Lthe*sin_Lphi * vx + cos_Lphi * vy + sin_Lthe*sin_Lphi * vz;
+      vzb =-sin_Lthe * vx + cos_Lthe * vz;*/
+      vxb = cos_Lthe*cos_Lphi * vx - sin_Lphi * vy;
+      vyb = cos_Lthe*sin_Lphi * vx + cos_Lphi * vy;
+      vzb =-sin_Lthe * vx;
 
       if((rnd_xi < 1.0-xi) && zb0 < 0.0)
         vzb = -vzb;
@@ -1351,17 +1368,16 @@ void gen_cloud_sample_model6(const void *pm, int flag_type, int flag_save)
     y = r * sin_phi;
     z = 0.0;
 
-/* right-handed framework
+/* left-handed framework
  * first rotate around y axis by an angle of Lthe, then rotate around z axis 
  * by an angle of Lphi
  */
-  /*xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
-    yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
-    zb = sin(Lthe) * x + cos(Lthe) * z; */
-    
-    xb = cos_Lthe*cos_Lphi * x + sin_Lphi * y;
-    yb =-cos_Lthe*sin_Lphi * x + cos_Lphi * y;
-    zb = sin_Lthe * x;
+  /*xb =  cos_Lthe*cos_Lphi * x - sin_Lphi * y + sin_Lthe*cos_Lphi * z;
+    yb =  cos_Lthe*sin_Lphi * x + cos_Lphi * y + sin_Lthe*sin_Lphi * z;
+    zb = -sin_Lthe * x + cos_Lthe * z;*/
+    xb =  cos_Lthe*cos_Lphi * x - sin_Lphi * y;
+    yb =  cos_Lthe*sin_Lphi * x + cos_Lphi * y;
+    zb = -sin_Lthe * x;
 
     zb0 = zb;
     rnd_xi = gsl_rng_uniform(gsl_blr);
@@ -1488,13 +1504,12 @@ void gen_cloud_sample_model6(const void *pm, int flag_type, int flag_save)
       vy = Vr * sin_phi + Vph * cos_phi;
       vz = 0.0;    
       
-    /*vxb = cos(Lthe)*cos(Lphi) * vx + sin(Lphi) * vy - sin(Lthe)*cos(Lphi) * vz;
-      vyb =-cos(Lthe)*sin(Lphi) * vx + cos(Lphi) * vy + sin(Lthe)*sin(Lphi) * vz;
-      vzb = sin(Lthe) * vx + cos(Lthe) * vz;*/
-
-      vxb = cos_Lthe*cos_Lphi * vx + sin_Lphi * vy;
-      vyb =-cos_Lthe*sin_Lphi * vx + cos_Lphi * vy;
-      vzb = sin_Lthe * vx;
+    /*vxb = cos_Lthe*cos_Lphi * vx - sin_Lphi * vy + sin_Lthe*cos_Lphi * vz;
+      vyb = cos_Lthe*sin_Lphi * vx + cos_Lphi * vy + sin_Lthe*sin_Lphi * vz;
+      vzb =-sin_Lthe * vx + cos_Lthe * vz;*/
+      vxb = cos_Lthe*cos_Lphi * vx - sin_Lphi * vy;
+      vyb = cos_Lthe*sin_Lphi * vx + cos_Lphi * vy;
+      vzb =-sin_Lthe * vx;
 
 
       if((rnd_xi < 1.0-xi) && zb0 < 0.0)
@@ -1628,17 +1643,16 @@ void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save)
     y = r * sin_phi;
     z = 0.0;
 
-/* right-handed framework
+/* left-handed framework
  * first rotate around y axis by an angle of Lthe, then rotate around z axis 
  * by an angle of Lphi
  */
-  /*xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
-    yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
-    zb = sin(Lthe) * x + cos(Lthe) * z; */
-    
-    xb = cos_Lthe*cos_Lphi * x + sin_Lphi * y;
-    yb =-cos_Lthe*sin_Lphi * x + cos_Lphi * y;
-    zb = sin_Lthe * x;
+  /*xb =  cos_Lthe*cos_Lphi * x - sin_Lphi * y + sin_Lthe*cos_Lphi * z;
+    yb =  cos_Lthe*sin_Lphi * x + cos_Lphi * y + sin_Lthe*sin_Lphi * z;
+    zb = -sin_Lthe * x + cos_Lthe * z;*/
+    xb =  cos_Lthe*cos_Lphi * x - sin_Lphi * y;
+    yb =  cos_Lthe*sin_Lphi * x + cos_Lphi * y;
+    zb = -sin_Lthe * x;
 
     zb0 = zb;
     rnd_xi = gsl_rng_uniform(gsl_blr);
@@ -1761,13 +1775,12 @@ void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save)
       vy = Vr * sin_phi + Vph * cos_phi;
       vz = 0.0;     
 
-    /*vxb = cos(Lthe)*cos(Lphi) * vx + sin(Lphi) * vy - sin(Lthe)*cos(Lphi) * vz;
-      vyb =-cos(Lthe)*sin(Lphi) * vx + cos(Lphi) * vy + sin(Lthe)*sin(Lphi) * vz;
-      vzb = sin(Lthe) * vx + cos(Lthe) * vz;*/
-
-      vxb = cos_Lthe*cos_Lphi * vx + sin_Lphi * vy;
-      vyb =-cos_Lthe*sin_Lphi * vx + cos_Lphi * vy;
-      vzb = sin_Lthe * vx;
+    /*vxb = cos_Lthe*cos_Lphi * vx - sin_Lphi * vy + sin_Lthe*cos_Lphi * vz;
+      vyb = cos_Lthe*sin_Lphi * vx + cos_Lphi * vy + sin_Lthe*sin_Lphi * vz;
+      vzb =-sin_Lthe * vx + cos_Lthe * vz;*/
+      vxb = cos_Lthe*cos_Lphi * vx - sin_Lphi * vy;
+      vyb = cos_Lthe*sin_Lphi * vx + cos_Lphi * vy;
+      vzb =-sin_Lthe * vx;
 
       if((rnd_xi < 1.0-xi) && zb0 < 0.0)
         vzb = -vzb;
@@ -1854,17 +1867,16 @@ void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save)
     y = r * sin_phi;
     z = 0.0;
 
-/* right-handed framework
+/* left-handed framework
  * first rotate around y axis by an angle of Lthe, then rotate around z axis 
  * by an angle of Lphi
  */
-  /*xb = cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
-    yb =-cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
-    zb = sin(Lthe) * x + cos(Lthe) * z; */
-    
-    xb = cos_Lthe*cos_Lphi * x + sin_Lphi * y;
-    yb =-cos_Lthe*sin_Lphi * x + cos_Lphi * y;
-    zb = sin_Lthe * x;
+  /*xb =  cos_Lthe*cos_Lphi * x - sin_Lphi * y + sin_Lthe*cos_Lphi * z;
+    yb =  cos_Lthe*sin_Lphi * x + cos_Lphi * y + sin_Lthe*sin_Lphi * z;
+    zb = -sin_Lthe * x + cos_Lthe * z;*/
+    xb =  cos_Lthe*cos_Lphi * x - sin_Lphi * y;
+    yb =  cos_Lthe*sin_Lphi * x + cos_Lphi * y;
+    zb = -sin_Lthe * x;
 
     zb0 = zb;
     rnd_xi = gsl_rng_uniform(gsl_blr);
@@ -1987,13 +1999,12 @@ void gen_cloud_sample_model7(const void *pm, int flag_type, int flag_save)
       vy = Vr * sin_phi + Vph * cos_phi;
       vz = 0.0;     
 
-    /*vxb = cos(Lthe)*cos(Lphi) * vx + sin(Lphi) * vy - sin(Lthe)*cos(Lphi) * vz;
-      vyb =-cos(Lthe)*sin(Lphi) * vx + cos(Lphi) * vy + sin(Lthe)*sin(Lphi) * vz;
-      vzb = sin(Lthe) * vx + cos(Lthe) * vz;*/
-
-      vxb = cos_Lthe*cos_Lphi * vx + sin_Lphi * vy;
-      vyb =-cos_Lthe*sin_Lphi * vx + cos_Lphi * vy;
-      vzb = sin_Lthe * vx;
+    /*vxb = cos_Lthe*cos_Lphi * vx - sin_Lphi * vy + sin_Lthe*cos_Lphi * vz;
+      vyb = cos_Lthe*sin_Lphi * vx + cos_Lphi * vy + sin_Lthe*sin_Lphi * vz;
+      vzb =-sin_Lthe * vx + cos_Lthe * vz;*/
+      vxb = cos_Lthe*cos_Lphi * vx - sin_Lphi * vy;
+      vyb = cos_Lthe*sin_Lphi * vx + cos_Lphi * vy;
+      vzb =-sin_Lthe * vx;
 
       if((rnd_xi < 1.0-xi) && zb0 < 0.0)
         vzb = -vzb;
@@ -2224,7 +2235,7 @@ void gen_cloud_sample_model9(const void *pm, int flag_type, int flag_save)
   double r, phi, dis, Lopn_cos;
   double x, y, z, xb, yb, zb, vx, vy, vz, vxb, vyb, vzb;
   double inc, F, beta, mu, a, s, rin, sig;
-  double Lphi, Lthe, Vkep, Rs, g;
+  double Lphi, Lthe, sin_Lphi, cos_Lphi, sin_Lthe, cos_Lthe, Vkep, Rs, g;
   double V, weight, rnd, sin_inc_cmp, cos_inc_cmp;
   BLRmodel9 *model = (BLRmodel9 *)pm;
   double Vr, Vph, mbh;
@@ -2262,6 +2273,11 @@ void gen_cloud_sample_model9(const void *pm, int flag_type, int flag_save)
     //Lthe = gsl_rng_uniform(gsl_blr) * Lopn;
     Lthe = theta_sample(1.0, Lopn_cos, 1.0);
 
+    sin_Lphi = sin(Lphi);
+    cos_Lphi = cos(Lphi);
+    sin_Lthe = sin(Lthe);
+    cos_Lthe = cos(Lthe);
+
     nc = 0;
     r = rcloud_max_set+1.0;
     while(r>rcloud_max_set || r<rcloud_min_set)
@@ -2282,13 +2298,12 @@ void gen_cloud_sample_model9(const void *pm, int flag_type, int flag_save)
     y = r * sin(phi);
     z = 0.0;
 
-  /*xb =  cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y - sin(Lthe)*cos(Lphi) * z;
-    yb = -cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y + sin(Lthe)*sin(Lphi) * z;
-    zb =  sin(Lthe) * x + cos(Lthe) * z;*/
-
-    xb =  cos(Lthe)*cos(Lphi) * x + sin(Lphi) * y;
-    yb = -cos(Lthe)*sin(Lphi) * x + cos(Lphi) * y;
-    zb =  sin(Lthe) * x;
+  /*xb =  cos_Lthe*cos_Lphi * x - sin_Lphi * y + sin_Lthe*cos_Lphi * z;
+    yb =  cos_Lthe*sin_Lphi * x + cos_Lphi * y + sin_Lthe*sin_Lphi * z;
+    zb = -sin_Lthe * x + cos_Lthe * z;*/
+    xb =  cos_Lthe*cos_Lphi * x - sin_Lphi * y;
+    yb =  cos_Lthe*sin_Lphi * x + cos_Lphi * y;
+    zb = -sin_Lthe * x;
 
     /* counter-rotate around y */
     //x = xb * cos(PI/2.0-inc) + zb * sin(PI/2.0-inc);
@@ -2392,13 +2407,12 @@ void gen_cloud_sample_model9(const void *pm, int flag_type, int flag_save)
       vy = Vr * sin(phi) + Vph * cos(phi);
       vz = 0.0;     
 
-    /*vxb = cos(Lthe)*cos(Lphi) * vx + sin(Lphi) * vy - sin(Lthe)*cos(Lphi) * vz;
-      vyb =-cos(Lthe)*sin(Lphi) * vx + cos(Lphi) * vy + sin(Lthe)*sin(Lphi) * vz;
-      vzb = sin(Lthe) * vx + cos(Lthe) * vz;*/
-
-      vxb = cos(Lthe)*cos(Lphi) * vx + sin(Lphi) * vy;
-      vyb =-cos(Lthe)*sin(Lphi) * vx + cos(Lphi) * vy;
-      vzb = sin(Lthe) * vx;
+    /*vxb = cos_Lthe*cos_Lphi * vx - sin_Lphi * vy + sin_Lthe*cos_Lphi * vz;
+      vyb = cos_Lthe*sin_Lphi * vx + cos_Lphi * vy + sin_Lthe*sin_Lphi * vz;
+      vzb =-sin_Lthe * vx + cos_Lthe * vz;*/
+      vxb = cos_Lthe*cos_Lphi * vx - sin_Lphi * vy;
+      vyb = cos_Lthe*sin_Lphi * vx + cos_Lphi * vy;
+      vzb =-sin_Lthe * vx;
     
       //vx = vxb * cos(PI/2.0-inc) + vzb * sin(PI/2.0-inc);
       //vy = vyb;
