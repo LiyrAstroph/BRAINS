@@ -544,6 +544,7 @@ void set_blr_range_model9(double **blr_range)
 /*==============================================================================*/
 /* the following functions are deprecated */
 
+#ifdef SpecAstro
 /*
  * setup  SA BLR model parameter range. 
  */
@@ -1073,3 +1074,4 @@ void set_sa_blr_range_model9()
 
   return;
 }
+#endif
