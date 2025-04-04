@@ -1954,6 +1954,13 @@ class bplotlib(Param, Options, ParaName):
         
     ax1.set_xlabel(r"$y$ (lt-day)")
     ax1.set_ylabel(r"$z$ (lt-day)")
+    ax1.invert_xaxis()
+
+    # plot N and E directions
+    ax1.arrow(0.95, 0.05,  0.0, 0.1, transform=ax1.transAxes, lw=2)
+    ax1.arrow(0.95, 0.05, -0.1, 0.0, transform=ax1.transAxes, lw=2)
+    ax1.text(0.95, 0.2, r"\bf N", va='center', ha='center', transform=ax1.transAxes)
+    ax1.text(0.8, 0.05, r"\bf E", va='center', ha='center', transform=ax1.transAxes)
     
     if velocity == True:
       cbar = plt.colorbar(cax, cax=ax2, location='top', label=r"LOS Velocity (km~s$^{-1}$)")
