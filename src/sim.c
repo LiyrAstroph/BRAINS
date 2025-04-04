@@ -32,7 +32,7 @@ void sim()
 
   FILE *fp;
   char fname[200];
-  int i, j, k, incr;
+  int i, j, k, incr, flag_save_clouds=0;
   double r_rw, r_ew;
 
   sim_init();
@@ -118,7 +118,7 @@ void sim()
   fclose(fp);
 
 /*==================================1d line============================================*/  
-  transfun_1d_cal(model, 0);
+  transfun_1d_cal(model, flag_save_clouds);
   calculate_line_from_blrmodel(model, Tline, Fline, parset.n_line_recon);
   
   sprintf(fname, "%s/%s", parset.file_dir, "/data/sim_line.txt");
@@ -160,7 +160,14 @@ void sim()
   fclose(fp);
 
 /*==================================2d line============================================*/  
-  transfun_2d_cal(model, TransV, Trans2D, parset.n_vel_recon, 0);
+  flag_save_clouds = 0;
+#ifndef SpecAstro
+  if(parset.flag_blrmodel == -1) /* in this case, line profile sim does not produce clouds */
+  {
+    flag_save_clouds = 1;
+  }
+#endif
+  transfun_2d_cal(model, TransV, Trans2D, parset.n_vel_recon, flag_save_clouds);
   calculate_line2d_from_blrmodel(model, Tline, TransV, 
           Trans2D, Fline2d, parset.n_line_recon, parset.n_vel_recon);
   
@@ -250,7 +257,11 @@ void sim()
 /*==================================line profile============================================*/
   if(parset.flag_blrmodel != -1)  
   {
-    gen_cloud_sample(model, 0, 0);
+    flag_save_clouds = 0;
+#ifndef SpecAstro
+    flag_save_clouds = 1;
+#endif
+    gen_cloud_sample(model, 0, flag_save_clouds);
     cal_line_profile_with_sample(model, TransV, Fline2d, parset.n_vel_recon);
     sprintf(fname, "%s/%s", parset.file_dir, "/data/sim_lineprofile.txt");
     printf("%-13s %s\n", "Line Profile:", fname);
@@ -276,7 +287,7 @@ void sim()
 /*==================================SA============================================*/  
   sa_smooth_init(parset.n_sa_vel_recon, vel_sa, parset.sa_InstRes);
 
-  gen_sa_cloud_sample((void *)sa_pm, 3, 0);
+  gen_sa_cloud_sample((void *)sa_pm, 3, flag_save_clouds);
   calculate_sa_sim_with_sample(pm, vel_sa, parset.n_sa_vel_recon, base_sa, parset.n_sa_base_recon, 
                                    phase_sa, Fline_sa);
   
@@ -315,8 +326,9 @@ void sim()
     Fcon_sarm[i] = gsl_interp_eval(gsl_linear, Tcon, Fcon_rm, Tline_sarm[i], gsl_acc);
   }
   
+  flag_save_clouds = 1;
   sarm_smooth_init(parset.n_sa_vel_recon, vel_sa, parset.sa_InstRes);
-  transfun_sarm_cal_cloud((void *)sa_pm, vel_sa, Trans2D, Trans_sarm_alpha, Trans_sarm_beta, parset.n_sa_vel_recon, 1);
+  transfun_sarm_cal_cloud((void *)sa_pm, vel_sa, Trans2D, Trans_sarm_alpha, Trans_sarm_beta, parset.n_sa_vel_recon, flag_save_clouds);
   calculate_sarm_sim_with_sample(pm, Tline_sarm, vel_sa, Trans2D, Trans_sarm_alpha, Trans_sarm_beta, 
                                      parset.n_sa_vel_recon, parset.n_sarm_line_recon, base_sarm, 
                                      parset.n_sarm_base_recon, phase_sarm, Fline_sarm, 
