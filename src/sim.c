@@ -229,7 +229,10 @@ void sim()
 /*==================================line profile============================================*/
   if(parset.flag_blrmodel != -1)  
   {
+    flag_save_clouds = 0;
+#ifndef SpecAstro
     flag_save_clouds = 1;
+#endif
     gen_cloud_sample(model, 0, flag_save_clouds);
     cal_line_profile_with_sample(model, TransV, Fline2d, parset.n_vel_recon);
     sprintf(fname, "%s/%s", parset.file_dir, "/data/sim_lineprofile.txt");
