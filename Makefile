@@ -93,7 +93,7 @@ OBJS     = $(SRC)/main.o $(SRC)/allvars.o $(SRC)/read.o $(SRC)/run.o     \
            $(SRC)/specastro.o $(SRC)/dnest_sa1d.o $(SRC)/dnest_sa2d.o    \
            $(SRC)/reconstruct_sa1d.o  $(SRC)/reconstruct_sa2d.o          \
            $(SRC)/sarm.o  $(SRC)/reconstruct_sarm.o  $(SRC)/dnest_sarm.o \
-           $(SRC)/sa_gravity.o          
+           $(SRC)/sa_gravity.o  $(SRC)/blr_range.o         
  
 INCL     = Makefile $(SRC)/allvars.h $(SRC)/proto.h $(SRC)/dnest_con.h   \
            $(SRC)/dnest_line1d.h  $(SRC)/dnest_line2d.h $(SRC)/nrutil.h  \
