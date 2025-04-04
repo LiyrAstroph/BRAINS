@@ -55,7 +55,7 @@ to ``MaxNumberLevels``. After that, the sampling stops to create new levels and 
 the created levels. This step can thoroughly explore the likelihood distribution and produces robust 
 posterior sample. **Therefore, in practice, if "PTol" is too small, the sampling might be creating levels in the end 
 of running, even though the fits already look acceptable. In this case, one can set "MaxNumberLevels" mannually
-to the number of levels already created and then resmue the running (see :ref:`resume_label`).**
+to the number of levels already created and then resmue the running.** (see :ref:`resume_label`)
 
 To check whether the values of options are appropriate, one may run the posterior processing
 to inspect the log-likelihood-curve (see also the user mannual in the 
