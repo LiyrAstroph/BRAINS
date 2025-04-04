@@ -11,11 +11,23 @@ Broad-line regions are generally assumed to be composed of a larg number of
 point-like clouds. These clouds respond to the central ionizing continuum
 and emit broad emission lines.
 
-.. figure:: _static/fig_blr_disk.jpg
+
+BLR coordinate and observer's coordinate
+========================================
+The BLR coordinate is adopted to be left-handed (see **Fig.1**). The x-axis is set to be along 
+the line of sight and the positive x-axis points to the observer. That is to say,
+a positive velocity in the BLR's coordinate corresponds to a blus-shift velocity
+in observer's coordinate.
+
+
+.. figure:: _static/fig_PA.jpg
   :align: center
   :width: 12 cm
 
-  Schematic of a disk-like broad-line region (Li et al. 2013).
+  **Fig.1** The coordinate frames. **X-axis is the along the line of sight and positive x-axis 
+  points to the observer**. Left-handed coordinate of 
+  the BLR is preferred, which is consistent with the coordinate frame of the observer. However, for 
+  axisymmetric BLRs, the two types of coordinate frames are indistinguishable.
 
 BLR model 1
 ===========
@@ -46,6 +58,14 @@ Clouds' distribution has a disk-like shape (see the figure) and is axis-symetric
 
   where :math:`\phi` is the angle between the observer's line of sight to the central ionizing 
   source and the cloud's line of sight to the central source.
+
+
+.. figure:: _static/fig_blr_disk.jpg
+  :align: center
+  :width: 12 cm
+
+  **Fig.2** Schematic of a disk-like broad-line region (Li et al. 2013).
+
 
 BLR model 2
 ===========
@@ -137,7 +157,7 @@ This is the shadowed model in Li et al. (2018).
   :align: center 
   :width: 12 cm
 
-  Schematic of a disk-like broad-line region with two zones (Li et al. 2018).
+  **Fig.3** Schematic of a disk-like broad-line region with two zones (Li et al. 2018).
 
 BLR model 8
 ===========
@@ -147,7 +167,7 @@ A disk wind model from Shlosman & Vitello (1993).
   :align: center 
   :width: 12 cm
 
-  Schematic of a disk wind model (figure credit: Higginbottom et al. 2013).
+  **Fig.4** Schematic of a disk wind model (figure credit: Higginbottom et al. 2013).
 
 In the cylindrical coordinate, the wind stream line have an angle as 
 
@@ -219,4 +239,3 @@ References
 * Pancoast, A. et al. 2014, MNRAS, 445, 3055
 
 * Shlosman I., Vitello P., 1993, ApJ, 409, 372
-
