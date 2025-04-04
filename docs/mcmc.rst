@@ -47,22 +47,33 @@ Lines beginning with '\#' are regarded as comments. The meaning of these options
 
 There is not a general rule to set the values of options. Sufficiently large values will work better, but also
 will cause extra computation time. ``PTol`` also controls the number of levels created. If the  number of 
-levels is not satisfactory, one can set ``MaxNumberLevels``. The option for maximum number of saves controls the length of the 
-Markov chains. Note that this is not the length of the final posterior sample. 
+levels is not satisfactory, one can set ``MaxNumberLevels`` mannually. The option for maximum number of saves 
+controls the length of the Markov chains. Note that this is not the length of the final posterior sample. 
+
+The sampling firstly keeps creating levels unitl ``PTol`` criteria is satisfied or the number of levels equals 
+to ``MaxNumberLevels``. After that, the sampling stops to create new levels and shuttles randomly among 
+the created levels. This step can thoroughly explore the likelihood distribution and produces robust 
+posterior sample. **Therefore, in practice, if "PTol" is too small, the sampling might be creating levels in the end 
+of running, even though the fits already look acceptable. In this case, one can set "MaxNumberLevels" mannually
+to the number of levels already created and then resmue the running (see :ref:`resume_label`).**
 
 To check whether the values of options are appropriate, one may run the posterior processing
 to inspect the log-likelihood-curve (see also the user mannual in the 
 package DNest3 developed by Brendon J. Brewer, which is available at https://github.com/eggplantbren/DNest3).
 This can done by calling the function `postprocess(temperature=1, doshow=False)` provided in the plotting 
-interface (see :ref:`plot_label`).
+interface (see :ref:`plot_label`). 
 
+**Fig.1** shows an example of a good run with the presence of a peak in the plot of posterior weights with log(X).
+**Fig.2** shows an example of a bad run, where there is not a clear peak in the plot of posterior weights with log(X).
+However, because the BLR models hardly reproduce all the fine features in the emission-line variations, we usually need
+to set a high posterior temperature (T>1) to force the peak to appear, which is equivalent to enlarging the data errors.
 
 .. figure:: _static/fig_post_good.jpg
   :align: center
   
-  Example for log-likelihood cruve of a good run with appropriate options.
+  **Fig.1** Example for log-likelihood cruve of a good run with appropriate options. 
 
 .. figure:: _static/fig_post_bad.jpg
   :align: center
   
-  Example for log-likelihood cruve of a bad run with inappropriate options.
+  **Fig.2** Example for log-likelihood cruve of a bad run with inappropriate options.

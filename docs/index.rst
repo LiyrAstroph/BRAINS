@@ -22,6 +22,7 @@ Documentation
    output.rst
    data.rst
    mcmc.rst
+   resmue.rst
    prior.rst
    model.rst
    user_model.rst
