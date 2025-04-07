@@ -365,6 +365,13 @@ class bplotlib(Param, Options, ParaName):
     nt = int(self.results['line_rec'].shape[0]/ns)
     nc = self.results['line_rec'].shape[1]
     self.results['line_rec'] = np.reshape(self.results['line_rec'], (ns, nt, nc), order='C')
+  
+  def _load_lp_rec(self):
+    self.results['lp_rec'] = np.loadtxt(self.file_dir+"data/lineprofile_rec.txt")
+    ns = int(self.sample_size)  
+    nv = int(self.results['lp_rec'].shape[0]/ns)
+    nc = self.results['lp_rec'].shape[1]
+    self.results['lp_rec'] = np.reshape(self.results['lp_rec'], (ns, nv, nc), order='C')
 
   def _load_sa_rec(self):
     # load sa line reconstructions
@@ -458,6 +465,7 @@ class bplotlib(Param, Options, ParaName):
       self.results['sample_info'] = np.loadtxt(self.file_dir + 'data/posterior_sample_info_lp.txt')
       self.sample_size = self.results['sample'].shape[0]
 
+      self._load_lp_rec()
 
     elif self.param['flagdim'] == '4':
       sample = self.results['sample'] = np.loadtxt(self.file_dir + 'data/posterior_sample_sa.txt')
@@ -516,6 +524,12 @@ class bplotlib(Param, Options, ParaName):
       return self.data['sa_data']
     else:
       raise ValueError("No sa data!")
+  
+  def get_lp_data(self):
+    if self.data__contains__('lp_data'):
+      return self.data['lp_data']
+    else:
+      raise ValueError("No lp data!")
 
   def plot_drw_parameters(self, doshow=False):
     """
@@ -1248,6 +1262,48 @@ class bplotlib(Param, Options, ParaName):
     plt.rcParams['ytick.direction'] = 'in'
     plt.rcParams['xtick.top'] = True
     plt.rcParams['ytick.right'] = True
+  
+  def plot_results_lp(self, doshow=False):
+    """
+    plot lp results
+    """
+    if not int(self.param['flagdim']) in [3]:
+      print("Flagdim =", self.param['flagdim'], "no lineprofile data.")
+      return
+    
+    print("# plotting results lineprofile.")
+
+    plt.rc('text', usetex=True)
+    plt.rc('font', family='serif', size=15)
+
+    profile = self.data['lp_data']
+    profile_rec = self.results['lp_rec']
+   
+    wave = profile_rec[0, :, 0]
+    profile_mean     = np.quantile(profile_rec[:, :, 1], axis=0, q=0.5)
+    profile_mean_upp = np.quantile(profile_rec[:, :, 1], axis=0, q=(1.0-0.683)/2.0)
+    profile_mean_low = np.quantile(profile_rec[:, :, 1], axis=0, q=1.0 - (1.0-0.683)/2.0)
+
+    # get the mean and 
+
+    fig = plt.figure(figsize=(8, 6))
+    ax = fig.add_subplot(111)
+
+    ax.errorbar(profile[:, 0], profile[:, 1], yerr=profile[:, 2], ls='none')
+    ax.plot(wave, profile_mean)
+    ax.fill_between(wave, y1=profile_mean_low, y2=profile_mean_upp, color='grey', zorder=0)
+    
+    ax.minorticks_on()
+    ax.set_xlabel("Wavelength")
+    ax.set_ylabel("Flux")
+    
+    fig.savefig("results_lp.pdf", bbox_inches='tight')
+    
+    if doshow:
+      plt.show()
+    else:
+      plt.close()
+
   
   def plot_results_sa(self, doshow=False, show_offset=False, subtract_offset=False, phase_limit=None):
     if not int(self.param['flagdim']) in [4, 5, 6]:
