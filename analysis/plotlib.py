@@ -746,7 +746,9 @@ class bplotlib(Param, Options, ParaName):
         ftrend +=  sample[:, idx_diff_trend+i-1, np.newaxis] * (trend[np.newaxis, :] - tmed)**(i)
       
       fcon_mean = np.median(conlc[:, 1])
-      ax1.plot(trend*(1.0+self.redshift) - t0, np.median(ftrend, axis=0)/self.con_scale + fcon_mean, ls='--', color='grey', lw=1)
+      ftrend_med, ftrend_low, ftrend_upp = np.quantile(ftrend, axis=0, q=(0.5, (1.0-0.683)/2, 1.0-(1.0-0.683)/2))/self.con_scale + fcon_mean
+      ax1.plot(trend*(1.0+self.redshift) - t0, ftrend_med, ls='--', color='grey', lw=1)
+      ax1.fill_between(trend*(1.0+self.redshift) - t0, y1=ftrend_low, y2=ftrend_upp, color='grey', alpha=0.5)
 
     #ax1.set_xlabel("Time")
     ax1.set_ylabel("Flux")
