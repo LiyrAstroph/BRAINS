@@ -1,7 +1,7 @@
 .. _model_label:
 
 ************************
-Broad-Line Region Models
+BLR Models
 ************************
 
 ``brains`` already encapsulates several BLR dynamical models detailed below. To specify those models in 

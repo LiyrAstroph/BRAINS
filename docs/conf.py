@@ -20,13 +20,13 @@ import sys
 # -- Project information -----------------------------------------------------
 
 project = u'BRAINS'
-copyright = u'2019, Yan-Rong Li'
+copyright = u'2016-2025, Yan-Rong Li'
 author = u'Yan-Rong Li'
 
 # The short X.Y version
-version = u''
+version = u'0.1'
 # The full version, including alpha/beta/rc tags
-release = u''
+release = u'0.1.9'
 
 
 # -- General configuration ---------------------------------------------------
@@ -80,12 +80,13 @@ pygments_style = None
 # html_theme = 'alabaster'
 
 # Readthedocs.
-on_rtd = os.environ.get("READTHEDOCS", None) == "True"
-if not on_rtd:
-    import sphinx_rtd_theme
-    html_theme = "sphinx_rtd_theme"
-    html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+# on_rtd = os.environ.get("READTHEDOCS", None) == "True"
+# if not on_rtd:
+#     import sphinx_rtd_theme
+#     html_theme = "sphinx_rtd_theme"
+#     html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
+html_theme = "sphinx_book_theme"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -108,6 +109,20 @@ html_static_path = ['_static']
 #
 # html_sidebars = {}
 
+html_theme_options = {
+    "path_to_docs": "docs",
+    "repository_url": "https://github.com/LiyrAstroph/BRAINS",
+    "repository_branch": "main",
+    "launch_buttons": {
+        "binderhub_url": "https://mybinder.org",
+        "colab_url": "https://colab.research.google.com/",
+        "notebook_interface": "jupyterlab",
+    },
+    "use_edit_page_button": True,
+    "use_issues_button": True,
+    "use_repository_button": True,
+    "use_download_button": True,
+}
 
 # -- Options for HTMLHelp output ---------------------------------------------
 
