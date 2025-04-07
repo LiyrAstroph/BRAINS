@@ -1,0 +1,5 @@
+[project]
+name = "brains"
+
+[project.optional-dependencies]
+docs = ["sphinx-book-theme"]
