@@ -1,9 +1,23 @@
-import matplotlib.pyplot as plt 
+# -*- coding: utf-8 -*-
 
+#
+# BRAINS
+# (B)LR (R)everberation-mapping (A)nalysis (I)n AGNs with (N)ested (S)ampling
+# Yan-Rong Li, liyanrong@ihep.ac.cn
+# Thu, Aug 4, 2016
+#
+# an example script for plotting BRAINS results using the backend bplotlib
+
+import matplotlib.pyplot as plt 
+import os.path as path
 from bbackend import bplotlib 
 
+# load the param file
 pb = bplotlib("../param/param")
+
+# get flagdim and file directory
 flagdim = int(pb.param["flagdim"])
+fdir = pb.param['filedir']
 
 #===============================================
 # continuum results, flagdim == 0
@@ -37,12 +51,12 @@ if flagdim == 1:
   pb.plot_blrmodel_para_hist(doshow=False)
 
   # plot clouds' distribution
-  pb.plot_clouds("../data/clouds.txt", doshow=False)
-  #pb.plot_clouds("../data/clouds.txt", range=[-10, 10], objname="target", format="jpg", velocity=False, doshow=False)
+  pb.plot_clouds(path.join(fdir, "data/clouds.txt"), doshow=False)
+  #pb.plot_clouds(path.join(fdir, "data/clouds.txt"), range=[-10, 10], objname="target", format="jpg", velocity=False, doshow=False)
 
   # plot clouds' distribution viewd from line of sight
-  pb.plot_clouds_los("../data/clouds.txt", doshow=False)
-  #pb.plot_clouds_los("../data/clouds.txt", range=[-10, 10], objname="target", format="jpg", velocity=False, doshow=False)
+  pb.plot_clouds_los(path.join(fdir, "data/clouds.txt"), doshow=False)
+  #pb.plot_clouds_los(path.join(fdir, "data/clouds.txt"), range=[-10, 10], objname="target", format="jpg", velocity=False, doshow=False)
 
 
 #===============================================
@@ -86,13 +100,36 @@ if flagdim == 2:
   pb.plot_blrmodel_para_hist(doshow=False)
 
   # plot clouds' distribution
-  pb.plot_clouds("../data/clouds.txt", doshow=False)
-  #pb.plot_clouds("../data/clouds.txt", range=[-10, 10], objname="target", format="jpg", velocity=True, doshow=False)
+  pb.plot_clouds(path.join(fdir, "data/clouds.txt"), doshow=False)
+  #pb.plot_clouds(path.join(fdir, "data/clouds.txt"), range=[-10, 10], objname="target", format="jpg", velocity=True, doshow=False)
   
   
   # plot clouds' distribution viewd from line of sight
-  pb.plot_clouds_los("../data/clouds.txt", doshow=False)
-  #pb.plot_clouds_los("../data/clouds.txt", range=[-10, 10], objname="target", format="jpg", velocity=True, doshow=False)
+  pb.plot_clouds_los(path.join(fdir, "data/clouds.txt"), doshow=False)
+  #pb.plot_clouds_los(path.join(fdir, "data/clouds.txt"), range=[-10, 10], objname="target", format="jpg", velocity=True, doshow=False)
+
+#===============================================
+# Line profile fitting, flagdim == 3
+# 
+if flagdim == 3:
+
+  # plot CDNest diagnoistics
+  temperature = 1
+  pb.postprocess(temperature, doshow=False)
+
+  # plot line profile fitting results
+  pb.plot_results_lp(doshow=False)
+
+  # plot histograms of BLR model parameters
+  pb.plot_blrmodel_para_hist(doshow=False)
+
+  # plot clouds' distribution
+  pb.plot_clouds(path.join(fdir, "data/clouds.txt"), doshow=False)
+  #pb.plot_clouds(path.join(fdir, "data/clouds.txt"), range=[-10, 10], objname="target", format="jpg", velocity=True, doshow=False)
+  
+  # plot clouds' distribution viewd from line of sight
+  pb.plot_clouds_los(path.join(fdir, "data/clouds.txt"), doshow=False)
+  #pb.plot_clouds_los(path.join(fdir, "data/clouds.txt"), range=[-10, 10], objname="target", format="jpg", velocity=True, doshow=False)
 
 
 #===============================================
@@ -110,3 +147,4 @@ if flagdim == 4:
   # pb.plot_results_sa(show_offset=True, subtract_offset=True, phase_limit=[-0.9, 0.9], column_first=False, average_baseline=3)
   # column_first: when plotting multiple columns (baselines>6), the baselines are arranged by column
   # average_baseline: the number of baselines to average, counting from the baseline with the largest blr signal.
+  
