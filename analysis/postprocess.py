@@ -38,7 +38,7 @@ def postprocess(ndim, temp=1.0, fcut=0.0, fdir="../", doshow=False):
   elif ndim == 2:
     str_dim = '_2d'
   elif ndim == 3:
-    str_dim = 'lp'
+    str_dim = '_lp'
   elif ndim == 4:
     str_dim = '_sa'
   elif ndim == 5:
