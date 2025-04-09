@@ -17,6 +17,9 @@
 int command_line_options(int argc, char** argv)
 {
   int opt, opt_idx, info=EXIT_SUCCESS;
+  extern int optind, opterr, optopt;
+  extern char *optarg;
+  extern int getopt(int argc, char *const *argv, const char *options);
 
   /* cope with command options. */
   if(thistask == roottask)
