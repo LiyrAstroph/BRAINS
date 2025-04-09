@@ -19,7 +19,8 @@ int command_line_options(int argc, char** argv)
   int opt, opt_idx, info=EXIT_SUCCESS;
   extern int optind, opterr, optopt;
   extern char *optarg;
-  extern int getopt(int argc, char *const *argv, const char *options);
+  extern int getopt_long(int argc, char *const *argv, const char *shortopts, 
+                         const struct option *longopts, int *indexptr);
 
   /* cope with command options. */
   if(thistask == roottask)
@@ -42,7 +43,6 @@ int command_line_options(int argc, char** argv)
     };
 
     opterr = 0; /* reset getopt. */
-    optind = 0; /* reset getopt. */
     parset.flag_postprc = 0; /* default value, 0 means postprocessing after runing MCMC sampling. */
     parset.temperature = 1.0; /* default value */
     parset.flag_restart = 0;
@@ -56,6 +56,15 @@ int command_line_options(int argc, char** argv)
     parset.flag_force_run = 1;
     parset.flag_gravity = 0;
     parset.flag_load_prior = 0;
+
+    /* MAC getopt and GNU  getopt seem not compatible */
+#if defined(__APPLE__) && defined(__MACH__)
+    extern int optreset;
+    optreset = 1; /* in BSD, optreset=1 reset getopt */
+    optind = 1; 
+#else
+    optind = 0; /* in GNU, optind=0 reset getopt */
+#endif
 
     while( (opt = getopt_long(argc, argv, "pt:rcs:ehvnfal:", long_options, &opt_idx)) != -1)
     {
