@@ -93,7 +93,7 @@ OBJS     = $(SRC)/main.o $(SRC)/allvars.o $(SRC)/read.o $(SRC)/run.o     \
            $(SRC)/specastro.o $(SRC)/dnest_sa1d.o $(SRC)/dnest_sa2d.o    \
            $(SRC)/reconstruct_sa1d.o  $(SRC)/reconstruct_sa2d.o          \
            $(SRC)/sarm.o  $(SRC)/reconstruct_sarm.o  $(SRC)/dnest_sarm.o \
-           $(SRC)/sa_gravity.o  $(SRC)/blr_range.o        
+           $(SRC)/sa_gravity.o  $(SRC)/blr_range.o   $(SRC)/mygetopt.o
  
 INCL     = Makefile $(SRC)/allvars.h $(SRC)/proto.h $(SRC)/dnest_con.h   \
            $(SRC)/dnest_line1d.h  $(SRC)/dnest_line2d.h $(SRC)/nrutil.h  \
@@ -102,7 +102,7 @@ INCL     = Makefile $(SRC)/allvars.h $(SRC)/proto.h $(SRC)/dnest_con.h   \
            $(SRC)/command_line.h  $(SRC)/user_blr_model.h                \
            $(SRC)/user_transfun.h  $(SRC)/dnest_sa.h $(SRC)/dnest_sa1d.h \
            $(SRC)/dnest_sa2d.h  $(SRC)/mathfun.h  $(SRC)/dnest_sarm.h    \
-           $(SRC)/sa_gravity.h
+           $(SRC)/sa_gravity.h  $(SRC)/mygetopt.h
 
 OPTIONS  = $(OPTIMIZE)
 CFLAGS   = $(OPTIONS) $(GSL_INCL) $(LAPACK_INCL) $(MPICHINCL) $(DNEST_INCL) $(FFTW_INCL)
