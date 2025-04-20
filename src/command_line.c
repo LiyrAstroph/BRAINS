@@ -39,6 +39,7 @@ int command_line_options(int argc, char** argv)
       {"seed", required_argument, 0, 's'},
       {"gravity", no_argument, 0, 'a'},
       {"load_prior", required_argument, 0, 'l'},
+      {"para_value", required_argument, 0, 'u'},
       {0, 0, 0, 0}
     };
 
@@ -56,6 +57,7 @@ int command_line_options(int argc, char** argv)
     parset.flag_force_run = 1;
     parset.flag_gravity = 0;
     parset.flag_load_prior = 0;
+    parset.flag_para_value = 0;
 
     /* MAC getopt and GNU  getopt seem not compatible */
 #if defined(__APPLE__) && defined(__MACH__)
@@ -66,7 +68,7 @@ int command_line_options(int argc, char** argv)
     optind = 0; /* in GNU, optind=0 reset getopt */
 #endif
 
-    while( (opt = getopt_long(argc, argv, "pt:rcs:ehvnfal:", long_options, &opt_idx)) != -1)
+    while( (opt = getopt_long(argc, argv, "pt:rcs:ehvnfal:u:", long_options, &opt_idx)) != -1)
     {
       switch(opt)
       {
@@ -140,6 +142,12 @@ int command_line_options(int argc, char** argv)
         case 'a': /* use gravity's baseline */
           printf("# Use GRAVITY's 3C 273 baselines.\n");
           parset.flag_gravity = 1;
+          break;
+        
+        case 'u': /* input parameter values */
+          parset.flag_para_value = 1;
+          strcpy(parset.para_value_file, optarg);
+          printf("# Load parameter values from %s.\n", parset.para_value_file);
           break;
           
         case '?':
