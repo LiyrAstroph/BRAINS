@@ -10,40 +10,38 @@
  *  \brief cope with command-line options.
  */
 
-#include <getopt.h>
-
 #include "brains.h"
+#include "mygetopt.h"
 
 int command_line_options(int argc, char** argv)
 {
   int opt, opt_idx, info=EXIT_SUCCESS;
-  extern int optind, opterr, optopt;
-  extern char *optarg;
-  extern int getopt_long(int argc, char *const *argv, const char *shortopts, 
-                         const struct option *longopts, int *indexptr);
+  extern int my_optind, my_opterr, my_optopt;
+  extern char *my_optarg;
+  extern int my_getopt_long(int argc, char *const *argv, const char *shortopts, 
+                            const struct my_option *longopts, int *indexptr);
 
   /* cope with command options. */
   if(thistask == roottask)
   {
-    static struct option long_options[] = 
+    static struct my_option long_options[] = 
     {
-      {"para_name", no_argument, 0, 'n'},
-      {"version", no_argument, 0, 'v'},
-      {"help", no_argument, 0, 'h'},
-      {"restart", no_argument, 0, 'r'},
-      {"post_proc", no_argument, 0, 'p'},
-      {"exam_prior", no_argument, 0, 'e'},
-      {"recalc_info", no_argument, 0, 'c'},
-      {"temperature", required_argument, 0, 't'},
-      {"temp", required_argument, 0, 't'},
-      {"seed", required_argument, 0, 's'},
-      {"gravity", no_argument, 0, 'a'},
-      {"load_prior", required_argument, 0, 'l'},
-      {"para_value", required_argument, 0, 'u'},
+      {"para_name", my_no_argument, 0, 'n'},
+      {"version", my_no_argument, 0, 'v'},
+      {"help", my_no_argument, 0, 'h'},
+      {"restart", my_no_argument, 0, 'r'},
+      {"post_proc", my_no_argument, 0, 'p'},
+      {"exam_prior", my_no_argument, 0, 'e'},
+      {"recalc_info", my_no_argument, 0, 'c'},
+      {"temperature", my_required_argument, 0, 't'},
+      {"temp", my_required_argument, 0, 't'},
+      {"seed", my_required_argument, 0, 's'},
+      {"gravity", my_no_argument, 0, 'a'},
+      {"load_prior", my_required_argument, 0, 'l'},
+      {"para_value", my_required_argument, 0, 'u'},
       {0, 0, 0, 0}
     };
 
-    opterr = 0; /* reset getopt. */
     parset.flag_postprc = 0; /* default value, 0 means postprocessing after runing MCMC sampling. */
     parset.temperature = 1.0; /* default value */
     parset.flag_restart = 0;
@@ -58,17 +56,11 @@ int command_line_options(int argc, char** argv)
     parset.flag_gravity = 0;
     parset.flag_load_prior = 0;
     parset.flag_para_value = 0;
+    
+    my_opterr = 0; /* surpress getopt error message. */
+    my_optind = 0; /* in GNU, optind=0 reset getopt */
 
-    /* MAC getopt and GNU  getopt seem not compatible */
-#if defined(__APPLE__) && defined(__MACH__)
-    extern int optreset;
-    optreset = 1; /* in BSD, optreset=1 reset getopt */
-    optind = 1; 
-#else
-    optind = 0; /* in GNU, optind=0 reset getopt */
-#endif
-
-    while( (opt = getopt_long(argc, argv, "pt:rcs:ehvnfal:u:", long_options, &opt_idx)) != -1)
+    while( (opt = my_getopt_long(argc, argv, "pt:rcs:ehvnfal:u:", long_options, &opt_idx)) != -1)
     {
       switch(opt)
       {
@@ -79,11 +71,11 @@ int command_line_options(int argc, char** argv)
           break;
         case 't': /* temperature for postprocessing */
           parset.flag_temp = 1;
-          parset.temperature = atof(optarg);
+          parset.temperature = atof(my_optarg);
           printf("# Set a temperature %f.\n", parset.temperature);
           if(parset.temperature == 0.0)
           {
-            printf("# Incorrect option -t %s.\n", optarg);
+            printf("# Incorrect option -t %s.\n", my_optarg);
             exit(0);
           }
           if(parset.temperature < 1.0)
@@ -105,7 +97,7 @@ int command_line_options(int argc, char** argv)
 
         case 's':  /* set random number generator seed */
           parset.flag_rng_seed = 1;
-          parset.rng_seed = atoi(optarg);
+          parset.rng_seed = atoi(my_optarg);
           printf("# Set random seed %d.\n", parset.rng_seed);
           break;
 
@@ -135,7 +127,7 @@ int command_line_options(int argc, char** argv)
         
         case 'l': /* Load parameter prior */
           parset.flag_load_prior = 1;
-          strcpy(parset.prior_file, optarg);
+          strcpy(parset.prior_file, my_optarg);
           printf("# Load parameter prior from %s.\n", parset.prior_file);
           break;
 
@@ -146,12 +138,12 @@ int command_line_options(int argc, char** argv)
         
         case 'u': /* input parameter values */
           parset.flag_para_value = 1;
-          strcpy(parset.para_value_file, optarg);
+          strcpy(parset.para_value_file, my_optarg);
           printf("# Load parameter values from %s.\n", parset.para_value_file);
           break;
           
         case '?':
-          printf("# Incorrect option -%c %s.\n", optopt, optarg);
+          printf("# Incorrect option -%c %s.\n", my_optopt, my_optarg);
           info = EXIT_FAILURE;
           break;
 
@@ -167,8 +159,8 @@ int command_line_options(int argc, char** argv)
       
       if(parset.flag_help == 0) /* not only print help */
       {
-        if(argv[optind] != NULL) /* parameter file is specified */
-          strcpy(parset.param_file, argv[optind]); /* copy input parameter file */
+        if(argv[my_optind] != NULL) /* parameter file is specified */
+          strcpy(parset.param_file, argv[my_optind]); /* copy input parameter file */
         else
         {
           parset.flag_end = 1;
