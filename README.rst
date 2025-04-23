@@ -27,9 +27,21 @@ If using spectro-astrometric reverberation mapping analysis, please cite our pap
   * `Li, Y.-R., Wang, J.-M., Ho, L. C. et al. 2013, ApJ, 779, 110 <http://adsabs.harvard.edu/abs/2013ApJ...779..110L>`_.
 
 
+There are two repository branches
+
+  * **master**: adopt a linear response of BLR clouds.
+
+  * **resp**: adopt a radial-dependent responsivity of BLR clouds. 
+    (see `Li, Y.-R. & Wang, J.-M. 2025, ApJ, 979, 126 <https://ui.adsabs.harvard.edu/abs/2025ApJ...979..126L/abstract>`_). 
+
+If you are not familiar with the differences of these two branches, just use the **master** branch.
+
 .. image:: https://readthedocs.org/projects/brains/badge/?version=latest
   :target: https://brains.readthedocs.io/en/latest/?badge=latest
   :alt: Documentation Status
+
+.. image:: https://zenodo.org/badge/157645744.svg
+  :target: https://doi.org/10.5281/zenodo.10674857
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 Read `the documentation <http://brains.readthedocs.io/>`_.
