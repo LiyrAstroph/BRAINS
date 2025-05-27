@@ -195,7 +195,7 @@ class ParaName:
     """
     idx = -1
     for i in range(self.num_param_blrmodel_rm):
-      if re.match("BLR_model_ln\(Mbh/1e6\)", self.para_names['name'][i]):
+      if re.match(r"BLR_model_ln\(Mbh/1e6\)", self.para_names['name'][i]):
         idx = i 
         break
     
