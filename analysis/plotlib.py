@@ -195,7 +195,7 @@ class ParaName:
     """
     idx = -1
     for i in range(self.num_param_blrmodel_rm):
-      if re.match("BLR_model_ln\(Mbh/1e6\)", self.para_names['name'][i]):
+      if re.match(r"BLR_model_ln\(Mbh/1e6\)", self.para_names['name'][i]):
         idx = i 
         break
     
@@ -1392,7 +1392,7 @@ class bplotlib(Param, Options, ParaName):
     ax.plot(grid_wav, mean_rec, label='Model Best')
     ax.plot(grid_wav, mean_rec_med, label='Model Median')
     ax.fill_between(grid_wav, y1 = mean_rec_low, y2 = mean_rec_upp, color='grey', alpha=0.5, 
-                    label=r"Uncertainties %.1f"%(ci*100)+"$\%$")
+                    label=r"Uncertainties %.1f"%(ci*100)+r"$\%$")
     ax.legend(fontsize=12)
 
     #ax.set_xlabel("Wavelength")
@@ -1407,7 +1407,7 @@ class bplotlib(Param, Options, ParaName):
     ax.plot(grid_wav, rms_rec, label='Model Best')
     ax.plot(grid_wav, rms_rec_med, label='Model Median')
     ax.fill_between(grid_wav, y1 = rms_rec_low, y2 = rms_rec_upp, color='grey', alpha=0.5, 
-                    label=r"Uncertainties %.1f"%(ci*100)+"$\%$")
+                    label=r"Uncertainties %.1f"%(ci*100)+r"$\%$")
     ax.legend(fontsize=12)
 
     ax.set_xlabel("Wavelength")
