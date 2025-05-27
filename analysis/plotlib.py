@@ -23,6 +23,14 @@ from .postprocess import postprocess as pt
 
 __all__ = ['bplotlib']
 
+# set the default parameters for matplotlib
+plt.rcParams["xtick.top"] = True
+plt.rcParams["xtick.bottom"] = True
+plt.rcParams["ytick.left"] = True
+plt.rcParams["ytick.right"] = True
+plt.rcParams["xtick.minor.visible"] = True
+plt.rcParams["ytick.minor.visible"] = True
+
 class Param:
   """
   load param file
