@@ -24,6 +24,7 @@ Documentation
    mcmc.rst
    resume.rst
    prior.rst
+   narrowline.rst
    model.rst
    user_model.rst
    transfun.rst
