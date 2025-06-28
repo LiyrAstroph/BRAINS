@@ -27,6 +27,16 @@ ifneq ($(strip $(GITCHECK)),)
 	endif
 endif
 
+# test pkg-config or pkgconf
+PKGCONF = 
+ifneq ($(shell which pkgconf),)
+  PKGCONF = pkgconf 
+else ifneq ((shell which pkg-config),)
+  PKGCONF = pkg-config
+else 
+  $(error "pkgconf is not installed on the system.")
+endif
+
 #------------target system---------
 #SYSTEM="Darwin"
 SYSTEM="Linux"
@@ -35,17 +45,17 @@ SYSTEM="Linux"
 
 ifeq ($(SYSTEM), "Linux")
 NCORE      :=$(grep -c ^processor /proc/cpuinfo)
-GSL_INCL    = $(shell pkg-config --cflags gsl) 
-GSL_LIBS    = $(shell pkg-config --libs gsl) 
+GSL_INCL    = $(shell $(PKGCONF) --cflags gsl) 
+GSL_LIBS    = $(shell $(PKGCONF) --libs gsl) 
 LAPACK_INCL = -I/usr/include/lapacke
 LAPACK_LIBS = -L/usr/lib64 -llapacke -llapack -lblas
 DNEST_INCL  = -I /home/liyropt/Projects/GIT/CDNest/
 DNEST_LIBS  = -L /home/liyropt/Projects/GIT/CDNest -ldnest
-FFTW_INCL   = $(shell pkg-config --cflags fftw3) 
-FFTW_LIBS   = $(shell pkg-config --libs fftw3) 
+FFTW_INCL   = $(shell $(PKGCONF) --cflags fftw3) 
+FFTW_LIBS   = $(shell $(PKGCONF) --libs fftw3) 
 
-MPICHINCL     = $(shell pkg-config --cflags mpich) 
-MPICHLIB    = $(shell pkg-config --libs mpich) 
+MPICHINCL     = $(shell $(PKGCONF) --cflags mpich) 
+MPICHLIB      = $(shell $(PKGCONF) --libs mpich) 
 endif
 
 ifeq ($(SYSTEM), "Cluster")
