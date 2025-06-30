@@ -44,17 +44,17 @@ LineProfileFile             data/sim_lineprofile.txt    % file for line profile
 % SALineCenter                2.165                     % rest frame, the unit must be the same as that of the wavelength in SA data           
 % FlagSABLRModel              6                         % same as FlagBLRModel 
 % FlagSAParMutual             1                         % flag for mutual parameters with BLR model
-                                                      % 0: all 
-                                                      % 1: only BH mass and inclination
-                                                      % 2: inclination and all dyamical parameters
+                                                        % 0: all 
+                                                        % 1: only BH mass and inclination
+                                                        % 2: inclination and all dyamical parameters
 % SAInstRes                   235.0                     % km/s, fixed
 % SAFile                      data/mrk509_sa.txt 
 % SARMFile                    data/sim_sarm.txt 
 
-% DA                          145.86                       % angular-size distance, in a unit of Mpc
-                                                      % applies only when FlagDim==4
+% DA                          145                       % angular-size distance, in a unit of Mpc
+                                                        % applies only when FlagDim==4
 % FlagSAPhaseOffset           0                         % whether include phase offset wrt continuum.
-                                                      % 0: not; 1: yes
+                                                        % 0: not; 1: yes
 %=========================================================================
 % reverberation mapping generic configuration
 %
@@ -69,7 +69,7 @@ LineCenter                  4861.0                      %  rest frame, the unit 
 FlagLineCenter              1                           % -1, epoch-dependent offset; 0, not included; 1, uniform offset
 LineCenterErr               50.0                        % km/s
 
-NCloudPerCore               50000                        % number of clouds per task
+NCloudPerCore               50000                       % number of clouds per task
 NVPerCloud                  1                           % number of velocities per cloud
 
 NTau                        200                         % number of time-lag points calculated in transfer function
@@ -83,19 +83,23 @@ FlagCloudsForceUpdate       0                           % default 0;
                                                         % 0, only update when BLR parameters are updated 
                                                         % 1, update every MCMC perturb (continuum + BLR)
 
-FlagConSysErr               0                           % 0, not include systematic error of continuum; 1, include
-FlagLineSysErr              0                           % 0, not include systematic error of line; 1, include
+FlagConSysErr               0                           % default: 0
+                                                        % 0, not include systematic error of continuum; 1, include
+FlagLineSysErr              0                           % default: 0
+                                                        % 0, not include systematic error of line; 1, include
 
-FlagFixResponsivity         0                           % 0, radial-dependent responsivity; 
+FlagFixResponsivity         0                           % default: 0
+                                                        % 0, radial-dependent responsivity; 
                                                         % 1, constant responsivity
                                                         % 2, fix responsivity to unity (eta==1)
-                                                        % default: 0
+                                                        
 
 ResponsivityMaxVal          1.5                         % codes uses a power law to model responsivity, this is the maximum allowed maximum value
                                                         % default: 1.5
                                                         % 
 
-FlagThetaSample             0                           % 0, sample over cos theta; 1, over theta
+FlagThetaSample             0                           % default: 0
+                                                        % 0, sample over cos theta; 1, over theta
 %========================================================================
 % continuum configuration
 %
@@ -109,7 +113,8 @@ ConConstructFileOut         data/pcon.txt               % output filename for co
 %========================================================================
 % line 1d configuration
 %
-FlagFixVar                  0                           % 0, not fixed; 1, fix the parameters of variation from continuum data.
+FlagFixVar                  0                           % default: 0
+                                                        % 0, not fixed; 1, fix the parameters of variation from continuum data.
 NLineRecon                  100                         % number of points for line reconstruction along time axis
 LineConstructFileOut        data/pline.txt              % output filename for 1d line reconstruction
 TranFileOut                 data/tran.txt               % output filename for 1d transfer function
@@ -117,7 +122,7 @@ TranFileOut                 data/tran.txt               % output filename for 1d
 %========================================================================
 %  line 2d configuration
 %
-NVelRecon                   100                          % number of points for line reconstruction along velocity axis
+NVelRecon                   100                         % number of points for line reconstruction along velocity axis
 Line2DConstructFileOut      data/pline2d.txt            % output filename for 2d line reconstrction
 Line2DDataConstructFileOut  data/pline2d_data.txt       % output filename for 2d line reconstrction at points same with data
 Tran2DFileOut               data/tran2d.txt             % output filename for 2d transfer function
@@ -132,7 +137,8 @@ LineProfileConstructFileOut        data/plineprofile.txt       % output filename
 % RM spectral broadening, referring to the standard deviation of Gaussian
 % InstRes means instrument broadening 
 %
-FlagInstRes                 0                           % 0, fixed to InstRes
+FlagInstRes                 0                           % default: 0
+                                                        % 0, fixed to InstRes
                                                         % 1, uniform prior, epoch-independent
                                                         % 2, uniform prior, but epoch-dependent parameterization
                                                         % 3, epoch-dependent parameterization, prior stored in "InstResFile"
@@ -142,8 +148,8 @@ InstRes                     490                         % instrument broadening 
 
 InstResErr                  50.0                        % instrument broadening error, in km/s, for FlagInstRes=1, or 2
 
-InstResFile                 data/sim_broadening.txt       % file for storing epoch-dependent instrument broadening
-                                                          % two columns: broadening width and error (km/s), in the order of time as the 2d line data
+InstResFile                 data/sim_broadening.txt     % file for storing epoch-dependent instrument broadening
+                                                        % two columns: broadening width and error (km/s), in the order of time as the 2d line data
 
 %========================================================================
 % RM narrow-line component
@@ -151,7 +157,8 @@ InstResFile                 data/sim_broadening.txt       % file for storing epo
 % width is the standard deviation of the Gaussian
 % note that here width is the instrinsic width (after correcting for spectral broandening)
 % 
-FlagNarrowLine              0                           % 0, no narrow line; 
+FlagNarrowLine              0                           % default: 0
+                                                        % 0, no narrow line; 
                                                         % 1, add fixed narrow line; 
                                                         % 2, add Gaussian priors of the flux for narrow line; 
                                                         % 3, add logarithmic prior of the flux for narrow line
@@ -159,8 +166,8 @@ FlagNarrowLine              0                           % 0, no narrow line;
 FluxNarrowLine              1.5                         % flux of narrow line
 FluxNarrowLineErr           1.50                        % flux error of narrow line
 WidthNarrowLine             93.0                        % width km/s
-WidthNarrowLineErr          10.0                         % width error
-ShiftNarrowLine             0.0                        % shift, km/s, with respect to broad line center.  
+WidthNarrowLineErr          10.0                        % width error
+ShiftNarrowLine             0.0                         % shift, km/s, with respect to broad line center.  
 ShiftNarrowLineErr          0.0                         % shift error
 
 FluxNarrowLineLimitLow      0.01                        % when FlagNarrowLine=3
@@ -174,11 +181,11 @@ FluxNarrowLineLimitUpp      1.00                        % when FlagNarrowLine=3
 BLRParFix                   0000000000
 BLRParFixVal                2.0:1.0  
 
-%SABLRParFix                   000000000
-%SABLRParFixVal                2.0:1.0
+%SABLRParFix                000000000
+%SABLRParFixVal             2.0:1.0
 
 %=========================================================================
 % bin type of data 
 % 0, center; 1, left edge.
-% the default type is 0.
+% default: 0
 FlagBinType                 0
