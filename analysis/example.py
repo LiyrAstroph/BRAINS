@@ -50,6 +50,9 @@ if flagdim == 1:
   # plot histograms of BLR model parameters
   pb.plot_blrmodel_para_hist(doshow=False)
 
+  # plot parameter limits with levels 
+  pb.plot_limits()
+
   # plot clouds' distribution
   pb.plot_clouds(path.join(fdir, "data/clouds.txt"), doshow=False)
   #pb.plot_clouds(path.join(fdir, "data/clouds.txt"), range=[-10, 10], objname="target", format="jpg", velocity=False, doshow=False)
@@ -94,6 +97,9 @@ if flagdim == 2:
   
   # plot histograms of BLR model parameters
   pb.plot_blrmodel_para_hist(doshow=False)
+
+  # plot parameter limits with levels 
+  pb.plot_limits()
 
   # plot clouds' distribution
   pb.plot_clouds(path.join(fdir, "data/clouds.txt"), doshow=False)
