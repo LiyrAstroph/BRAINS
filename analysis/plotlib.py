@@ -1289,6 +1289,47 @@ class bplotlib(Param, Options, ParaName):
     plt.rcParams['xtick.top'] = True
     plt.rcParams['ytick.right'] = True
   
+  def plot_responsivity(self, doshow=False, r_range=[0.1, 10], eta_range=[-1.6, 1.6], 
+                        eta_limit_low = -1.5, eta_limit_upp=1.5):
+    """
+    plot responspivity over a radius range
+    """
+    try:
+      idx_eta =  np.nonzero(self.para_names['name'] == 'BLR_model_eta0')[0][0]
+    except:
+      raise ValueError("No responsivity parameters!")
+    
+    plt.rc('text', usetex=True)
+    plt.rc('font', family='serif', size=15)
+
+    fig = plt.figure(figsize=(8, 6))
+    ax = fig.add_subplot(111)
+    eta_sample = self.results["sample"][:, idx_eta:idx_eta+3]
+    
+    nr = 100
+    r = np.logspace(np.log10(r_range[0]), np.log10(r_range[1]), nr)
+    eta = eta_sample[:, 0, np.newaxis] + eta_sample[:, 1, np.newaxis]*r[np.newaxis, :]**(eta_sample[:, 2, np.newaxis])
+    eta[eta>eta_limit_upp] = eta_limit_upp
+    eta[eta<eta_limit_low] = eta_limit_low
+
+    eta_med, eta_low, eta_upp = np.quantile(eta, q=(0.5, 0.17, 0.83), axis=0)
+
+    ax.fill_between(r, y1=eta_low, y2=eta_upp, color='darkgrey')
+    ax.plot(r, eta_med)
+    ax.set_xscale('log')
+    ax.set_xlabel(r"$R/R_{\rm BLR}$")
+    ax.set_ylabel(r"Responsivity $\eta$")
+    ax.set_xlim(r_range[0], r_range[1])
+    ax.set_ylim(eta_range[0], eta_range[1])
+    
+    fig.savefig("resp.pdf", bbox_inches='tight')
+
+    if doshow==True:
+      plt.show()
+    else:
+      plt.close()
+    
+  
   def plot_results_lp(self, doshow=False):
     """
     plot lp results
