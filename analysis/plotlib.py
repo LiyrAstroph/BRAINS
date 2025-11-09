@@ -838,8 +838,8 @@ class bplotlib(Param, Options, ParaName):
     hblc[:, 1]=np.sum(prof, axis=1) * dV
     hblc[:, 2]=np.sqrt(np.sum(prof_err**2, axis=1)) * dV
     
-    date0 = conlc[0, 0]
-    conlc[:, 0]=conlc[:, 0]-date0
+    date0 = int(conlc[0, 0])
+    conlc[:, 0] = conlc[:, 0]-date0
     date_line = date_line - date0 
     hblc[:, 0] = date_line
     
@@ -897,7 +897,11 @@ class bplotlib(Param, Options, ParaName):
     ax5.plot(date_line, line_mean* wave0*self.VelUnit/3e5, color='red', zorder=20)
     ax5.fill_between(date_line, y1 = line_mean_upp* wave0*self.VelUnit/3e5, y2 = line_mean_low * wave0*self.VelUnit/3e5, color='grey')
     
-    ax5.set_xlabel(r'$\rm Time\ (day)$')
+    if date0 != 0.0:
+      ax5.set_xlabel(r'$\rm Time\ (day) - %d$'%date0)
+    else:
+      ax5.set_xlabel(r'$\rm Time\ (day)$')
+
     ax5.set_ylabel(r'$F_{\rm H\beta}$')
     
     ymax = np.max(hblc[:, 1]* wave0*self.VelUnit/3e5)
@@ -1081,8 +1085,8 @@ class bplotlib(Param, Options, ParaName):
     hblc[:, 1]=np.sum(prof, axis=1) * dV
     hblc[:, 2]=np.sqrt(np.sum(prof_err**2, axis=1)) * dV
     
-    date0 = conlc[0, 0]
-    conlc[:, 0]=conlc[:, 0]-date0
+    date0 = int(conlc[0, 0])
+    conlc[:, 0] = conlc[:, 0]-date0
     date_line = date_line - date0 
     hblc[:, 0] = date_line
     
@@ -1137,7 +1141,10 @@ class bplotlib(Param, Options, ParaName):
     ax6.plot(date_line, line_mean* wave0*self.VelUnit/3e5, color='red', zorder=20)
     ax6.fill_between(date_line, y1 = line_mean_upp* wave0*self.VelUnit/3e5, y2 = line_mean_low * wave0*self.VelUnit/3e5, color='grey')
     
-    ax6.set_xlabel(r'$\rm Time\ (day)$')
+    if date0 != 0:
+      ax6.set_xlabel(r'$\rm Time\ (day) - %d$'%date0)
+    else:
+      ax6.set_xlabel(r'$\rm Time\ (day)$')
     ax6.set_ylabel(r'$F_{\rm H\beta}$')
     
     ymax = np.max(hblc[:, 1]* wave0*self.VelUnit/3e5)
