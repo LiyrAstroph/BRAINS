@@ -1,7 +1,9 @@
+*
 *.o
 src/*
 src/*~
 doc/*
+docs/*
 data/*
 !data/sim_con.txt
 !data/sim_hb.txt
@@ -18,4 +20,6 @@ analysis/*
 !param
 !param/param
 !param/OPTIONS*
+!docs/*.rst
+!docs/requirements.txt
 brains
