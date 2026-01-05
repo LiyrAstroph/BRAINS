@@ -52,13 +52,17 @@ char *BLRmodel8_name[] = {"theta_min", "dtheta_max", "ln(r_min)", "ln(fr_max)", 
                           "ln(Rblr)", "cos(Inc)", "ln(Mbh/1e6)"};
 char *BLRmodel9_name[] = {"ln(Rblr)", "beta", "F", "cos(Inc)", "Opn", "ln(Mbh/1e6)"};
 
-/* cluster around outer disk face, Lopn_cos1 < Lopn_cos2 */
+/* cluster around outer disk face, Lopn_cos1 < Lopn_cos2
+ * ref: Equation 30 and Figure 3 in Li, Y.-R. et al. 2022, ApJ, 927, 58 
+ */
 inline double theta_sample_outer(double gam, double Lopn_cos1, double Lopn_cos2)
 {
   return acos(Lopn_cos1 + (Lopn_cos2-Lopn_cos1) * pow(gsl_rng_uniform(gsl_blr), gam));
 }
 
-/* cluster around equatorial plane, Lopn_cos1 < Lopn_cos2 */
+/* cluster around equatorial plane, Lopn_cos1 < Lopn_cos2 
+ * ref: Equation 32 and Figure 3 in Li, Y.-R. et al. 2022, ApJ, 927, 58
+ */
 inline double theta_sample_inner(double gam, double Lopn_cos1, double Lopn_cos2)
 {
   /* note that cosine is a decreaing function */
