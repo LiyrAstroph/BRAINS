@@ -122,7 +122,7 @@ $(EXEC):$(OBJS)
 	$(CC) $(OBJS) $(LIBS) -o $@
 	
 	# install plotting interface
-	cd $(ANAL) && python setup.py install --user
+	cd $(ANAL) && python -m pip install --no-build-isolation .
 
 $(OBJS): $(INCL)
 
