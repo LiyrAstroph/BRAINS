@@ -806,7 +806,7 @@ class bplotlib(Param, Options, ParaName):
     else:
       plt.close()
 
-  def plot_results_2d_style2018(self, doshow=False, time_range=None):
+  def plot_results_2d_style2018(self, doshow=False, time_range=None, smooth=False):
     """
     plot 2d results in the style of 2018 ApJ paper
     """
@@ -953,9 +953,14 @@ class bplotlib(Param, Options, ParaName):
     plt.rcParams['ytick.right'] = False
     #========================================================================
     # subfig 1
+    if smooth:
+      intpol = "gaussian"
+    else:
+      intpol = "none"
+
     ax1 = fig.add_axes([0.1, 0.6, 0.25, 0.3])
     
-    plt.imshow(prof, cmap=cmap, interpolation='gaussian', aspect='auto', origin='lower', \
+    plt.imshow(prof, cmap=cmap, interpolation=intpol, aspect='auto', origin='lower', \
                extent=[grid_vel[0]/1.0e3, grid_vel[nv-1]/1.0e3, 1, prof.shape[0]], vmax = np.amax(prof), vmin=np.amin(prof))
     ax1.set_xlabel(r'$\rm Velocity\ (10^3km\ s^{-1})$')
     ax1.set_ylabel(r'$\rm Epoch~Number$')
@@ -965,7 +970,7 @@ class bplotlib(Param, Options, ParaName):
     # subfig 2
     ax2=fig.add_axes([0.37, 0.6, 0.25, 0.3])
     
-    plt.imshow(prof_rec_max, cmap=cmap, interpolation='gaussian',  aspect='auto', origin='lower', \
+    plt.imshow(prof_rec_max, cmap=cmap, interpolation=intpol,  aspect='auto', origin='lower', \
                extent=[grid_vel[0]/1.0e3, grid_vel[nv-1]/1.0e3, 1, prof.shape[0]], vmax = np.amax(prof), vmin=np.amin(prof))
     ax2.set_xlabel(r'$\rm Velocity\ (10^3km\ s^{-1})$')
     ax2.text(0.08, 0.9, r'$\rm Model$', color='white', transform=ax2.transAxes)
@@ -1049,7 +1054,7 @@ class bplotlib(Param, Options, ParaName):
     plt.rcParams['xtick.top'] = True
     plt.rcParams['ytick.right'] = True
   
-  def plot_results_2d_style2022(self, doshow=False, time_range=None):
+  def plot_results_2d_style2022(self, doshow=False, time_range=None, smooth=False):
     """
     plot 2d results in the style of 2022 ApJ paper
     """
@@ -1198,9 +1203,14 @@ class bplotlib(Param, Options, ParaName):
     plt.rcParams['ytick.right'] = False
     #========================================================================
     # subfig 1
+    if smooth:
+      intpol = "gaussian"
+    else:
+      intpol = "none"
+
     ax1 = fig.add_axes([0.1, 0.6, 0.25, 0.3])
     
-    plt.imshow(prof, cmap=cmap, interpolation='gaussian', aspect='auto', origin='lower',\
+    plt.imshow(prof, cmap=cmap, interpolation=intpol, aspect='auto', origin='lower',\
                extent=[grid_vel[0]/1.0e3, grid_vel[nv-1]/1.0e3, 1, prof.shape[0]], vmax = np.amax(prof), vmin=np.amin(prof))
     ax1.set_xlabel(r'$\rm Velocity\ (10^3km\ s^{-1})$')
     ax1.set_ylabel(r'$\rm Epoch~Number$')
@@ -1210,7 +1220,7 @@ class bplotlib(Param, Options, ParaName):
     # subfig 2
     ax2=fig.add_axes([0.37, 0.6, 0.25, 0.3])
     
-    plt.imshow(prof_rec_max, cmap=cmap, interpolation='gaussian',  aspect='auto', origin='lower', \
+    plt.imshow(prof_rec_max, cmap=cmap, interpolation=intpol,  aspect='auto', origin='lower', \
                extent=[grid_vel[0]/1.0e3, grid_vel[nv-1]/1.0e3, 1, prof.shape[0]], vmax = np.amax(prof), vmin=np.amin(prof))
     ax2.set_xlabel(r'$\rm Velocity\ (10^3km\ s^{-1})$')
     ax2.text(0.08, 0.9, r'\bf Model', color='white', transform=ax2.transAxes)
@@ -1224,10 +1234,10 @@ class bplotlib(Param, Options, ParaName):
     img = prof_diff/np.sqrt(prof_err**2 + syserr_line**2)
     vmax = np.max((abs(np.max(img)), abs(np.min(img)), 5.5))
     vmin = -vmax
-    cmap=ax3.imshow(img,  aspect='auto', origin='lower', cmap='jet',
+    cmapbar=ax3.imshow(img,  aspect='auto', origin='lower', cmap=cmap, interpolation=intpol, \
                     extent=[grid_vel[0]/1.0e3, grid_vel[nv-1]/1.0e3, 1, prof.shape[0]], vmax = vmax, vmin = vmin)
     
-    plt.colorbar(cmap, ticks=[-5, -2.5, 0.0, 2.5, 5.0])
+    plt.colorbar(cmapbar, ticks=[-5, -2.5, 0.0, 2.5, 5.0])
     ax3.text(0.08, 0.9, r'\bf Residuals', color='white', transform=ax3.transAxes)
     ax3.set_xlabel(r'$\rm Velocity\ (10^3\ km\ s^{-1})$')
     [i.set_visible(False) for i in ax3.get_yticklabels()]
@@ -1589,6 +1599,7 @@ class bplotlib(Param, Options, ParaName):
     find the parameter set with the maximum prob
     """
     idx = np.argmax(self.results['sample_info'])
+    print("the maximum prob index:", idx)
     return idx, self.results['sample'][idx, :]
   
   def check_cloud_dist_p14(self):
@@ -1656,11 +1667,16 @@ class bplotlib(Param, Options, ParaName):
   
     pdf.close()
   
-  def plot_tran2d(self, tau_range=None, vel_range=None, doshow=False):
+  def plot_tran2d(self, tau_range=None, vel_range=None, doshow=False, smooth=False):
     """
     plot transfer function with the maximum prob
     """
     print("# plotting 2d transfer function.")
+    
+    if smooth:
+      intpol = "gaussian"
+    else:
+      intpol = "none"
 
     if int(self.param['flagdim']) in [2, 5, 6]:
       idx, par = self.find_max_prob()
@@ -1674,7 +1690,7 @@ class bplotlib(Param, Options, ParaName):
       ax = fig.add_subplot(111)
       ax.imshow(self.results['tran2d_rec'][idx], aspect='auto', origin='lower', \
                 extent=extent,\
-                interpolation='gaussian')
+                interpolation=intpol)
       
       if tau_range is not None:
         ax.set_ylim(tau_range[0], tau_range[1])
@@ -1755,6 +1771,7 @@ class bplotlib(Param, Options, ParaName):
     prange[:, 0] -= 0.1*dprange 
     prange[:, 1] += 0.1*dprange
     
+    idx_max = self.find_max_prob()[0]
     print("BLR para num:", self.num_param_blrmodel_rm)
     if int(self.param['flagdim']) >= 1:
       if para_indx is None:
@@ -1764,14 +1781,16 @@ class bplotlib(Param, Options, ParaName):
 
         fig = corner.corner(self.results['sample'][:, :self.num_param_blrmodel_rm], \
                             range = prange[:self.num_param_blrmodel_rm, :], \
-                            smooth=True, smooth1d=True, labels=label)
+                            smooth=True, smooth1d=True, labels=label, truth_color='red', 
+                            truths=self.results['sample'][idx_max, :self.num_param_blrmodel_rm])
       else:
         label = []
         for i in para_indx:
           label += [self.para_names['name'][i][10:]]
 
         fig = corner.corner(self.results['sample'][:, para_indx], range = prange[para_indx, :], \
-                            smooth=True, smooth1d=True, labels=label)
+                            smooth=True, smooth1d=True, labels=label, truth_color='red', 
+                            truths=self.results['sample'][idx_max, para_indx])
       
       if doshow:
         plt.show()

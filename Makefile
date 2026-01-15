@@ -123,7 +123,6 @@ $(EXEC):$(OBJS)
 	
 	# install plotting interface
 	cd $(ANAL) && python -m pip install --no-build-isolation .
-
 $(OBJS): $(INCL)
 
 clean:
