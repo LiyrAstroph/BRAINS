@@ -11,8 +11,10 @@ data/*
 !data/sim_hb2d.txt
 !data/sim_broadening.txt
 !data/sim_sa.txt
+!analysis
 analysis/*
-!analysis/*.py
+!analysis/plotlib.py
+!analysis/example.py
 !analysis/readme.txt
 !src/*.[ch]
 !src/doxyfile
