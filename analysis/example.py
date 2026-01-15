@@ -82,14 +82,14 @@ if flagdim == 2:
   # get line 2D data 
   line2d_data = pb.get_line2d_data()
   
-  # pb.plot_results_2d_style2018(doshow=False)
-  pb.plot_results_2d_style2022(doshow=False)
+  # pb.plot_results_2d_style2018(doshow=False, smooth=False)
+  pb.plot_results_2d_style2022(doshow=False, smooth=False)
   
   # plot 2d tranfer function with the maximum prob
   # pb.plot_tran2d(tau_range=[a, b])
   # pb.plot_tran2d(vel_range=[a, b])
-  # pb.plot_tran2d(tau_range=[a, b], vel_range=[c, d], doshow=False)
-  pb.plot_tran2d(doshow=False)
+  # pb.plot_tran2d(tau_range=[a, b], vel_range=[c, d], doshow=False, smooth=False)
+  pb.plot_tran2d(doshow=False, smooth=False)
 
   # plot mean and rms spectra and their reconstruction
   # ci: confidence interval
