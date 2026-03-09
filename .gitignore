@@ -4,6 +4,7 @@
 src/*
 src/*~
 doc/*
+!docs
 docs/*
 data/*
 !data/sim_con.txt
