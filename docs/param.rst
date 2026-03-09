@@ -112,3 +112,30 @@ Parameter File
 .. note::
   In the subdirectory ``example/``, some examples of parameter file are provided. Users can choose appropriate 
   parameter files with their purposes.
+
+
+The meaning of most parameters are self-explanatory from their names and comments. Some parameters are explained as 
+follows:
+
+- ``FlagLineCenter``: whether to include the line center as a free parameter. 
+  
+  If included, the line center is allowed to have an offset with respect 
+  to the input value (``FlagLineCenter`` =1) or an epoch-dependent offset 
+  (``FlagLineCenter`` =-1). 
+  If not included (``FlagLineCenter`` =0), the line center is fixed to the input value.
+
+  - For ``FlagLineCenter`` =1, the line center offset for all epochs is the same. Its prior is
+    Gaussian with a standard deviation of ``LineCenterErr`` in unit of km/s. 
+  
+  - For ``FlagLineCenter`` =-1, the line center offset is epoch-dependent. For each epoch, an 
+    independent Gaussian prior is used to model it. The standard deviation of the Gaussian 
+    distribution is also set by ``LineCenterErr`` in unit of km/s.
+  
+  - The line center parameter in the posterior sample is defined as 
+
+    .. math::
+      x_v = {\rm LineCenterOffset / LineCenterErr}
+    
+    A positive :math:`x_v` means an increase of the line velocity, namely, a redshift of the line center.
+    A negative :math:`x_v` means the opposite, namely, a blueshift of the line center. 
+    The line center offset in unit of km/s can be calculated by multiplying :math:`x_v` with ``LineCenterErr``.
