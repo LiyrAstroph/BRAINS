@@ -23,3 +23,8 @@ To-do List
 
 .. todo:: 
   Add fitting to a single line profile only.
+
+  **Finished on Mar 06, 2024**.
+
+.. todo::
+  Use unevenly spaced bins for tranfer function to improve the resolution.
