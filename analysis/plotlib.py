@@ -1838,6 +1838,11 @@ class bplotlib(Param, Options, ParaName):
                 extent=extent,\
                 interpolation=intpol)
       
+      # time delay integral 
+      tran1d_vel = np.sum(self.results['tran2d_rec'][idx]*self.results['tau_rec'][idx][:, np.newaxis], axis=0) \
+                    / (np.sum(self.results['tran2d_rec'][idx], axis=0) + 1e-10)
+      ax.plot(self.data['line2d_data']['profile'][0, :, 0], tran1d_vel, color='white', lw=2)
+      
       if tau_range is not None:
         ax.set_ylim(tau_range[0], tau_range[1])
       if vel_range is not None:
