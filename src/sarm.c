@@ -83,16 +83,19 @@ void transfun_sarm_cal_with_sample(double *transv, double *trans2d, double *tran
     }
   }
 
-  /* normalize transfer functions */
+  /* normalize transfer functions, do integration along time delay axis using Simpson's rule */
   Anorm = 0.0;
-  for(i=0; i<parset.n_tau; i++)
-    for(j=0; j<n_vel; j++)
+  for(j=0; j<n_vel; j++)
+  {
+    for(i=0; i<parset.n_tau; i++)
     {
-      Anorm += trans2d[i*n_vel+j];
+      trans_buffer[i] = trans2d[i*n_vel + j];
     }
+    Anorm += integration_simpson(trans_buffer, parset.n_tau);
+  }
   Anorm *= (dV * dTransTau);
   
-  Anorm += EPS;
+  Anorm += EPS; /* avoid zero division */
   for(i=0; i<parset.n_tau; i++)
   {
     for(j=0; j<n_vel; j++)
@@ -113,7 +116,7 @@ void transfun_sarm_cal_with_sample(double *transv, double *trans2d, double *tran
 void calculate_sarm_with_sample(const void *pm)
 {
   int i, j, k, m;
-  double tau, tl, tc, fcon_rm, dTransTau, ratio, flux_ratio, fcon;
+  double tau, tl, tc, dTransTau, ratio, flux_ratio, fcon;
   double DA, PA, cos_PA, sin_PA, y, z, alphac, betac;
   double *pmodel = (double *)pm;
 
@@ -154,15 +157,33 @@ void calculate_sarm_with_sample(const void *pm)
       tau = TransTau[k];
       tc = tl - tau;
       //fcon_rm = gsl_interp_eval(gsl_linear, Tcon, Fcon_rm, tc, gsl_acc);
-      fcon_rm = interp_con_rm(tc);
+      //fcon_rm = interp_con_rm(tc);
+      fcon_intp[k] = interp_con_rm(tc); /* interpolation */
+    }
 
-      for(i=0; i<n_vel_sarm_data_ext; i++)
+   
+    for(i=0; i<n_vel_sarm_data_ext; i++)
+    {
+      // Fline2d_sarm_at_data[j*n_vel_sarm_data_ext + i] += Trans2D_at_veldata[k*n_vel_sarm_data_ext+i] * fcon_rm;
+      for(k=0; k<parset.n_tau; k++)
       {
-        Fline2d_sarm_at_data[j*n_vel_sarm_data_ext + i] += Trans2D_at_veldata[k*n_vel_sarm_data_ext+i] * fcon_rm;
-      
-        momentum_sarm_alpha[j*n_vel_sarm_data_ext + i] += Trans_alpha_at_veldata[k*n_vel_sarm_data_ext + i] * fcon_rm;
-        momentum_sarm_beta[j*n_vel_sarm_data_ext + i] += Trans_beta_at_veldata[k*n_vel_sarm_data_ext + i] * fcon_rm;
+        trans_buffer[k] = Trans2D_at_veldata[k*n_vel_sarm_data_ext + i];
       }
+      Fline2d_sarm_at_data[j*n_vel_sarm_data_ext + i] = integration_simpson2(trans_buffer, fcon_intp, parset.n_tau);
+
+      // momentum_sarm_alpha[j*n_vel_sarm_data_ext + i] += Trans_alpha_at_veldata[k*n_vel_sarm_data_ext + i] * fcon_rm;
+      for(k=0; k<parset.n_tau; k++)
+      {
+        trans_buffer[k] = Trans_alpha_at_veldata[k*n_vel_sarm_data_ext + i];
+      }
+      momentum_sarm_alpha[j*n_vel_sarm_data_ext + i] = integration_simpson2(trans_buffer, fcon_intp, parset.n_tau);
+
+      // momentum_sarm_beta[j*n_vel_sarm_data_ext + i] += Trans_beta_at_veldata[k*n_vel_sarm_data_ext + i] * fcon_rm;
+      for(k=0; k<parset.n_tau; k++)
+      {
+        trans_buffer[k] = Trans_beta_at_veldata[k*n_vel_sarm_data_ext + i];
+      }
+      momentum_sarm_beta[j*n_vel_sarm_data_ext + i] = integration_simpson2(trans_buffer, fcon_intp, parset.n_tau);
     }
     
     for(i=0; i<n_vel_sarm_data_ext; i++)
@@ -214,7 +235,7 @@ void calculate_sarm_sim_with_sample(const void *pm, double *tline, double *vel_s
                                     double *photocenter_alpha, double *photocenter_beta)
 {
   int i, j, k, m;
-  double tau, tl, tc, fcon_rm, dTransTau, ratio, flux_ratio, fcon;
+  double tau, tl, tc, dTransTau, ratio, flux_ratio, fcon;
   double DA, PA, FA, cos_PA, sin_PA, y, z, alphac, betac;
   double *pmodel = (double *)pm;
 
@@ -254,15 +275,32 @@ void calculate_sarm_sim_with_sample(const void *pm, double *tline, double *vel_s
       tau = TransTau[k];
       tc = tl - tau;
       //fcon_rm = gsl_interp_eval(gsl_linear, Tcon, Fcon_rm, tc, gsl_acc);
-      fcon_rm = interp_con_rm(tc);
+      //fcon_rm = interp_con_rm(tc);
+      fcon_intp[k] = interp_con_rm(tc); /* interpolation */
+    }
 
-      for(i=0; i<n_vel; i++)
+    for(i=0; i<n_vel; i++)
+    {
+      //fline[j*n_vel + i] += trans2d[k*n_vel+i] * fcon_rm;
+      for(k=0; k<parset.n_tau; k++)
       {
-        fline[j*n_vel + i] += trans2d[k*n_vel+i] * fcon_rm;
-      
-        momentum_alpha[j*n_vel + i] += trans_alpha[k*n_vel + i] * fcon_rm;
-        momentum_beta[j*n_vel + i] += trans_beta[k*n_vel + i] * fcon_rm;
+        trans_buffer[k] = trans2d[k*n_vel + i];
       }
+      fline[j*n_vel + i] = integration_simpson2(trans_buffer, fcon_intp, parset.n_tau);
+    
+      //momentum_alpha[j*n_vel + i] += trans_alpha[k*n_vel + i] * fcon_rm;
+      for(k=0; k<parset.n_tau; k++)
+      {
+        trans_buffer[k] = trans_alpha[k*n_vel + i];
+      }
+      momentum_alpha[j*n_vel + i] = integration_simpson2(trans_buffer, fcon_intp, parset.n_tau);
+
+      //momentum_beta[j*n_vel + i] += trans_beta[k*n_vel + i] * fcon_rm;
+      for(k=0; k<parset.n_tau; k++)
+      {
+        trans_buffer[k] = trans_beta[k*n_vel + i];
+      }
+      momentum_beta[j*n_vel + i] = integration_simpson2(trans_buffer, fcon_intp, parset.n_tau);
     }
 
     for(i=0; i<n_vel; i++)

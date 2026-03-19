@@ -490,6 +490,9 @@ void reconstruct_line1d_init()
 
   clouds_tau = malloc(parset.n_cloud_per_task * sizeof(double));
   clouds_weight = malloc(parset.n_cloud_per_task * sizeof(double));
+  
+  /* continuum interpolation */
+  fcon_intp = malloc(parset.n_tau * sizeof(double));
 
   if(parset.flag_save_clouds && thistask == roottask)
   {
@@ -566,7 +569,9 @@ void reconstruct_line1d_end()
 
   free(clouds_tau);
   free(clouds_weight);
-
+  
+  free(fcon_intp);
+  
   if(parset.flag_save_clouds && thistask==roottask)
   {
     fclose(fcloud_out);

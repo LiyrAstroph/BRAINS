@@ -120,7 +120,7 @@ void calculate_con_rm(const void *pm)
 void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl)
 {
   int i, j;
-  double fline, fcon_rm, tl, tc, tau, dTransTau;
+  double fline, tl, tc, tau, dTransTau;
 
   dTransTau = TransTau[1] - TransTau[0];
 
@@ -132,11 +132,10 @@ void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl
     {
       tau = TransTau[j];
       tc = tl - tau;
-      //fcon_rm = gsl_interp_eval(gsl_linear, Tcon, Fcon_rm, tc, gsl_acc); /* interpolation */
-      fcon_rm = interp_con_rm(tc);
-    
-      fline += Trans1D[j] * fcon_rm;     /*  line response */
+      fcon_intp[j] = interp_con_rm(tc); /* interpolation */
     }
+    /* sum(tran * fcon)*/
+    fline = integration_simpson2(Trans1D, fcon_intp, parset.n_tau);
     Fl[i] = fline * dTransTau;
   }
 
@@ -150,7 +149,7 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
                                               double *fl2d, int nl, int nv)
 {
   int i, j, k;
-  double tau, tl, tc, fcon_rm, fnarrow, dTransTau;
+  double tau, tl, tc, fnarrow, dTransTau;
   double *pmodel = (double *)pm;
 
   dTransTau = TransTau[1] - TransTau[0];
@@ -166,13 +165,19 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
       tau = TransTau[k];
       tc = tl - tau;
       //fcon_rm = gsl_interp_eval(gsl_linear, Tcon, Fcon_rm, tc, gsl_acc);
-      fcon_rm = interp_con_rm(tc);
-
-      for(i=0; i<nv; i++)
-      {
-        fl2d[j*nv + i] += trans2d[k*nv+i] * fcon_rm;
-      }
+      //fcon_rm = interp_con_rm(tc);
+      fcon_intp[k] = interp_con_rm(tc); /* interpolation */
     }
+    
+    for(i=0; i<nv; i++)
+    {
+      for(k=0; k<parset.n_tau; k++)
+      {
+        trans_buffer[k] = trans2d[k*nv + i];
+      }
+      fl2d[j*nv + i] = integration_simpson2(trans_buffer, fcon_intp, parset.n_tau);
+    }
+    
     for(i=0; i<nv; i++)
     {
       fl2d[j*nv + i] *= dTransTau;
@@ -263,23 +268,17 @@ void transfun_1d_cal_with_sample()
     Trans1D[idt] += clouds_weight[i];
   }
 
-  /* normalize transfer function */
-  Anorm = 0.0;
-  for(i=0;i<parset.n_tau;i++)
-  {
-    Anorm += Trans1D[i];
-  }
+  /* normalize transfer function, do integration using Simpson's rule */
+  Anorm = integration_simpson(Trans1D, parset.n_tau);
   Anorm *= dTransTau;
-
-  Anorm += EPS;
+  Anorm += EPS; /* avoid zero division */
 
   for(i=0; i<parset.n_tau; i++)
   {
     Trans1D[i] /= Anorm;
   }
 
-  smooth_transfer_function_tau(Trans1D);
-  
+  // smooth_transfer_function_tau(Trans1D);
   return;
 }
 
@@ -342,16 +341,19 @@ void transfun_2d_cal_with_sample(double *transv, double *trans2d, int n_vel)
     }
   }
 
-  /* normalize transfer function */
+  /* normalize transfer function, do integration along time delay axis using Simpson's rule */
   Anorm = 0.0;
-  for(i=0; i<parset.n_tau; i++)
-    for(j=0; j<n_vel; j++)
+  for(j=0; j<n_vel; j++)
+  {
+    for(i=0; i<parset.n_tau; i++)
     {
-      Anorm += trans2d[i*n_vel+j];
+      trans_buffer[i] = trans2d[i*n_vel + j];
     }
+    Anorm += integration_simpson(trans_buffer, parset.n_tau); 
+  }
   Anorm *= (dV * dTransTau);
   
-  Anorm += EPS;
+  Anorm += EPS; /* avoid zero division */
   for(i=0; i<parset.n_tau; i++)
   {
     for(j=0; j<n_vel; j++)
@@ -360,7 +362,7 @@ void transfun_2d_cal_with_sample(double *transv, double *trans2d, int n_vel)
     }
   }
 
-  smooth_transfer_function2d_tau(trans2d, n_vel);
+  //smooth_transfer_function2d_tau(trans2d, n_vel);
 
   return;
 }

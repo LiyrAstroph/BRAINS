@@ -677,6 +677,10 @@ void reconstruct_line2d_init()
   clouds_tau = malloc(parset.n_cloud_per_task * sizeof(double));
   clouds_weight = malloc(parset.n_cloud_per_task * sizeof(double));
   clouds_vel = malloc(parset.n_cloud_per_task * parset.n_vel_per_cloud * sizeof(double));
+  
+  /* continuum interpolation */
+  fcon_intp = malloc(parset.n_tau * sizeof(double));
+  trans_buffer = malloc(parset.n_tau * sizeof(double));
 
   if(parset.flag_save_clouds && thistask == roottask)
   {
@@ -756,6 +760,9 @@ void reconstruct_line2d_end()
   free(clouds_tau);
   free(clouds_weight);
   free(clouds_vel);
+
+  free(fcon_intp);
+  free(trans_buffer);
   
   if(parset.flag_save_clouds && thistask==roottask)
   {

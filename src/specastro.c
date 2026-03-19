@@ -603,9 +603,13 @@ void set_par_fix_sa_blrmodel()
       }
     }
   }
-
-  MPI_Bcast(par_fix + num_params_blr, num_params_sa_blr_model, MPI_INT, roottask, MPI_COMM_WORLD);
-  MPI_Bcast(par_fix_val + num_params_blr, num_params_sa_blr_model, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+  
+  /* for simulation, no need to broadcast */
+  if(parset.flag_dim != -2 && parset.flag_dim != -1)
+  {
+    MPI_Bcast(par_fix + num_params_blr, num_params_sa_blr_model, MPI_INT, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(par_fix_val + num_params_blr, num_params_sa_blr_model, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+  }
 
   return;
 }
