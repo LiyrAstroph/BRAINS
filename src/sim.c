@@ -27,6 +27,7 @@ void *model;
 
 void sim()
 {
+  /* for simulation, only use roottask core */
   if(thistask != roottask)
     return;
 
@@ -726,6 +727,8 @@ void sim_init()
 
   Fcon = malloc(parset.n_con_recon * sizeof(double));
   Fcon_rm = malloc(parset.n_con_recon * sizeof(double));
+  fcon_intp = malloc(parset.n_tau * sizeof(double));
+  trans_buffer = malloc(parset.n_tau * sizeof(double));
 
   idx = get_idx_mbh_from_blrmodel(parset.flag_blrmodel);
   mbh = exp(pm[idx]);
@@ -756,7 +759,7 @@ void sim_init()
   }
   else
   {
-    Tspan = Rblr*10.0;
+    Tspan = Rblr*15.0;
 
     rcloud_min_set = 0.0;
     rcloud_max_set = Tspan/2.0;
@@ -1020,6 +1023,8 @@ void sim_end()
   free(par_fix_val);
   free(Fcon);
   free(Fcon_rm);
+  free(fcon_intp);
+  free(trans_buffer);
 
   free(TransTau);
   free(TransV);

@@ -569,6 +569,10 @@ void reconstruct_sarm_init()
   momentum_sarm_alpha = malloc(n_epoch_sarm_data * n_vel_sarm_data_ext * sizeof(double));
   momentum_sarm_beta = malloc(n_epoch_sarm_data * n_vel_sarm_data_ext * sizeof(double));
   
+  /* continuum interpolation */
+  fcon_intp = malloc(parset.n_tau * sizeof(double));
+  trans_buffer = malloc(parset.n_tau * sizeof(double));
+
   workspace_phase = malloc( (3*n_vel_sarm_data_ext)* sizeof(double));
 
   if(parset.flag_save_clouds && thistask == roottask)
@@ -660,6 +664,9 @@ void reconstruct_sarm_end()
 
   free(momentum_sarm_alpha);
   free(momentum_sarm_beta);
+
+  free(fcon_intp);
+  free(trans_buffer);
 
   free(workspace_phase);
 

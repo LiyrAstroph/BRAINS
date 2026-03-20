@@ -108,7 +108,7 @@ void calculate_con_rm(const void *pm)
 void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl)
 {
   int i, j;
-  double A, fcon_mean, fline, fline_mean, fcon_rm, tl, tc, tau, dTransTau;
+  double A, fcon_mean, fline, fline_mean, tl, tc, tau, dTransTau;
   double *pmodel = (double *)pm;
   A=exp(pmodel[idx_resp]);
   fcon_mean=pmodel[idx_resp + 1];
@@ -126,10 +126,12 @@ void calculate_line_from_blrmodel(const void *pm, double *Tl, double *Fl, int nl
       tau = TransTau[j];
       tc = tl - tau;
       //fcon_rm = gsl_interp_eval(gsl_linear, Tcon, Fcon_rm, tc, gsl_acc); /* interpolation */
-      fcon_rm = interp_con_rm(tc);
-    
-      fline += Trans1D[j] * fcon_rm;     /*  line response */
+      //fcon_rm = interp_con_rm(tc);
+      fcon_intp[j] = interp_con_rm(tc);
     }
+    
+    fline = integration_simpson2(Trans1D, fcon_intp, parset.n_tau);     /*  line response */
+    
     Fl[i] = fline * dTransTau + fline_mean;  /* add back mean spectrum */
   }
 
@@ -143,7 +145,7 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
                                               double *fl2d, int nl, int nv)
 {
   int i, j, k;
-  double A, fcon_mean, tau, tl, tc, fcon_rm, fnarrow, dTransTau, sigV_mean, linecenter_mean;
+  double A, fcon_mean, tau, tl, tc, fnarrow, dTransTau, sigV_mean, linecenter_mean;
   double *pmodel = (double *)pm;
   A=exp(pmodel[idx_resp]);
   fcon_mean=pmodel[idx_resp + 1];
@@ -167,13 +169,19 @@ void calculate_line2d_from_blrmodel(const void *pm, const double *Tl, const doub
       tau = TransTau[k];
       tc = tl - tau;
       //fcon_rm = gsl_interp_eval(gsl_linear, Tcon, Fcon_rm, tc, gsl_acc);
-      fcon_rm = interp_con_rm(tc);
-
-      for(i=0; i<nv; i++)
-      {
-        fl2d[j*nv + i] += trans2d[k*nv+i] * fcon_rm;
-      }
+      //fcon_rm = interp_con_rm(tc);
+      fcon_intp[k] = interp_con_rm(tc);
     }
+
+    for(i=0; i<nv; i++)
+    {
+      for(k=0; k<parset.n_tau; k++)
+      {
+        trans_buffer[k] = trans2d[k*nv + i];
+      }
+      fl2d[j*nv + i] = integration_simpson2(trans_buffer, fcon_intp, parset.n_tau);
+    }
+    
     for(i=0; i<nv; i++)
     {
       fl2d[j*nv + i] *= dTransTau;
@@ -280,7 +288,7 @@ void transfun_1d_cal_with_sample()
   
   Fline_mean = 1.0; 
 
-  smooth_transfer_function_tau(Trans1D);
+  // smooth_transfer_function_tau(Trans1D);
   
   return;
 }
@@ -373,7 +381,7 @@ void transfun_2d_cal_with_sample(double *transv, double *trans2d, int n_vel)
     }
   }
 
-  smooth_transfer_function2d_tau(trans2d, n_vel);
+  // smooth_transfer_function2d_tau(trans2d, n_vel);
 
   return;
 }

@@ -673,6 +673,41 @@ void multiply_matvec_semiseparable_uv(double *y, double *u, double  *W, double *
   return;
 }
 
+/**
+ * Integrate a function using Simpson's rule.
+ * Note that n must be odd. 
+ * The step size is not included.
+ */
+double integration_simpson(double *f, int n)
+{
+  double sum=0.0;
+  int i;
+  for(i=1; i<n-1; i+=2)
+  {
+    sum += 4 * f[i];
+  }
+  for(i=2; i<n-1; i+=2)
+  {
+    sum += 2 * f[i];
+  }
+  sum += f[0] + f[n-1];
+  return sum/3.0;
+}
+double integration_simpson2(double *f, double *w, int n)
+{
+  double sum=0.0;
+  int i;
+  for(i=1; i<n-1; i+=2)
+  {
+    sum += 4 * f[i] * w[i];
+  }
+  for(i=2; i<n-1; i+=2)
+  {
+    sum += 2 * f[i] * w[i];
+  }
+  sum += f[0] * w[0] + f[n-1] * w[n-1];
+  return sum/3.0;
+}
 
 /*!
  * This function display matrix on the screen.
@@ -754,4 +789,20 @@ void test_mathfun()
   
   det = det_mat(A, n, &info);
   printf("%f\n", det);
+}
+
+void test_integration()
+{
+  double f[501], w[501], h;
+  int i, n=501;
+  h = 0.5/(n-1);
+  for(i=0; i<n; i++)
+  {
+    f[i] = sqrt(i*h + 0.5);
+    w[i] = sqrt(i*h + 0.5);
+  }
+  printf("Integration: %20.15f, Exact: %20.15f\n",
+     integration_simpson(f, n) * h, 2.0*(1.0 - pow(0.5, 1.5))/3.0);
+  printf("Integration: %20.15f, Exact: %20.15f\n", 
+    integration_simpson2(f, w, n) * h, 0.5-1.0/8.0);
 }

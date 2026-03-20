@@ -35,9 +35,13 @@ void multiply_vec2mat(double * x, double * a, int n);
 void eigen_sym_mat(double *a, int n, double *val, int *info);
 void Chol_decomp_U(double *a, int n, int *info);
 void Chol_decomp_L(double *a, int n, int *info);
+double integration_simpson(double *f, int n);
+double integration_simpson2(double *f, double *w, int n);
 double ** matrix_malloc(int n1, int n2);
 double * array_malloc(int n);
 void test_mathfun();
+void test_integration();
+
 void compute_semiseparable_drw(double *t, int n, double a1, double c1, double *sigma, double syserr,  double *W, double *D, double *phi);
 void multiply_matvec_semiseparable_drw(double *y, double  *W, double *D, double *phi, int n, double a1, double *z);
 void multiply_mat_semiseparable_drw(double *Y, double  *W, double *D, double *phi, int n, int m, double a1, double *Z);

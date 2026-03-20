@@ -780,13 +780,19 @@ void read_parset()
         parset.n_vel_per_cloud = fmax(10.0, parset.n_vel_per_cloud);
         printf("# set NCloudPerCore and NVPerCloud: %d %d\n", parset.n_cloud_per_task, parset.n_vel_per_cloud);
   
-        parset.n_tau = fmax(1000, parset.n_tau);
+        parset.n_tau = fmax(1001, parset.n_tau);
         parset.n_con_recon = fmax(1000, parset.n_con_recon);
         printf("# set NTau and NConRecon: %d %d\n", parset.n_tau, parset.n_con_recon);
         parset.flag_save_clouds = 1;
       }
   
-      
+      /* ensure n_tau is an odd number */
+      if((parset.n_tau & 1) == 0)
+      {
+        parset.n_tau += 1;
+        printf("# NTau should be an odd number, set to %d.\n", parset.n_tau);
+      }
+
       if(parset.flag_blrmodel == 3 || parset.flag_blrmodel == 4 || parset.flag_blrmodel == 8)
       {
         parset.n_vel_per_cloud = 1;

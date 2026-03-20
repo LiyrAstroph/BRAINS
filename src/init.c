@@ -932,9 +932,13 @@ void set_par_fix_blrmodel()
       }
     }
   }
-
-  MPI_Bcast(par_fix, num_params_blr_model, MPI_INT, roottask, MPI_COMM_WORLD);
-  MPI_Bcast(par_fix_val, num_params_blr_model, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+  
+  /* for simulation, no need to broadcast */
+  if(parset.flag_dim != -2 && parset.flag_dim != -1)
+  {
+    MPI_Bcast(par_fix, num_params_blr_model, MPI_INT, roottask, MPI_COMM_WORLD);
+    MPI_Bcast(par_fix_val, num_params_blr_model, MPI_DOUBLE, roottask, MPI_COMM_WORLD);
+  }
 
   return;
 }
@@ -1176,10 +1180,10 @@ void set_nlr_range_model()
  */
 void set_eta_range_model()
 {
-  eta_range_model[0][0] = -1.5;
+  eta_range_model[0][0] =  0.0;
   eta_range_model[0][1] =  1.5;
 
-  eta_range_model[1][0] = -1.5;
+  eta_range_model[1][0] =  0.0;
   eta_range_model[1][1] =  1.5;
 
   eta_range_model[2][0] =  0.0;
