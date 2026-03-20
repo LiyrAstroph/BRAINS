@@ -446,6 +446,8 @@ class bplotlib(Param, Options, ParaName):
       sample = np.loadtxt(self.file_dir + "data/posterior_sample_con.txt")
       if sample.ndim == 1:
         self.results['sample'] = np.reshape(sample, (1, sample.shape[0]))
+      #load likelihoods
+      self.results['sample_info'] = np.loadtxt(self.file_dir + 'data/posterior_sample_info_con.txt')
       self.sample_size = self.results['sample'].shape[0]
       self._load_con_rec()
     
@@ -453,6 +455,8 @@ class bplotlib(Param, Options, ParaName):
       sample = self.results['sample'] = np.loadtxt(self.file_dir + "data/posterior_sample_1d.txt")      
       if sample.ndim == 1:
         self.results['sample'] = np.reshape(sample, (1, sample.shape[0]))
+      #load likelihoods
+      self.results['sample_info'] = np.loadtxt(self.file_dir + 'data/posterior_sample_info_1d.txt')
       self.sample_size = self.results['sample'].shape[0]
       self._load_con_rec()
       self._load_line_rec()
