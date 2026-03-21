@@ -30,6 +30,8 @@ plt.rcParams["ytick.left"] = True
 plt.rcParams["ytick.right"] = True
 plt.rcParams["xtick.minor.visible"] = True
 plt.rcParams["ytick.minor.visible"] = True
+plt.rcParams["xtick.direction"] = "in"
+plt.rcParams["ytick.direction"] = "in"
 
 class Param:
   """
@@ -1734,6 +1736,8 @@ class bplotlib(Param, Options, ParaName):
       for i in range(0, tran_rec.shape[0], int(tran_rec.shape[0]/100+1.0)):
         ax.plot(tran_rec[i, :, 0], tran_rec[i, :, 1], lw=0.5)
       
+      ax.set_xlabel(r"Time Lag")
+      ax.set_ylabel(r"Transfer Function")
       if tau_range is not None:
         ax.set_xlim(tau_range[0], tau_range[1])
       
