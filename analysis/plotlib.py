@@ -15,6 +15,7 @@ import copy
 import corner
 import numpy as np 
 import configparser as cp
+from matplotlib import ticker
 from matplotlib import colors
 import matplotlib.pyplot as plt
 from scipy.ndimage import gaussian_filter
@@ -1238,12 +1239,12 @@ class bplotlib(Param, Options, ParaName):
     prof_diff = prof - prof_rec_max
     ax3=fig.add_axes([0.64, 0.6, 0.31, 0.3])
     img = prof_diff/np.sqrt(prof_err**2 + syserr_line**2)
-    vmax = np.min((abs(np.max(img)), abs(np.min(img)), 5.5))
+    vmax = np.max((np.min((abs(np.max(img)), abs(np.min(img)), 5.5)), 3.5))
     vmin = -vmax
     cmapbar=ax3.imshow(img,  aspect='auto', origin='lower', cmap=cmap, interpolation=intpol, \
                     extent=[grid_vel[0]/1.0e3, grid_vel[nv-1]/1.0e3, 1, prof.shape[0]], vmax = vmax, vmin = vmin)
     
-    plt.colorbar(cmapbar, ticks=[-5, -2.5, 0.0, 2.5, 5.0])
+    plt.colorbar(cmapbar, ticks=ticker.AutoLocator(), label=r"Std. Res.")
     ax3.text(0.08, 0.9, r'\bf Std. Res.', color='white', transform=ax3.transAxes)
     ax3.set_xlabel(r'$\rm Velocity\ (10^3\ km\ s^{-1})$')
     [i.set_visible(False) for i in ax3.get_yticklabels()]
