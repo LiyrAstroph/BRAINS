@@ -33,7 +33,7 @@ void postprocesslp()
   char posterior_sample_file_info[BRAINS_MAX_STR_LENGTH];
   void *posterior_sample, *posterior_sample_info, *post_model;
   double *pm, *pmstd;
-  int size_of_modeltype = num_params * sizeof(double);
+  size_t size_of_modeltype = (size_t)num_params * sizeof(double);
 
   best_model_lp = malloc(size_of_modeltype);
   best_model_std_lp = malloc(size_of_modeltype);
@@ -87,8 +87,18 @@ void postprocesslp()
     printf("# Number of points in posterior sample: %d\n", num_ps);
     
     post_model = malloc(size_of_modeltype);
-    posterior_sample = malloc(num_ps * size_of_modeltype);
-    posterior_sample_info = malloc(num_ps * sizeof(double));
+    posterior_sample = calloc(num_ps, size_of_modeltype);
+    if(posterior_sample == NULL)
+    {
+      fprintf(stderr, "# Error: Cannot allocate memory for posterior sample.\n");
+      exit(0);
+    }
+    posterior_sample_info = calloc(num_ps, sizeof(double));
+    if(posterior_sample_info == NULL)
+    {
+      fprintf(stderr, "# Error: Cannot allocate memory for posterior sample info.\n");
+      exit(0);
+    }
     pinfo = (double *)posterior_sample_info;
     
     Fline_at_data = Fline_at_data_particles[0];
