@@ -37,11 +37,22 @@ else
   $(error "pkgconf is not installed on the system.")
 endif
 
+# test MKLROOT environment variable
+ifdef MKLROOT
+    MKL_AVAILABLE = yes
+    MKL_INCLUDE = $(MKLROOT)/include
+    MKL_LIB = $(MKLROOT)/lib/intel64
+    OPTIMIZE += -DIntelMKL
+else
+    MKL_AVAILABLE = no
+endif
+
 #------------target system---------
 #SYSTEM="Darwin"
-SYSTEM="Linux"
+#SYSTEM="Linux"
 #SYSTEM="Cluster"
 #SYSTEM="TianheII"
+SYSTEM="Linux+MKL"
 
 ifeq ($(SYSTEM), "Linux")
 NCORE      :=$(grep -c ^processor /proc/cpuinfo)
@@ -86,6 +97,26 @@ DNEST_INCL  = -I /HOME/ihep_yrli_1/BIGDATA/soft/DNest/
 DNEST_LIBS  = -L /HOME/ihep_yrli_1/BIGDATA/soft/DNest -ldnest
 endif
 
+ifeq ($(SYSTEM), "Linux+MKL")
+GSL_INCL    = $(shell $(PKGCONF) --cflags gsl) 
+GSL_LIBS    = $(shell $(PKGCONF) --libs gsl) 
+
+FFTW_INCL   = $(shell $(PKGCONF) --cflags fftw3) 
+FFTW_LIBS   = $(shell $(PKGCONF) --libs fftw3) 
+
+DNEST_INCL  = -I /home/liyropt/Projects/GIT/CDNest/
+DNEST_LIBS  = -L /home/liyropt/Projects/GIT/CDNest -ldnest
+
+ifdef MKL_AVAILABLE
+LAPACK_INCL = -I$(MKL_INCLUDE)
+LAPACK_LIBS = -L$(MKL_LIB) -lmkl_intel_ilp64 -lmkl_intel_thread -lmkl_core \
+          -liomp5 -lpthread -lm -ldl
+else
+LAPACK_INCL = -I/sharefs/mbh/user/liyanrong/soft/lapack/include
+LAPACK_LIBS = -L/sharefs/mbh/user/liyanrong/soft/lapack/lib -llapacke -llapack -lblas -lgfortran
+endif
+
+endif
 
 EXEC     = brains
 ANAL     = ./analysis
