@@ -33,7 +33,7 @@ void postprocess2d()
   double *lag;
   void *posterior_sample, *post_model;
   double mean_lag, mean_lag_std, sum1, sum2, sumv;
-  int size_of_modeltype = num_params * sizeof(double);
+  size_t size_of_modeltype = (size_t)num_params * sizeof(double);
   
   best_model_line2d = malloc(size_of_modeltype);
   best_model_std_line2d = malloc(size_of_modeltype);
@@ -117,7 +117,12 @@ void postprocess2d()
 
     lag = malloc(num_ps * sizeof(double));
     post_model = malloc(size_of_modeltype);
-    posterior_sample = malloc(num_ps * size_of_modeltype);
+    posterior_sample = calloc(num_ps, size_of_modeltype);
+    if(posterior_sample == NULL)
+    {
+      fprintf(stderr, "# Error: Cannot allocate memory for posterior sample.\n");
+      exit(0);
+    }
 
     force_update = 1;
     which_parameter_update = -1; // force to update the transfer function
