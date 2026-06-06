@@ -16,11 +16,19 @@ Third-party Package Dependence
   * **CDNest** --- Diffusive nested sampling, downloaded at https://github.com/LiyrAstroph/CDNest
 
 .. note::
-  In Linux systems, there are package managers that can install the above libraries convienently (except for CDNest).
-  For example, DNF package managers in Fedora distribution.  
-  If so, use them. In such a case, the libraries usually are installed in standard environment path. Otherwise, 
-  if any of the above libraries is not installed in standard locations on your system, the :ref:`Makefile` provided 
-  with the code may need slight adjustments. 
+  - In Linux systems, there are package managers that can install the above libraries convienently (except for CDNest).
+    For example, DNF package managers in Fedora distribution.  
+    If so, use them. In such a case, the libraries usually are installed in standard environment path. Otherwise, 
+    if any of the above libraries is not installed in standard locations on your system, the :ref:`Makefile` provided 
+    with the code may need slight adjustments. 
+
+  - For Intel CPUs, the Intel OneAPI MKL library provides optimized interfaces to LAPACKE and BLAS libraries. Using MKL libraray can improve
+    the running speed and it is therefore highly recommended. MICA automatically checks the system environment variable ``MKLROOT`` to 
+    determine whether MKL libraray has been installed. If yes, MICA will by default use the interfaces of the MKL library; if not, the original 
+    LAPACKE and BLAS libraraies will be used. See `OneAPI Installaton <https://mica2.readthedocs.io/en/latest/oneapi.html>`_ or the official documentation 
+    `Intel OneAPI MKL <https://www.intel.com/content/www/us/en/docs/onemkl/get-started-guide/2025-0/overview.html>`_
+    for the installation. Please keep in mind that one needs to source the MKL's variable in `bashrc`, 
+    so as to let it be searchable.
 
 Compiling
 =============================
