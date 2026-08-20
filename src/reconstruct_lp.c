@@ -424,7 +424,7 @@ void cal_line_profile_with_sample(const void *pm, double *vel, double *fv, int n
     norm += clouds_weight[i] * parset.n_vel_per_cloud;
     for(j=0; j<parset.n_vel_per_cloud; j++)
     {
-      V = clouds_vel[i];
+      V = clouds_vel[i*parset.n_vel_per_cloud + j];
             
       V_offset = V + bin_offset * dV; /* bin type: center or left edge */
       if(V_offset < vel[0] || V_offset >= vel[nvel-1] + dV )
