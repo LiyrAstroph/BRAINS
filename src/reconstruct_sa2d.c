@@ -648,7 +648,7 @@ void reconstruct_sa2d_init()
   	TransV[i] = vel_min_set + dVel*i;
   }
 
-  Fcon = malloc(parset.n_con_recon * sizeof(double *));
+  Fcon = malloc(parset.n_con_recon * sizeof(double));
   Fcon_rm_particles = malloc(parset.num_particles * sizeof(double *));
   Fcon_rm_particles_perturb = malloc(parset.num_particles * sizeof(double *));
   for(i=0; i<parset.num_particles; i++)
