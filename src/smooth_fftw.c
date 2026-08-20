@@ -237,12 +237,12 @@ void line_gaussian_smooth_FFT(const double *transv, double *fl, int nv, const vo
 
   for(i=0; i<nd_fft_cal; i++)
   {
-    resp_fft[i][0] = exp(-2.0 * PI*PI * sigV/dV*sigV/dV * i*i*1.0/nd_fft/nd_fft)/nd_fft;
-    resp_fft[i][1] = 0.0;
+    resp_fft0[i][0] = exp(-2.0 * PI*PI * sigV/dV*sigV/dV * i*i*1.0/nd_fft/nd_fft)/nd_fft;
+    resp_fft0[i][1] = 0.0;
 
     /* line center */
-    resp_fft[i][0] =  resp_fft[i][0] * cos(2.0*PI*linecenter/dV * i*1.0/nd_fft);
-    resp_fft[i][1] = -resp_fft[i][0] * sin(2.0*PI*linecenter/dV * i*1.0/nd_fft);
+    resp_fft[i][0] =  resp_fft0[i][0] * cos(2.0*PI*linecenter/dV * i*1.0/nd_fft);
+    resp_fft[i][1] = -resp_fft0[i][0] * sin(2.0*PI*linecenter/dV * i*1.0/nd_fft);
   }
 
   /* FFT of line */
