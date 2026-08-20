@@ -912,7 +912,7 @@ void reconstruct_con_init()
   }
   MPI_Bcast(&parset.num_particles, 1, MPI_INT, roottask, MPI_COMM_WORLD);
 
-  Fcon = malloc(parset.n_con_recon * sizeof(double *));
+  Fcon = malloc(parset.n_con_recon * sizeof(double));
   prob_con_particles = malloc(parset.num_particles * sizeof(double));
   prob_con_particles_perturb = malloc(parset.num_particles * sizeof(double));
 
